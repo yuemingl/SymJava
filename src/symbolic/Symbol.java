@@ -68,5 +68,10 @@ public class Symbol extends Expr {
 		if(this == expr)
 			return C1;
 		return C0;
+	}
+
+	@Override
+	public Expr simplify() {
+		return this;
 	}	
 }

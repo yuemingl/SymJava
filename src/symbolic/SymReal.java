@@ -25,4 +25,9 @@ public class SymReal<T extends Number> extends Expr {
 	public Expr subs(Expr from, Expr to) {
 		return this;
 	}
+
+	@Override
+	public Expr simplify() {
+		return this;
+	}
 }

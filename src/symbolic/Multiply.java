@@ -43,4 +43,9 @@ public class Multiply extends BinaryOp {
 	public Expr diff(Expr expr) {
 		return left.diff(expr).multiply(right).add(left.multiply(right.diff(expr)));
 	}
+
+	@Override
+	public Expr simplify() {
+		return simplifiedIns(left.simplify(), right.simplify());
+	}
 }

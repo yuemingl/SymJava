@@ -23,4 +23,9 @@ public class SymComplex extends Expr {
 		return new SymComplex(real.subs(from, to), imaginary.subs(from, to));
 	}
 
+	@Override
+	public Expr simplify() {
+		return new SymComplex(real.simplify(), imaginary.simplify());
+	}
+
 }

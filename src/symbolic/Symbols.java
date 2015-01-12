@@ -43,4 +43,9 @@ public class Symbols extends Expr {
 			return Symbol.C1;
 		return Symbol.C0;
 	}
+
+	@Override
+	public Expr simplify() {
+		return this;
+	}
 }

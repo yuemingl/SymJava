@@ -4,6 +4,7 @@ abstract public class Expr {
 	String name = null;
 	
 	public abstract Expr diff(Expr expr);
+	public abstract Expr simplify();
 	
 	/**
 	 * 

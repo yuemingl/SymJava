@@ -18,4 +18,9 @@ public class Power extends UnaryOp {
 		SymInteger i = new SymInteger(exponent);
 		return i.multiply(new Power(base, exponent - 1)).multiply(base.diff(expr));
 	}
+
+	@Override
+	public Expr simplify() {
+		return new Power(base.simplify(), exponent);
+	}
 }

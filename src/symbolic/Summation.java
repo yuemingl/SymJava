@@ -37,5 +37,10 @@ public class Summation extends Expr {
 	@Override
 	public Expr diff(Expr expr) {
 		return new Summation(summand.diff(expr), indexVar, start, end);
+	}
+
+	@Override
+	public Expr simplify() {
+		return new Summation(summand.simplify(), indexVar, start, end);
 	}	
 }
