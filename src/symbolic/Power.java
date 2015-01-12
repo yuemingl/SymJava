@@ -3,7 +3,7 @@ package symbolic;
 public class Power extends UnaryOp {
 	public int exponent;
 	public Power(Expr base, int exponent) {
-		this.base = base;
+		super(base);
 		this.exponent = exponent;
 		name = "("+base + ")^" + exponent;
 	}
@@ -22,5 +22,15 @@ public class Power extends UnaryOp {
 	@Override
 	public Expr simplify() {
 		return new Power(base.simplify(), exponent);
+	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		if(other instanceof Power) {
+			Power o = (Power)other;
+			if(base.symEquals(o.base) && exponent == o.exponent)
+				return true;
+		}
+		return false;
 	}
 }

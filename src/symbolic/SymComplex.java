@@ -28,4 +28,14 @@ public class SymComplex extends Expr {
 		return new SymComplex(real.simplify(), imaginary.simplify());
 	}
 
+	@Override
+	public boolean symEquals(Expr other) {
+		if(other instanceof SymComplex) {
+			SymComplex o = (SymComplex)other;
+			if(real.symEquals(o.real) && imaginary.symEquals(o.imaginary))
+				return true;
+		}
+		return false;
+	}
+
 }

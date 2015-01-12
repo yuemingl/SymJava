@@ -73,5 +73,10 @@ public class Symbol extends Expr {
 	@Override
 	public Expr simplify() {
 		return this;
+	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		return this == other;
 	}	
 }

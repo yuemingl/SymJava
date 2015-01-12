@@ -29,10 +29,6 @@ public class TestSymbolic {
 		Expr expr = x + y + z;
 		System.out.println(expr);
 
-		Expr sub_expr = expr.subs(x, 1).subs(y, 2L).subs(z, 3.0d);
-		System.out.println(sub_expr);
-		System.out.println(sub_expr.simplify());
-		
 		SymInteger n1 = new SymInteger(1);
 		SymLong n2 = new SymLong(2);
 		SymFloat n3 = new SymFloat(3.0f);
@@ -61,6 +57,27 @@ public class TestSymbolic {
 		Expr summand2 = sum2.getSummand(2).subs(ss.get(2), y);
 		System.out.println(summand2);
 			
+	}
+	
+	public static void testSimplify() {
+		System.out.println("--------------testSimplify-----------------");
+		Expr expr = x + y + z;
+		Expr sub_expr = expr.subs(x, 1).subs(y, 2L).subs(z, 3.0d);
+		System.out.println(sub_expr);
+		System.out.println(sub_expr.simplify());
+		
+		Expr nxn = (x + 1) + 2; 
+		System.out.println(nxn);
+		
+		Expr ypz = (y + z) + (y + 1);
+		System.out.println(ypz);
+
+		Expr ymz = (y * z) * (y * 2);
+		System.out.println(ymz);
+		
+		Expr yz= y + z;
+		sub_expr = expr.subs(x, yz);
+		System.out.println(sub_expr.simplify());
 	}
 	
 	public static void testToBytecodeFunc() {
@@ -104,6 +121,7 @@ public class TestSymbolic {
 		//eclipse���ܱ�������⣺cmd����ĳ��classĿ¼�󣬸�Ŀ¼������ɾ����
 		//����eclipse����ɾ����Ŀ¼�����Բ��ܱ���
 		testBasic();
+		testSimplify();
 		testToBytecodeFunc();
 		testDiff();
 	}

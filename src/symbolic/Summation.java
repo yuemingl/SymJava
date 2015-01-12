@@ -42,5 +42,16 @@ public class Summation extends Expr {
 	@Override
 	public Expr simplify() {
 		return new Summation(summand.simplify(), indexVar, start, end);
+	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		if(other instanceof Summation) {
+			Summation o = (Summation)other;
+			if(summand.symEquals(o.summand) && indexVar.symEquals(o.indexVar) && 
+					start == o.start && end == o.end)
+				return true;
+		}
+		return false;
 	}	
 }

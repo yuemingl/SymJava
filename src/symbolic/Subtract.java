@@ -2,8 +2,7 @@ package symbolic;
 
 public class Subtract extends BinaryOp {
 	public Subtract(Expr l, Expr r) {
-		left = l;
-		right = r;
+		super(l, r);
 		name = left + " - " + right;
 	}
 	
@@ -13,9 +12,9 @@ public class Subtract extends BinaryOp {
 	}
 
 	public static Expr simplifiedIns(Expr l, Expr r) {
-		if(r == Symbol.C0)
+		if(r.symEquals(Symbol.C0))
 			return l;
-		else if(l == Symbol.C0)
+		else if(l.symEquals(Symbol.C0))
 			return Symbol.Cm1.multiply(r);
 		else
 			return new Add(l, r);
@@ -29,5 +28,15 @@ public class Subtract extends BinaryOp {
 	@Override
 	public Expr simplify() {
 		return simplifiedIns(left.simplify(), right.simplify());
+	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		if(other instanceof Subtract) {
+			Subtract o = (Subtract)other;
+			if(	(left.symEquals(o.left) && right.symEquals(o.right)) )
+				return true;
+		}
+		return false;
 	}
 }
