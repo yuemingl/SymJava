@@ -17,4 +17,9 @@ public class Negate extends UnaryOp {
 		return new Negate(base.subs(from, to));
 	}
 
+	@Override
+	public Expr simplify() {
+		return new Negate(base.simplify());
+	}
+
 }

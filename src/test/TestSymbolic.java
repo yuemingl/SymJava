@@ -29,7 +29,9 @@ public class TestSymbolic {
 		Expr expr = x + y + z;
 		System.out.println(expr);
 
-		System.out.println(expr.subs(x, 1).subs(y, 2L).subs(z, 3.0d));
+		Expr sub_expr = expr.subs(x, 1).subs(y, 2L).subs(z, 3.0d);
+		System.out.println(sub_expr);
+		System.out.println(sub_expr.simplify());
 		
 		SymInteger n1 = new SymInteger(1);
 		SymLong n2 = new SymLong(2);
@@ -99,8 +101,8 @@ public class TestSymbolic {
 	}
 	
 	public static void main(String[] args) {
-		//eclipse²»ÄÜ±àÒëµÄÎÊÌâ£ºcmd½øµ½Ä³¸öclassÄ¿Â¼ºó£¬¸ÃÄ¿Â¼²»ÔÊÐíÉ¾³ý£¬
-		//µ¼ÖÂeclipse²»ÄÜÉ¾³ý¸ÃÄ¿Â¼£¬ËùÒÔ²»ÄÜ±àÒë
+		//eclipseï¿½ï¿½ï¿½Ü±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â£ºcmdï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½classÄ¿Â¼ï¿½ó£¬¸ï¿½Ä¿Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½
+		//ï¿½ï¿½ï¿½ï¿½eclipseï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½Ä¿Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½ï¿½Ü±ï¿½ï¿½ï¿½
 		testBasic();
 		testToBytecodeFunc();
 		testDiff();

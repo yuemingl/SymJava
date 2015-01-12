@@ -46,5 +46,11 @@ public class Func extends Expr {
 	public Expr subs(Expr from, Expr to) {
 		return new Func(this.name, this.expr.subs(from, to));
 	}
-
+	
+	@Override
+	public Expr simplify() {
+		Func f = new Func(name, expr.simplify());
+		f.args = this.args;
+		return f;
+	}
 }

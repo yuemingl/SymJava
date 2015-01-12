@@ -31,4 +31,9 @@ public class Divide extends BinaryOp {
 		return left.diff(expr).multiply(right).subtract(left.multiply(right.diff(expr))).
 				divide(right.multiply(right));
 	}
+
+	@Override
+	public Expr simplify() {
+		return simplifiedIns(left.simplify(), right.simplify());
+	}
 }
