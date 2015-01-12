@@ -53,4 +53,21 @@ public class Func extends Expr {
 		f.args = this.args;
 		return f;
 	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		if(other instanceof Func) {
+			Func o = (Func)other;
+			if(expr.symEquals(o.expr)) {
+				if(args.length != o.args.length)
+					return false;
+				for(int i=0; i<args.length; i++) {
+					if(!args[i].symEquals(o.args[i]))
+						return false;
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 }

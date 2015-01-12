@@ -153,4 +153,24 @@ public class Utils {
 			System.err.println(e);
 		}			
 	}
+	
+	public static class Tuple4<T> {
+		public T o1, o2, o3, o4;
+		public Tuple4(T o1, T o2, T o3, T o4) {
+			this.o1 = o1;
+			this.o2 = o2;
+			this.o3 = o3;
+			this.o4 = o4;
+		}
+	}
+	public static <T> List<Tuple4<T>> C_4_2(T o1, T o2, T o3, T o4) {
+		List<Tuple4<T>> list = new ArrayList<Tuple4<T>>();
+		list.add(new Tuple4<T>(o1, o2, o3, o4));
+		list.add(new Tuple4<T>(o1, o3, o2, o4));
+		list.add(new Tuple4<T>(o1, o4, o2, o3));
+		list.add(new Tuple4<T>(o2, o3, o1, o4));
+		list.add(new Tuple4<T>(o2, o4, o1, o3));
+		list.add(new Tuple4<T>(o3, o4, o1, o2));
+		return list;
+	}
 }

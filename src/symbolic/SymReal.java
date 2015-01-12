@@ -30,4 +30,16 @@ public class SymReal<T extends Number> extends Expr {
 	public Expr simplify() {
 		return this;
 	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		if(other instanceof SymReal<?>) {
+			SymReal<?> o = (SymReal<?>)other;
+			Number t1 = (Number)val;
+			Number t2 = (Number)o.getVal();
+			if(t1.doubleValue() == t2.doubleValue())
+				return true;
+		}
+		return false;
+	}
 }

@@ -7,15 +7,14 @@ package symbolic;
  */
 public class Divide extends BinaryOp {
 	public Divide(Expr numerator, Expr denominator) {
-		left = numerator;
-		right = denominator;	
+		super(numerator, denominator);
 		name = left + " / " + right;
 	}
 
 	public static Expr simplifiedIns(Expr numerator, Expr denominator) {
-		if(numerator == Symbol.C0)
+		if(numerator.symEquals(Symbol.C0))
 			return Symbol.C0;
-		else if(denominator == Symbol.C0)
+		else if(denominator.symEquals(Symbol.C0))
 			throw new IllegalArgumentException("Argument 'divisor' is 0");
 		else 
 			return new Divide(numerator, denominator);
@@ -35,5 +34,15 @@ public class Divide extends BinaryOp {
 	@Override
 	public Expr simplify() {
 		return simplifiedIns(left.simplify(), right.simplify());
+	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		if(other instanceof Divide) {
+			Divide o = (Divide)other;
+			if(	(left.symEquals(o.left) && right.symEquals(o.right)) )
+				return true;
+		}
+		return false;
 	}
 }

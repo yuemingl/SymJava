@@ -1,10 +1,22 @@
 package symbolic;
 
 abstract public class Expr {
+	//Number of simplify operations
+	protected int simplifyOps = 0;
 	String name = null;
 	
 	public abstract Expr diff(Expr expr);
+	
 	public abstract Expr simplify();
+	
+	public abstract boolean symEquals(Expr other);
+	
+	protected int getSimplifyOps() {
+		return simplifyOps;
+	}
+	protected void setSimplifyOps(int n) {
+		simplifyOps = n;
+	}
 	
 	/**
 	 * 

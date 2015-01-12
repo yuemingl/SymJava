@@ -3,7 +3,7 @@ package symbolic;
 public class Negate extends UnaryOp {
 	
 	public Negate(Expr expr) {
-		this.base = expr;
+		super(expr);
 		name = "-"+expr;
 	}
 	
@@ -20,6 +20,13 @@ public class Negate extends UnaryOp {
 	@Override
 	public Expr simplify() {
 		return new Negate(base.simplify());
+	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		if(other instanceof Negate && base.symEquals(((Negate)other).base))
+			return true;
+		return false;
 	}
 
 }
