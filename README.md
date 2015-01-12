@@ -1,2 +1,2 @@
 # SymJava
-Java Mathematic Symbolic Library
+SymJava is a Java library for symbolic mathematics.
