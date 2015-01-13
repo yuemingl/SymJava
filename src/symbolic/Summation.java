@@ -1,6 +1,7 @@
 package symbolic;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class Summation extends Expr {
 	public Expr summand;
@@ -53,5 +54,16 @@ public class Summation extends Expr {
 				return true;
 		}
 		return false;
-	}	
+	}
+	
+	@Override
+	protected void flattenAdd(List<Expr> outList) {
+		outList.add(this);
+	}
+	
+	@Override
+	protected void flattenMultiply(List<Expr> outList) {
+		outList.add(this);
+	}
+
 }

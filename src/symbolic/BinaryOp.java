@@ -10,6 +10,10 @@ public abstract class BinaryOp extends Expr {
 		this.right = r;
 	}
 	
+	public boolean symEquals(Expr other) {
+		return Utils.flattenSortAndEquals(this.simplify(), other.simplify());
+	}
+	
 	public ExprType getType() {
 		return ExprType.BINARY_OP;
 	}

@@ -1,5 +1,7 @@
 package symbolic;
 
+import java.util.List;
+
 public class SymComplex extends Expr {
 	Expr real;
 	Expr imaginary;
@@ -36,6 +38,16 @@ public class SymComplex extends Expr {
 				return true;
 		}
 		return false;
+	}
+
+	@Override
+	protected void flattenAdd(List<Expr> outList) {
+		outList.add(this);
+	}
+
+	@Override
+	protected void flattenMultiply(List<Expr> outList) {
+		outList.add(this);
 	}
 
 }

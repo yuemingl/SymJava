@@ -1,8 +1,8 @@
 package symbolic;
 
+import java.util.List;
+
 abstract public class Expr {
-	//Number of simplify operations
-	protected int simplifyOps = 0;
 	String name = null;
 	
 	public abstract Expr diff(Expr expr);
@@ -10,7 +10,14 @@ abstract public class Expr {
 	public abstract Expr simplify();
 	
 	public abstract boolean symEquals(Expr other);
+
+	protected abstract void flattenAdd(List<Expr> outList);
 	
+	protected abstract void flattenMultiply(List<Expr> outList);
+	
+	//Number of simplify operations
+	protected int simplifyOps = 0;
+
 	protected int getSimplifyOps() {
 		return simplifyOps;
 	}

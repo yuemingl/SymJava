@@ -1,5 +1,6 @@
 package symbolic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import symbolic.Utils.Tuple4;
@@ -19,6 +20,8 @@ public class Multiply extends BinaryOp {
 	}
 	
 	public static Expr simplifiedIns(Expr l, Expr r) {
+		l = l.simplify();
+		r = r.simplify();		
 		if(l.symEquals(Symbol.C1))
 			return r;
 		else if(r.symEquals(Symbol.C1))
@@ -32,8 +35,14 @@ public class Multiply extends BinaryOp {
 		} else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
 			Number t1 = (Number)((SymReal<?>)l).getVal();
 			Number t2 = (Number)((SymReal<?>)r).getVal();
-			return new SymDouble(t1.doubleValue() * t2.doubleValue());
-		}  else if((l instanceof SymReal<?>) && r instanceof Multiply) {
+			Expr rlt = new SymDouble(t1.doubleValue() * t2.doubleValue());
+			rlt.setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
+			return rlt;
+		} else if(l.symEquals(Symbol.Cm1)) {
+			return new Negate(r);
+		} else if(r.symEquals(Symbol.Cm1)) {
+			return new Negate(l);
+		} else if((l instanceof SymReal<?>) && r instanceof Multiply) {
 			Multiply rr = (Multiply)r;
 			if(rr.left instanceof SymReal<?>) {
 				Number t1 = (Number)((SymReal<?>)l).getVal();
@@ -82,13 +91,25 @@ public class Multiply extends BinaryOp {
 	}
 
 	@Override
-	public boolean symEquals(Expr other) {
-		if(other instanceof Multiply) {
-			Multiply o = (Multiply)other;
-			if(	(left.symEquals(o.left) && right.symEquals(o.right)) ||
-				(left.symEquals(o.right) && right.symEquals(o.left)) )
-				return true;
+	protected void flattenAdd(List<Expr> outList) {
+		List<Expr> list1 = new ArrayList<Expr>();
+		List<Expr> list2 = new ArrayList<Expr>();
+		left.flattenAdd(list1);
+		right.flattenAdd(list2);
+		if(list1.size()==1 && list2.size()==1)
+			outList.add(this);
+		else {
+			for(Expr e1 : list1) {
+				for(Expr e2 : list2) {
+					outList.add( simplifiedIns(e1, e2) );
+				}
+			}
 		}
-		return false;
+	}
+
+	@Override
+	protected void flattenMultiply(List<Expr> outList) {
+		left.flattenMultiply(outList);
+		right.flattenMultiply(outList);
 	}
 }
