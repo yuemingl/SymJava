@@ -1,5 +1,7 @@
 package symbolic;
 
+import java.util.List;
+
 import bytecode.BytecodeFunc;
 
 public class Func extends Expr {
@@ -69,5 +71,15 @@ public class Func extends Expr {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	protected void flattenAdd(List<Expr> outList) {
+		expr.flattenAdd(outList);
+	}
+
+	@Override
+	protected void flattenMultiply(List<Expr> outList) {
+		expr.flattenAdd(outList);
 	}
 }

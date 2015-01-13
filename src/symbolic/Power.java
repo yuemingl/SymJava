@@ -1,5 +1,7 @@
 package symbolic;
 
+import java.util.List;
+
 public class Power extends UnaryOp {
 	public int exponent;
 	public Power(Expr base, int exponent) {
@@ -36,4 +38,15 @@ public class Power extends UnaryOp {
 		}
 		return false;
 	}
+
+	@Override
+	protected void flattenAdd(List<Expr> outList) {
+		outList.add(this);
+	}
+
+	@Override
+	protected void flattenMultiply(List<Expr> outList) {
+		outList.add(this);
+	}
+
 }

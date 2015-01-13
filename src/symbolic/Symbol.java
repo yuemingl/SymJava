@@ -1,5 +1,7 @@
 package symbolic;
 
+import java.util.List;
+
 public class Symbol extends Expr {
 	public static Symbol a = new Symbol("a");
 	public static Symbol b = new Symbol("b");
@@ -78,5 +80,15 @@ public class Symbol extends Expr {
 	@Override
 	public boolean symEquals(Expr other) {
 		return this == other;
+	}
+
+	@Override
+	protected void flattenAdd(List<Expr> outList) {
+		outList.add(this);
+	}
+
+	@Override
+	protected void flattenMultiply(List<Expr> outList) {
+		outList.add(this);
 	}	
 }

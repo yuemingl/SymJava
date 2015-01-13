@@ -1,6 +1,7 @@
 package symbolic;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class Symbols extends Expr {
 	String namePrefix;
@@ -53,4 +54,14 @@ public class Symbols extends Expr {
 	public boolean symEquals(Expr other) {
 		return this == other;
 	}
+
+	@Override
+	protected void flattenAdd(List<Expr> outList) {
+		outList.add(this);
+	}
+
+	@Override
+	protected void flattenMultiply(List<Expr> outList) {
+		outList.add(this);
+	}	
 }

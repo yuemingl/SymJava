@@ -1,5 +1,8 @@
 package symbolic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 
  * @author yuemingl
@@ -12,6 +15,8 @@ public class Divide extends BinaryOp {
 	}
 
 	public static Expr simplifiedIns(Expr numerator, Expr denominator) {
+		numerator = numerator.simplify();
+		denominator = denominator.simplify();
 		if(numerator.symEquals(Symbol.C0))
 			return Symbol.C0;
 		else if(numerator instanceof SymReal<?> && denominator instanceof SymReal<?>) {
@@ -20,6 +25,8 @@ public class Divide extends BinaryOp {
 			return new SymDouble(t1.doubleValue() / t2.doubleValue());
 		} else if(denominator.symEquals(Symbol.C0))
 			throw new IllegalArgumentException("Argument 'divisor' is 0");
+		 else if(denominator.symEquals(Symbol.C1))
+			return numerator;
 		else 
 			return new Divide(numerator, denominator);
 	}
@@ -41,12 +48,19 @@ public class Divide extends BinaryOp {
 	}
 
 	@Override
-	public boolean symEquals(Expr other) {
-		if(other instanceof Divide) {
-			Divide o = (Divide)other;
-			if(	(left.symEquals(o.left) && right.symEquals(o.right)) )
-				return true;
+	protected void flattenAdd(List<Expr> outList) {
+		List<Expr> list1 = new ArrayList<Expr>();
+		left.flattenAdd(list1);
+		Reciprocal r = new Reciprocal(right);
+		for(Expr e : list1) {
+			outList.add( Multiply.simplifiedIns(e, r));
 		}
-		return false;
 	}
+
+	@Override
+	protected void flattenMultiply(List<Expr> outList) {
+		left.flattenMultiply(outList);
+		new Reciprocal(right).flattenMultiply(outList);
+	}
+
 }

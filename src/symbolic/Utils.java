@@ -5,6 +5,7 @@ import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -172,5 +173,53 @@ public class Utils {
 		list.add(new Tuple4<T>(o2, o4, o1, o3));
 		list.add(new Tuple4<T>(o3, o4, o1, o2));
 		return list;
+	}
+	
+	public static boolean flattenSortAndEquals(Expr expr1, Expr expr2) {
+		List<Expr> l1 = new ArrayList<Expr>();
+		List<Expr> l2 = new ArrayList<Expr>();
+		expr1.flattenAdd(l1);
+		expr2.flattenAdd(l2);
+		if(l1.size() != l2.size())
+			return false;
+		Collections.sort(l1, new Comparator<Expr>() {
+			@Override
+			public int compare(Expr o1, Expr o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
+		Collections.sort(l2, new Comparator<Expr>() {
+			@Override
+			public int compare(Expr o1, Expr o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
+		for(int i=0; i<l1.size(); i++) {
+			Expr e1 = l1.get(i);
+			Expr e2 = l2.get(i);
+			List<Expr> le1 = new ArrayList<Expr>();
+			List<Expr> le2 = new ArrayList<Expr>();	
+			e1.flattenMultiply(le1);
+			e2.flattenMultiply(le2);
+			if(le1.size() != le2.size())
+				return false;
+			Collections.sort(le1, new Comparator<Expr>() {
+				@Override
+				public int compare(Expr o1, Expr o2) {
+					return o1.toString().compareTo(o2.toString());
+				}
+			});
+			Collections.sort(le2, new Comparator<Expr>() {
+				@Override
+				public int compare(Expr o1, Expr o2) {
+					return o1.toString().compareTo(o2.toString());
+				}
+			});			
+			for(int j=0; j<le1.size(); j++) {
+				if(!le1.get(j).symEquals(le2.get(j)))
+					return false;
+			}
+		}
+		return true;
 	}
 }

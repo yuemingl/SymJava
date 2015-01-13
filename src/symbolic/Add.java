@@ -1,7 +1,6 @@
 package symbolic;
 
 import java.util.List;
-
 import symbolic.Utils.Tuple4;
 
 public class Add extends BinaryOp {
@@ -11,6 +10,8 @@ public class Add extends BinaryOp {
 	}
 	
 	public static Expr simplifiedIns(Expr l, Expr r) {
+		l = l.simplify();
+		r = r.simplify();
 		if(l.symEquals(Symbol.C0))
 			return r;
 		else if(r.symEquals(Symbol.C0))
@@ -22,7 +23,9 @@ public class Add extends BinaryOp {
 		} else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
 			Number t1 = (Number)((SymReal<?>)l).getVal();
 			Number t2 = (Number)((SymReal<?>)r).getVal();
-			return new SymDouble(t1.doubleValue() + t2.doubleValue());
+			Expr rlt = new SymDouble(t1.doubleValue() + t2.doubleValue());
+			rlt.setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
+			return rlt;
 		} else if(l instanceof Add && r instanceof Add) {
 			Add a1 = (Add)l;
 			Add a2 = (Add)r;
@@ -67,7 +70,7 @@ public class Add extends BinaryOp {
 		}
 		return new Add(l, r);
 	}
-
+	
 	@Override
 	public Expr subs(Expr from, Expr to) {
 		return new Add(left.subs(from, to), right.subs(from, to));
@@ -83,14 +86,14 @@ public class Add extends BinaryOp {
 		return simplifiedIns(left.simplify(), right.simplify());
 	}
 
-	@Override
-	public boolean symEquals(Expr other) {
-		if(other instanceof Add) {
-			Add o = (Add)other;
-			if(	(left.symEquals(o.left) && right.symEquals(o.right)) ||
-				(left.symEquals(o.right) && right.symEquals(o.left)) )
-				return true;
-		}
-		return false;
+	public void flattenAdd(List<Expr> outList) {
+		left.flattenAdd(outList);
+		right.flattenAdd(outList);
 	}
+
+	@Override
+	protected void flattenMultiply(List<Expr> outList) {
+		outList.add(this);
+	}
+		
 }

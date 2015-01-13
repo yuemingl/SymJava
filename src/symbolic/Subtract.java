@@ -1,5 +1,7 @@
 package symbolic;
 
+import java.util.List;
+
 public class Subtract extends BinaryOp {
 	public Subtract(Expr l, Expr r) {
 		super(l, r);
@@ -12,6 +14,8 @@ public class Subtract extends BinaryOp {
 	}
 
 	public static Expr simplifiedIns(Expr l, Expr r) {
+		l = l.simplify();
+		r = r.simplify();		
 		if(r.symEquals(Symbol.C0))
 			return l;
 		else if(l.symEquals(Symbol.C0))
@@ -35,12 +39,13 @@ public class Subtract extends BinaryOp {
 	}
 
 	@Override
-	public boolean symEquals(Expr other) {
-		if(other instanceof Subtract) {
-			Subtract o = (Subtract)other;
-			if(	(left.symEquals(o.left) && right.symEquals(o.right)) )
-				return true;
-		}
-		return false;
+	protected void flattenAdd(List<Expr> outList) {
+		left.flattenAdd(outList);
+		new Negate(right).flattenAdd(outList);
+	}
+
+	@Override
+	protected void flattenMultiply(List<Expr> outList) {
+		outList.add(this);
 	}
 }
