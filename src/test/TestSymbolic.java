@@ -24,20 +24,98 @@ import bytecode.BytecodeFunc;
 
 
 public class TestSymbolic {
-	
+	public static void checkResult(String expect, Expr expr) {
+		if( expect.equals(expr.toString()))
+			System.out.println(true);
+		else
+			System.out.println("FAIL: " + expect +" != " + expr);
+	}
+	public static void checkResult(Expr expr1, Expr expr2) {
+		if( expr1.symEquals(expr2))
+			System.out.println(true);
+		else
+			System.out.println("FAIL: " + expr1 +" != " + expr2);
+	}	
 	public static void testBasic() {
-		Expr expr = x + y + z;
-		System.out.println(expr);
+		System.out.println("--------------testBasic-----------------");
+		Expr expr = x + y;
+		checkResult("x + y",expr);
 
+		expr = x - y;
+		checkResult("x - y",expr);
+
+		expr = x * y;
+		checkResult("x * y",expr);
+
+		expr = x / y;
+		checkResult("x / y",expr);
+		
+		expr = - x;
+		checkResult("-x",expr);
+
+		expr = new Power(x,2);
+		checkResult("x^2",expr);
+
+		checkResult("x + y + z", x + y + z);
+
+		checkResult("r * x + s / y + t - z", r * x + s / y + t - z);
+
+	}
+	public static void testSimplify() {
+		System.out.println("--------------testSimplify-----------------");
+		Expr expr = null;
+		
 		SymInteger n1 = new SymInteger(1);
 		SymLong n2 = new SymLong(2);
 		SymFloat n3 = new SymFloat(3.0f);
 		SymDouble n4 = new SymDouble(4.0);
-		System.out.println(n1 + n2 + n3 + n4);
+		expr = n1 + n2 + n3 + n4;
+		checkResult("10.0",expr);
+		expr = n1 * n2 * n3 * n4;
+		checkResult("24.0",expr);
+		expr = n4 - n2;
+		checkResult("2.0",expr);
+		expr = n4 / n2;
+		checkResult("2.0",expr);
+		expr = n2 * (n1 + n3) / n4;
+		checkResult("2.0",expr);
 		
-		expr = r * x + s * y + t * z;
+		checkResult(x + y + z, x + z + y);
+		checkResult(x + y + z, y + x + z);
+		checkResult(x + y + z, y + z + x);
+		checkResult(x + y + z, z + x + y);
+		checkResult(x + y + z, z + y + x);
+
+		expr = x + y + z;
+		Expr sub_expr = expr.subs(x, 1).subs(y, 2L).subs(z, 3.0d);
+		checkResult("1 + 2 + 3.0", sub_expr);
+		checkResult("6.0", sub_expr.simplify());
+		
+		expr = (x + 1) + 2; 
+		checkResult("x + 3.0", expr);
+		
+		expr = (y + z) + (y + 1);
+		checkResult("2 * y + z + 1", expr);
+
+		expr = (y * z) * (y * 2);
+		checkResult("y^2 * 2 * z", expr);
+		
+		expr = (x + y) + (y + x);
 		System.out.println(expr);
 		
+		expr = x + y + z;
+		Expr yz= y + z;
+		sub_expr = expr.subs(x, yz);
+		System.out.println(sub_expr.simplify());
+
+		checkResult(r * x + s / y + t - z, s / y + r * x + t - z);
+		checkResult(r * x + s / y + t - z, r * x + t + s / y - z);
+		checkResult(r * x + s / y + t - z, r * x + s / y - z + t);
+
+		checkResult(r * x + s / y + t - z, t + r * x + s / y - z);
+	}
+	public static void testSummation() {
+		System.out.println("--------------testSummation-----------------");
 		Expr sum = new Summation( x*x, x, 1, 5);
 		System.out.println(sum);
 		System.out.println(sum.subs(x, 2));
@@ -55,32 +133,13 @@ public class TestSymbolic {
 		}
 		System.out.println();
 		Expr summand2 = sum2.getSummand(2).subs(ss.get(2), y);
-		System.out.println(summand2);
-			
+		System.out.println(summand2);		
 	}
 	
-	public static void testSimplify() {
-		System.out.println("--------------testSimplify-----------------");
-		Expr expr = x + y + z;
-		Expr sub_expr = expr.subs(x, 1).subs(y, 2L).subs(z, 3.0d);
-		System.out.println(sub_expr);
-		System.out.println(sub_expr.simplify());
-		
-		Expr nxn = (x + 1) + 2; 
-		System.out.println(nxn);
-		
-		Expr ypz = (y + z) + (y + 1);
-		System.out.println(ypz);
 
-		Expr ymz = (y * z) * (y * 2);
-		System.out.println(ymz);
-		
-		Expr yz= y + z;
-		sub_expr = expr.subs(x, yz);
-		System.out.println(sub_expr.simplify());
-	}
 	
 	public static void testToBytecodeFunc() {
+		System.out.println("--------------testToBytecodeFunc-----------------");
 		Expr expr = new Power(x + y * z, 2);
 		System.out.println(expr);
 		
@@ -105,6 +164,7 @@ public class TestSymbolic {
 	}
 	
 	public static void testDiff() {
+		System.out.println("--------------testDiff-----------------");
 		Expr expr = x*x*2.0 + x + 1.0;
 		System.out.println(expr.diff(x));
 		
@@ -122,6 +182,7 @@ public class TestSymbolic {
 		//����eclipse����ɾ����Ŀ¼�����Բ��ܱ���
 		testBasic();
 		testSimplify();
+		testSummation();
 		testToBytecodeFunc();
 		testDiff();
 	}

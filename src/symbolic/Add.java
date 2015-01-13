@@ -28,12 +28,18 @@ public class Add extends BinaryOp {
 			Add a2 = (Add)r;
 			int maxSimplifyOps = -1;
 			Expr simplest = null;
-			List<Tuple4<Expr>> coms = Utils.C_4_2(a1.left, a1.right, a2.left, a2.right);
+			//List<Tuple4<Expr>> coms = Utils.C_4_2(a1.left, a1.right, a2.left, a2.right);
+			List<Tuple4<Expr>> coms = Utils.C_4_2(
+					a1.left.simplify(), 
+					a1.right.simplify(), 
+					a2.left.simplify(), 
+					a2.right.simplify()
+					);
 			for(Utils.Tuple4<Expr> com : coms) {
 				//if(a1.left == com.o1 && a1.right == com.o2 && a2.left == com.o3 && a2.right == com.o4)
 				//	continue;
 				Expr tmp = new Add( simplifiedIns(com.o1, com.o2), simplifiedIns(com.o3, com.o4) );
-				System.out.println(tmp+"->"+tmp.getSimplifyOps());
+				//System.out.println(tmp+"->"+tmp.getSimplifyOps());
 				if(tmp.getSimplifyOps() > maxSimplifyOps) {
 					maxSimplifyOps = tmp.getSimplifyOps();
 					simplest = tmp;
@@ -44,6 +50,20 @@ public class Add extends BinaryOp {
 			//TODO
 		} else if(l instanceof Multiply && r instanceof Add) {
 			//TODO
+		} else if(l instanceof Add) {
+			Add a = (Add)l;
+			Expr tmp1 = new Add( a.left.simplify(), simplifiedIns(a.right, r) );
+			Expr tmp2 = new Add( simplifiedIns(a.left, r), a.right.simplify() );
+			if(tmp1.getSimplifyOps() >= tmp2.getSimplifyOps())
+				return tmp1;
+			return tmp2;
+		} else if(r instanceof Add) {
+			Add a = (Add)r;
+			Expr tmp1 = new Add( simplifiedIns(l, a.left), a.right.simplify() );
+			Expr tmp2 = new Add( a.left.simplify(), simplifiedIns(l, a.right));
+			if(tmp1.getSimplifyOps() >= tmp2.getSimplifyOps())
+				return tmp1;
+			return tmp2;
 		}
 		return new Add(l, r);
 	}

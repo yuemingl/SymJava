@@ -29,7 +29,11 @@ public class Multiply extends BinaryOp {
 			Power p = new Power(l, 2);
 			p.setSimplifyOps(Math.max(l.getSimplifyOps(), r.getSimplifyOps()) + 1);
 			return p;
-		} else if((l instanceof SymReal<?>) && r instanceof Multiply) {
+		} else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
+			Number t1 = (Number)((SymReal<?>)l).getVal();
+			Number t2 = (Number)((SymReal<?>)r).getVal();
+			return new SymDouble(t1.doubleValue() * t2.doubleValue());
+		}  else if((l instanceof SymReal<?>) && r instanceof Multiply) {
 			Multiply rr = (Multiply)r;
 			if(rr.left instanceof SymReal<?>) {
 				Number t1 = (Number)((SymReal<?>)l).getVal();
@@ -47,7 +51,7 @@ public class Multiply extends BinaryOp {
 			List<Tuple4<Expr>> coms = Utils.C_4_2(a1.left, a1.right, a2.left, a2.right);
 			for(Utils.Tuple4<Expr> com : coms) {
 				Expr tmp = new Multiply( simplifiedIns(com.o1, com.o2), simplifiedIns(com.o3, com.o4) );
-				System.out.println(tmp+"->"+tmp.getSimplifyOps());
+				//System.out.println(tmp+"->"+tmp.getSimplifyOps());
 				if(tmp.getSimplifyOps() > maxSimplifyOps) {
 					maxSimplifyOps = tmp.getSimplifyOps();
 					simplest = tmp;

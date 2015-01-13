@@ -5,7 +5,10 @@ public class Power extends UnaryOp {
 	public Power(Expr base, int exponent) {
 		super(base);
 		this.exponent = exponent;
-		name = "("+base + ")^" + exponent;
+		if(base instanceof Symbol)
+			name = base + "^" + exponent;
+		else
+			name = "("+base + ")^" + exponent;
 	}
 	
 	@Override
