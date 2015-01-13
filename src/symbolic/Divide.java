@@ -14,7 +14,11 @@ public class Divide extends BinaryOp {
 	public static Expr simplifiedIns(Expr numerator, Expr denominator) {
 		if(numerator.symEquals(Symbol.C0))
 			return Symbol.C0;
-		else if(denominator.symEquals(Symbol.C0))
+		else if(numerator instanceof SymReal<?> && denominator instanceof SymReal<?>) {
+			Number t1 = (Number)((SymReal<?>)numerator).getVal();
+			Number t2 = (Number)((SymReal<?>)denominator).getVal();
+			return new SymDouble(t1.doubleValue() / t2.doubleValue());
+		} else if(denominator.symEquals(Symbol.C0))
 			throw new IllegalArgumentException("Argument 'divisor' is 0");
 		else 
 			return new Divide(numerator, denominator);

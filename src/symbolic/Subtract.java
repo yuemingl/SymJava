@@ -16,8 +16,12 @@ public class Subtract extends BinaryOp {
 			return l;
 		else if(l.symEquals(Symbol.C0))
 			return Symbol.Cm1.multiply(r);
-		else
-			return new Add(l, r);
+		else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
+			Number t1 = (Number)((SymReal<?>)l).getVal();
+			Number t2 = (Number)((SymReal<?>)r).getVal();
+			return new SymDouble(t1.doubleValue() - t2.doubleValue());
+		} else
+			return new Subtract(l, r);
 	}
 	
 	@Override
