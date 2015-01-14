@@ -16,32 +16,32 @@ public class Multiply extends BinaryOp {
 			left = l;
 			right = r;
 		}
-		name = left + " * " + right;
+		name =  SymPrinting.addParenthsesIfNeeded(left, this) 
+				+ " * " + 
+				SymPrinting.addParenthsesIfNeeded(right, this);
 	}
 	
 	public static Expr simplifiedIns(Expr l, Expr r) {
 		l = l.simplify();
-		r = r.simplify();		
-		if(l.symEquals(Symbol.C1))
-			return r;
-		else if(r.symEquals(Symbol.C1))
-			return l;
-		else if(l.symEquals(Symbol.C0) || r.symEquals(Symbol.C0))
-			return Symbol.C0;
-		else if(l.symEquals(r)) {
-			Power p = new Power(l, 2);
-			p.setSimplifyOps(Math.max(l.getSimplifyOps(), r.getSimplifyOps()) + 1);
-			return p;
+		r = r.simplify();
+		if(Symbol.C1.symEquals(l))
+			return r.incSimplifyOps(1);
+		else if(Symbol.C1.symEquals(r))
+			return l.incSimplifyOps(1);
+		else if(Symbol.C0.symEquals(l) || Symbol.C0.symEquals(r))
+			return Symbol.C0.incSimplifyOps(1);
+		else if(Utils.symCompare(l, r)) {
+			return new Power(l, 2).setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
 		} else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
 			Number t1 = (Number)((SymReal<?>)l).getVal();
 			Number t2 = (Number)((SymReal<?>)r).getVal();
-			Expr rlt = new SymDouble(t1.doubleValue() * t2.doubleValue());
-			rlt.setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
-			return rlt;
-		} else if(l.symEquals(Symbol.Cm1)) {
-			return new Negate(r);
-		} else if(r.symEquals(Symbol.Cm1)) {
-			return new Negate(l);
+			return new SymDouble(t1.doubleValue() * t2.doubleValue()).setSimplifyOps(
+					l.getSimplifyOps() + r.getSimplifyOps() + 1
+					);
+		} else if(Symbol.Cm1.symEquals(l)) {
+			return new Negate(r).incSimplifyOps(1);
+		} else if(Symbol.Cm1.symEquals(r)) {
+			return new Negate(l).incSimplifyOps(1);
 		} else if((l instanceof SymReal<?>) && r instanceof Multiply) {
 			Multiply rr = (Multiply)r;
 			if(rr.left instanceof SymReal<?>) {
@@ -50,7 +50,9 @@ public class Multiply extends BinaryOp {
 				double coef = t1.doubleValue()*t2.doubleValue();
 				if(coef == 1.0) 
 					return rr.right;
-				return new Multiply(new SymDouble(coef), rr.right);
+				return new Multiply(new SymDouble(coef), rr.right).setSimplifyOps(
+						l.getSimplifyOps() + r.getSimplifyOps() + 1
+						);
 			}
 		} else if(l instanceof Multiply && r instanceof Multiply) {
 			Multiply a1 = (Multiply)l;
@@ -87,7 +89,7 @@ public class Multiply extends BinaryOp {
 
 	@Override
 	public Expr simplify() {
-		return simplifiedIns(left.simplify(), right.simplify());
+		return simplifiedIns(left, right);
 	}
 
 	@Override

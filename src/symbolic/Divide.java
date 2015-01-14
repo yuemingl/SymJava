@@ -11,24 +11,28 @@ import java.util.List;
 public class Divide extends BinaryOp {
 	public Divide(Expr numerator, Expr denominator) {
 		super(numerator, denominator);
-		name = left + " / " + right;
+		name =  SymPrinting.addParenthsesIfNeeded(left, this) 
+				+ " / " + 
+				SymPrinting.addParenthsesIfNeeded(right, this);
 	}
 
 	public static Expr simplifiedIns(Expr numerator, Expr denominator) {
 		numerator = numerator.simplify();
 		denominator = denominator.simplify();
-		if(numerator.symEquals(Symbol.C0))
-			return Symbol.C0;
+		if(Symbol.C0.symEquals(numerator))
+			return Symbol.C0.incSimplifyOps(1);
 		else if(numerator instanceof SymReal<?> && denominator instanceof SymReal<?>) {
 			Number t1 = (Number)((SymReal<?>)numerator).getVal();
 			Number t2 = (Number)((SymReal<?>)denominator).getVal();
-			return new SymDouble(t1.doubleValue() / t2.doubleValue());
+			return new SymDouble(t1.doubleValue() / t2.doubleValue()).setSimplifyOps(
+					numerator.getSimplifyOps() + denominator.getSimplifyOps() + 1
+					);
 		} else if(denominator.symEquals(Symbol.C0))
 			throw new IllegalArgumentException("Argument 'divisor' is 0");
-		 else if(denominator.symEquals(Symbol.C1))
-			return numerator;
-		else 
-			return new Divide(numerator, denominator);
+		 else if(Symbol.C1.symEquals(denominator))
+			return numerator.incSimplifyOps(1);
+		
+		return new Divide(numerator, denominator);
 	}
 	
 	@Override
@@ -44,7 +48,7 @@ public class Divide extends BinaryOp {
 
 	@Override
 	public Expr simplify() {
-		return simplifiedIns(left.simplify(), right.simplify());
+		return simplifiedIns(left, right);
 	}
 
 	@Override
