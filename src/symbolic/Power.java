@@ -20,8 +20,12 @@ public class Power extends UnaryOp {
 
 	@Override
 	public Expr diff(Expr expr) {
-		SymInteger i = new SymInteger(exponent);
-		return i.multiply(new Power(base, exponent - 1)).multiply(base.diff(expr));
+		if(exponent == 2)
+			return Symbol.C2.multiply(base).multiply(base.diff(expr));
+		else {
+			SymInteger i = new SymInteger(exponent);
+			return i.multiply(new Power(base, exponent - 1)).multiply(base.diff(expr));
+		}
 	}
 
 	@Override

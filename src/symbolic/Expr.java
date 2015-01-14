@@ -21,10 +21,14 @@ abstract public class Expr {
 	protected int getSimplifyOps() {
 		return simplifyOps;
 	}
-	protected void setSimplifyOps(int n) {
+	protected Expr setSimplifyOps(int n) {
 		simplifyOps = n;
+		return this;
 	}
-	
+	protected Expr incSimplifyOps(int n) {
+		simplifyOps += n;
+		return this;
+	}	
 	/**
 	 * 
 	 * @param v

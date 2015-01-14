@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +37,10 @@ public class Utils {
 			BinaryOp be = (BinaryOp)e; 
 			post_order(be.left, outList);
 			post_order(be.right, outList);
+		} else if(e instanceof Reciprocal) {
+			Reciprocal ue = (Reciprocal)e;
+			outList.add(Symbol.C1);
+			post_order(ue.base, outList);
 		} else if(e instanceof UnaryOp) {
 			UnaryOp ue = (UnaryOp)e; 
 			post_order(ue.base, outList);
@@ -127,9 +133,11 @@ public class Utils {
 				il.append(new DDIV());
 			} else if(ins instanceof Power) {
 				Power p = (Power)ins;
-				il.append(new PUSH(cp, (double)p.exponent));				
+				il.append(new PUSH(cp, (double)p.exponent));
 				il.append(factory.createInvoke("java.lang.Math", "pow",
 						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));				
+			} else if(ins instanceof Reciprocal) {
+				il.append(new DDIV());
 			} else if(ins instanceof Negate) {
 				il.append(new PUSH(cp, -1.0));		
 				il.append(new DMUL());				
@@ -169,57 +177,101 @@ public class Utils {
 		list.add(new Tuple4<T>(o1, o2, o3, o4));
 		list.add(new Tuple4<T>(o1, o3, o2, o4));
 		list.add(new Tuple4<T>(o1, o4, o2, o3));
-		list.add(new Tuple4<T>(o2, o3, o1, o4));
-		list.add(new Tuple4<T>(o2, o4, o1, o3));
-		list.add(new Tuple4<T>(o3, o4, o1, o2));
+		//list.add(new Tuple4<T>(o2, o3, o1, o4));
+		//list.add(new Tuple4<T>(o2, o4, o1, o3));
+		//list.add(new Tuple4<T>(o3, o4, o1, o2));
 		return list;
 	}
 	
-	public static boolean flattenSortAndEquals(Expr expr1, Expr expr2) {
-		List<Expr> l1 = new ArrayList<Expr>();
-		List<Expr> l2 = new ArrayList<Expr>();
-		expr1.flattenAdd(l1);
-		expr2.flattenAdd(l2);
+	public static List<Expr> flattenAddAndSort(Expr expr) {
+		List<Expr> l = new LinkedList<Expr>();
+		expr.flattenAdd(l);
+		sortExprList(l);
+		return l;
+	}
+
+	public static List<Expr> flattenMultiplyAndSort(Expr expr) {
+		List<Expr> l = new LinkedList<Expr>();
+		expr.flattenMultiply(l);
+		sortExprList(l);
+		return l;
+	}
+	
+	public static List<Expr> sortExprList(List<Expr> list) {
+		Collections.sort(list, new Comparator<Expr>() {
+			@Override
+			public int compare(Expr o1, Expr o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
+		return list;
+	}
+
+	public static boolean flattenSortAndCompare(Expr expr1, Expr expr2) {
+		List<Expr> l1 = flattenAddAndSort(expr1);
+		List<Expr> l2 = flattenAddAndSort(expr2);
 		if(l1.size() != l2.size())
 			return false;
-		Collections.sort(l1, new Comparator<Expr>() {
-			@Override
-			public int compare(Expr o1, Expr o2) {
-				return o1.toString().compareTo(o2.toString());
-			}
-		});
-		Collections.sort(l2, new Comparator<Expr>() {
-			@Override
-			public int compare(Expr o1, Expr o2) {
-				return o1.toString().compareTo(o2.toString());
-			}
-		});
+
 		for(int i=0; i<l1.size(); i++) {
 			Expr e1 = l1.get(i);
 			Expr e2 = l2.get(i);
-			List<Expr> le1 = new ArrayList<Expr>();
-			List<Expr> le2 = new ArrayList<Expr>();	
-			e1.flattenMultiply(le1);
-			e2.flattenMultiply(le2);
+			List<Expr> le1 = flattenMultiplyAndSort(e1);
+			List<Expr> le2 = flattenMultiplyAndSort(e2);
 			if(le1.size() != le2.size())
 				return false;
-			Collections.sort(le1, new Comparator<Expr>() {
-				@Override
-				public int compare(Expr o1, Expr o2) {
-					return o1.toString().compareTo(o2.toString());
-				}
-			});
-			Collections.sort(le2, new Comparator<Expr>() {
-				@Override
-				public int compare(Expr o1, Expr o2) {
-					return o1.toString().compareTo(o2.toString());
-				}
-			});			
+
 			for(int j=0; j<le1.size(); j++) {
-				if(!le1.get(j).symEquals(le2.get(j)))
+				if(!symCompare(le1.get(j), le2.get(j)))
 					return false;
 			}
 		}
 		return true;
+	}
+	
+	public static boolean symCompare(Expr expr1, Expr expr2) {
+		if( expr1 instanceof Symbol || 
+			expr2 instanceof Symbol || 
+			expr1 instanceof Symbols || 
+			expr2 instanceof Symbols) {
+			return expr1 == expr2;
+		}
+		return expr1.symEquals(expr2);
+	}
+	
+	public static List<Expr> simplifyAddList(Expr expr1, Expr expr2) {
+		List<Expr> l1 = flattenAddAndSort(expr1);
+		List<Expr> l2 = flattenAddAndSort(expr2);
+		return simplifyAddListHelper(l1, l2);
+	}
+	
+	protected static List<Expr> simplifyAddListHelper(List<Expr> l1, List<Expr> l2) {
+		if(l1.size() == 1 && l2.size() == 1) {
+			l1.addAll(l2);
+			sortExprList(l1);
+			return l1;
+		}
+		List<Expr> l3 = new LinkedList<Expr>();
+		Iterator<Expr> it1 = l1.iterator();
+		while(it1.hasNext()) {
+			Expr e1 = it1.next();
+			Iterator<Expr> it2 = l2.iterator();
+			while(it2.hasNext()) {
+				Expr e2 = it2.next();
+				Expr simIns = Add.simplifiedIns(e1, e2);
+				if( simIns.getSimplifyOps() > e1.getSimplifyOps() + e2.getSimplifyOps() ) {
+					l3.add(simIns);
+					it2.remove();
+					it1.remove();
+					break;
+				}
+			}
+		}
+		l1.addAll(l2);
+		sortExprList(l1);
+		if(l3.size() > 0) {
+			return simplifyAddListHelper(l3, l1);
+		}
+		return l1;
 	}
 }

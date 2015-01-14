@@ -32,17 +32,11 @@ public class Symbol extends Expr {
 	public static Symbol beta = new Symbol("\\beta");
 	public static Symbol gamma = new Symbol("\\gamma");
 	
+	public static SymInteger Cm2 = new SymInteger(-1);
 	public static SymInteger Cm1 = new SymInteger(-1);
 	public static SymInteger C0 = new SymInteger(0);
 	public static SymInteger C1 = new SymInteger(1);
 	public static SymInteger C2 = new SymInteger(2);
-	public static SymInteger C3 = new SymInteger(3);
-	public static SymInteger C4 = new SymInteger(4);
-	public static SymInteger C5 = new SymInteger(5);
-	public static SymInteger C6 = new SymInteger(6);
-	public static SymInteger C7 = new SymInteger(7);
-	public static SymInteger C8 = new SymInteger(8);
-	public static SymInteger C9 = new SymInteger(9);
 	
 	
 	public Symbol(String name) {

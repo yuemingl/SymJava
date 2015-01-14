@@ -7,7 +7,7 @@ public class Negate extends UnaryOp {
 	
 	public Negate(Expr expr) {
 		super(expr);
-		name = "-"+expr;
+		name = "-" + SymPrinting.addParenthsesIfNeeded(expr, this);
 	}
 	
 	@Override

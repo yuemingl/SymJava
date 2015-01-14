@@ -1,27 +1,9 @@
 package test;
-import static symbolic.Symbol.r;
-import static symbolic.Symbol.s;
-import static symbolic.Symbol.t;
-import static symbolic.Symbol.x;
-import static symbolic.Symbol.y;
-import static symbolic.Symbol.z;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import symbolic.Expr;
-import symbolic.Func;
-import symbolic.Power;
-import symbolic.Reciprocal;
-import symbolic.Summation;
-import symbolic.SymDouble;
-import symbolic.SymFloat;
-import symbolic.SymInteger;
-import symbolic.SymLong;
-import symbolic.Symbol;
-import symbolic.Symbols;
-import symbolic.Utils;
+import static symbolic.Symbol.*;
+import symbolic.*;
 import bytecode.BytecodeFunc;
+import java.util.*;
 
 
 public class TestSymbolic {
@@ -36,6 +18,12 @@ public class TestSymbolic {
 			System.out.println(true);
 		else
 			System.out.println("FAIL: " + expr1 +" != " + expr2);
+	}
+	public static void checkResult(double d1, double d2, Expr expr) {
+		if( d1 == d2 )
+			System.out.println(true);
+		else
+			System.out.println("FAIL: " + expr + " => " + d1 +" != " + d2);
 	}	
 	public static void testBasic() {
 		System.out.println("--------------testBasic-----------------");
@@ -66,8 +54,15 @@ public class TestSymbolic {
 		checkResult("-x", x * -1);
 		checkResult("x + y + z", x + y + z);
 
-		checkResult("r * x + s / y + t - z", r * x + s / y + t - z);
+		checkResult("r * x + s * 1 / y + t - z", r * x + s / y + t - z);
 
+	}
+	public static void testPrint() {
+		System.out.println("--------------testPrint-----------------");
+		checkResult("x * (y + z)", (x*(y+z)));
+		checkResult("x / (y + z)", (x/(y+z)));
+		checkResult("(y + z)^2", ((y+z)*(y+z)));
+		checkResult("-(y + z)", (-(y+z)));
 	}
 	public static void testSimplify() {
 		System.out.println("--------------testSimplify-----------------");
@@ -110,10 +105,10 @@ public class TestSymbolic {
 		checkResult("6.0", sub_expr.simplify());
 		
 		expr = (x + 1) + 2; 
-		checkResult("x + 3.0", expr);
+		checkResult("3.0 + x", expr);
 		
 		expr = (y + z) + (y + 1);
-		checkResult("2 * y + z + 1", expr);
+		checkResult("1 + 2 * y + z", expr);
 
 		expr = (y * z) * (y * 2);
 		checkResult("y^2 * 2 * z", expr);
@@ -129,6 +124,8 @@ public class TestSymbolic {
 		checkResult(r * x + s / y + t - z, r * x + t + s / y - z);
 		checkResult(r * x + s / y + t - z, r * x + s / y - z + t);
 		checkResult(r * x + s / y + t - z, t + r * x + s / y - z);
+		
+		checkResult(x * -(y + z), -x*y - x*z);
 	}
 	
 	public static void testSummation() {
@@ -176,6 +173,11 @@ public class TestSymbolic {
 			System.out.println(e.getClass());		
 		func = c.toBytecodeFunc();
 		System.out.println(func.apply(0.0));
+		
+		Reciprocal rec = new Reciprocal(x + y);
+		
+		checkResult(0.5, new Func("test_reciprocal", rec).toBytecodeFunc().apply(1,1), rec);
+		
 	}
 	
 	public static void testDiff() {
@@ -196,6 +198,7 @@ public class TestSymbolic {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
 		testBasic();
+		testPrint();
 		testSimplify();
 		testSummation();
 		testToBytecodeFunc();
