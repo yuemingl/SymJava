@@ -65,7 +65,6 @@ public class Negate extends UnaryOp {
 				outList.add(tmp.get(i));
 			}
 		}
-		//outList.add(this);
 	}
 
 }

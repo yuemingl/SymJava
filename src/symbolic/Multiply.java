@@ -59,62 +59,6 @@ public class Multiply extends BinaryOp {
 	
 	public static Expr simplifiedIns(Expr l, Expr r) {
 		return Utils.flattenSortAndSimplify(shallowSimplifiedIns(l, r));
-
-//			//dead loop?
-//			List<Expr> ll = Utils.flattenAddAndSort(l);
-//			List<Expr> lr = Utils.flattenAddAndSort(r);
-//			if(ll.size() == 1 && lr.size() == 1) {
-//				return new Multiply(l, r);
-//			}
-//			List<Expr> addList = new ArrayList<Expr>();
-//			for(Expr e1 : ll) {
-//				for(Expr e2 : lr) {
-//					addList.add(simplifiedIns(e1, e2));
-//				}
-//			}
-//			List<Expr> simList = Utils.simplifyAddList(Utils.addListToExpr(addList));
-//			List<Expr> simList2 = new ArrayList<Expr>();
-//			for(Expr e : simList) {
-//				simList2.add(Utils.multiplyListToExpr(Utils.simplifyMultiplyList(e)));
-//			}
-//			return Utils.addListToExpr(simList2);
-		
-//		else if((l instanceof SymReal<?>) && r instanceof Multiply) {
-//			Multiply rr = (Multiply)r;
-//			if(rr.left instanceof SymReal<?>) {
-//				Number t1 = (Number)((SymReal<?>)l).getVal();
-//				Number t2 = (Number)((SymReal<?>)rr.left).getVal();
-//				double coef = t1.doubleValue()*t2.doubleValue();
-//				if(coef == 1.0) 
-//					return rr.right;
-//				return new Multiply(new SymDouble(coef), rr.right).setSimplifyOps(
-//						l.getSimplifyOps() + r.getSimplifyOps() + 1
-//						);
-//			}
-//		}
-		
-//		else if(l instanceof Multiply && r instanceof Multiply) {
-//			Multiply a1 = (Multiply)l;
-//			Multiply a2 = (Multiply)r;
-//			int maxSimplifyOps = -1;
-//			Expr simplest = null;
-//			List<Tuple4<Expr>> coms = Utils.C_4_2(a1.left, a1.right, a2.left, a2.right);
-//			for(Utils.Tuple4<Expr> com : coms) {
-//				Expr tmp = new Multiply( simplifiedIns(com.o1, com.o2), simplifiedIns(com.o3, com.o4) );
-//				//System.out.println(tmp+"->"+tmp.getSimplifyOps());
-//				if(tmp.getSimplifyOps() > maxSimplifyOps) {
-//					maxSimplifyOps = tmp.getSimplifyOps();
-//					simplest = tmp;
-//				}
-//			}
-//			return simplest;
-//		} else if(l instanceof Add && r instanceof Multiply) {
-//			//TODO
-//		} else if(l instanceof Multiply && r instanceof Add) {
-//			//TODO
-//		}
-		
-//		return new Multiply(l, r);
 	}
 	
 	@Override
