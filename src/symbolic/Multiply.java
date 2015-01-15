@@ -3,6 +3,8 @@ package symbolic;
 import java.util.ArrayList;
 import java.util.List;
 
+import symbolic.utils.Utils;
+
 public class Multiply extends BinaryOp {
 	public Multiply(Expr l, Expr r) {
 		super(l, r);
@@ -51,19 +53,24 @@ public class Multiply extends BinaryOp {
 			Reciprocal rr = (Reciprocal)r;
 			return Divide.simplifiedIns(l, rr.base).incSimplifyOps(1);
 		} else {
-			List<Expr> simList = Utils.simplifyMultiplyList(l, r);
-//			for(Expr e : simList) {
-//				Utils.simplifyMultiplyList(e);
-//			}
-			if(simList.size() == 1)
-				return simList.get(0);
-			else {
-				Expr rlt = simList.get(0);
-				for(int i=1; i<simList.size(); i++) {
-					rlt = new Multiply(rlt, simList.get(i));
+			//dead loop?
+			List<Expr> ll = Utils.flattenAddAndSort(l);
+			List<Expr> lr = Utils.flattenAddAndSort(r);
+			if(ll.size() == 1 && lr.size() == 1) {
+				return new Multiply(l, r);
+			}
+			List<Expr> addList = new ArrayList<Expr>();
+			for(Expr e1 : ll) {
+				for(Expr e2 : lr) {
+					addList.add(simplifiedIns(e1, e2));
 				}
-				return rlt;
-			}			
+			}
+			List<Expr> simList = Utils.simplifyAddList(Utils.addListToExpr(addList));
+			List<Expr> simList2 = new ArrayList<Expr>();
+			for(Expr e : simList) {
+				simList2.add(Utils.multiplyListToExpr(Utils.simplifyMultiplyList(e)));
+			}
+			return Utils.addListToExpr(simList2);
 		}
 		
 //		else if((l instanceof SymReal<?>) && r instanceof Multiply) {
@@ -120,7 +127,7 @@ public class Multiply extends BinaryOp {
 	}
 
 	@Override
-	protected void flattenAdd(List<Expr> outList) {
+	public void flattenAdd(List<Expr> outList) {
 		List<Expr> list1 = new ArrayList<Expr>();
 		List<Expr> list2 = new ArrayList<Expr>();
 		left.flattenAdd(list1);
@@ -137,7 +144,7 @@ public class Multiply extends BinaryOp {
 	}
 
 	@Override
-	protected void flattenMultiply(List<Expr> outList) {
+	public void flattenMultiply(List<Expr> outList) {
 		left.flattenMultiply(outList);
 		right.flattenMultiply(outList);
 	}

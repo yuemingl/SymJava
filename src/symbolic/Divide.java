@@ -54,7 +54,7 @@ public class Divide extends BinaryOp {
 	}
 
 	@Override
-	protected void flattenAdd(List<Expr> outList) {
+	public void flattenAdd(List<Expr> outList) {
 		List<Expr> list1 = new ArrayList<Expr>();
 		left.flattenAdd(list1);
 		Reciprocal r = new Reciprocal(right);
@@ -64,7 +64,7 @@ public class Divide extends BinaryOp {
 	}
 
 	@Override
-	protected void flattenMultiply(List<Expr> outList) {
+	public void flattenMultiply(List<Expr> outList) {
 		left.flattenMultiply(outList);
 		new Reciprocal(right).flattenMultiply(outList);
 	}

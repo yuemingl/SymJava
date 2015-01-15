@@ -33,7 +33,7 @@ public class Negate extends UnaryOp {
 	}
 
 	@Override
-	protected void flattenAdd(List<Expr> outList) {
+	public void flattenAdd(List<Expr> outList) {
 		List<Expr> list1 = new ArrayList<Expr>();
 		base.flattenAdd(list1);
 		if(list1.size() == 1) { 
@@ -46,7 +46,7 @@ public class Negate extends UnaryOp {
 	}
 
 	@Override
-	protected void flattenMultiply(List<Expr> outList) {
+	public void flattenMultiply(List<Expr> outList) {
 		outList.add(this);
 	}
 
