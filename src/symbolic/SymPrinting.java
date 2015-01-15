@@ -6,6 +6,8 @@ public class SymPrinting {
 			return 10;
 		if(expr instanceof Multiply || expr instanceof Divide || expr instanceof Negate)
 			return 20;
+		if( expr instanceof Reciprocal )
+			return 25;
 		if(expr instanceof Power)
 			return 30;
 		if(expr instanceof Symbol || expr instanceof Symbols || expr instanceof SymReal<?>)

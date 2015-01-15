@@ -44,17 +44,21 @@ public class TestSymbolic {
 
 		expr = new Power(x,2);
 		checkResult("x^2",expr);
-		
-		expr = new Reciprocal(x);
-		checkResult("1/x", expr);
 
 		checkResult("0.0", Symbol.Cm1 + Symbol.C1);
-		checkResult("-1", Symbol.Cm1 * Symbol.C1);
 		checkResult("0", x + (-x));
-		checkResult("-x", x * -1);
-		checkResult("x + y + z", x + y + z);
 
-		checkResult("r * x + s * 1 / y + t - z", r * x + s / y + t - z);
+		checkResult("-1", Symbol.Cm1 * Symbol.C1);
+		checkResult("-x", x * -1);
+
+		checkResult("1/x", new Reciprocal(x));
+		checkResult("1/x", Symbol.C1 / x);
+		checkResult("x / y", x * new Reciprocal(y));
+		checkResult("1/(x * y)", new Reciprocal(x) * new Reciprocal(y));
+
+		checkResult("x + y / z", x + y / z);
+		
+		checkResult("r * x + s / y + t - z", r * x + s / y + t - z);
 
 	}
 	public static void testPrint() {
@@ -94,9 +98,20 @@ public class TestSymbolic {
 		checkResult(x * y * z, y * z * x);
 		checkResult(x * y * z, z * x * y);
 		checkResult(x * y * z, z * y * x);
+
 		
-		checkResult( ((x + y) * z) * (r * s), x*z*r*s + y*z*r*s);
+		checkResult("", x * y * x * z * x * new Power(x,2));
 		
+		checkResult("", (x * y * x * z * x) + (y * z * y * z) + (z * y * z * y));
+	
+		checkResult("", (x + y) * (y + z) * (z + x) );
+		
+		checkResult("", (x * y * x) + (y * z * y) + (z * x * z) );
+		
+		
+		checkResult("", ((x + y) * z) * (r * s));
+		checkResult(((x + y) * z) * (r * s), x*z*r*s + y*z*r*s);
+	
 		checkResult(x * y * z + r + s + t, r + s + t + z * y * x);
 		
 		expr = x + y + z;
@@ -111,7 +126,7 @@ public class TestSymbolic {
 		checkResult("1 + 2 * y + z", expr);
 
 		expr = (y * z) * (y * 2);
-		checkResult("y^2 * 2 * z", expr);
+		checkResult("2 * y^2 * z", expr);
 		
 		expr = x + y + z;
 		Expr yz= y + z;

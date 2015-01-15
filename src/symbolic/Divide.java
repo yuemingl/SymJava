@@ -29,6 +29,8 @@ public class Divide extends BinaryOp {
 					);
 		} else if(denominator.symEquals(Symbol.C0))
 			throw new IllegalArgumentException("Argument 'divisor' is 0");
+		 else if(Symbol.C1.symEquals(numerator))
+			return new Reciprocal(denominator).incSimplifyOps(1);
 		 else if(Symbol.C1.symEquals(denominator))
 			return numerator.incSimplifyOps(1);
 		

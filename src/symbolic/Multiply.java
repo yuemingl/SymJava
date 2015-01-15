@@ -3,8 +3,6 @@ package symbolic;
 import java.util.ArrayList;
 import java.util.List;
 
-import symbolic.Utils.Tuple4;
-
 public class Multiply extends BinaryOp {
 	public Multiply(Expr l, Expr r) {
 		super(l, r);
@@ -30,51 +28,80 @@ public class Multiply extends BinaryOp {
 			return l.incSimplifyOps(1);
 		else if(Symbol.C0.symEquals(l) || Symbol.C0.symEquals(r))
 			return Symbol.C0.incSimplifyOps(1);
-		else if(Utils.symCompare(l, r)) {
-			return new Power(l, 2).setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
-		} else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
+		else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
 			Number t1 = (Number)((SymReal<?>)l).getVal();
 			Number t2 = (Number)((SymReal<?>)r).getVal();
 			return new SymDouble(t1.doubleValue() * t2.doubleValue()).setSimplifyOps(
 					l.getSimplifyOps() + r.getSimplifyOps() + 1
 					);
+		} else if(Utils.symCompare(l, r)) {
+				return new Power(l, 2).setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
 		} else if(Symbol.Cm1.symEquals(l)) {
 			return new Negate(r).incSimplifyOps(1);
 		} else if(Symbol.Cm1.symEquals(r)) {
 			return new Negate(l).incSimplifyOps(1);
-		} else if((l instanceof SymReal<?>) && r instanceof Multiply) {
-			Multiply rr = (Multiply)r;
-			if(rr.left instanceof SymReal<?>) {
-				Number t1 = (Number)((SymReal<?>)l).getVal();
-				Number t2 = (Number)((SymReal<?>)rr.left).getVal();
-				double coef = t1.doubleValue()*t2.doubleValue();
-				if(coef == 1.0) 
-					return rr.right;
-				return new Multiply(new SymDouble(coef), rr.right).setSimplifyOps(
-						l.getSimplifyOps() + r.getSimplifyOps() + 1
-						);
-			}
-		} else if(l instanceof Multiply && r instanceof Multiply) {
-			Multiply a1 = (Multiply)l;
-			Multiply a2 = (Multiply)r;
-			int maxSimplifyOps = -1;
-			Expr simplest = null;
-			List<Tuple4<Expr>> coms = Utils.C_4_2(a1.left, a1.right, a2.left, a2.right);
-			for(Utils.Tuple4<Expr> com : coms) {
-				Expr tmp = new Multiply( simplifiedIns(com.o1, com.o2), simplifiedIns(com.o3, com.o4) );
-				//System.out.println(tmp+"->"+tmp.getSimplifyOps());
-				if(tmp.getSimplifyOps() > maxSimplifyOps) {
-					maxSimplifyOps = tmp.getSimplifyOps();
-					simplest = tmp;
+		} else if(l instanceof Reciprocal && r instanceof Reciprocal) {
+			Reciprocal rl = (Reciprocal)l;
+			Reciprocal rr = (Reciprocal)r;
+			return new Reciprocal( simplifiedIns(rl.base, rr.base) ).incSimplifyOps(1);
+		} else if(l instanceof Reciprocal) {
+			Reciprocal rl = (Reciprocal)l;
+			return Divide.simplifiedIns(r, rl.base).incSimplifyOps(1);
+		} else if(r instanceof Reciprocal) {
+			Reciprocal rr = (Reciprocal)r;
+			return Divide.simplifiedIns(l, rr.base).incSimplifyOps(1);
+		} else {
+			List<Expr> simList = Utils.simplifyMultiplyList(l, r);
+//			for(Expr e : simList) {
+//				Utils.simplifyMultiplyList(e);
+//			}
+			if(simList.size() == 1)
+				return simList.get(0);
+			else {
+				Expr rlt = simList.get(0);
+				for(int i=1; i<simList.size(); i++) {
+					rlt = new Multiply(rlt, simList.get(i));
 				}
-			}
-			return simplest;
-		} else if(l instanceof Add && r instanceof Multiply) {
-			//TODO
-		} else if(l instanceof Multiply && r instanceof Add) {
-			//TODO
+				return rlt;
+			}			
 		}
-		return new Multiply(l, r);
+		
+//		else if((l instanceof SymReal<?>) && r instanceof Multiply) {
+//			Multiply rr = (Multiply)r;
+//			if(rr.left instanceof SymReal<?>) {
+//				Number t1 = (Number)((SymReal<?>)l).getVal();
+//				Number t2 = (Number)((SymReal<?>)rr.left).getVal();
+//				double coef = t1.doubleValue()*t2.doubleValue();
+//				if(coef == 1.0) 
+//					return rr.right;
+//				return new Multiply(new SymDouble(coef), rr.right).setSimplifyOps(
+//						l.getSimplifyOps() + r.getSimplifyOps() + 1
+//						);
+//			}
+//		}
+		
+//		else if(l instanceof Multiply && r instanceof Multiply) {
+//			Multiply a1 = (Multiply)l;
+//			Multiply a2 = (Multiply)r;
+//			int maxSimplifyOps = -1;
+//			Expr simplest = null;
+//			List<Tuple4<Expr>> coms = Utils.C_4_2(a1.left, a1.right, a2.left, a2.right);
+//			for(Utils.Tuple4<Expr> com : coms) {
+//				Expr tmp = new Multiply( simplifiedIns(com.o1, com.o2), simplifiedIns(com.o3, com.o4) );
+//				//System.out.println(tmp+"->"+tmp.getSimplifyOps());
+//				if(tmp.getSimplifyOps() > maxSimplifyOps) {
+//					maxSimplifyOps = tmp.getSimplifyOps();
+//					simplest = tmp;
+//				}
+//			}
+//			return simplest;
+//		} else if(l instanceof Add && r instanceof Multiply) {
+//			//TODO
+//		} else if(l instanceof Multiply && r instanceof Add) {
+//			//TODO
+//		}
+		
+//		return new Multiply(l, r);
 	}
 	
 	@Override

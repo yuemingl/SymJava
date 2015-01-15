@@ -24,6 +24,9 @@ public class Add extends BinaryOp {
 					setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
 		} else {
 			List<Expr> simList = Utils.simplifyAddList(l, r);
+//			for(Expr e : simList) {
+//				Utils.simplifyMultiplyList(e);
+//			}
 			if(simList.size() == 1)
 				return simList.get(0);
 			else {
