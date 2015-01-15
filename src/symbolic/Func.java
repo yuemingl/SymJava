@@ -15,25 +15,25 @@ public class Func extends Expr {
 	 * @param args
 	 */
 	public Func(String name, Symbol ...args) {
-		this.name = name;
+		this.label = name;
 		this.args = args;
 	}
 	
 	public Func(String name, Expr expr) {
 		//Extract free variables from expr
-		this.name = name;
+		this.label = name;
 		this.expr = expr;
 		args = BytecodeUtils.extractSymbols(expr);
 	}
 	
 	public String getName() {
-		return name;
+		return label;
 	}
 	
 	public BytecodeFunc toBytecodeFunc() {
 		try {
 			BytecodeUtils.genClass(this);
-			return (BytecodeFunc)Class.forName("bytecode."+this.name).newInstance();
+			return (BytecodeFunc)Class.forName("bytecode."+this.label).newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -41,7 +41,7 @@ public class Func extends Expr {
 	}
 
 	public String toString() {
-		return name+"("+BytecodeUtils.joinName(args, ",")+")";
+		return label+"("+BytecodeUtils.joinName(args, ",")+")";
 	}
 
 	@Override
@@ -51,12 +51,12 @@ public class Func extends Expr {
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
-		return new Func(this.name, this.expr.subs(from, to));
+		return new Func(this.label, this.expr.subs(from, to));
 	}
 	
 	@Override
 	public Expr simplify() {
-		Func f = new Func(name, expr.simplify());
+		Func f = new Func(label, expr.simplify());
 		f.args = this.args;
 		return f;
 	}

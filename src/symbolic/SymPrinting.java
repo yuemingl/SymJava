@@ -20,4 +20,10 @@ public class SymPrinting {
 			return "(" + toMe.toString() + ")";
 		return toMe.toString();
 	}
+	
+	public static String addParenthsesIfNeeded2(Expr toMe, Expr forOperation) {
+		if(getPrecedence(toMe) <= getPrecedence(forOperation))
+			return "(" + toMe.toString() + ")";
+		return toMe.toString();
+	}	
 }

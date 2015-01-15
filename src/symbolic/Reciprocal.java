@@ -6,7 +6,8 @@ public class Reciprocal extends UnaryOp {
 
 	public Reciprocal(Expr base) {
 		super(base);
-		name =  "1/" +  SymPrinting.addParenthsesIfNeeded(base, this);		
+		label =  "1/" +  SymPrinting.addParenthsesIfNeeded(base, this);		
+		sortKey = base.getSortKey();
 	}
 
 	@Override

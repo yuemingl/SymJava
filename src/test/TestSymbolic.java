@@ -3,7 +3,6 @@ package test;
 import static symbolic.Symbol.*;
 import symbolic.*;
 import symbolic.utils.BytecodeUtils;
-import symbolic.utils.Utils;
 import bytecode.BytecodeFunc;
 
 import java.util.*;
@@ -37,10 +36,10 @@ public class TestSymbolic {
 		checkResult("x - y",expr);
 
 		expr = x * y;
-		checkResult("x * y",expr);
+		checkResult("x*y",expr);
 
 		expr = x / y;
-		checkResult("x / y",expr);
+		checkResult("x/y",expr);
 		
 		expr = - x;
 		checkResult("-x",expr);
@@ -56,18 +55,23 @@ public class TestSymbolic {
 
 		checkResult("1/x", new Reciprocal(x));
 		checkResult("1/x", Symbol.C1 / x);
-		checkResult("x / y", x * new Reciprocal(y));
-		checkResult("1/(x * y)", new Reciprocal(x) * new Reciprocal(y));
+		checkResult("x/y", x * new Reciprocal(y));
+		checkResult("1/(x*y)", new Reciprocal(x) * new Reciprocal(y));
 
-		checkResult("x + y / z", x + y / z);
+		checkResult("r + x + y + z", (x + y) + (z + r));
+		checkResult("r*x*y*z", (x * y) * (z * r));
 		
-		checkResult("r * x + s / y + t - z", r * x + s / y + t - z);
+		checkResult("x/(y*z)", x / (y * z));
+		checkResult("x/(y*z)", x / y / z);
+		checkResult("x + y/z", x + y / z);
+		
+		checkResult("r*x + s/y + t - z", r * x + s / y + t - z);
 
 	}
 	public static void testPrint() {
 		System.out.println("--------------testPrint-----------------");
-		checkResult("x * (y + z)", (x*(y+z)));
-		checkResult("x / (y + z)", (x/(y+z)));
+		checkResult("x*y + x*z", (x*(y+z)));
+		checkResult("x/(y + z)", (x/(y+z)));
 		checkResult("(y + z)^2", ((y+z)*(y+z)));
 		checkResult("-(y + z)", (-(y+z)));
 	}
@@ -103,17 +107,17 @@ public class TestSymbolic {
 		checkResult(x * y * z, z * y * x);
 
 		
-		checkResult("", x * y * x * z * x * new Power(x,2));
+		checkResult("x^5*y*z", x * y * x * z * x * new Power(x,2));
 		
-		checkResult("", (x * y * x * z * x) + (y * z * y * z) + (z * y * z * y));
+		checkResult("2*y^2*z^2 + x^3*y*z", (x * y * x * z * x) + (y * z * y * z) + (z * y * z * y));
 	
-		checkResult("", (x + y) * (y + z) * (z + x) );
+		checkResult("2*x*y*z + x^2*y + x*y^2 + x^2*z + x*z^2 + y^2*z + y*z^2", (x + y) * (y + z) * (z + x) );
 		
-		checkResult("", (x * y * x) + (y * z * y) + (z * x * z) );
+		checkResult("x^2*y + x*z^2 + y^2*z", (x * y * x) + (y * z * y) + (z * x * z) );
 		
 		
-		checkResult("", (x + y) * (x - y));
-		checkResult("", ((x + y) * z) * (r * s));
+		checkResult("x^2 - y^2", (x + y) * (x - y));
+		checkResult("r*s*x*z + r*s*y*z", ((x + y) * z) * (r * s));
 		checkResult(((x + y) * z) * (r * s), x*z*r*s + y*z*r*s);
 	
 		checkResult(x * y * z + r + s + t, r + s + t + z * y * x);
@@ -127,10 +131,10 @@ public class TestSymbolic {
 		checkResult("3.0 + x", expr);
 		
 		expr = (y + z) + (y + 1);
-		checkResult("1 + 2 * y + z", expr);
+		checkResult("1 + 2*y + z", expr);
 
 		expr = (y * z) * (y * 2);
-		checkResult("2 * y^2 * z", expr);
+		checkResult("2*y^2*z", expr);
 		
 		expr = x + y + z;
 		Expr yz= y + z;
@@ -217,15 +221,10 @@ public class TestSymbolic {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
 		testBasic();
-//		testPrint();
-//		testSimplify();
+		testPrint();
+		testSimplify();
 //		testSummation();
 //		testToBytecodeFunc();
 //		testDiff();
-//		checkResult("",(x + y) * (x - y));
-		
-		checkResult("",-x*y + x*y);
-		
-		//checkResult("",(x + y) * (x + z));
 	}
 }

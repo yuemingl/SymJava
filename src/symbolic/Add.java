@@ -1,6 +1,5 @@
 package symbolic;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import symbolic.utils.Utils;
@@ -8,10 +7,11 @@ import symbolic.utils.Utils;
 public class Add extends BinaryOp {
 	public Add(Expr l, Expr r) {
 		super(l, r);
-		name = l + " + " + r;
+		label = l + " + " + r;
+		sortKey = left.getSortKey()+right.getSortKey();
 	}
 	
-	public static Expr simplifiedIns(Expr l, Expr r) {
+	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
 		l = l.simplify();
 		r = r.simplify();
 		if(Symbol.C0.symEquals(l))
@@ -31,19 +31,16 @@ public class Add extends BinaryOp {
 			return new Negate(Add.simplifiedIns(nl.base, nr.base)).incSimplifyOps(1);
 		} else if(l instanceof Negate) {
 			Negate nl = (Negate)l;
-			return Subtract.simplifiedIns(r, nl.base).incSimplifyOps(1);
+			return Subtract.simplifiedIns(r, nl.base);
 		} else if(r instanceof Negate) {
 			Negate nr = (Negate)r;
-			return Subtract.simplifiedIns(l, nr.base).incSimplifyOps(1);
-		} else {
-			List<Expr> simList = Utils.simplifyAddList(l, r);
-			List<Expr> simList2 = new ArrayList<Expr>();
-			for(Expr e : simList) {
-				simList2.add(Utils.multiplyListToExpr(Utils.simplifyMultiplyList(e)));
-			}
-			return Utils.addListToExpr(simList2);
-			//return Utils.addListToExpr(simList);
+			return Subtract.simplifiedIns(l, nr.base);
 		}
+		return new Add(l, r);
+	}
+	
+	public static Expr simplifiedIns(Expr l, Expr r) {
+		return Utils.flattenSortAndSimplify(shallowSimplifiedIns(l,r));
 		
 //		else if(l instanceof Add && r instanceof Add) {
 //			Add a1 = (Add)l;

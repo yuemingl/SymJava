@@ -11,7 +11,8 @@ public class Symbols extends Expr {
 	public Symbols(String namePrefix, Expr indexSymbol) {
 		this.namePrefix = namePrefix;
 		this.indexSymbol = indexSymbol;
-		this.name = namePrefix + "_" + indexSymbol;
+		this.label = namePrefix + "_" + indexSymbol;
+		sortKey = label;
 	}
 	
 	public Symbol get(int index) {

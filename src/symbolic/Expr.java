@@ -3,7 +3,8 @@ package symbolic;
 import java.util.List;
 
 abstract public class Expr {
-	String name = null;
+	String label = null;
+	String sortKey = null;
 	
 	public abstract Expr diff(Expr expr);
 	
@@ -204,6 +205,10 @@ abstract public class Expr {
 	}
 
 	public String toString() {
-		return name;
-	}	
+		return label;
+	}
+	
+	public String getSortKey() {
+		return sortKey;
+	}
 }

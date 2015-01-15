@@ -3,11 +3,14 @@ package symbolic;
 import java.util.ArrayList;
 import java.util.List;
 
+import symbolic.utils.Utils;
+
 public class Negate extends UnaryOp {
 	
 	public Negate(Expr expr) {
 		super(expr);
-		name = "-" + SymPrinting.addParenthsesIfNeeded(expr, this);
+		label = "-" + SymPrinting.addParenthsesIfNeeded(expr, this);
+		sortKey = base.getSortKey();
 	}
 	
 	@Override
@@ -38,16 +41,31 @@ public class Negate extends UnaryOp {
 		base.flattenAdd(list1);
 		if(list1.size() == 1) { 
 			outList.add(this);
-			return;
-		}
-		for(Expr e : list1) {
-			outList.add( new Negate(e) );
+		} else {
+			for(Expr e : list1) {
+				outList.add( new Negate(e) );
+			}
 		}
 	}
 
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
-		outList.add(this);
+		List<Expr> tmp = new ArrayList<Expr>();
+		base.flattenMultiply(tmp);
+		if(tmp.size() == 1)
+			outList.add(this);
+		else {
+			int sign = Utils.getMultiplyGlobalSign(tmp);
+			Utils.removeNegate(tmp);
+			if(sign == 1)
+				outList.add(new Negate(tmp.get(0)));
+			else
+				outList.add(tmp.get(0));
+			for(int i=1; i<tmp.size(); i++) {
+				outList.add(tmp.get(i));
+			}
+		}
+		//outList.add(this);
 	}
 
 }

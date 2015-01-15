@@ -13,7 +13,7 @@ public class Summation extends Expr {
 	public Summation(Expr summandTemplate, Symbol indexVar, int start, int end) {
  		this.summand = summandTemplate;
  		this.indexVar = indexVar;
-		name = "\\Sigma_"+indexVar+"="+start+"^"+end+"(" + summandTemplate + ")";
+		label = "\\Sigma_"+indexVar+"="+start+"^"+end+"(" + summandTemplate + ")";
 		this.start = start;
 		this.end = end;
 	}

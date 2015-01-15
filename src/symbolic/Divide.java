@@ -3,6 +3,8 @@ package symbolic;
 import java.util.ArrayList;
 import java.util.List;
 
+import symbolic.utils.Utils;
+
 /**
  * 
  * @author yuemingl
@@ -11,12 +13,13 @@ import java.util.List;
 public class Divide extends BinaryOp {
 	public Divide(Expr numerator, Expr denominator) {
 		super(numerator, denominator);
-		name =  SymPrinting.addParenthsesIfNeeded(left, this) 
-				+ " / " + 
-				SymPrinting.addParenthsesIfNeeded(right, this);
+		label =  SymPrinting.addParenthsesIfNeeded(left, this) 
+				+ "/" + 
+				SymPrinting.addParenthsesIfNeeded2(right, this);
+		sortKey = left.getSortKey()+right.getSortKey();
 	}
-
-	public static Expr simplifiedIns(Expr numerator, Expr denominator) {
+	
+	public static Expr shallowSimplifiedIns(Expr numerator, Expr denominator) {
 		numerator = numerator.simplify();
 		denominator = denominator.simplify();
 		if(Symbol.C0.symEquals(numerator))
@@ -33,8 +36,11 @@ public class Divide extends BinaryOp {
 			return new Reciprocal(denominator).incSimplifyOps(1);
 		 else if(Symbol.C1.symEquals(denominator))
 			return numerator.incSimplifyOps(1);
-		
 		return new Divide(numerator, denominator);
+	}
+	
+	public static Expr simplifiedIns(Expr numerator, Expr denominator) {
+		return Utils.flattenSortAndSimplify(shallowSimplifiedIns(numerator, denominator));
 	}
 	
 	@Override
@@ -59,7 +65,7 @@ public class Divide extends BinaryOp {
 		left.flattenAdd(list1);
 		Reciprocal r = new Reciprocal(right);
 		for(Expr e : list1) {
-			outList.add( Multiply.simplifiedIns(e, r));
+			outList.add( new Multiply(e, r) );
 		}
 	}
 
