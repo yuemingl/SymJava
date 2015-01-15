@@ -1,6 +1,9 @@
 package symbolic;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import symbolic.utils.Utils;
 
 public class Add extends BinaryOp {
 	public Add(Expr l, Expr r) {
@@ -22,20 +25,24 @@ public class Add extends BinaryOp {
 			Number t2 = (Number)((SymReal<?>)r).getVal();
 			return new SymDouble(t1.doubleValue() + t2.doubleValue()).
 					setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
+		} else if(l instanceof Negate && r instanceof Negate) {
+			Negate nl = (Negate)l;
+			Negate nr = (Negate)r;
+			return new Negate(Add.simplifiedIns(nl.base, nr.base)).incSimplifyOps(1);
+		} else if(l instanceof Negate) {
+			Negate nl = (Negate)l;
+			return Subtract.simplifiedIns(r, nl.base).incSimplifyOps(1);
+		} else if(r instanceof Negate) {
+			Negate nr = (Negate)r;
+			return Subtract.simplifiedIns(l, nr.base).incSimplifyOps(1);
 		} else {
 			List<Expr> simList = Utils.simplifyAddList(l, r);
-//			for(Expr e : simList) {
-//				Utils.simplifyMultiplyList(e);
-//			}
-			if(simList.size() == 1)
-				return simList.get(0);
-			else {
-				Expr rlt = simList.get(0);
-				for(int i=1; i<simList.size(); i++) {
-					rlt = new Add(rlt, simList.get(i));
-				}
-				return rlt;
+			List<Expr> simList2 = new ArrayList<Expr>();
+			for(Expr e : simList) {
+				simList2.add(Utils.multiplyListToExpr(Utils.simplifyMultiplyList(e)));
 			}
+			return Utils.addListToExpr(simList2);
+			//return Utils.addListToExpr(simList);
 		}
 		
 //		else if(l instanceof Add && r instanceof Add) {
@@ -104,7 +111,7 @@ public class Add extends BinaryOp {
 	}
 
 	@Override
-	protected void flattenMultiply(List<Expr> outList) {
+	public void flattenMultiply(List<Expr> outList) {
 		outList.add(this);
 	}
 		

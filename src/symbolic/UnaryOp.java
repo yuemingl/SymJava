@@ -7,7 +7,4 @@ public abstract class UnaryOp extends Expr {
 		this.base = base;
 		this.simplifyOps = base.simplifyOps;
 	}
-	public ExprType getType() {
-		return ExprType.UNARY_OP;
-	}
 }

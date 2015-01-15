@@ -2,6 +2,7 @@ package symbolic;
 
 import java.util.List;
 
+import symbolic.utils.BytecodeUtils;
 import bytecode.BytecodeFunc;
 
 public class Func extends Expr {
@@ -22,12 +23,16 @@ public class Func extends Expr {
 		//Extract free variables from expr
 		this.name = name;
 		this.expr = expr;
-		args = Utils.extractSymbols(expr);
+		args = BytecodeUtils.extractSymbols(expr);
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	public BytecodeFunc toBytecodeFunc() {
 		try {
-			Utils.genClass(this);
+			BytecodeUtils.genClass(this);
 			return (BytecodeFunc)Class.forName("bytecode."+this.name).newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -36,7 +41,7 @@ public class Func extends Expr {
 	}
 
 	public String toString() {
-		return name+"("+Utils.joinName(args, ",")+")";
+		return name+"("+BytecodeUtils.joinName(args, ",")+")";
 	}
 
 	@Override
@@ -74,12 +79,12 @@ public class Func extends Expr {
 	}
 
 	@Override
-	protected void flattenAdd(List<Expr> outList) {
+	public void flattenAdd(List<Expr> outList) {
 		expr.flattenAdd(outList);
 	}
 
 	@Override
-	protected void flattenMultiply(List<Expr> outList) {
+	public void flattenMultiply(List<Expr> outList) {
 		expr.flattenAdd(outList);
 	}
 }

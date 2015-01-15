@@ -1,5 +1,7 @@
 package symbolic;
 
+import symbolic.utils.Utils;
+
 public abstract class BinaryOp extends Expr {
 	public Expr left;
 	public Expr right;
@@ -12,9 +14,5 @@ public abstract class BinaryOp extends Expr {
 	
 	public boolean symEquals(Expr other) {
 		return Utils.flattenSortAndCompare(this.simplify(), other.simplify());
-	}
-	
-	public ExprType getType() {
-		return ExprType.BINARY_OP;
 	}
 }

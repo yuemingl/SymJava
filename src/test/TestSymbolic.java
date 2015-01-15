@@ -2,7 +2,10 @@ package test;
 
 import static symbolic.Symbol.*;
 import symbolic.*;
+import symbolic.utils.BytecodeUtils;
+import symbolic.utils.Utils;
 import bytecode.BytecodeFunc;
+
 import java.util.*;
 
 
@@ -109,6 +112,7 @@ public class TestSymbolic {
 		checkResult("", (x * y * x) + (y * z * y) + (z * x * z) );
 		
 		
+		checkResult("", (x + y) * (x - y));
 		checkResult("", ((x + y) * z) * (r * s));
 		checkResult(((x + y) * z) * (r * s), x*z*r*s + y*z*r*s);
 	
@@ -171,7 +175,7 @@ public class TestSymbolic {
 		System.out.println(expr);
 		
 		List<Expr> list = new ArrayList<Expr>();
-		Utils.post_order(expr, list);
+		BytecodeUtils.post_order(expr, list);
 		for(Expr e : list)
 			System.out.println(e.getClass());
 		
@@ -183,7 +187,7 @@ public class TestSymbolic {
 		
 		Func c = new Func("test_const", new SymInteger(8));
 		list.clear();
-		Utils.post_order(c.expr, list);
+		BytecodeUtils.post_order(c.expr, list);
 		for(Expr e : list)
 			System.out.println(e.getClass());		
 		func = c.toBytecodeFunc();
@@ -213,10 +217,15 @@ public class TestSymbolic {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
 		testBasic();
-		testPrint();
-		testSimplify();
-		testSummation();
-		testToBytecodeFunc();
-		testDiff();
+//		testPrint();
+//		testSimplify();
+//		testSummation();
+//		testToBytecodeFunc();
+//		testDiff();
+//		checkResult("",(x + y) * (x - y));
+		
+		checkResult("",-x*y + x*y);
+		
+		//checkResult("",(x + y) * (x + z));
 	}
 }

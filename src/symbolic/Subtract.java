@@ -2,6 +2,8 @@ package symbolic;
 
 import java.util.List;
 
+import symbolic.utils.Utils;
+
 public class Subtract extends BinaryOp {
 	public Subtract(Expr l, Expr r) {
 		super(l, r);
@@ -26,6 +28,8 @@ public class Subtract extends BinaryOp {
 			return new SymDouble(t1.doubleValue() - t2.doubleValue()).setSimplifyOps(
 					l.getSimplifyOps() + r.getSimplifyOps() + 1
 					);
+		} else if(Utils.symCompare(l, r)) {
+			return Symbol.C0;
 		}
 		
 		return new Subtract(l, r);
@@ -42,13 +46,13 @@ public class Subtract extends BinaryOp {
 	}
 
 	@Override
-	protected void flattenAdd(List<Expr> outList) {
+	public void flattenAdd(List<Expr> outList) {
 		left.flattenAdd(outList);
 		new Negate(right).flattenAdd(outList);
 	}
 
 	@Override
-	protected void flattenMultiply(List<Expr> outList) {
+	public void flattenMultiply(List<Expr> outList) {
 		outList.add(this);
 	}
 }

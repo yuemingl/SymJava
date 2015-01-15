@@ -11,21 +11,21 @@ abstract public class Expr {
 	
 	public abstract boolean symEquals(Expr other);
 
-	protected abstract void flattenAdd(List<Expr> outList);
+	public abstract void flattenAdd(List<Expr> outList);
 	
-	protected abstract void flattenMultiply(List<Expr> outList);
+	public abstract void flattenMultiply(List<Expr> outList);
 	
 	//Number of simplify operations
 	protected int simplifyOps = 0;
 
-	protected int getSimplifyOps() {
+	public int getSimplifyOps() {
 		return simplifyOps;
 	}
-	protected Expr setSimplifyOps(int n) {
+	public Expr setSimplifyOps(int n) {
 		simplifyOps = n;
 		return this;
 	}
-	protected Expr incSimplifyOps(int n) {
+	public Expr incSimplifyOps(int n) {
 		simplifyOps += n;
 		return this;
 	}	
