@@ -8,9 +8,10 @@ public class Power extends UnaryOp {
 		super(base);
 		this.exponent = exponent;
 		if(base instanceof Symbol)
-			name = base + "^" + exponent;
+			label = base + "^" + exponent;
 		else
-			name = "("+base + ")^" + exponent;
+			label = "("+base + ")^" + exponent;
+		sortKey = base.getSortKey();
 	}
 	
 	@Override

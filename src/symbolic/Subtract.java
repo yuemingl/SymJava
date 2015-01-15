@@ -7,7 +7,8 @@ import symbolic.utils.Utils;
 public class Subtract extends BinaryOp {
 	public Subtract(Expr l, Expr r) {
 		super(l, r);
-		name = left + " - " + right;
+		label = left + " - " + right;
+		sortKey = left.getSortKey()+right.getSortKey();
 	}
 	
 	@Override
@@ -15,7 +16,7 @@ public class Subtract extends BinaryOp {
 		return new Subtract(left.subs(from, to), right.subs(from, to));
 	}
 
-	public static Expr simplifiedIns(Expr l, Expr r) {
+	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
 		l = l.simplify();
 		r = r.simplify();
 		if(Symbol.C0.symEquals(r))
@@ -29,10 +30,13 @@ public class Subtract extends BinaryOp {
 					l.getSimplifyOps() + r.getSimplifyOps() + 1
 					);
 		} else if(Utils.symCompare(l, r)) {
-			return Symbol.C0;
+			return Symbol.C0.incSimplifyOps(1);
 		}
-		
 		return new Subtract(l, r);
+	}
+	
+	public static Expr simplifiedIns(Expr l, Expr r) {
+		return Utils.flattenSortAndSimplify(shallowSimplifiedIns(l,r));
 	}
 	
 	@Override

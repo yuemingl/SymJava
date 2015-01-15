@@ -7,7 +7,8 @@ public class SymReal<T extends Number> extends Expr {
 	
 	public SymReal(T val) {
 		this.val = val;
-		name = String.valueOf(val);
+		label = String.valueOf(val);
+		sortKey = label;
 	}
 
 	public T getVal() {

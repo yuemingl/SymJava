@@ -16,12 +16,13 @@ public class Multiply extends BinaryOp {
 			left = l;
 			right = r;
 		}
-		name =  SymPrinting.addParenthsesIfNeeded(left, this) 
-				+ " * " + 
+		label =  SymPrinting.addParenthsesIfNeeded(left, this) 
+				+ "*" + 
 				SymPrinting.addParenthsesIfNeeded(right, this);
+		sortKey = left.getSortKey()+right.getSortKey();
 	}
 	
-	public static Expr simplifiedIns(Expr l, Expr r) {
+	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
 		l = l.simplify();
 		r = r.simplify();
 		if(Symbol.C1.symEquals(l))
@@ -48,30 +49,35 @@ public class Multiply extends BinaryOp {
 			return new Reciprocal( simplifiedIns(rl.base, rr.base) ).incSimplifyOps(1);
 		} else if(l instanceof Reciprocal) {
 			Reciprocal rl = (Reciprocal)l;
-			return Divide.simplifiedIns(r, rl.base).incSimplifyOps(1);
+			return Divide.simplifiedIns(r, rl.base);
 		} else if(r instanceof Reciprocal) {
 			Reciprocal rr = (Reciprocal)r;
-			return Divide.simplifiedIns(l, rr.base).incSimplifyOps(1);
-		} else {
-			//dead loop?
-			List<Expr> ll = Utils.flattenAddAndSort(l);
-			List<Expr> lr = Utils.flattenAddAndSort(r);
-			if(ll.size() == 1 && lr.size() == 1) {
-				return new Multiply(l, r);
-			}
-			List<Expr> addList = new ArrayList<Expr>();
-			for(Expr e1 : ll) {
-				for(Expr e2 : lr) {
-					addList.add(simplifiedIns(e1, e2));
-				}
-			}
-			List<Expr> simList = Utils.simplifyAddList(Utils.addListToExpr(addList));
-			List<Expr> simList2 = new ArrayList<Expr>();
-			for(Expr e : simList) {
-				simList2.add(Utils.multiplyListToExpr(Utils.simplifyMultiplyList(e)));
-			}
-			return Utils.addListToExpr(simList2);
+			return Divide.simplifiedIns(l, rr.base);
 		}
+		return new Multiply(l, r);
+	}
+	
+	public static Expr simplifiedIns(Expr l, Expr r) {
+		return Utils.flattenSortAndSimplify(shallowSimplifiedIns(l, r));
+
+//			//dead loop?
+//			List<Expr> ll = Utils.flattenAddAndSort(l);
+//			List<Expr> lr = Utils.flattenAddAndSort(r);
+//			if(ll.size() == 1 && lr.size() == 1) {
+//				return new Multiply(l, r);
+//			}
+//			List<Expr> addList = new ArrayList<Expr>();
+//			for(Expr e1 : ll) {
+//				for(Expr e2 : lr) {
+//					addList.add(simplifiedIns(e1, e2));
+//				}
+//			}
+//			List<Expr> simList = Utils.simplifyAddList(Utils.addListToExpr(addList));
+//			List<Expr> simList2 = new ArrayList<Expr>();
+//			for(Expr e : simList) {
+//				simList2.add(Utils.multiplyListToExpr(Utils.simplifyMultiplyList(e)));
+//			}
+//			return Utils.addListToExpr(simList2);
 		
 //		else if((l instanceof SymReal<?>) && r instanceof Multiply) {
 //			Multiply rr = (Multiply)r;
@@ -137,7 +143,7 @@ public class Multiply extends BinaryOp {
 		else {
 			for(Expr e1 : list1) {
 				for(Expr e2 : list2) {
-					outList.add( simplifiedIns(e1, e2) );
+					outList.add( shallowSimplifiedIns(e1, e2) );
 				}
 			}
 		}

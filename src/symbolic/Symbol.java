@@ -40,11 +40,12 @@ public class Symbol extends Expr {
 	
 	
 	public Symbol(String name) {
-		this.name = name;
+		this.label = name;
+		sortKey = label;
 	}
 	
 	public String toString() {
-		return name;
+		return label;
 	}
 	
 	@Override

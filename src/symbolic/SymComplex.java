@@ -17,7 +17,7 @@ public class SymComplex extends Expr {
 	}
 	
 	public String toString() {
-		return real.name + "+" + imaginary.name + "i";
+		return real.label + "+" + imaginary.label + "i";
 	}
 
 	@Override

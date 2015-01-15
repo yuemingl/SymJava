@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 import symbolic.Add;
+import symbolic.Divide;
 import symbolic.Expr;
 import symbolic.Multiply;
 import symbolic.Negate;
+import symbolic.Reciprocal;
+import symbolic.Subtract;
 import symbolic.Symbol;
 import symbolic.Symbols;
 
@@ -51,7 +55,7 @@ public class Utils {
 		Collections.sort(list, new Comparator<Expr>() {
 			@Override
 			public int compare(Expr o1, Expr o2) {
-				return o1.toString().compareTo(o2.toString());
+				return o1.getSortKey().compareTo(o2.getSortKey());
 			}
 		});
 		return list;
@@ -89,21 +93,95 @@ public class Utils {
 		return expr1.symEquals(expr2);
 	}
 	
-	public static List<Expr> simplifyAddList(Expr expr1, Expr expr2) {
-		List<Expr> l1 = flattenAddAndSort(expr1);
-		List<Expr> l2 = flattenAddAndSort(expr2);
-		if(l1.size() == 1 && l2.size() == 1) {
-			l1.addAll(l2);
-			sortExprList(l1);
-			return l1;
+	public static int getMultiplyGlobalSign(List<Expr> list) {
+		int count = 0;
+		for(Expr e : list) {
+			if(e instanceof Negate) {
+				count++;
+			}
 		}
-		l1.addAll(l2);		
-		return simplifyAddListHelper(l1);
+		if(count%2==1)
+			return -1;
+		return 1;
 	}
-
-	public static List<Expr> simplifyAddList(Expr expr) {
-		return simplifyAddListHelper(flattenAddAndSort(expr));
+	
+	public static List<Expr> removeNegate(List<Expr> list) {
+		List<Expr> rlt = new ArrayList<Expr>();
+		for(Expr e : list) {
+			if(e instanceof Negate) {
+				Negate ee = (Negate)e;
+				rlt.add(ee.base);
+			} else {
+				rlt.add(e);
+			}
+		}
+		list.clear();
+		list.addAll(rlt);
+		return list;
 	}
+	
+	public static Expr flattenSortAndSimplify(Expr expr) {
+		List<Expr> addList = flattenAddAndSort(expr);
+		List<Expr> rlt = new ArrayList<Expr>();
+		for(int i=0; i<addList.size(); i++) {
+			Expr e = addList.get(i);
+			List<Expr> mulList = flattenMultiplyAndSort(e);
+			if(mulList.size() == 1)
+				rlt.addAll(mulList);
+			else {
+				int sign = getMultiplyGlobalSign(mulList);
+				removeNegate(mulList);
+				if(mulList.size() > 2) {
+					simplifyMultiplyListHelper(mulList);
+				}
+				if(sign == -1) {
+					rlt.add(new Negate(multiplyListToExpr(mulList)));
+				} else {
+					rlt.add(multiplyListToExpr(mulList));
+				}				
+			}
+		}
+		if(addList.size() > 2) {
+			simplifyAddListHelper(rlt);
+		}
+		return addListWithNegateToExpr(rlt);
+	}
+	
+	
+//	public static List<Expr> simplifyAddList(Expr expr1, Expr expr2) {
+//		List<Expr> l1 = flattenAddAndSort(expr1);
+//		List<Expr> l2 = flattenAddAndSort(expr2);
+//		if(l1.size() == 1 && l2.size() == 1) {
+//			l1.addAll(l2);
+//			sortExprList(l1);
+//			return l1;
+//		}
+//		l1.addAll(l2);
+//		return simplifyAddListHelper(l1);
+//	}
+//
+//	public static List<Expr> simplifyAddList(Expr expr) {
+//		return simplifyAddListHelper(flattenAddAndSort(expr));
+//	}
+//	
+//	/**
+//	 * expr1 - expr2
+//	 * e.g. (x+y+z) - (x+y)
+//	 * @param expr1
+//	 * @param expr2
+//	 * @return
+//	 */
+//	public static List<Expr> simplifySubtractList(Expr expr1, Expr expr2) {
+//		List<Expr> l1 = flattenAddAndSort(expr1);
+//		List<Expr> l2 = flattenAddAndSort(expr2);
+//		if(l1.size() == 1 && l2.size() == 1) {
+//			l1.add(new Negate(l2.get(0)));
+//			sortExprList(l1);
+//			return l1;
+//		}
+//		l1.addAll(l2);		
+//		return simplifyAddListHelper(l1);
+//	}
 	
 //	protected static List<Expr> simplifyAddListHelper(List<Expr> l1, List<Expr> l2) {
 //		if(l1.size() == 1 && l2.size() == 1) {
@@ -143,7 +221,7 @@ public class Utils {
 			for(int i=0; i<l.size(); i++) {
 				boolean found = false;
 				for(int j=i+1; j<l.size(); j++) {
-					Expr simIns = Add.simplifiedIns(l.get(i), l.get(j));
+					Expr simIns = Add.shallowSimplifiedIns(l.get(i), l.get(j));
 					if( simIns.getSimplifyOps() > l.get(i).getSimplifyOps() + l.get(j).getSimplifyOps() ) {
 						l2.add(simIns);
 						found = true;
@@ -170,21 +248,21 @@ public class Utils {
 		return l;
 	}
 	
-	public static List<Expr> simplifyMultiplyList(Expr expr1, Expr expr2) {
-		List<Expr> l1 = flattenMultiplyAndSort(expr1);
-		List<Expr> l2 = flattenMultiplyAndSort(expr2);
-		if(l1.size() == 1 && l2.size() == 1) {
-			l1.addAll(l2);
-			sortExprList(l1);
-			return l1;
-		}
-		l1.addAll(l2);
-		return simplifyMultiplyListHelper(l1);
-	}
-	
-	public static List<Expr> simplifyMultiplyList(Expr expr) {
-		return simplifyMultiplyListHelper(flattenMultiplyAndSort(expr));
-	}	
+//	public static List<Expr> simplifyMultiplyList(Expr expr1, Expr expr2) {
+//		List<Expr> l1 = flattenMultiplyAndSort(expr1);
+//		List<Expr> l2 = flattenMultiplyAndSort(expr2);
+//		if(l1.size() == 1 && l2.size() == 1) {
+//			l1.addAll(l2);
+//			sortExprList(l1);
+//			return l1;
+//		}
+//		l1.addAll(l2);
+//		return simplifyMultiplyListHelper(l1);
+//	}
+//	
+//	public static List<Expr> simplifyMultiplyList(Expr expr) {
+//		return simplifyMultiplyListHelper(flattenMultiplyAndSort(expr));
+//	}	
 	
 	protected static List<Expr> simplifyMultiplyListHelper(List<Expr> l) {
 		List<Expr> l2 = new ArrayList<Expr>();
@@ -194,7 +272,7 @@ public class Utils {
 			for(int i=0; i<l.size(); i++) {
 				boolean found = false;
 				for(int j=i+1; j<l.size(); j++) {
-					Expr simIns = Multiply.simplifiedIns(l.get(i), l.get(j));
+					Expr simIns = Multiply.shallowSimplifiedIns(l.get(i), l.get(j));
 					if( simIns.getSimplifyOps() > l.get(i).getSimplifyOps() + l.get(j).getSimplifyOps() ) {
 						l2.add(simIns);
 						found = true;
@@ -221,17 +299,34 @@ public class Utils {
 		return l;
 	}
 	
-	public static Expr addListToExpr(List<Expr> list) {
+//	public static Expr addListToExpr(List<Expr> list) {
+//		if(list.size() == 1)
+//			return list.get(0);
+//		else {
+//			Expr rlt = list.get(0);
+//			for(int i=1; i<list.size(); i++) {
+//				rlt = new Add(rlt, list.get(i));
+//			}
+//			return rlt;
+//		}
+//	}
+	
+	public static Expr addListWithNegateToExpr(List<Expr> list) {
 		if(list.size() == 1)
 			return list.get(0);
 		else {
 			Expr rlt = list.get(0);
 			for(int i=1; i<list.size(); i++) {
-				rlt = new Add(rlt, list.get(i));
+				Expr e = list.get(i);
+				if(e instanceof Negate) {
+					Negate ee = (Negate)e;
+					rlt = Subtract.shallowSimplifiedIns(rlt, ee.base);
+				} else
+					rlt = Add.shallowSimplifiedIns(rlt, e);
 			}
 			return rlt;
 		}
-	}
+	}	
 	
 	public static Expr multiplyListToExpr(List<Expr> list) {
 		if(list.size() == 1)
@@ -239,7 +334,13 @@ public class Utils {
 		else {
 			Expr rlt = list.get(0);
 			for(int i=1; i<list.size(); i++) {
-				rlt = new Multiply(rlt, list.get(i));
+				Expr e = list.get(i);
+				if(e instanceof Reciprocal) {
+					Reciprocal ee = (Reciprocal)e;
+					rlt = Divide.shallowSimplifiedIns(rlt, ee.base);
+				} else {
+					rlt = Multiply.shallowSimplifiedIns(rlt, list.get(i));
+				}
 			}
 			return rlt;
 		}		
