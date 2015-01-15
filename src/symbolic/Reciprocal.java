@@ -17,7 +17,6 @@ public class Reciprocal extends UnaryOp {
 
 	@Override
 	public Expr simplify() {
-		//return Divide.simplifiedIns(Symbol.C1, base);
 		return this;
 	}
 
