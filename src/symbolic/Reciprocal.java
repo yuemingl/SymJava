@@ -6,10 +6,7 @@ public class Reciprocal extends UnaryOp {
 
 	public Reciprocal(Expr base) {
 		super(base);
-		if(base instanceof Symbol)
-			name = "1/" + base;
-		else
-			name = "1/(" + base + ")";
+		name =  "1/" +  SymPrinting.addParenthsesIfNeeded(base, this);		
 	}
 
 	@Override
@@ -19,7 +16,8 @@ public class Reciprocal extends UnaryOp {
 
 	@Override
 	public Expr simplify() {
-		return Divide.simplifiedIns(Symbol.C1, base);
+		//return Divide.simplifiedIns(Symbol.C1, base);
+		return this;
 	}
 
 	@Override
