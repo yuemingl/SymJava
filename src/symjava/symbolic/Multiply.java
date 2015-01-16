@@ -19,7 +19,11 @@ public class Multiply extends BinaryOp {
 		label =  SymPrinting.addParenthsesIfNeeded(left, this) 
 				+ "*" + 
 				SymPrinting.addParenthsesIfNeeded(right, this);
-		sortKey = left.getSortKey()+right.getSortKey();
+		if(this.isCoeffMulSymbol()) {
+			sortKey = this.getSymbolTerm().getSortKey();//+this.getCoeffTerm().getSortKey();
+		} else {
+			sortKey = left.getSortKey()+right.getSortKey();
+		}
 	}
 	
 	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
@@ -69,7 +73,8 @@ public class Multiply extends BinaryOp {
 			if(Utils.symCompare(rp.base, l)) {
 				return new Power(rp.base, rp.exponent + 1).incSimplifyOps(1);
 			}
-		} else if(Utils.symCompare(l, r)) {
+		}
+		if(Utils.symCompare(l, r)) {
 			return new Power(l, 2).setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
 		}
 		return new Multiply(l, r);
@@ -77,6 +82,28 @@ public class Multiply extends BinaryOp {
 	
 	public static Expr simplifiedIns(Expr l, Expr r) {
 		return Utils.flattenSortAndSimplify(shallowSimplifiedIns(l, r));
+	}
+	
+	boolean isCoeffMulSymbol() {
+		if(left instanceof SymReal<?> && !(right instanceof SymReal<?>) )
+			return true;
+		if(right instanceof SymReal<?> && !(left instanceof SymReal<?>) )
+			return true;
+		return false;
+	}
+	public Expr getCoeffTerm() {
+		if(left instanceof SymReal<?> && !(right instanceof SymReal<?>) )
+			return left;
+		if(right instanceof SymReal<?> && !(left instanceof SymReal<?>) )
+			return right;
+		return null;
+	}
+	public Expr getSymbolTerm() {
+		if(left instanceof SymReal<?> && !(right instanceof SymReal<?>) )
+			return right;
+		if(right instanceof SymReal<?> && !(left instanceof SymReal<?>) )
+			return left;
+		return null;		
 	}
 	
 	@Override

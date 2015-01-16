@@ -110,12 +110,19 @@ public class TestSymbolic {
 		checkResult(x * y * z, z * x * y);
 		checkResult(x * y * z, z * y * x);
 
+		Expr ry = new Reciprocal(y);
+		checkResult("2/y",ry + ry);
+		checkResult("1/y^2",ry * ry);
+		Expr ny = -y;
+		checkResult("-2*y",ny + ny);
+		checkResult("y^2",ny * ny);
+		checkResult(y*y, ny * ny);
 		
 		checkResult("x^5*y*z", x * y * x * z * x * new Power(x,2));
 		
-		checkResult("2*(y*z)^2 + x^3*y*z", (x * y * x * z * x) + (y * z * y * z) + (z * y * z * y));
+		checkResult("x^3*y*z + 2*(y*z)^2", (x * y * x * z * x) + (y * z * y * z) + (z * y * z * y));
 	
-		checkResult("2*x*y*z + x^2*y + x*y^2 + x^2*z + x*z^2 + y^2*z + y*z^2", (x + y) * (y + z) * (z + x) );
+		checkResult("x^2*y + x^2*z + x*y^2 + 2*x*y*z + x*z^2 + y^2*z + y*z^2", (x + y) * (y + z) * (z + x) );
 		
 		checkResult("x^2*y + x*z^2 + y^2*z", (x * y * x) + (y * z * y) + (z * x * z) );
 		
@@ -192,7 +199,7 @@ public class TestSymbolic {
 //			System.out.println(e.getClass());
 		
 		Func f = new Func("test_fun1",expr);
-		checkResult("test_fun1(x,y,z)",f);
+		checkResult("(x + y*z)^2",f);
 		
 		BytecodeFunc func = f.toBytecodeFunc();
 		checkResult(49.0, func.apply(1,2,3), null);
@@ -216,9 +223,19 @@ public class TestSymbolic {
 		checkResult("-2*x", expr2.diff(x));
 		checkResult("-2*y", expr2.diff(y));
 		
-		Func f = new Func("test_fun2",expr2);
-		checkResult("test_fun2(x,y)", f);
-		checkResult(-13.0, f.toBytecodeFunc().apply(2,3), null);
+		Func f = new Func("f", x*x*x*y+x*x*y+z);
+		checkResult("x^2*y + x^3*y + z",f);
+		checkResult("3*x^2*y + 2*x*y",f.diff(x));
+		checkResult("6.0*x*y + 2*y",f.diff(x).diff(x));
+		Expr diff1 = f.diff(x).diff(x).diff(y);
+		checkResult("2 + 6.0*x",diff1);
+		
+		Func f2 = new Func("f2", x,y,z);
+		checkResult("f2(x,y,z)*x",f2*x);
+		checkResult("Df2Dxxy(x,y,z)",f2.diff(x).diff(x).diff(y));
+		Func test_fun2 = new Func("test_fun2",expr2);
+		checkResult("-(x^2 + y^2)", test_fun2);
+		checkResult(-13.0, test_fun2.toBytecodeFunc().apply(2,3), null);
 	}
 	
 	public static void main(String[] args) {

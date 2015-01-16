@@ -16,6 +16,22 @@ abstract public class Expr {
 	
 	public abstract void flattenMultiply(List<Expr> outList);
 	
+	public boolean isAbstract() {
+		return false;
+	}
+	
+	public Expr getExpr() {
+		return this;
+	}
+	
+	public String toString() {
+		return label;
+	}
+	
+	public String getSortKey() {
+		return sortKey;
+	}
+	
 	//Number of simplify operations
 	protected int simplifyOps = 0;
 
@@ -204,11 +220,4 @@ abstract public class Expr {
 		return subs(from, new SymDouble(to));
 	}
 
-	public String toString() {
-		return label;
-	}
-	
-	public String getSortKey() {
-		return sortKey;
-	}
 }
