@@ -8,7 +8,6 @@ Click in menu: Help -> Install New Software. Enter in "Work with" field:
 http://amelentev.github.io/eclipse.jdt-oo-site/
 
 -----------------------Examples---------------------------
-See symjava.examples.*
 
 Expr expr = x + y * z;
 System.out.println(expr); //x + y*z
