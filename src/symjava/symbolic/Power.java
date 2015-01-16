@@ -11,7 +11,7 @@ public class Power extends UnaryOp {
 			label = base + "^" + exponent;
 		else
 			label = "("+base + ")^" + exponent;
-		sortKey = base.getSortKey();
+		sortKey = base.getSortKey()+String.valueOf(exponent);
 	}
 	
 	@Override

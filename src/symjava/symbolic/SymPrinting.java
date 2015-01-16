@@ -12,6 +12,13 @@ public class SymPrinting {
 			return 30;
 		if(expr instanceof Symbol || expr instanceof Symbols || expr instanceof SymReal<?>)
 			return 100;
+		if(expr instanceof Func) {
+			Func f = (Func)expr;
+			if(f.isAbstract())
+				return 90;
+			else
+				return getPrecedence(f.getExpr());
+		}
 		return 1;
 	}
 	

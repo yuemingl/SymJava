@@ -16,10 +16,8 @@ public class Add extends BinaryOp {
 		r = r.simplify();
 		if(Symbol.C0.symEquals(l))
 			return r.simplify().incSimplifyOps(1);
-		else if(Symbol.C0.symEquals(r))
+		else if(Symbol.C0.symEquals(r)) {
 			return l.simplify().incSimplifyOps(1);
-		else if(Utils.symCompare(l, r)) {
-			return Symbol.C2.multiply(l).setSimplifyOps(l.getSimplifyOps()+r.getSimplifyOps() + 1);
 		} else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
 			Number t1 = (Number)((SymReal<?>)l).getVal();
 			Number t2 = (Number)((SymReal<?>)r).getVal();
@@ -35,6 +33,44 @@ public class Add extends BinaryOp {
 		} else if(r instanceof Negate) {
 			Negate nr = (Negate)r;
 			return Subtract.simplifiedIns(l, nr.base);
+		} else if(l instanceof Multiply && r instanceof Multiply) {
+			Multiply ml = (Multiply)l;
+			Multiply mr = (Multiply)r;
+			if(ml.isCoeffMulSymbol() && mr.isCoeffMulSymbol()) {
+				if(Utils.symCompare(ml.getSymbolTerm(), mr.getSymbolTerm())) {
+					Expr coeff = ml.getCoeffTerm().add(mr.getCoeffTerm());
+					return coeff.multiply(ml.getSymbolTerm());
+				}
+			} else if(ml.isCoeffMulSymbol()) {
+				if(Utils.symCompare(ml.getSymbolTerm(), r)) {
+					Expr coeff = ml.getCoeffTerm().add(Symbol.C1);
+					return coeff.multiply(r); 
+				}
+			} else if(mr.isCoeffMulSymbol()) {
+				if(Utils.symCompare(mr.getSymbolTerm(), l)) {
+					Expr coeff = mr.getCoeffTerm().add(Symbol.C1);
+					return coeff.multiply(l);
+				}
+			}
+		} else if(l instanceof Multiply) {
+			Multiply ml = (Multiply)l;
+			if(ml.isCoeffMulSymbol()) {
+				if(Utils.symCompare(ml.getSymbolTerm(), r)) {
+					Expr coeff = ml.getCoeffTerm().add(Symbol.C1);
+					return coeff.multiply(r); 
+				}
+			}
+		} else if(r instanceof Multiply) {
+			Multiply mr = (Multiply)r;
+			if(mr.isCoeffMulSymbol()) {
+				if(Utils.symCompare(mr.getSymbolTerm(), l)) {
+				Expr coeff = mr.getCoeffTerm().add(Symbol.C1);
+				return coeff.multiply(l);
+				}
+			}
+		}
+		if(Utils.symCompare(l, r)) {
+			return Symbol.C2.multiply(l).setSimplifyOps(l.getSimplifyOps()+r.getSimplifyOps() + 1);
 		}
 		return new Add(l, r);
 	}
