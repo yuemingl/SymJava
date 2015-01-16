@@ -173,7 +173,12 @@ public class TestSymbolic {
 			checkResult("x_"+j+"^2", sum2.getSummand(j));
 		}
 		Expr summand2 = sum2.getSummand(2).subs(ss.get(2), y);
-		checkResult("y^2",summand2);		
+		checkResult("y^2",summand2);
+		
+		int n = 100;
+		Expr sum3 = new Summation(new Reciprocal((x+3.5)*(x+8)), x, 1, n);
+		checkResult("\\Sigma_x=1^100(1/(28.0 + 11.5*x + x^2))", sum3);
+		
 	}
 	
 	public static void testToBytecodeFunc() {
