@@ -37,8 +37,6 @@ public class Multiply extends BinaryOp {
 			return new SymDouble(t1.doubleValue() * t2.doubleValue()).setSimplifyOps(
 					l.getSimplifyOps() + r.getSimplifyOps() + 1
 					);
-		} else if(Utils.symCompare(l, r)) {
-				return new Power(l, 2).setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
 		} else if(Symbol.Cm1.symEquals(l)) {
 			return new Negate(r).incSimplifyOps(1);
 		} else if(Symbol.Cm1.symEquals(r)) {
@@ -53,6 +51,26 @@ public class Multiply extends BinaryOp {
 		} else if(r instanceof Reciprocal) {
 			Reciprocal rr = (Reciprocal)r;
 			return Divide.simplifiedIns(l, rr.base);
+		} else if(l instanceof Power && r instanceof Power) {
+			Power lp = (Power)l;
+			Power rp = (Power)r;
+			if(Utils.symCompare(lp.base, rp.base)) {
+				return new Power( lp.base, lp.exponent+rp.exponent).incSimplifyOps(1);
+			} else if(lp.exponent == rp.exponent) {
+				return new Power( simplifiedIns(lp.base, rp.base), lp.exponent).incSimplifyOps(1);
+			}
+		} else if(l instanceof Power) {
+			Power lp = (Power)l;
+			if(Utils.symCompare(lp.base, r)) {
+				return new Power(lp.base, lp.exponent + 1).incSimplifyOps(1);
+			}
+		} else if(r instanceof Power) {
+			Power rp = (Power)r;
+			if(Utils.symCompare(rp.base, l)) {
+				return new Power(rp.base, rp.exponent + 1).incSimplifyOps(1);
+			}
+		} else if(Utils.symCompare(l, r)) {
+			return new Power(l, 2).setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
 		}
 		return new Multiply(l, r);
 	}

@@ -9,7 +9,7 @@ public class Reciprocal extends UnaryOp {
 		label =  "1/" +  SymPrinting.addParenthsesIfNeeded(base, this);		
 		sortKey = base.getSortKey();
 	}
-
+	
 	@Override
 	public Expr diff(Expr expr) {
 		return base.diff(expr);
@@ -17,6 +17,10 @@ public class Reciprocal extends UnaryOp {
 
 	@Override
 	public Expr simplify() {
+		if(base instanceof Power) {
+			Power p = (Power)base;
+			return new Power(p.base, -p.exponent);
+		}
 		return this;
 	}
 

@@ -24,8 +24,12 @@ public class TestSymbolic {
 	public static void checkResult(double d1, double d2, Expr expr) {
 		if( d1 == d2 )
 			System.out.println(true);
-		else
-			System.out.println("FAIL: " + expr + " => " + d1 +" != " + d2);
+		else {
+			if(expr != null)
+				System.out.println("FAIL: " + expr + " => " + d1 +" != " + d2);
+			else
+				System.out.println("FAIL: " + d1 +" != " + d2);
+		}
 	}	
 	public static void testBasic() {
 		System.out.println("--------------testBasic-----------------");
@@ -109,7 +113,7 @@ public class TestSymbolic {
 		
 		checkResult("x^5*y*z", x * y * x * z * x * new Power(x,2));
 		
-		checkResult("2*y^2*z^2 + x^3*y*z", (x * y * x * z * x) + (y * z * y * z) + (z * y * z * y));
+		checkResult("2*(y*z)^2 + x^3*y*z", (x * y * x * z * x) + (y * z * y * z) + (z * y * z * y));
 	
 		checkResult("2*x*y*z + x^2*y + x*y^2 + x^2*z + x*z^2 + y^2*z + y*z^2", (x + y) * (y + z) * (z + x) );
 		
@@ -154,48 +158,43 @@ public class TestSymbolic {
 	public static void testSummation() {
 		System.out.println("--------------testSummation-----------------");
 		Expr sum = new Summation( x*x, x, 1, 5);
-		System.out.println(sum);
-		System.out.println(sum.subs(x, 2));
+		checkResult("\\Sigma_x=1^5(x^2)", sum);
+		checkResult("\\Sigma_x=1^5((2)^2)", sum.subs(x, 2));
 		
 		Symbol i = new Symbol("i");
 		Symbols ss = new Symbols("x", i);
-		System.out.println(ss);
-		System.out.println(ss.get(2));
+		checkResult("x_i", ss);
+		checkResult("x_2", ss.get(2));
 		
 		Summation sum2 = new Summation( ss*ss, i, 1, 5);
-		System.out.println(sum2);
+		checkResult("\\Sigma_i=1^5((x_i)^2)",sum2);
 		
 		for(int j=sum2.start; j<sum2.end; j++) {
-			System.out.println("summand_"+j+"="+sum2.getSummand(j));
+			checkResult("x_"+j+"^2", sum2.getSummand(j));
 		}
-		System.out.println();
 		Expr summand2 = sum2.getSummand(2).subs(ss.get(2), y);
-		System.out.println(summand2);		
+		checkResult("y^2",summand2);		
 	}
 	
 	public static void testToBytecodeFunc() {
 		System.out.println("--------------testToBytecodeFunc-----------------");
 		Expr expr = new Power(x + y * z, 2);
-		System.out.println(expr);
+		checkResult("(x + y*z)^2", expr);
 		
-		List<Expr> list = new ArrayList<Expr>();
-		BytecodeUtils.post_order(expr, list);
-		for(Expr e : list)
-			System.out.println(e.getClass());
+//		List<Expr> list = new ArrayList<Expr>();
+//		BytecodeUtils.post_order(expr, list);
+//		for(Expr e : list)
+//			System.out.println(e.getClass());
 		
-		Func f = new Func("test_fun",expr);
-		System.out.println(f);
+		Func f = new Func("test_fun1",expr);
+		checkResult("test_fun1(x,y,z)",f);
 		
 		BytecodeFunc func = f.toBytecodeFunc();
-		System.out.println(func.apply(1,2,3));
+		checkResult(49.0, func.apply(1,2,3), null);
 		
-		Func c = new Func("test_const", new SymInteger(8));
-		list.clear();
-		BytecodeUtils.post_order(c.expr, list);
-		for(Expr e : list)
-			System.out.println(e.getClass());		
+		Func c = new Func("test_const", new SymInteger(8));	
 		func = c.toBytecodeFunc();
-		System.out.println(func.apply(0.0));
+		checkResult(8.0, func.apply(0.0), null);
 		
 		Reciprocal rec = new Reciprocal(x + y);
 		
@@ -206,15 +205,15 @@ public class TestSymbolic {
 	public static void testDiff() {
 		System.out.println("--------------testDiff-----------------");
 		Expr expr = x*x*2.0 + x + 1.0;
-		System.out.println(expr.diff(x));
+		checkResult("1 + 4.0*x", expr.diff(x));
 		
 		Expr expr2 = -(x*x + y*y);
-		System.out.println(expr2.diff(x));
-		System.out.println(expr2.diff(y));
+		checkResult("-2*x", expr2.diff(x));
+		checkResult("-2*y", expr2.diff(y));
 		
 		Func f = new Func("test_fun2",expr2);
-		System.out.println(f);
-		System.out.println(f.toBytecodeFunc().apply(2,3));
+		checkResult("test_fun2(x,y)", f);
+		checkResult(-13.0, f.toBytecodeFunc().apply(2,3), null);
 	}
 	
 	public static void main(String[] args) {
@@ -223,8 +222,8 @@ public class TestSymbolic {
 		testBasic();
 		testPrint();
 		testSimplify();
-//		testSummation();
-//		testToBytecodeFunc();
-//		testDiff();
+		testSummation();
+		testToBytecodeFunc();
+		testDiff();
 	}
 }
