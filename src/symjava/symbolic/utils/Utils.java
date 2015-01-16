@@ -155,7 +155,7 @@ public class Utils {
 		
 		if(l2.size() > 0) {
 			l.addAll(l2);
-			return simplifyMultiplyListHelper(l);
+			return simplifyAddListHelper(l);
 		}
 		
 		sortExprList(l);

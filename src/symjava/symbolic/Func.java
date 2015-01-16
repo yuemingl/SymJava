@@ -4,6 +4,7 @@ import java.util.List;
 
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.utils.BytecodeUtils;
+import symjava.symbolic.utils.Utils;
 
 public class Func extends Expr {
 	public Expr expr = null;
@@ -65,12 +66,33 @@ public class Func extends Expr {
 
 	@Override
 	public Expr diff(Expr expr) {
-		return new Derivative(this, expr);
+		if(Utils.symCompare(this, expr)) {
+			return Symbol.C1;
+		} else if(this.containsArg(expr)) {
+			return new Derivative(this, expr);
+		} else {
+			return Symbol.C0;
+		}
+	}
+	
+	public boolean containsArg(Expr arg) {
+		if(arg != null) {
+			for(Expr e : args) {
+				boolean b = Utils.symCompare(e, arg);
+				if(b) return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
-		return new Func(this.label, this.expr.subs(from, to));
+		if(Utils.symCompare(this, from))
+			return to;
+		else if(this.expr != null)
+			return new Func(this.label, this.expr.subs(from, to));
+		else
+			return this;
 	}
 	
 	@Override
@@ -86,7 +108,14 @@ public class Func extends Expr {
 	public boolean symEquals(Expr other) {
 		if(other instanceof Func) {
 			Func o = (Func)other;
-			if(expr.symEquals(o.expr)) {
+			if(this.expr == null && o.expr != null)
+				return false;
+			if(this.expr != null && o.expr == null)
+				return false;
+			if(!this.label.equals(o.label))
+				return false;
+			if( (this.expr == null && o.expr == null) ||
+				 Utils.symCompare(this.expr, o.expr) ) {
 				if(args.length != o.args.length)
 					return false;
 				for(int i=0; i<args.length; i++) {

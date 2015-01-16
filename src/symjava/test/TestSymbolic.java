@@ -223,19 +223,32 @@ public class TestSymbolic {
 		checkResult("-2*x", expr2.diff(x));
 		checkResult("-2*y", expr2.diff(y));
 		
-		Func f = new Func("f", x*x*x*y+x*x*y+z);
-		checkResult("x^2*y + x^3*y + z",f);
-		checkResult("3*x^2*y + 2*x*y",f.diff(x));
-		checkResult("6.0*x*y + 2*y",f.diff(x).diff(x));
-		Expr diff1 = f.diff(x).diff(x).diff(y);
+		Func F = new Func("F", x*x*x*y+x*x*y+z);
+		checkResult("x^2*y + x^3*y + z",F);
+		checkResult("3*x^2*y + 2*x*y",F.diff(x));
+		checkResult("6.0*x*y + 2*y",F.diff(x).diff(x));
+		Expr diff1 = F.diff(x).diff(x).diff(y);
 		checkResult("2 + 6.0*x",diff1);
 		
-		Func f2 = new Func("f2", x,y,z);
-		checkResult("f2(x,y,z)*x",f2*x);
-		checkResult("Df2Dxxy(x,y,z)",f2.diff(x).diff(x).diff(y));
+		Func f = new Func("f", x,y,z);
+		checkResult("f(x,y,z)*x",f*x);
+		checkResult("DfDxxy(x,y,z)",f.diff(x).diff(x).diff(y));
+		checkResult("DfDx(x,y,z)*x + f(x,y,z)",(f*x).diff(x));
+		checkResult("DfDxx(x,y,z)*x + 2*DfDx(x,y,z)",(f*x).diff(x).diff(x));
+		checkResult("DfDxxy(x,y,z)*x + 2*DfDxy(x,y,z)",(f*x).diff(x).diff(x).diff(y));
 		Func test_fun2 = new Func("test_fun2",expr2);
 		checkResult("-(x^2 + y^2)", test_fun2);
-		checkResult(-13.0, test_fun2.toBytecodeFunc().apply(2,3), null);
+		//checkResult(-13.0, test_fun2.toBytecodeFunc().apply(2,3), null);
+
+		//Test for functional derivative
+		Func u = new Func("u", x,y,z);
+		Func L = new Func("L", u * u);
+		Symbol alp = new Symbol("a");
+		Func du = new Func("du", x,y,z);
+		Expr Lu = L.subs(u, u + alp * du).diff(alp); 
+		checkResult("2*a*(du(x,y,z))^2 + 2*du(x,y,z)*u(x,y,z)", Lu);
+		checkResult("2*du(x,y,z)*u(x,y,z)", Lu.subs(alp, Symbol.C0).simplify());
+		
 	}
 	
 	public static void main(String[] args) {
