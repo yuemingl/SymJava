@@ -58,6 +58,10 @@ public class Func extends Expr {
 		else
 			return label+"("+BytecodeUtils.joinName(args, ",")+")";
 	}
+	
+	public String funcLabel() {
+		return label+"("+BytecodeUtils.joinName(args, ",")+")";
+	}
 
 	@Override
 	public Expr diff(Expr expr) {
