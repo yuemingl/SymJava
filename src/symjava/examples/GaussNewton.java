@@ -46,7 +46,7 @@ public class GaussNewton {
 		
 		for(int i=0; i<n; i++) {
 			Eq subEq = eq.subsUnknowns(data[i]);
-			res[i] = subEq.rhs - subEq.lhs; //res[i] = -a*x[i]/(b+x[i]) + y[i]; 
+			res[i] = subEq.lhs - subEq.rhs; //res[i] = -a*x[i]/(b+x[i]) + y[i]; 
 			J[i][0] = res[i].diff(a);
 			J[i][1] = res[i].diff(b);
 		}
