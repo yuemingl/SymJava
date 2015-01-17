@@ -5,7 +5,7 @@ import java.util.Vector;
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
-import symjava.symbolic.Symbol;
+import symjava.symbolic.Expr;
 
 public class NumMatrix {
 	Vector<Vector<BytecodeFunc>> data = new Vector<Vector<BytecodeFunc>>();
@@ -20,7 +20,7 @@ public class NumMatrix {
 		}
 	}
 	
-	public NumMatrix(SymMatrix sm, Symbol[] args) {
+	public NumMatrix(SymMatrix sm, Expr[] args) {
 		int m = sm.rowDim();
 		int n = sm.colDim();
 		data.setSize(m);

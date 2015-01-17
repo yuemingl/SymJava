@@ -33,20 +33,21 @@ System.out.println(func.apply(1,2)); //4.0
 ```Java
 package symjava.examples;
 
-import Jama.Matrix;
-import symjava.matrix.*;
 import symjava.relational.Eq;
 import symjava.symbolic.Symbol;
 import static symjava.symbolic.Symbol.*;
 
-/**
- * Use Gauss-Newton algorithm to fit a given model y=a*x/(b-x)
- * See http://en.wikipedia.org/wiki/Gauss-Newton_algorithm
- *
- */
-public class GaussNewton {
 
-	public static void main(String[] args) {
+public class Example2 {
+
+	/**
+	 * Example from Wikipedia
+	 * (http://en.wikipedia.org/wiki/Gauss-Newton_algorithm)
+	 * 
+	 * Use Gauss-Newton algorithm to fit a given model y=a*x/(b-x)
+	 *
+	 */
+	public static void example1() {
 		//Model y=a*x/(b-x), Unknown parameters: a, b
 		Symbol[] unknowns = {x, y};
 		Symbol[] params = {a, b};
@@ -66,59 +67,51 @@ public class GaussNewton {
 		double[] initialGuess = {0.9, 0.2};
 		
 		//Here we go ...
-		runGaussNewton(eq, initialGuess, data);
+		GaussNewton.solve(eq, initialGuess, data, 10, 1e-4);
 
 	}
 	
 	/**
-	 * A general Gauss Newton solver
-	 * @param eq
-	 * @param init
-	 * @param data
+	 * Example from Apache Commons Math 
+	 * (http://commons.apache.org/proper/commons-math/userguide/optimization.html)
+	 * 
+	 * "We are looking to find the best parameters [a, b, c] for the quadratic function 
+	 * 
+	 * f(x) = a x2 + b x + c. 
+	 * 
+	 * The data set below was generated using [a = 8, b = 10, c = 16]. A random number 
+	 * between zero and one was added to each y value calculated. "
+	 * 
 	 */	
-	public static void runGaussNewton(Eq eq, double[] init, double[] ...data) {
-		int n = data.length;
+	public static void example2() {
+		Symbol[] unknowns = {x, y};
+		Symbol[] params = {a, b, c};
+		Eq eq = new Eq(y, a*x*x + b*x + c, unknowns, params);
 		
-		//Construct Jacobian Matrix and Residuals
-		SymVector res = new SymVector(n);
-		SymMatrix J = new SymMatrix(n, eq.getParams().length);
+		double[][] data = {
+				{1 , 34.234064369},
+				{2 , 68.2681162306108},
+				{3 , 118.615899084602},
+				{4 , 184.138197238557},
+				{5 , 266.599877916276},
+				{6 , 364.147735251579},
+				{7 , 478.019226091914},
+				{8 , 608.140949270688},
+				{9 , 754.598868667148},
+				{10, 916.128818085883},		
+		};
 		
-		for(int i=0; i<n; i++) {
-			Eq subEq = eq.subsUnknowns(data[i]);
-			res[i] = subEq.lhs - subEq.rhs; //res[i] =y[i] - a*x[i]/(b + x[i]); 
-			J[i][0] = res[i].diff(a);
-			J[i][1] = res[i].diff(b);
-		}
+		double[] initialSolution = {1, 1, 1};
 		
-		System.out.println("Jacobian Matrix = ");
-		J.print();
-		System.out.println("Residuals = ");
-		res.print();
-		
-		int maxIter = 10;
-		double eps = 1e-4;
-		Symbol[] params = {a, b};
-		//Convert symbolic staff to Bytecode staff to speedup evaluation
-		NumVector Nres = new NumVector(res, params);
-		NumMatrix NJ = new NumMatrix(J, params);
-		
-		System.out.println("Iterativly sovle a and b in model y=a*x/(b-x) ... ");
-		for(int i=0; i<maxIter; i++) {
-			//Use JAMA to solve the system
-			Matrix A = new Matrix(NJ.eval(init));
-			Matrix b = new Matrix(Nres.eval(init), Nres.dim());
-			Matrix x = A.solve(b); //Lease Square solution
-			if(x.norm2() < eps) 
-				break;
-			//Update initial guess
-			for(int j=0; j<init.length; j++) {
-				init[j] = init[j] - x.get(j, 0);
-				System.out.print(String.format("%s=%.3f",eq.getParams()[j], init[j])+" ");
-			}
-			System.out.println();
-		}		
+		GaussNewton.solve(eq, initialSolution, data, 10, 1e-4);
+	}
+	
+	public static void main(String[] args) {
+		example1();
+		example2();
 	}
 }
+
 ```
 Output:
 ```
@@ -139,11 +132,91 @@ Residuals =
 0.2665 - 2.5/(2.5 + b)*a
 0.3317 - 3.74/(3.74 + b)*a
 Iterativly sovle a and b in model y=a*x/(b-x) ... 
-a=0.333 b=0.260 
-a=0.343 b=0.426 
-a=0.358 b=0.530 
-a=0.361 b=0.554 
-a=0.362 b=0.556 
-a=0.362 b=0.556 
+a=0.33266 b=0.26017 
+a=0.34281 b=0.42608 
+a=0.35778 b=0.52951 
+a=0.36141 b=0.55366 
+a=0.36180 b=0.55607 
+a=0.36183 b=0.55625 
+
+Jacobian Matrix = 
+-(1.0)^2	-1	-1	
+-(2.0)^2	-2.0	-1	
+-(3.0)^2	-3.0	-1	
+-(4.0)^2	-4.0	-1	
+-(5.0)^2	-5.0	-1	
+-(6.0)^2	-6.0	-1	
+-(7.0)^2	-7.0	-1	
+-(8.0)^2	-8.0	-1	
+-(9.0)^2	-9.0	-1	
+-(10.0)^2	-10.0	-1	
+Residuals = 
+34.234064369 - (1.0)^2*a + b - c
+68.2681162306108 - (2.0)^2*a + 2.0*b - c
+118.615899084602 - (3.0)^2*a + 3.0*b - c
+184.138197238557 - (4.0)^2*a + 4.0*b - c
+266.599877916276 - (5.0)^2*a + 5.0*b - c
+364.147735251579 - (6.0)^2*a + 6.0*b - c
+478.019226091914 - (7.0)^2*a + 7.0*b - c
+608.140949270688 - (8.0)^2*a + 8.0*b - c
+754.598868667148 - (9.0)^2*a + 9.0*b - c
+916.128818085883 - (10.0)^2*a + 10.0*b - c
+Iterativly sovle a and b in model y=a*x/(b-x) ... 
+a=7.99883 b=10.00184 c=16.32401 
 ```
 
+```Java
+package symjava.examples;
+
+import Jama.Matrix;
+import symjava.matrix.*;
+import symjava.relational.Eq;
+
+/**
+ * A general Gauss Newton solver using SymJava for simbolic computations
+ * instead of writing your own Jacobian matrix and Residuals
+ */
+public class GaussNewton {
+
+	public static void solve(Eq eq, double[] init, double[][] data, int maxIter, double eps) {
+		int n = data.length;
+		
+		//Construct Jacobian Matrix and Residuals
+		SymVector res = new SymVector(n);
+		SymMatrix J = new SymMatrix(n, eq.getParams().length);
+		
+		for(int i=0; i<n; i++) {
+			Eq subEq = eq.subsUnknowns(data[i]);
+			res[i] = subEq.lhs - subEq.rhs; //res[i] =y[i] - a*x[i]/(b + x[i]); 
+			for(int j=0; j<eq.getParams().length; j++)
+				J[i][j] = res[i].diff(eq.getParams()[j]);
+		}
+		
+		System.out.println("Jacobian Matrix = ");
+		J.print();
+		System.out.println("Residuals = ");
+		res.print();
+		
+		//Convert symbolic staff to Bytecode staff to speedup evaluation
+		NumVector Nres = new NumVector(res, eq.getParams());
+		NumMatrix NJ = new NumMatrix(J, eq.getParams());
+		
+		System.out.println("Iterativly sovle a and b in model y=a*x/(b-x) ... ");
+		for(int i=0; i<maxIter; i++) {
+			//Use JAMA to solve the system
+			Matrix A = new Matrix(NJ.eval(init));
+			Matrix b = new Matrix(Nres.eval(init), Nres.dim());
+			Matrix x = A.solve(b); //Lease Square solution
+			if(x.norm2() < eps) 
+				break;
+			//Update initial guess
+			for(int j=0; j<init.length; j++) {
+				init[j] = init[j] - x.get(j, 0);
+				System.out.print(String.format("%s=%.5f",eq.getParams()[j], init[j])+" ");
+			}
+			System.out.println();
+		}		
+	}
+}
+
+```

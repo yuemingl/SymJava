@@ -5,7 +5,7 @@ import java.util.Vector;
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
-import symjava.symbolic.Symbol;
+import symjava.symbolic.Expr;
 
 public class NumVector {
 	Vector<BytecodeFunc> data = new Vector<BytecodeFunc>();
@@ -18,7 +18,7 @@ public class NumVector {
 		data.setSize(size);
 	}
 	
-	public NumVector(SymVector sv, Symbol[] args) {
+	public NumVector(SymVector sv, Expr[] args) {
 		int n = sv.dim();
 		data.setSize(n);
 		for(int j=0; j<n; j++) {
