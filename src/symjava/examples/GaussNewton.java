@@ -33,7 +33,7 @@ public class GaussNewton {
 		NumVector Nres = new NumVector(res, eq.getParams());
 		NumMatrix NJ = new NumMatrix(J, eq.getParams());
 		
-		System.out.println("Iterativly sovle a and b in model y=a*x/(b-x) ... ");
+		System.out.println("Iterativly sovle ... ");
 		for(int i=0; i<maxIter; i++) {
 			//Use JAMA to solve the system
 			Matrix A = new Matrix(NJ.eval(init));
