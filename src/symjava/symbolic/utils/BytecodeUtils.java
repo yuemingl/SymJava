@@ -116,8 +116,8 @@ public class BytecodeUtils {
 				"apply", fullClsName, // method, class
 				il, cp);
 		
-		Symbol[] fArgs = fun.args;
-		HashMap<Symbol, Integer> argsMap = new HashMap<Symbol, Integer>();
+		Expr[] fArgs = fun.args;
+		HashMap<Expr, Integer> argsMap = new HashMap<Expr, Integer>();
 		for(int i=0; i<fArgs.length; i++) {
 			argsMap.put(fArgs[i], i);
 		}

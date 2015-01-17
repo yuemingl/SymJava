@@ -8,14 +8,14 @@ import symjava.symbolic.utils.Utils;
 
 public class Func extends Expr {
 	public Expr expr = null;
-	public Symbol[] args = null;
+	public Expr[] args = null;
 
 	/**
 	 * Construct an abstract function
 	 * @param name
 	 * @param args
 	 */
-	public Func(String name, Symbol ...args) {
+	public Func(String name, Expr ...args) {
 		this.label = name;
 		this.args = args;
 		this.sortKey = label;
