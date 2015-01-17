@@ -131,7 +131,7 @@ Residuals =
 0.2729 - 1.253/(1.253 + b)*a
 0.2665 - 2.5/(2.5 + b)*a
 0.3317 - 3.74/(3.74 + b)*a
-Iterativly sovle a and b in model y=a*x/(b-x) ... 
+Iterativly sovle ... 
 a=0.33266 b=0.26017 
 a=0.34281 b=0.42608 
 a=0.35778 b=0.52951 
@@ -161,7 +161,7 @@ Residuals =
 608.140949270688 - (8.0)^2*a + 8.0*b - c
 754.598868667148 - (9.0)^2*a + 9.0*b - c
 916.128818085883 - (10.0)^2*a + 10.0*b - c
-Iterativly sovle a and b in model y=a*x/(b-x) ... 
+Iterativly sovle ... 
 a=7.99883 b=10.00184 c=16.32401 
 ```
 
