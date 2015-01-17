@@ -70,6 +70,12 @@ public class GaussNewton {
 
 	}
 	
+	/**
+	 * A general Gauss Newton solver
+	 * @param eq
+	 * @param init
+	 * @param data
+	 */	
 	public static void runGaussNewton(Eq eq, double[] init, double[] ...data) {
 		int n = data.length;
 		
