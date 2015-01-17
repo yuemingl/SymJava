@@ -41,7 +41,7 @@ public class Subtract extends BinaryOp {
 	
 	@Override
 	public Expr diff(Expr expr) {
-		return left.diff(expr) + right.diff(expr);
+		return left.diff(expr).subtract(right.diff(expr));
 	}
 
 	@Override

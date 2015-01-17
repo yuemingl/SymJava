@@ -26,13 +26,13 @@ public class Add extends BinaryOp {
 		} else if(l instanceof Negate && r instanceof Negate) {
 			Negate nl = (Negate)l;
 			Negate nr = (Negate)r;
-			return new Negate(Add.simplifiedIns(nl.base, nr.base)).incSimplifyOps(1);
+			return new Negate(Add.shallowSimplifiedIns(nl.base, nr.base)).incSimplifyOps(1);
 		} else if(l instanceof Negate) {
 			Negate nl = (Negate)l;
-			return Subtract.simplifiedIns(r, nl.base);
+			return Subtract.shallowSimplifiedIns(r, nl.base);
 		} else if(r instanceof Negate) {
 			Negate nr = (Negate)r;
-			return Subtract.simplifiedIns(l, nr.base);
+			return Subtract.shallowSimplifiedIns(l, nr.base);
 		} else if(l instanceof Multiply && r instanceof Multiply) {
 			Multiply ml = (Multiply)l;
 			Multiply mr = (Multiply)r;
@@ -86,7 +86,7 @@ public class Add extends BinaryOp {
 
 	@Override
 	public Expr diff(Expr expr) {
-		return left.diff(expr) + right.diff(expr);
+		return left.diff(expr).add(right.diff(expr));
 	}
 
 	@Override
