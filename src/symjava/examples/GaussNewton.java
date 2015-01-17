@@ -59,11 +59,13 @@ public class GaussNewton {
 		int maxIter = 10;
 		double eps = 1e-4;
 		Symbol[] params = {a, b};
+		//Convert symbolic staff to Bytecode staff to speedup evaluation
 		NumVector Nres = new NumVector(res, params);
 		NumMatrix NJ = new NumMatrix(J, params);
 		
 		System.out.println("Iterativly sovle a and b in model y=a*x/(b-x) ... ");
 		for(int i=0; i<maxIter; i++) {
+			//Use JAMA to solve the system
 			Matrix A = new Matrix(NJ.eval(init));
 			Matrix b = new Matrix(Nres.eval(init), Nres.dim());
 			Matrix x = A.solve(b); //Lease Square solution
