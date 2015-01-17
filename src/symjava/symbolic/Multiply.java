@@ -51,10 +51,10 @@ public class Multiply extends BinaryOp {
 			return new Reciprocal( simplifiedIns(rl.base, rr.base) ).incSimplifyOps(1);
 		} else if(l instanceof Reciprocal) {
 			Reciprocal rl = (Reciprocal)l;
-			return Divide.simplifiedIns(r, rl.base);
+			return Divide.shallowSimplifiedIns(r, rl.base);
 		} else if(r instanceof Reciprocal) {
 			Reciprocal rr = (Reciprocal)r;
-			return Divide.simplifiedIns(l, rr.base);
+			return Divide.shallowSimplifiedIns(l, rr.base);
 		} else if(l instanceof Power && r instanceof Power) {
 			Power lp = (Power)l;
 			Power rp = (Power)r;

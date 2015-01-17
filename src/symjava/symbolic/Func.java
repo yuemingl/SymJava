@@ -60,7 +60,7 @@ public class Func extends Expr {
 			return label+"("+BytecodeUtils.joinName(args, ",")+")";
 	}
 	
-	public String funcLabel() {
+	public String getLabel() {
 		return label+"("+BytecodeUtils.joinName(args, ",")+")";
 	}
 
