@@ -3,9 +3,6 @@ package symjava.test;
 import static symjava.symbolic.Symbol.*;
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.*;
-import symjava.symbolic.utils.BytecodeUtils;
-
-import java.util.*;
 
 
 public class TestSymbolic {
@@ -33,29 +30,19 @@ public class TestSymbolic {
 	}	
 	public static void testBasic() {
 		System.out.println("--------------testBasic-----------------");
-		Expr expr = x + y;
-		checkResult("x + y",expr);
-
-		expr = x - y;
-		checkResult("x - y",expr);
-
-		expr = x * y;
-		checkResult("x*y",expr);
-
-		expr = x / y;
-		checkResult("x/y",expr);
-		
-		expr = - x;
-		checkResult("-x",expr);
-
-		expr = new Power(x,2);
-		checkResult("x^2",expr);
+		checkResult("x + y", x + y);
+		checkResult("x - y",x - y);
+		checkResult("x*y",x * y);
+		checkResult("x/y",x / y);
+		checkResult("-x",- x);
+		checkResult("x^2",new Power(x,2));
 
 		checkResult("0.0", Symbol.Cm1 + Symbol.C1);
 		checkResult("0", x + (-x));
-
 		checkResult("-1", Symbol.Cm1 * Symbol.C1);
 		checkResult("-x", x * -1);
+		checkResult("0", -Symbol.C0);
+		checkResult("1", -Symbol.C0 + 1);
 
 		checkResult("1/x", new Reciprocal(x));
 		checkResult("1/x", Symbol.C1 / x);
@@ -76,7 +63,8 @@ public class TestSymbolic {
 		System.out.println("--------------testPrint-----------------");
 		checkResult("x*y + x*z", (x*(y+z)));
 		checkResult("x/(y + z)", (x/(y+z)));
-		checkResult("(y + z)^2", ((y+z)*(y+z)));
+		//checkResult("(y + z)^2", ((y+z)*(y+z)));
+		checkResult("y^2 + 2*y*z + z^2", ((y+z)*(y+z)));
 		checkResult("-(y + z)", (-(y+z)));
 	}
 	public static void testSimplify() {
@@ -149,7 +137,7 @@ public class TestSymbolic {
 		
 		expr = x + y + z;
 		Expr yz= y + z;
-		sub_expr = expr.subs(x, yz);
+		sub_expr = expr.subs(x, yz);//.simplify();
 		checkResult("y + z + y + z", sub_expr);
 		checkResult(sub_expr, (z + y) + (y + z));
 		checkResult(sub_expr, (z + y)*2.0);

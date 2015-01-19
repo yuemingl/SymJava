@@ -16,9 +16,9 @@ public class Example2 {
 	 */
 	public static void example1() {
 		//Model y=a*x/(b-x), Unknown parameters: a, b
-		Symbol[] unknowns = {x, y};
+		Symbol[] freeVars = {x};
 		Symbol[] params = {a, b};
-		Eq eq = new Eq(y, a*x/(b+x), unknowns, params); 
+		Eq eq = new Eq(y, a*x/(b+x), freeVars, params); 
 		
 		//Data for (x,y)
 		double[][] data = {
@@ -51,9 +51,9 @@ public class Example2 {
 	 * 
 	 */	
 	public static void example2() {
-		Symbol[] unknowns = {x, y};
+		Symbol[] freeVars = {x};
 		Symbol[] params = {a, b, c};
-		Eq eq = new Eq(y, a*x*x + b*x + c, unknowns, params);
+		Eq eq = new Eq(y, a*x*x + b*x + c, freeVars, params);
 		
 		double[][] data = {
 				{1 , 34.234064369},
@@ -68,9 +68,9 @@ public class Example2 {
 				{10, 916.128818085883},		
 		};
 		
-		double[] initialSolution = {1, 1, 1};
+		double[] initialGuess = {1, 1, 1};
 		
-		GaussNewton.solve(eq, initialSolution, data, 10, 1e-4);
+		GaussNewton.solve(eq, initialGuess, data, 10, 1e-4);
 	}
 	
 	public static void main(String[] args) {

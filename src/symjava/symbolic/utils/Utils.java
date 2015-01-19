@@ -1,9 +1,12 @@
 package symjava.symbolic.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import symjava.symbolic.Add;
 import symjava.symbolic.Divide;
@@ -111,9 +114,9 @@ public class Utils {
 			else {
 				int sign = getMultiplyGlobalSign(mulList);
 				removeNegate(mulList);
-				if(mulList.size() > 2) {
+				//if(mulList.size() > 2) {
 					simplifyMultiplyListHelper(mulList);
-				}
+				//}
 				if(sign == -1) {
 					rlt.add(new Negate(multiplyListToExpr(mulList)));
 				} else {
@@ -121,10 +124,12 @@ public class Utils {
 				}				
 			}
 		}
-		if(addList.size() > 2) {
+		//if(addList.size() > 2) {
 			simplifyAddListHelper(rlt);
-		}
-		return addListWithNegateToExpr(rlt);
+		//}
+		Expr ret = addListToExpr(rlt);
+		ret.setAsSimplified();
+		return ret;
 	}
 	
 	protected static List<Expr> simplifyAddListHelper(List<Expr> l) {
@@ -135,8 +140,10 @@ public class Utils {
 			for(int i=0; i<l.size(); i++) {
 				boolean found = false;
 				for(int j=i+1; j<l.size(); j++) {
+					int oldSimOps = l.get(i).getSimplifyOps() + l.get(j).getSimplifyOps();
+					//Expr simIns = Add.simplifiedIns(l.get(i), l.get(j));
 					Expr simIns = Add.shallowSimplifiedIns(l.get(i), l.get(j));
-					if( simIns.getSimplifyOps() > l.get(i).getSimplifyOps() + l.get(j).getSimplifyOps() ) {
+					if( simIns.getSimplifyOps() > oldSimOps ) {
 						l2.add(simIns);
 						found = true;
 						foundPair = true;
@@ -170,8 +177,9 @@ public class Utils {
 			for(int i=0; i<l.size(); i++) {
 				boolean found = false;
 				for(int j=i+1; j<l.size(); j++) {
+					int oldSimOps = l.get(i).getSimplifyOps() + l.get(j).getSimplifyOps();
 					Expr simIns = Multiply.shallowSimplifiedIns(l.get(i), l.get(j));
-					if( simIns.getSimplifyOps() > l.get(i).getSimplifyOps() + l.get(j).getSimplifyOps() ) {
+					if( simIns.getSimplifyOps() > oldSimOps ) {
 						l2.add(simIns);
 						found = true;
 						foundPair = true;
@@ -197,7 +205,7 @@ public class Utils {
 		return l;
 	}
 	
-	public static Expr addListWithNegateToExpr(List<Expr> list) {
+	public static Expr addListToExpr(List<Expr> list) {
 		if(list.size() == 1)
 			return list.get(0);
 		else {
@@ -206,9 +214,11 @@ public class Utils {
 				Expr e = list.get(i);
 				if(e instanceof Negate) {
 					Negate ee = (Negate)e;
-					rlt = Subtract.shallowSimplifiedIns(rlt, ee.base);
+					//rlt = Subtract.shallowSimplifiedIns(rlt, ee.base);
+					rlt = new Subtract(rlt, ee.base);
 				} else
-					rlt = Add.shallowSimplifiedIns(rlt, e);
+					//rlt = Add.shallowSimplifiedIns(rlt, e);
+					rlt = new Add(rlt, e);
 			}
 			return rlt;
 		}
@@ -223,12 +233,36 @@ public class Utils {
 				Expr e = list.get(i);
 				if(e instanceof Reciprocal) {
 					Reciprocal ee = (Reciprocal)e;
-					rlt = Divide.shallowSimplifiedIns(rlt, ee.base);
+					//rlt = Divide.shallowSimplifiedIns(rlt, ee.base);
+					rlt = new Divide(rlt, ee.base);
 				} else {
-					rlt = Multiply.shallowSimplifiedIns(rlt, list.get(i));
+					//rlt = Multiply.shallowSimplifiedIns(rlt, e);
+					rlt = new Multiply(rlt, e);
 				}
 			}
 			return rlt;
 		}		
 	}
+	
+	public static List<Symbol> extractSymbols(Expr ...exprs) {
+		Set<Symbol> set = new HashSet<Symbol>();
+		List<Expr> list = new ArrayList<Expr>();
+		for(int i=0; i<exprs.length; i++) {
+			BytecodeUtils.post_order(exprs[i], list);
+			for(Expr e : list) {
+				if(e instanceof Symbol) {
+					set.add((Symbol)e);
+				}
+			}
+		}
+		List<Symbol> rlt = new ArrayList<Symbol>();
+		rlt.addAll(set);
+		Collections.sort(rlt, new Comparator<Symbol>() {
+			@Override
+			public int compare(Symbol o1, Symbol o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
+		return rlt;
+	}	
 }

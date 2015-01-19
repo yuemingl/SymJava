@@ -14,5 +14,6 @@ public abstract class BinaryOp extends Expr {
 	
 	public boolean symEquals(Expr other) {
 		return Utils.flattenSortAndCompare(this.simplify(), other.simplify());
+		//return Utils.flattenSortAndCompare(this, other);
 	}
 }

@@ -34,18 +34,27 @@ abstract public class Expr {
 	
 	//Number of simplify operations
 	protected int simplifyOps = 0;
+	protected boolean simplified = false;
 
 	public int getSimplifyOps() {
 		return simplifyOps;
 	}
 	public Expr setSimplifyOps(int n) {
+		if(n > simplifyOps)
+			simplified = true;
 		simplifyOps = n;
 		return this;
 	}
 	public Expr incSimplifyOps(int n) {
 		simplifyOps += n;
+		simplified = true;
 		return this;
-	}	
+	}
+	public Expr setAsSimplified() {
+		simplified = true;
+		return this;
+	}
+	
 	/**
 	 * 
 	 * @param v
@@ -196,6 +205,13 @@ abstract public class Expr {
 	}
 	
 	public Expr negate() {
+		if(this instanceof SymReal<?>) {
+			SymReal<?> dd = (SymReal<?>)this;
+			double dv = dd.getVal().doubleValue();
+			if(dv == 0)
+				return Symbol.C0;
+			return new SymDouble(-dv);
+		}
 		return new Negate(this);
 	};
 	

@@ -2,6 +2,7 @@ package symjava.symbolic;
 
 import java.util.List;
 
+import symjava.bytecode.BConstant;
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
@@ -45,6 +46,10 @@ public class Func extends Expr {
 	
 	public BytecodeFunc toBytecodeFunc() {
 		try {
+			if(this.expr instanceof SymReal<?>) {
+				SymReal<?> r = (SymReal<?>)this.expr;
+				return new BConstant(r.getVal().doubleValue());
+			}
 			BytecodeUtils.genClass(this);
 			return (BytecodeFunc)Class.forName("symjava.bytecode."+this.label).newInstance();
 		} catch (Exception e) {
@@ -97,10 +102,15 @@ public class Func extends Expr {
 	
 	@Override
 	public Expr simplify() {
+		if(this.simplified)
+			return this;
 		if(expr != null) {
 			Func f = new Func(label, expr.simplify());
 			f.args = this.args;
+			f.simplified = true;
+			return f;
 		}
+		this.simplified = true;
 		return this;
 	}
 

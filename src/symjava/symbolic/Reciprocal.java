@@ -17,10 +17,16 @@ public class Reciprocal extends UnaryOp {
 
 	@Override
 	public Expr simplify() {
+		if(this.simplified)
+			return this;
 		if(base instanceof Power) {
-			Power p = (Power)base;
-			return new Power(p.base, -p.exponent);
+			Power p = (Power)base.simplify();
+			p.simplified = true;
+			Expr rlt = new Power(p.base, -p.exponent);
+			rlt.simplified = true;
+			return rlt;
 		}
+		this.simplified = true;
 		return this;
 	}
 

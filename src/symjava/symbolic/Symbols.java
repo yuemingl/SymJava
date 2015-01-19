@@ -8,6 +8,12 @@ public class Symbols extends Expr {
 	Expr indexSymbol;
 	HashMap<Integer, Symbol> cache = new HashMap<Integer, Symbol>();
 	
+	public Symbols(String namePrefix) {
+		this.namePrefix = namePrefix;
+		this.label = namePrefix + "_?";
+		sortKey = label;
+	}
+	
 	public Symbols(String namePrefix, Expr indexSymbol) {
 		this.namePrefix = namePrefix;
 		this.indexSymbol = indexSymbol;
