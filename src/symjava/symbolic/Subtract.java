@@ -17,22 +17,18 @@ public class Subtract extends BinaryOp {
 	}
 
 	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
-		l = l.simplify();
-		r = r.simplify();
-		if(Symbol.C0.symEquals(r))
-			return l.incSimplifyOps(1);
-		else if(Symbol.C0.symEquals(l))
-			return new Negate(r).setSimplifyOps(r.getSimplifyOps() + 1);
-		else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
+		int simOps = l.getSimplifyOps() + r.getSimplifyOps() + 1;
+		if(Utils.symCompare(l, r)) {
+			return new SymInteger(0).setSimplifyOps(simOps);
+		} else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
 			Number t1 = (Number)((SymReal<?>)l).getVal();
 			Number t2 = (Number)((SymReal<?>)r).getVal();
-			return new SymDouble(t1.doubleValue() - t2.doubleValue()).setSimplifyOps(
-					l.getSimplifyOps() + r.getSimplifyOps() + 1
-					);
-		} else if(Utils.symCompare(l, r)) {
-			return Symbol.C0.incSimplifyOps(1);
-		}
-		return new Subtract(l, r);
+			return new SymDouble(t1.doubleValue() - t2.doubleValue()).setSimplifyOps(simOps);
+		} else if(Symbol.C0.symEquals(r))
+			return l.setSimplifyOps(simOps);
+		else if(Symbol.C0.symEquals(l))
+			return new Negate(r).setSimplifyOps(simOps);
+		return new Subtract(l, r).setAsSimplified();
 	}
 	
 	public static Expr simplifiedIns(Expr l, Expr r) {
@@ -46,7 +42,10 @@ public class Subtract extends BinaryOp {
 
 	@Override
 	public Expr simplify() {
-		return simplifiedIns(left, right);
+		if(!this.simplified) {
+			return simplifiedIns(left, right);
+		}
+		return this;
 	}
 
 	@Override

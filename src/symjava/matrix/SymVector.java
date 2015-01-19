@@ -32,7 +32,8 @@ public class SymVector {
 	}
 	
 	public void print() {
-		for(int j=0; j<data.size(); j++)
+		for(int j=0; j<data.size(); j++) {
 			System.out.println(data.get(j));
+		}
 	}
 }

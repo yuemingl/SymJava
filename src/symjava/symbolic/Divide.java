@@ -20,23 +20,20 @@ public class Divide extends BinaryOp {
 	}
 	
 	public static Expr shallowSimplifiedIns(Expr numerator, Expr denominator) {
-		numerator = numerator.simplify();
-		denominator = denominator.simplify();
+		int simOps = numerator.getSimplifyOps() + denominator.getSimplifyOps() + 1;
 		if(Symbol.C0.symEquals(numerator))
-			return Symbol.C0.incSimplifyOps(1);
+			return new SymInteger(0).setSimplifyOps(simOps);
 		else if(numerator instanceof SymReal<?> && denominator instanceof SymReal<?>) {
 			Number t1 = (Number)((SymReal<?>)numerator).getVal();
 			Number t2 = (Number)((SymReal<?>)denominator).getVal();
-			return new SymDouble(t1.doubleValue() / t2.doubleValue()).setSimplifyOps(
-					numerator.getSimplifyOps() + denominator.getSimplifyOps() + 1
-					);
+			return new SymDouble(t1.doubleValue() / t2.doubleValue()).setSimplifyOps(simOps);
 		} else if(denominator.symEquals(Symbol.C0))
 			throw new IllegalArgumentException("Argument 'divisor' is 0");
 		 else if(Symbol.C1.symEquals(numerator))
-			return new Reciprocal(denominator).incSimplifyOps(1);
+			return new Reciprocal(denominator).setSimplifyOps(simOps);
 		 else if(Symbol.C1.symEquals(denominator))
-			return numerator.incSimplifyOps(1);
-		return new Divide(numerator, denominator);
+			return numerator.setSimplifyOps(simOps);
+		return new Divide(numerator, denominator).setAsSimplified();
 	}
 	
 	public static Expr simplifiedIns(Expr numerator, Expr denominator) {
@@ -56,7 +53,10 @@ public class Divide extends BinaryOp {
 
 	@Override
 	public Expr simplify() {
-		return simplifiedIns(left, right);
+		if(!this.simplified) {
+			return simplifiedIns(left, right);
+		}
+		return this;
 	}
 
 	@Override

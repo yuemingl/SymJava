@@ -15,6 +15,12 @@ public class Negate extends UnaryOp {
 	
 	@Override
 	public Expr diff(Expr expr) {
+		Expr d = base.diff(expr);
+		if(d instanceof SymReal<?>) {
+			SymReal<?> dd = (SymReal<?>)d;
+			double dv = dd.getVal().doubleValue();
+			return new SymDouble(-dv);
+		}
 		return new Negate(base.diff(expr));
 	}
 
@@ -25,7 +31,13 @@ public class Negate extends UnaryOp {
 
 	@Override
 	public Expr simplify() {
-		return new Negate(base.simplify());
+		if(this.simplified)
+			return this;
+		Expr nb = base.simplify();
+		nb.simplified = true;
+		Expr rlt = new Negate(nb);
+		rlt.simplified = true;
+		return rlt;
 	}
 
 	@Override

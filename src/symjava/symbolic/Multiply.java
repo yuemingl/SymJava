@@ -27,28 +27,28 @@ public class Multiply extends BinaryOp {
 	}
 	
 	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
-		l = l.simplify();
-		r = r.simplify();
+		int simOps = l.getSimplifyOps() + r.getSimplifyOps() + 1;
 		if(Symbol.C1.symEquals(l))
-			return r.incSimplifyOps(1);
+			return r.setSimplifyOps(simOps);
 		else if(Symbol.C1.symEquals(r))
-			return l.incSimplifyOps(1);
+			return l.setSimplifyOps(simOps);
 		else if(Symbol.C0.symEquals(l) || Symbol.C0.symEquals(r))
-			return Symbol.C0.incSimplifyOps(1);
+			//Here we need a new instance of 0 to hold the number of simplify operations
+			return new SymInteger(0).setSimplifyOps(simOps);
 		else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
 			Number t1 = (Number)((SymReal<?>)l).getVal();
 			Number t2 = (Number)((SymReal<?>)r).getVal();
-			return new SymDouble(t1.doubleValue() * t2.doubleValue()).setSimplifyOps(
-					l.getSimplifyOps() + r.getSimplifyOps() + 1
-					);
+			return new SymDouble(t1.doubleValue() * t2.doubleValue()).setSimplifyOps(simOps);
 		} else if(Symbol.Cm1.symEquals(l)) {
-			return new Negate(r).incSimplifyOps(1);
+			return new Negate(r).setSimplifyOps(simOps);
 		} else if(Symbol.Cm1.symEquals(r)) {
-			return new Negate(l).incSimplifyOps(1);
+			return new Negate(l).setSimplifyOps(simOps);
 		} else if(l instanceof Reciprocal && r instanceof Reciprocal) {
 			Reciprocal rl = (Reciprocal)l;
 			Reciprocal rr = (Reciprocal)r;
-			return new Reciprocal( simplifiedIns(rl.base, rr.base) ).incSimplifyOps(1);
+			Expr newBase = simplifiedIns(rl.base, rr.base);
+			//? 
+			return new Reciprocal( newBase ).setSimplifyOps(simOps + newBase.getSimplifyOps() + 1);
 		} else if(l instanceof Reciprocal) {
 			Reciprocal rl = (Reciprocal)l;
 			return Divide.shallowSimplifiedIns(r, rl.base);
@@ -59,25 +59,25 @@ public class Multiply extends BinaryOp {
 			Power lp = (Power)l;
 			Power rp = (Power)r;
 			if(Utils.symCompare(lp.base, rp.base)) {
-				return new Power( lp.base, lp.exponent+rp.exponent).incSimplifyOps(1);
+				return new Power( lp.base, lp.exponent+rp.exponent).setSimplifyOps(simOps);
 			} else if(lp.exponent == rp.exponent) {
-				return new Power( simplifiedIns(lp.base, rp.base), lp.exponent).incSimplifyOps(1);
+				return new Power( simplifiedIns(lp.base, rp.base), lp.exponent).setSimplifyOps(simOps);
 			}
 		} else if(l instanceof Power) {
 			Power lp = (Power)l;
 			if(Utils.symCompare(lp.base, r)) {
-				return new Power(lp.base, lp.exponent + 1).incSimplifyOps(1);
+				return new Power(lp.base, lp.exponent + 1).setSimplifyOps(simOps);
 			}
 		} else if(r instanceof Power) {
 			Power rp = (Power)r;
 			if(Utils.symCompare(rp.base, l)) {
-				return new Power(rp.base, rp.exponent + 1).incSimplifyOps(1);
+				return new Power(rp.base, rp.exponent + 1).setSimplifyOps(simOps);
 			}
 		}
 		if(Utils.symCompare(l, r)) {
-			return new Power(l, 2).setSimplifyOps(l.getSimplifyOps() + r.getSimplifyOps() + 1);
+			return new Power(l, 2).setSimplifyOps(simOps);
 		}
-		return new Multiply(l, r);
+		return new Multiply(l, r).setAsSimplified();
 	}
 	
 	public static Expr simplifiedIns(Expr l, Expr r) {
@@ -118,7 +118,10 @@ public class Multiply extends BinaryOp {
 
 	@Override
 	public Expr simplify() {
-		return simplifiedIns(left, right);
+		if(!this.simplified) {
+			return simplifiedIns(left, right);
+		}
+		return this;
 	}
 
 	@Override
