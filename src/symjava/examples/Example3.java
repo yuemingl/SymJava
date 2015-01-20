@@ -19,7 +19,7 @@ public class Example3 {
 		
 		double[] guess = new double[]{ 10 };
 		
-		Newton.solve(eq, guess, 10,1e-3);
+		Newton.solve(eq, guess, 100, 1e-3);
 	}
 	
 	/**
@@ -51,7 +51,7 @@ public class Example3 {
 		LagrangeMultipliers lm = new LagrangeMultipliers(eq, initialGuess, data);
 		Eq L = lm.getEq();
 		System.out.println("L("+SymPrinting.join(L.getUnknowns(),",")+")=\n    "+L.lhs);
-		NewtonOptimization.solve(L, lm.getInitialGuess(), 10, 1e-4);
+		NewtonOptimization.solve(L, lm.getInitialGuess(), 100, 1e-4);
 	}
 	
 	public static void main(String[] args) {

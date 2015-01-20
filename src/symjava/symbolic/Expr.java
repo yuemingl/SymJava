@@ -212,7 +212,7 @@ abstract public class Expr implements Cloneable {
 				return Symbol.C0;
 			return new SymDouble(-dv);
 		}
-		return new Negate(this);
+		return Negate.simplifiedIns(this);
 	};
 	
 	/**

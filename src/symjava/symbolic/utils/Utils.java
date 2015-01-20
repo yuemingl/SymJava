@@ -264,5 +264,17 @@ public class Utils {
 			}
 		});
 		return rlt;
-	}	
+	}
+	
+	public static boolean containSymbol(Expr expr, Symbol s) {
+		List<Expr> list = new ArrayList<Expr>();
+		BytecodeUtils.post_order(expr, list);
+		for(Expr e : list) {
+			if(e instanceof Symbol) {
+				if(e.symEquals(s))
+					return true;
+			}
+		}
+		return false;
+	}
 }

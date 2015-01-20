@@ -1,6 +1,9 @@
 package symjava.symbolic;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import symjava.symbolic.utils.Utils;
 
 public class Power extends UnaryOp {
 	public int exponent;
@@ -46,13 +49,21 @@ public class Power extends UnaryOp {
 
 	@Override
 	public void flattenAdd(List<Expr> outList) {
+//		List<Expr> list = new ArrayList<Expr>();
+//		for(int i=0; i<exponent; i++)
+//			list.add(this.base);
+//		Expr mul = Utils.multiplyListToExpr(list);
+//		mul.flattenAdd(outList);
 		outList.add(this);
 	}
 
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
-		for(int i=0; i<exponent; i++)
-			outList.add(base);
+		if(exponent > 0) {
+			for(int i=0; i<exponent; i++)
+				outList.add(base);
+		} else
+			outList.add(this);
 	}
 
 }

@@ -29,7 +29,15 @@ public class Negate extends UnaryOp {
 				return new SymDouble(0.0);
 			return new SymDouble(-dv);
 		}
-		return new Negate(base.diff(expr));
+		return Negate.simplifiedIns(base.diff(expr));
+	}
+	
+	public static Expr simplifiedIns(Expr expr) {
+		if(expr instanceof Negate) {
+			Negate n = (Negate)expr;
+			return n.base;
+		}
+		return new Negate(expr);
 	}
 
 	@Override
