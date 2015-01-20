@@ -28,17 +28,26 @@ public class Multiply extends BinaryOp {
 	
 	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
 		int simOps = l.getSimplifyOps() + r.getSimplifyOps() + 1;
-		if(Symbol.C1.symEquals(l))
-			return r.setSimplifyOps(simOps);
-		else if(Symbol.C1.symEquals(r))
-			return l.setSimplifyOps(simOps);
-		else if(Symbol.C0.symEquals(l) || Symbol.C0.symEquals(r))
-			//Here we need a new instance of 0 to hold the number of simplify operations
-			return new SymInteger(0).setSimplifyOps(simOps);
-		else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
+		if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
+			if(l instanceof SymInteger && r instanceof SymInteger) {
+				SymInteger il = (SymInteger)l;
+				SymInteger ir = (SymInteger)r;
+				return new SymInteger(il.getVal()*ir.getVal()).setSimplifyOps(simOps);
+			} else if(l instanceof SymLong && r instanceof SymLong) {
+				SymLong il = (SymLong)l;
+				SymLong ir = (SymLong)r;
+				return new SymLong(il.getVal()*ir.getVal()).setSimplifyOps(simOps);
+			}
 			Number t1 = (Number)((SymReal<?>)l).getVal();
 			Number t2 = (Number)((SymReal<?>)r).getVal();
 			return new SymDouble(t1.doubleValue() * t2.doubleValue()).setSimplifyOps(simOps);
+		} else if(Symbol.C1.symEquals(l))
+			return r.clone().setSimplifyOps(simOps);
+		else if(Symbol.C1.symEquals(r))
+			return l.clone().setSimplifyOps(simOps);
+		else if(Symbol.C0.symEquals(l) || Symbol.C0.symEquals(r)) {
+			//Here we need a new instance of 0 to hold the number of simplify operations
+			return new SymInteger(0).setSimplifyOps(simOps);
 		} else if(Symbol.Cm1.symEquals(l)) {
 			return new Negate(r).setSimplifyOps(simOps);
 		} else if(Symbol.Cm1.symEquals(r)) {
@@ -47,7 +56,7 @@ public class Multiply extends BinaryOp {
 			Reciprocal rl = (Reciprocal)l;
 			Reciprocal rr = (Reciprocal)r;
 			Expr newBase = simplifiedIns(rl.base, rr.base);
-			//? 
+			//SimplifyOps=? 
 			return new Reciprocal( newBase ).setSimplifyOps(simOps + newBase.getSimplifyOps() + 1);
 		} else if(l instanceof Reciprocal) {
 			Reciprocal rl = (Reciprocal)l;

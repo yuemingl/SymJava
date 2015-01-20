@@ -30,6 +30,8 @@ public class TestSymbolic {
 	}	
 	public static void testBasic() {
 		System.out.println("--------------testBasic-----------------");
+		checkResult(new Symbol("s1"), new Symbol("s1"));
+		
 		checkResult("x + y", x + y);
 		checkResult("x - y",x - y);
 		checkResult("x*y",x * y);
@@ -37,7 +39,7 @@ public class TestSymbolic {
 		checkResult("-x",- x);
 		checkResult("x^2",new Power(x,2));
 
-		checkResult("0.0", Symbol.Cm1 + Symbol.C1);
+		checkResult("0", Symbol.Cm1 + Symbol.C1);
 		checkResult("0", x + (-x));
 		checkResult("-1", Symbol.Cm1 * Symbol.C1);
 		checkResult("-x", x * -1);
@@ -127,7 +129,7 @@ public class TestSymbolic {
 		checkResult("6.0", sub_expr.simplify());
 		
 		expr = (x + 1) + 2; 
-		checkResult("3.0 + x", expr);
+		checkResult("3 + x", expr);
 		
 		expr = (y + z) + (y + 1);
 		checkResult("1 + 2*y + z", expr);
@@ -214,15 +216,15 @@ public class TestSymbolic {
 		Func F = new Func("F", x*x*x*y+x*x*y+z);
 		checkResult("x^2*y + x^3*y + z",F);
 		checkResult("3*x^2*y + 2*x*y",F.diff(x));
-		checkResult("6.0*x*y + 2*y",F.diff(x).diff(x));
+		checkResult("6*x*y + 2*y",F.diff(x).diff(x));
 		Expr diff1 = F.diff(x).diff(x).diff(y);
-		checkResult("2 + 6.0*x",diff1);
+		checkResult("2 + 6*x",diff1);
 		
 		Func f = new Func("f", x,y,z);
 		checkResult("f(x,y,z)*x",f*x);
 		checkResult("DfDxxy(x,y,z)",f.diff(x).diff(x).diff(y));
 		checkResult("DfDx(x,y,z)*x + f(x,y,z)",(f*x).diff(x));
-		checkResult("DfDxx(x,y,z)*x + 2*DfDx(x,y,z)",(f*x).diff(x).diff(x));
+		checkResult("2*DfDx(x,y,z) + DfDxx(x,y,z)*x",(f*x).diff(x).diff(x));
 		checkResult("DfDxxy(x,y,z)*x + 2*DfDxy(x,y,z)",(f*x).diff(x).diff(x).diff(y));
 		Func test_fun2 = new Func("test_fun2",expr2);
 		checkResult("-(x^2 + y^2)", test_fun2);

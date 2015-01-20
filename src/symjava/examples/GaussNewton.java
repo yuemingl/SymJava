@@ -3,6 +3,7 @@ package symjava.examples;
 import Jama.Matrix;
 import symjava.matrix.*;
 import symjava.relational.Eq;
+import symjava.symbolic.Expr;
 
 /**
  * A general Gauss Newton solver using SymJava for simbolic computations
@@ -17,11 +18,14 @@ public class GaussNewton {
 		SymVector res = new SymVector(n);
 		SymMatrix J = new SymMatrix(n, eq.getParams().length);
 		
+		Expr[] params = eq.getParams();
 		for(int i=0; i<n; i++) {
 			Eq subEq = eq.subsUnknowns(data[i]);
 			res[i] = subEq.lhs - subEq.rhs; //res[i] =y[i] - a*x[i]/(b + x[i]); 
-			for(int j=0; j<eq.getParams().length; j++)
-				J[i][j] = res[i].diff(eq.getParams()[j]);
+			for(int j=0; j<eq.getParams().length; j++) {
+				Expr df = res[i].diff(params[j]);
+				J[i][j] = df;
+			}
 		}
 		
 		System.out.println("Jacobian Matrix = ");

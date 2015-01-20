@@ -2,9 +2,13 @@ package symjava.symbolic;
 
 import java.util.List;
 
-abstract public class Expr {
+abstract public class Expr implements Cloneable {
 	String label = null;
 	String sortKey = null;
+	
+	//Number of operations for simplifying an expression
+	protected int simplifyOps = 0;
+	protected boolean simplified = false;
 	
 	public abstract Expr diff(Expr expr);
 	
@@ -31,10 +35,6 @@ abstract public class Expr {
 	public String getSortKey() {
 		return sortKey;
 	}
-	
-	//Number of simplify operations
-	protected int simplifyOps = 0;
-	protected boolean simplified = false;
 
 	public int getSimplifyOps() {
 		return simplifyOps;
@@ -235,5 +235,23 @@ abstract public class Expr {
 	public Expr subs(Expr from, double to) {
 		return subs(from, new SymDouble(to));
 	}
+	
+	protected Expr clone() {
+		try {
+			return (Expr) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+    @Override
+    public int hashCode() {
+        return this.label.hashCode();
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+       return this.label.equals(((Expr)obj).label);
+    }
 }

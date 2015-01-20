@@ -17,8 +17,16 @@ public class Negate extends UnaryOp {
 	public Expr diff(Expr expr) {
 		Expr d = base.diff(expr);
 		if(d instanceof SymReal<?>) {
+			if(d instanceof SymInteger) {
+				return new SymInteger(-((SymInteger)d).getVal());
+			}
+			if(d instanceof SymLong) {
+				return new SymLong(-((SymLong)d).getVal());
+			}
 			SymReal<?> dd = (SymReal<?>)d;
 			double dv = dd.getVal().doubleValue();
+			if(dv == 0.0)
+				return new SymDouble(0.0);
 			return new SymDouble(-dv);
 		}
 		return new Negate(base.diff(expr));

@@ -14,7 +14,7 @@ public class Example3 {
 		Expr[] freeVars = {x};
 		double num = 612;
 		Eq[] eq = new Eq[] {
-				new Eq(x*x-num, Symbol.C0, freeVars, null)
+				new Eq(x*x-num, C0, freeVars, null)
 		};
 		
 		double[] guess = new double[]{ 10 };

@@ -51,7 +51,8 @@ public class Power extends UnaryOp {
 
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
-		outList.add(this);
+		for(int i=0; i<exponent; i++)
+			outList.add(base);
 	}
 
 }
