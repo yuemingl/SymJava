@@ -49,8 +49,9 @@ public class Example3 {
 		double[] initialGuess = {0.9, 0.2};
 		
 		LagrangeMultipliers lm = new LagrangeMultipliers(eq, initialGuess, data);
-		
-		NewtonOptimization.solve(lm.getEq(), lm.getInitialGuess(), 10, 1e-4);
+		Eq L = lm.getEq();
+		System.out.println("L("+SymPrinting.join(L.getUnknowns(),",")+")=\n    "+L.lhs);
+		NewtonOptimization.solve(L, lm.getInitialGuess(), 10, 1e-4);
 	}
 	
 	public static void main(String[] args) {

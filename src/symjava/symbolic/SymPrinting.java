@@ -32,5 +32,14 @@ public class SymPrinting {
 		if(getPrecedence(toMe) <= getPrecedence(forOperation))
 			return "(" + toMe.toString() + ")";
 		return toMe.toString();
-	}	
+	}
+	
+	public static String join(Expr[] exprs,String deliminator) {
+		StringBuilder sb = new StringBuilder();
+		for(Expr e : exprs) {
+			sb.append(e.toString());
+			sb.append(deliminator);
+		}
+		return sb.substring(0, sb.length()-deliminator.length());
+	}
 }
