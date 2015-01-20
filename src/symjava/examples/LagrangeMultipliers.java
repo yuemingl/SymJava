@@ -61,6 +61,8 @@ public class LagrangeMultipliers {
 	public double[] getInitialGuess() {
 		Expr[] depVars = eq.getDependentVars();
 		double[] ret = new double[data.length*depVars.length + data.length + eq.getParams().length];
+		for(int i=0; i<data.length*depVars.length + data.length; i++)
+			ret[i] = 0;//Math.random();
 		for(int i=0; i<eq.getParams().length; i++)
 			ret[data.length*depVars.length + data.length + i] = init[i];		
 		return ret;

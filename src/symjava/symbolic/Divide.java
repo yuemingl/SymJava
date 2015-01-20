@@ -48,6 +48,17 @@ public class Divide extends BinaryOp {
 	@Override
 	public Expr diff(Expr expr) {
 		//For debug purpose
+		if(expr instanceof Symbol) {
+			boolean bl = Utils.containSymbol(left, (Symbol)expr);
+			boolean br = Utils.containSymbol(right, (Symbol)expr);
+			if(!bl && !br) {
+				return Symbol.C0;
+			} else if(!bl) {
+				return left.multiply(new Reciprocal(right).diff(expr));
+			} else if(!br) {
+				return left.diff(expr).multiply(new Reciprocal(right));
+			}
+		}
 		Expr n0 = left.diff(expr);
 		Expr n1 = n0.multiply(right);
 		Expr n2 = left.multiply(right.diff(expr));
@@ -55,6 +66,7 @@ public class Divide extends BinaryOp {
 		Expr n4 = right.multiply(right);
 		Expr n5 = n3.divide(n4);
 		return n5;
+		
 	}
 
 	@Override

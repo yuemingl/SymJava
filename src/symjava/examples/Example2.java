@@ -34,7 +34,7 @@ public class Example2 {
 		double[] initialGuess = {0.9, 0.2};
 		
 		//Here we go ...
-		GaussNewton.solve(eq, initialGuess, data, 10, 1e-4);
+		GaussNewton.solve(eq, initialGuess, data, 100, 1e-4);
 
 	}
 	
@@ -70,7 +70,7 @@ public class Example2 {
 		
 		double[] initialGuess = {1, 1, 1};
 		
-		GaussNewton.solve(eq, initialGuess, data, 10, 1e-4);
+		GaussNewton.solve(eq, initialGuess, data, 100, 1e-4);
 	}
 	
 	public static void main(String[] args) {

@@ -12,7 +12,7 @@ public class Reciprocal extends UnaryOp {
 	
 	@Override
 	public Expr diff(Expr expr) {
-		return base.diff(expr);
+		return new Negate(new Power(base,-2)).multiply(base.diff(expr));
 	}
 
 	@Override
