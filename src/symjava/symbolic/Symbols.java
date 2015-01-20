@@ -59,7 +59,7 @@ public class Symbols extends Expr {
 
 	@Override
 	public boolean symEquals(Expr other) {
-		return this == other;
+		return this.label.equals(other.label);
 	}
 
 	@Override

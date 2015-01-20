@@ -21,11 +21,20 @@ public class Subtract extends BinaryOp {
 		if(Utils.symCompare(l, r)) {
 			return new SymInteger(0).setSimplifyOps(simOps);
 		} else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
+			if(l instanceof SymInteger && r instanceof SymInteger) {
+				SymInteger il = (SymInteger)l;
+				SymInteger ir = (SymInteger)r;
+				return new SymInteger(il.getVal()-ir.getVal()).setSimplifyOps(simOps);
+			} else if(l instanceof SymLong && r instanceof SymLong) {
+				SymLong il = (SymLong)l;
+				SymLong ir = (SymLong)r;
+				return new SymLong(il.getVal()-ir.getVal()).setSimplifyOps(simOps);
+			}
 			Number t1 = (Number)((SymReal<?>)l).getVal();
 			Number t2 = (Number)((SymReal<?>)r).getVal();
 			return new SymDouble(t1.doubleValue() - t2.doubleValue()).setSimplifyOps(simOps);
 		} else if(Symbol.C0.symEquals(r))
-			return l.setSimplifyOps(simOps);
+			return l.clone().setSimplifyOps(simOps);
 		else if(Symbol.C0.symEquals(l))
 			return new Negate(r).setSimplifyOps(simOps);
 		return new Subtract(l, r).setAsSimplified();

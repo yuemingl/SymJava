@@ -58,7 +58,7 @@ public class Symbol extends Expr {
 
 	@Override
 	public Expr diff(Expr expr) {
-		if(this == expr)
+		if(this.symEquals(expr))
 			return C1;
 		return C0;
 	}
@@ -70,7 +70,7 @@ public class Symbol extends Expr {
 
 	@Override
 	public boolean symEquals(Expr other) {
-		return this == other;
+		return this.label.equals(other.label);
 	}
 
 	@Override
@@ -82,4 +82,5 @@ public class Symbol extends Expr {
 	public void flattenMultiply(List<Expr> outList) {
 		outList.add(this);
 	}	
+
 }

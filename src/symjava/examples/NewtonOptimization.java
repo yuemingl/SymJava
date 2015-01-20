@@ -26,7 +26,6 @@ public class NewtonOptimization {
 			grad[i] = L.diff(unknowns[i]);
 			for(int j=0; j<n; j++) {
 				Expr df = grad[i].diff(unknowns[j]);
-				df = df.simplify();
 				hess[i][j] = df;
 			}
 		}

@@ -9,6 +9,7 @@ public class SymReal<T extends Number> extends Expr {
 		this.val = val;
 		label = String.valueOf(val);
 		sortKey = label;
+		simplified = true;
 	}
 
 	public T getVal() {

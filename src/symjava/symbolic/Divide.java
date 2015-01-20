@@ -32,7 +32,7 @@ public class Divide extends BinaryOp {
 		 else if(Symbol.C1.symEquals(numerator))
 			return new Reciprocal(denominator).setSimplifyOps(simOps);
 		 else if(Symbol.C1.symEquals(denominator))
-			return numerator.setSimplifyOps(simOps);
+			return numerator.clone().setSimplifyOps(simOps);
 		return new Divide(numerator, denominator).setAsSimplified();
 	}
 	
@@ -47,8 +47,14 @@ public class Divide extends BinaryOp {
 
 	@Override
 	public Expr diff(Expr expr) {
-		return left.diff(expr).multiply(right).subtract(left.multiply(right.diff(expr))).
-				divide(right.multiply(right));
+		//For debug purpose
+		Expr n0 = left.diff(expr);
+		Expr n1 = n0.multiply(right);
+		Expr n2 = left.multiply(right.diff(expr));
+		Expr n3 = n1.subtract(n2);
+		Expr n4 = right.multiply(right);
+		Expr n5 = n3.divide(n4);
+		return n5;
 	}
 
 	@Override
