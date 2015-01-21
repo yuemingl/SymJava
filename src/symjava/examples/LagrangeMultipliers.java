@@ -39,7 +39,7 @@ public class LagrangeMultipliers {
 				Expr yi = ys.get(yIdx);
 				freeVarForL[yIdx] = yi;
 				//addList.add(new Power(-ys.get(yIdx) + data[i][depVarIdxStart+j], 2)/2);
-				addList.add(new Power(-ys.get(yIdx) + data[i][depVarIdxStart+j], 2));
+				addList.add(Power.simplifiedIns(-ys.get(yIdx) + data[i][depVarIdxStart+j], 2));
 				state_eq = state_eq.subs(depVars[j], ys.get(yIdx));
 			}
 			Expr lmdi = lambdas.get(i);

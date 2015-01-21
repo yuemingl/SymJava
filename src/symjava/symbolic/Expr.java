@@ -11,6 +11,9 @@ abstract public class Expr implements Cloneable {
 	protected boolean simplified = false;
 	
 	public abstract Expr diff(Expr expr);
+	public Expr fdiff(Expr f, Expr df) {
+		return null;
+	}
 	
 	public abstract Expr simplify();
 	

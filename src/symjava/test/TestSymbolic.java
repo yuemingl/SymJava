@@ -27,7 +27,15 @@ public class TestSymbolic {
 			else
 				System.out.println("FAIL: " + d1 +" != " + d2);
 		}
-	}	
+	}
+	public static void checkResult(String s1, String s2) {
+		if( s1.equals(s2) )
+			System.out.println(true);
+		else {
+			System.out.println("FAIL: " + s1 +" != " + s2);
+		}
+	}
+	
 	public static void testBasic() {
 		System.out.println("--------------testBasic-----------------");
 		checkResult(new Symbol("s1"), new Symbol("s1"));
@@ -65,8 +73,8 @@ public class TestSymbolic {
 		System.out.println("--------------testPrint-----------------");
 		checkResult("x*y + x*z", (x*(y+z)));
 		checkResult("x/(y + z)", (x/(y+z)));
-		//checkResult("(y + z)^2", ((y+z)*(y+z)));
-		checkResult("y^2 + 2*y*z + z^2", ((y+z)*(y+z)));
+		checkResult("(y + z)^2", ((y+z)*(y+z)));
+		//checkResult("y^2 + 2*y*z + z^2", ((y+z)*(y+z)));
 		checkResult("-(y + z)", (-(y+z)));
 	}
 	public static void testSimplify() {
@@ -154,7 +162,7 @@ public class TestSymbolic {
 	
 	public static void testSummation() {
 		System.out.println("--------------testSummation-----------------");
-		Expr sum = new Summation( x*x, x, 1, 5);
+		Expr sum = new Sum( x*x, x, 1, 5);
 		checkResult("\\Sigma_x=1^5(x^2)", sum);
 		checkResult("\\Sigma_x=1^5((2)^2)", sum.subs(x, 2));
 		
@@ -163,7 +171,7 @@ public class TestSymbolic {
 		checkResult("x_i", ss);
 		checkResult("x_2", ss.get(2));
 		
-		Summation sum2 = new Summation( ss*ss, i, 1, 5);
+		Sum sum2 = new Sum( ss*ss, i, 1, 5);
 		checkResult("\\Sigma_i=1^5((x_i)^2)",sum2);
 		
 		for(int j=sum2.start; j<sum2.end; j++) {
@@ -173,7 +181,7 @@ public class TestSymbolic {
 		checkResult("y^2",summand2);
 		
 		int n = 100;
-		Expr sum3 = new Summation(new Reciprocal((x+3.5)*(x+8)), x, 1, n);
+		Expr sum3 = new Sum(new Reciprocal((x+3.5)*(x+8)), x, 1, n);
 		checkResult("\\Sigma_x=1^100(1/(28.0 + 11.5*x + x^2))", sum3);
 		
 	}
@@ -229,9 +237,13 @@ public class TestSymbolic {
 		Func test_fun2 = new Func("test_fun2",expr2);
 		checkResult("-(x^2 + y^2)", test_fun2);
 		//checkResult(-13.0, test_fun2.toBytecodeFunc().apply(2,3), null);
-
+	}
+	
+	public static void testAbstract() {
+		System.out.println("--------------testAbstract-----------------");
 		//Test for functional derivative
 		Func u = new Func("u", x,y,z);
+		Func v = new Func("v", x,y,z);
 		Func L = new Func("L", u * u);
 		Symbol alp = new Symbol("a");
 		Func du = new Func("du", x,y,z);
@@ -239,6 +251,14 @@ public class TestSymbolic {
 		checkResult("2*a*(du(x,y,z))^2 + 2*du(x,y,z)*u(x,y,z)", Lu);
 		checkResult("2*du(x,y,z)*u(x,y,z)", Lu.subs(alp, Symbol.C0).simplify());
 		
+		Grad gu = new Grad(u);
+		checkResult("\\nabla{u(x,y,z)}",gu.toString());
+		Grad gv = new Grad(v);
+		checkResult("\\nabla{u(x,y,z)} \\dot \\nabla{v(x,y,z)}",new Dot(gu, gv));
+		checkResult("3",new Dot(new Grad(x+y+z), new Grad(x+y+z)));
+		
+		Func w = new Func("w", x, y, x);
+		checkResult("\\nabla{w(x,y,x)} \\dot \\nabla{v(x,y,z)}", new Dot(gu, gv).fdiff(u,w));
 	}
 	
 	public static void main(String[] args) {
@@ -250,5 +270,6 @@ public class TestSymbolic {
 		testSummation();
 		testToBytecodeFunc();
 		testDiff();
+		testAbstract();
 	}
 }

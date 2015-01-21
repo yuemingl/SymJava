@@ -68,9 +68,9 @@ public class Multiply extends BinaryOp {
 			Power lp = (Power)l;
 			Power rp = (Power)r;
 			if(Utils.symCompare(lp.base, rp.base)) {
-				return new Power( lp.base, lp.exponent+rp.exponent).setSimplifyOps(simOps);
+				return Power.simplifiedIns( lp.base, lp.exponent+rp.exponent).setSimplifyOps(simOps);
 			} else if(lp.exponent == rp.exponent) {
-				return new Power( simplifiedIns(lp.base, rp.base), lp.exponent).setSimplifyOps(simOps);
+				return Power.simplifiedIns( simplifiedIns(lp.base, rp.base), lp.exponent).setSimplifyOps(simOps);
 			}
 		} else if(l instanceof Power) {
 			Power lp = (Power)l;

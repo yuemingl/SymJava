@@ -11,6 +11,7 @@ import java.util.Set;
 import symjava.symbolic.Add;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Func;
 import symjava.symbolic.Multiply;
 import symjava.symbolic.Negate;
 import symjava.symbolic.Reciprocal;
@@ -250,6 +251,12 @@ public class Utils {
 			for(Expr e : list) {
 				if(e instanceof Symbol) {
 					set.add((Symbol)e);
+				} else if(e instanceof Func) {
+					Func fe = (Func)e;
+					for(Expr arg : fe.args) {
+						if(arg instanceof Symbol)
+							set.add((Symbol)arg);
+					}
 				}
 			}
 		}

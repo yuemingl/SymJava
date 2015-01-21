@@ -14,6 +14,7 @@ import java.util.Set;
 import symjava.symbolic.Add;
 import symjava.symbolic.BinaryOp;
 import symjava.symbolic.Divide;
+import symjava.symbolic.Dot;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 import symjava.symbolic.Multiply;
@@ -21,7 +22,7 @@ import symjava.symbolic.Negate;
 import symjava.symbolic.Power;
 import symjava.symbolic.Reciprocal;
 import symjava.symbolic.Subtract;
-import symjava.symbolic.Summation;
+import symjava.symbolic.Sum;
 import symjava.symbolic.SymReal;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.UnaryOp;
@@ -56,10 +57,16 @@ public class BytecodeUtils {
 		} else if(e instanceof UnaryOp) {
 			UnaryOp ue = (UnaryOp)e; 
 			post_order(ue.base, outList);
-		} else if(e instanceof Summation) {
-			Summation se = (Summation)e;
+		} else if(e instanceof Sum) {
+			Sum se = (Sum)e;
 			for(int i=se.start; i<se.end; i++)
 				post_order(se.getSummand(i), outList);
+		} else if(e instanceof Dot) {
+			Dot de = (Dot)e;
+			post_order(de.getExpr(), outList);
+			return;
+		} else if(e instanceof Func) {
+			//Do nothing
 		}
 		outList.add(e);
 	}
@@ -71,6 +78,12 @@ public class BytecodeUtils {
 		for(Expr e : list) {
 			if(e instanceof Symbol) {
 				set.add((Symbol)e);
+			} else if(e instanceof Func) {
+				Func fe = (Func)e;
+				for(Expr arg : fe.args) {
+					if(arg instanceof Symbol)
+						set.add((Symbol)arg);
+				}
 			}
 		}
 		Symbol[] rlt = new Symbol[set.size()];

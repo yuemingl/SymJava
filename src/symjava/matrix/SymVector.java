@@ -6,7 +6,7 @@ import java.util.Vector;
 import symjava.symbolic.Expr;
 
 public class SymVector implements Iterable<Expr> {
-	Vector<Expr> data = new Vector<Expr>();
+	protected Vector<Expr> data = new Vector<Expr>();
 	
 	public SymVector() {
 		
@@ -49,5 +49,13 @@ public class SymVector implements Iterable<Expr> {
 	@Override
 	public Iterator<Expr> iterator() {
 		return data.iterator();
+	}
+	
+	public SymVector subs(Expr from, Expr to) {
+		SymVector rlt = new SymVector();
+		for(Expr e : data) {
+			rlt.add(e.subs(from, to));
+		}
+		return rlt;
 	}
 }

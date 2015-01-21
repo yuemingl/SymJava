@@ -1,52 +1,20 @@
 package symjava.examples;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import symjava.matrix.*;
-import symjava.symbolic.*;
-import symjava.symbolic.utils.Utils;
-import static symjava.symbolic.Symbol.*;
+import static symjava.symbolic.Symbol.x;
+import static symjava.symbolic.Symbol.y;
+import static symjava.symbolic.Symbol.z;
+import symjava.matrix.SymMatrix;
+import symjava.matrix.SymVector;
+import symjava.symbolic.Dot;
+import symjava.symbolic.Expr;
+import symjava.symbolic.Func;
+import symjava.symbolic.Grad;
 
 /**
  * Example for PDE Constrained Parameters Optimization
  *
  */
 public class Example4 {
-	public static SymVector grad(Func f) {
-		SymVector g = new SymVector();
-		for(Expr arg : f.args) {
-			g.add(f.diff(arg));
-		}
-		return g;
-	}
-	public static Expr dot(SymVector a, SymVector b) {
-		if(a.dim() != b.dim()) 
-			return null;
-		List<Expr> list = new ArrayList<Expr>();
-		for(int i=0; i<a.dim(); i++) {
-			list.add(a.get(i).multiply(b.get(i)));
-		}
-		return Utils.addListToExpr(list);
-	}
-	
-	//Functional derivative
-	public static Expr fdiff(Expr F, Expr f, Expr df) {
-		Symbol alpha = new Symbol("_alpha_");
-		Expr ff = F.subs(f, f+alpha*df);
-		Expr dff = ff.diff(alpha);
-		return dff.subs(alpha, 0).simplify();
-	}
-	
-	//Functional grad
-	public static SymVector fgrad(Expr F, Expr[] fs, Expr[] dfs) {
-		SymVector g = new SymVector();
-		for(int i=0; i<fs.length; i++) {
-			g.add(fdiff(F, fs[i], dfs[i]));
-		}
-		return g;
-	}
-	
 	public static void main(String[] args) {
 		Func u =  new Func("u",  x,y,z);
 		Func u0 = new Func("u0", x,y,z);
@@ -57,7 +25,9 @@ public class Example4 {
 		
 		Expr reg_term = (q-q0)*(q-q0)*0.5*0.1;
 
-		Expr L = (u-u0)*(u-u0)/2 + reg_term + q*dot(grad(u), grad(lamd)) - f*lamd;
+		//Func L = new Func("L",(u-u0)*(u-u0)/2 + reg_term + q*Dot.apply(Grad.apply(u), Grad.apply(lamd)) - f*lamd);
+		Func L = new Func("L",Dot.apply(Grad.apply(u), Grad.apply(lamd)));
+		
 		System.out.println("Lagrange L(u, \\lambda, q) = \n"+L);
 		
 		Func phi = new Func("\\phi ", x,y,z);
@@ -65,7 +35,7 @@ public class Example4 {
 		Func chi = new Func("\\chi ", x,y,z);
 		Expr[] xs =  new Expr[]{u,   lamd, q   };
 		Expr[] dxs = new Expr[]{phi, psi,  chi };
-		SymVector Lx = fgrad(L, xs, dxs);
+		SymVector Lx = Grad.apply(L, xs, dxs);
 		System.out.println("\nGradient Lx = (Lu, Llamd, Lq) =");
 		Lx.print();
 		
@@ -75,7 +45,7 @@ public class Example4 {
 		Expr[] dxs2 = new Expr[] { du, dl, dq };
 		SymMatrix Lxx = new SymMatrix();
 		for(Expr Lxi : Lx) {
-			Lxx.add(fgrad(Lxi, xs, dxs2));
+			Lxx.add(Grad.apply(Lxi, xs, dxs2));
 		}
 		System.out.println("\nHessian Matrix =");
 		Lxx.print();

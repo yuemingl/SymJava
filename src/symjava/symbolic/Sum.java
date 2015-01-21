@@ -3,14 +3,14 @@ package symjava.symbolic;
 import java.util.HashMap;
 import java.util.List;
 
-public class Summation extends Expr {
+public class Sum extends Expr {
 	public Expr summand;
 	public Symbol indexVar;
 	public int start;
 	public int end;
 	HashMap<Integer, Expr> cache = new HashMap<Integer, Expr>();
 	
-	public Summation(Expr summandTemplate, Symbol indexVar, int start, int end) {
+	public Sum(Expr summandTemplate, Symbol indexVar, int start, int end) {
  		this.summand = summandTemplate;
  		this.indexVar = indexVar;
 		label = "\\Sigma_"+indexVar+"="+start+"^"+end+"(" + summandTemplate + ")";
@@ -32,23 +32,23 @@ public class Summation extends Expr {
 		//if(from == indexVar) {
 		//	return new Summation(summand, to, start, end);
 		//}
-		return new Summation(summand.subs(from, to), indexVar, start, end);
+		return new Sum(summand.subs(from, to), indexVar, start, end);
 	}
 
 	@Override
 	public Expr diff(Expr expr) {
-		return new Summation(summand.diff(expr), indexVar, start, end);
+		return new Sum(summand.diff(expr), indexVar, start, end);
 	}
 
 	@Override
 	public Expr simplify() {
-		return new Summation(summand.simplify(), indexVar, start, end);
+		return new Sum(summand.simplify(), indexVar, start, end);
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		if(other instanceof Summation) {
-			Summation o = (Summation)other;
+		if(other instanceof Sum) {
+			Sum o = (Sum)other;
 			if(summand.symEquals(o.summand) && indexVar.symEquals(o.indexVar) && 
 					start == o.start && end == o.end)
 				return true;

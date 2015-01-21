@@ -12,7 +12,7 @@ public class Reciprocal extends UnaryOp {
 	
 	@Override
 	public Expr diff(Expr expr) {
-		return new Negate(new Power(base,-2)).multiply(base.diff(expr));
+		return new Negate(Power.simplifiedIns(base,-2)).multiply(base.diff(expr));
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class Reciprocal extends UnaryOp {
 		if(base instanceof Power) {
 			Power p = (Power)base.simplify();
 			p.simplified = true;
-			Expr rlt = new Power(p.base, -p.exponent);
+			Expr rlt = Power.simplifiedIns(p.base, -p.exponent);
 			rlt.simplified = true;
 			return rlt;
 		}
