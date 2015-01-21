@@ -29,6 +29,14 @@ public class Reciprocal extends UnaryOp {
 		this.simplified = true;
 		return this;
 	}
+	
+	public static Expr simplifiedIns(Expr expr) {
+		if(expr instanceof SymReal<?>) {
+			Number n = (Number)((SymReal<?>)expr).getVal();
+			return new SymDouble(1.0/n.doubleValue());
+		}
+		return new Reciprocal(expr);
+	}
 
 	@Override
 	public boolean symEquals(Expr other) {
@@ -49,7 +57,9 @@ public class Reciprocal extends UnaryOp {
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
-		return base.subs(from, to);
+		if(base.subs(from,to) == base) 
+			return this;
+		return Reciprocal.simplifiedIns(base.subs(from, to));
 	}
 
 	@Override

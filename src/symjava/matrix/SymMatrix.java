@@ -43,12 +43,24 @@ public class SymMatrix {
 		return 0;
 	}
 	
+//	  \left[ {\begin{array}{ccccc}
+//	   1 & 2 & 3 & 4 & 5\\
+//	   3 & 4 & 5 & 6 & 7\\
+//	  \end{array} } \right]
 	public void print() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("\\left[ {\\begin{array}{");
+		for(int j=0; j<colDim(); j++)
+			sb.append("c");
+		sb.append("}\n");
 		for(int i=0; i<data.size(); i++) {
 			SymVector row = data.get(i);
-			for(int j=0; j<row.dim(); j++)
-				System.out.print(row.get(j)+"\t");
-			System.out.println();
+			sb.append(row.get(0));
+			for(int j=1; j<row.dim(); j++)
+				sb.append(" & "+row.get(j));
+			sb.append("\\\\\n");
 		}
+		sb.append("\\end{array} } \\right]");
+		System.out.println(sb.toString());
 	}
 }

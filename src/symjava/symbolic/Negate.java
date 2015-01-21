@@ -33,7 +33,10 @@ public class Negate extends UnaryOp {
 	}
 	
 	public static Expr simplifiedIns(Expr expr) {
-		if(expr instanceof Negate) {
+		if(expr instanceof SymReal<?>) {
+			Number n = ((SymReal<?>)expr).getVal();
+			return new SymDouble(-n.doubleValue());
+		} else if(expr instanceof Negate) {
 			Negate n = (Negate)expr;
 			return n.base;
 		}
@@ -42,7 +45,9 @@ public class Negate extends UnaryOp {
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
-		return new Negate(base.subs(from, to));
+		if(base.subs(from,to) == base) 
+			return this;
+		return Negate.simplifiedIns(base.subs(from, to));
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package symjava.matrix;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 import symjava.bytecode.BytecodeFunc;
@@ -7,7 +8,7 @@ import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 import symjava.symbolic.Expr;
 
-public class NumVector {
+public class NumVector implements Iterable<BytecodeFunc> {
 	Vector<BytecodeFunc> data = new Vector<BytecodeFunc>();
 	
 	public NumVector() {
@@ -60,5 +61,10 @@ public class NumVector {
 			rlt[i] = data.get(i).apply(args);
 		}
 		return rlt;
-	}	
+	}
+
+	@Override
+	public Iterator<BytecodeFunc> iterator() {
+		return data.iterator();
+	}
 }

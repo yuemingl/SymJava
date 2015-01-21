@@ -30,7 +30,7 @@ public class Divide extends BinaryOp {
 		} else if(denominator.symEquals(Symbol.C0))
 			throw new IllegalArgumentException("Argument 'divisor' is 0");
 		 else if(Symbol.C1.symEquals(numerator))
-			return new Reciprocal(denominator).setSimplifyOps(simOps);
+			return Reciprocal.simplifiedIns(denominator).setSimplifyOps(simOps);
 		 else if(Symbol.C1.symEquals(denominator))
 			return numerator.clone().setSimplifyOps(simOps);
 		return new Divide(numerator, denominator).setAsSimplified();
@@ -54,9 +54,9 @@ public class Divide extends BinaryOp {
 			if(!bl && !br) {
 				return Symbol.C0;
 			} else if(!bl) {
-				return left.multiply(new Reciprocal(right).diff(expr));
+				return left.multiply(Reciprocal.simplifiedIns(right).diff(expr));
 			} else if(!br) {
-				return left.diff(expr).multiply(new Reciprocal(right));
+				return left.diff(expr).multiply(Reciprocal.simplifiedIns(right));
 			}
 		}
 		Expr n0 = left.diff(expr);
@@ -81,7 +81,7 @@ public class Divide extends BinaryOp {
 	public void flattenAdd(List<Expr> outList) {
 		List<Expr> list1 = new ArrayList<Expr>();
 		left.flattenAdd(list1);
-		Reciprocal r = new Reciprocal(right);
+		Expr r = Reciprocal.simplifiedIns(right);
 		for(Expr e : list1) {
 			outList.add( new Multiply(e, r) );
 		}
@@ -90,7 +90,7 @@ public class Divide extends BinaryOp {
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
 		left.flattenMultiply(outList);
-		new Reciprocal(right).flattenMultiply(outList);
+		Reciprocal.simplifiedIns(right).flattenMultiply(outList);
 	}
 
 }

@@ -57,7 +57,7 @@ public class Multiply extends BinaryOp {
 			Reciprocal rr = (Reciprocal)r;
 			Expr newBase = simplifiedIns(rl.base, rr.base);
 			//SimplifyOps=? 
-			return new Reciprocal( newBase ).setSimplifyOps(simOps + newBase.getSimplifyOps() + 1);
+			return Reciprocal.simplifiedIns( newBase ).setSimplifyOps(simOps + newBase.getSimplifyOps() + 1);
 		} else if(l instanceof Reciprocal) {
 			Reciprocal rl = (Reciprocal)l;
 			return Divide.shallowSimplifiedIns(r, rl.base);

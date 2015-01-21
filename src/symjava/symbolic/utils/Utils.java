@@ -67,12 +67,10 @@ public class Utils {
 	}
 	
 	public static boolean symCompare(Expr expr1, Expr expr2) {
-		if( expr1 instanceof Symbol || 
-			expr2 instanceof Symbol || 
-			expr1 instanceof Symbols || 
-			expr2 instanceof Symbols) {
-			return expr1 == expr2;
-		}
+		if( expr1 instanceof Symbol || expr1 instanceof Symbols)
+			return expr1.symEquals(expr2);
+		if( expr2 instanceof Symbol || expr2 instanceof Symbols)
+			return expr2.symEquals(expr1);
 		return expr1.symEquals(expr2);
 	}
 	

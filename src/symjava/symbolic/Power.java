@@ -19,6 +19,8 @@ public class Power extends UnaryOp {
 	
 	@Override
 	public Expr subs(Expr from, Expr to) {
+		if(base.subs(from,to) == base) 
+			return this;
 		return new Power(base.subs(from, to), exponent);
 	}
 
