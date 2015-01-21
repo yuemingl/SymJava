@@ -25,8 +25,8 @@ public class Example4 {
 		
 		Expr reg_term = (q-q0)*(q-q0)*0.5*0.1;
 
-		//Func L = new Func("L",(u-u0)*(u-u0)/2 + reg_term + q*Dot.apply(Grad.apply(u), Grad.apply(lamd)) - f*lamd);
-		Func L = new Func("L",Dot.apply(Grad.apply(u), Grad.apply(lamd)));
+		Func L = new Func("L",(u-u0)*(u-u0)/2 + reg_term + q*Dot.apply(Grad.apply(u), Grad.apply(lamd)) - f*lamd);
+		//Func L = new Func("L",Dot.apply(Grad.apply(u), Grad.apply(lamd)));
 		
 		System.out.println("Lagrange L(u, \\lambda, q) = \n"+L);
 		
@@ -37,7 +37,7 @@ public class Example4 {
 		Expr[] dxs = new Expr[]{phi, psi,  chi };
 		SymVector Lx = Grad.apply(L, xs, dxs);
 		System.out.println("\nGradient Lx = (Lu, Llamd, Lq) =");
-		Lx.print();
+		System.out.println(Lx);
 		
 		Func du = new Func("\\delta{u}", x,y,z);
 		Func dl = new Func("\\delta{\\lambda}", x,y,z);
@@ -48,6 +48,6 @@ public class Example4 {
 			Lxx.add(Grad.apply(Lxi, xs, dxs2));
 		}
 		System.out.println("\nHessian Matrix =");
-		Lxx.print();
+		System.out.println(Lxx);
 	}
 }

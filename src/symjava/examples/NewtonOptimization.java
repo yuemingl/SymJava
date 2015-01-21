@@ -32,9 +32,9 @@ public class NewtonOptimization {
 
 		
 		System.out.println("Hessian Matrix = ");
-		hess.print();
+		System.out.println(hess);
 		System.out.println("Grident = ");
-		grad.print();
+		System.out.println(grad);
 		
 		//Convert symbolic staff to Bytecode staff to speedup evaluation
 		NumMatrix NH = new NumMatrix(hess, unknowns);

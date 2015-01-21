@@ -37,7 +37,7 @@ public class Newton {
 		}
 
 		System.out.println("Jacobian Matrix = ");
-		hess.print();
+		System.out.println(hess);
 		
 		//Convert symbolic staff to Bytecode staff to speedup evaluation
 		NumMatrix NH = new NumMatrix(hess, unknowns);

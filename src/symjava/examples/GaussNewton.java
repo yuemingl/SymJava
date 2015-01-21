@@ -29,9 +29,9 @@ public class GaussNewton {
 		}
 		
 		System.out.println("Jacobian Matrix = ");
-		J.print();
+		System.out.println(J);
 		System.out.println("Residuals = ");
-		res.print();
+		System.out.println(res);
 		
 		//Convert symbolic staff to Bytecode staff to speedup evaluation
 		NumVector Nres = new NumVector(res, eq.getParams());

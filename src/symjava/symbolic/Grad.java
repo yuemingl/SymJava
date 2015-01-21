@@ -9,6 +9,12 @@ public class Grad extends SymVector {
 	Func func = null;
 	Expr[] args = null;
 	
+	public Grad(SymVector data, Expr[] args) {
+		for(Expr e : data)
+			this.data.add(e);
+		this.args = args;
+	}
+	
 	public Grad(Expr f) {
 		if(f instanceof Func) {
 			if(f.isAbstract()) {
@@ -81,13 +87,6 @@ public class Grad extends SymVector {
 		return new Grad(F, fs, dfs);
 	}
 	
-	public String toString() {
-		if(func != null)
-			return "\\nabla{"+func+"}";
-		else
-			return super.toString();
-	}
-	
 	public Func getFunc() {
 		return func;
 	}
@@ -99,8 +98,27 @@ public class Grad extends SymVector {
 	}
 	
 	public SymVector subs(Expr from, Expr to) {
+		if(this.func == null) {
+			return new Grad(super.subs(from, to), this.args);
+		}
 		if(this.func == this.func.subs(from, to))
 			return this;
 		return new Grad(this.func.subs(from, to), this.func.args);
+	}
+	
+	public SymVector diff(Expr expr) {
+		return new Grad(super.diff(expr), this.args);
+	}
+	
+	public String getLabel() {
+		if(this.func == null) {
+			for(Expr e : this.data) {
+				if(e instanceof Derivative) {
+					return "\\nabla{"+((Derivative)e).func.toString()+"}";
+				}
+			}
+			return super.toString();
+		}
+		return "\\nabla{"+func+"}";
 	}
 }

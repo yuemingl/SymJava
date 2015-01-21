@@ -67,7 +67,7 @@ public class Example4Old {
 		Expr[] dxs = new Expr[]{phi, psi,  chi };
 		SymVector Lx = fgrad(L, xs, dxs);
 		System.out.println("\nGradient Lx = (Lu, Llamd, Lq) =");
-		Lx.print();
+		System.out.println(Lx);
 		
 		Func du = new Func("\\delta{u}", x,y,z);
 		Func dl = new Func("\\delta{\\lambda}", x,y,z);
@@ -78,6 +78,6 @@ public class Example4Old {
 			Lxx.add(fgrad(Lxi, xs, dxs2));
 		}
 		System.out.println("\nHessian Matrix =");
-		Lxx.print();
+		System.out.println(Lxx);
 	}
 }
