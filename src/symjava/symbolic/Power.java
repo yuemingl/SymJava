@@ -1,27 +1,39 @@
 package symjava.symbolic;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import symjava.symbolic.utils.Utils;
 
 public class Power extends UnaryOp {
 	public int exponent;
 	public Power(Expr base, int exponent) {
 		super(base);
 		this.exponent = exponent;
-		if(base instanceof Symbol)
-			label = base + "^" + exponent;
-		else
-			label = "("+base + ")^" + exponent;
+		if(base instanceof Symbol) {
+			if(exponent < 0)
+				label = "("+base + ")^{" + exponent + "}";
+			else
+				label = base + "^" + exponent + "";
+
+		} else {
+			if(exponent < 0)
+				label = "("+base + ")^{" + exponent + "}";
+			else
+				label = "("+base + ")^" + exponent;
+		}
 		sortKey = base.getSortKey()+String.valueOf(exponent);
+	}
+	
+	public static Expr simplifiedIns(Expr base, int exponent) {
+		if(exponent == 0)
+			return Symbol.C1;
+		else
+			return new Power(base, exponent);
 	}
 	
 	@Override
 	public Expr subs(Expr from, Expr to) {
 		if(base.subs(from,to) == base) 
 			return this;
-		return new Power(base.subs(from, to), exponent);
+		return Power.simplifiedIns(base.subs(from, to), exponent);
 	}
 
 	@Override
@@ -30,13 +42,13 @@ public class Power extends UnaryOp {
 			return Symbol.C2.multiply(base).multiply(base.diff(expr));
 		else {
 			SymInteger i = new SymInteger(exponent);
-			return i.multiply(new Power(base, exponent - 1)).multiply(base.diff(expr));
+			return i.multiply(Power.simplifiedIns(base, exponent - 1)).multiply(base.diff(expr));
 		}
 	}
 
 	@Override
 	public Expr simplify() {
-		return new Power(base.simplify(), exponent);
+		return Power.simplifiedIns(base.simplify(), exponent);
 	}
 
 	@Override
