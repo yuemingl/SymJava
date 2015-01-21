@@ -292,6 +292,7 @@ x=24.79064
 x=24.73869 
 ```
 Output in Latex:
+
 Lagrange=
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_L.png)
 Hessian=
