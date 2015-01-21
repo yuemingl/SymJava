@@ -344,6 +344,10 @@ public class Example4 {
 }
 ```
 Output in Latex:
+
+Lagrange=
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_L.png)
+Hessian=
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_hessian.png)
+Grad(L)=
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_grad.png)
