@@ -1,10 +1,11 @@
 package symjava.matrix;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 import symjava.symbolic.Expr;
 
-public class SymVector {
+public class SymVector implements Iterable<Expr> {
 	Vector<Expr> data = new Vector<Expr>();
 	
 	public SymVector() {
@@ -31,9 +32,22 @@ public class SymVector {
 		return data.size();
 	}
 	
+//	  \left[ {\begin{array}{c}
+//	   1\\
+//	   3\\
+//	  \end{array} } \right]
 	public void print() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("\\left[ {\\begin{array}{c}");
 		for(int j=0; j<data.size(); j++) {
-			System.out.println(data.get(j));
+			sb.append(data.get(j)+"\\\\\n");
 		}
+		sb.append("\\end{array} } \\right]");
+		System.out.println(sb.toString());
+	}
+
+	@Override
+	public Iterator<Expr> iterator() {
+		return data.iterator();
 	}
 }

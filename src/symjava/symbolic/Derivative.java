@@ -11,6 +11,7 @@ public class Derivative extends Func {
 	
 	public Derivative(Func f, Expr x) {
 		super("", f.args);
+		//Member variable 'expr' in func here is the expression after taking derivative
 		if(f.expr != null)
 			this.expr = f.expr.diff(x);
 		this.func = f;
@@ -39,6 +40,12 @@ public class Derivative extends Func {
 		this.sortKey = other.sortKey;		
 	}
 	
+	public static Expr simplifiedIns(Func f, Expr x) {
+		if(f.expr == null)
+			return new Derivative(f, x);
+		return f.expr.diff(x);
+	}
+	
 	protected String getDxyzLabel() {
 		StringBuilder sb = new StringBuilder();
 		for(Expr e : dxyz) {
@@ -49,21 +56,20 @@ public class Derivative extends Func {
 
 	@Override
 	public Expr diff(Expr expr) {
-		if(Utils.symCompare(this, expr)) {
+		if(this.expr != null)
+			return this.expr.diff(expr);
+		else if(Utils.symCompare(this, expr)) {
 			return Symbol.C1;
-		} else if(this.containsArg(expr)) {
-			return new Derivative(this, expr);
-		} else {
+		} else if(!this.containsArg(expr) && expr instanceof Symbol) {
 			return Symbol.C0;
 		}
+		return new Derivative(this, expr);
 	}
 
 	@Override
 	public Expr simplify() {
 		if(this.expr != null) {
-			Derivative rlt = new Derivative(this);
-			rlt.expr = this.expr.simplify();
-			return rlt;
+			return this.expr.simplify();
 		}
 		return this;
 	}
@@ -117,9 +123,18 @@ public class Derivative extends Func {
 	@Override
 	public Expr subs(Expr from, Expr to) {
 		if(expr != null) {
-			Derivative rlt = new Derivative(this);
-			rlt.expr = expr.subs(from, to);
-			return rlt;
+			return expr.subs(from, to);
+		} else if(Utils.symCompare(func, from)) {
+			if(to instanceof Func) {
+				Derivative rlt = new Derivative(this);
+				rlt.func = (Func)to;
+				return rlt;
+			} else {
+				Expr diffExpr = to;
+				for(Expr x : dxyz)
+					diffExpr = diffExpr.diff(x);
+				return diffExpr;
+			}
 		}
 		return this;
 	}

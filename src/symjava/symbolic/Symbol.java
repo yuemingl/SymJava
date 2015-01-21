@@ -2,6 +2,8 @@ package symjava.symbolic;
 
 import java.util.List;
 
+import symjava.symbolic.utils.Utils;
+
 public class Symbol extends Expr {
 	public static Symbol a = new Symbol("a");
 	public static Symbol b = new Symbol("b");
@@ -50,7 +52,7 @@ public class Symbol extends Expr {
 	
 	@Override
 	public Expr subs(Expr from, Expr to) {
-		if(this == from) {
+		if(Utils.symCompare(this, from)) {
 			return to;
 		}
 		return this;
