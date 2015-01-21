@@ -292,9 +292,13 @@ x=24.79064
 x=24.73869 
 ```
 Output in Latex:
+Lagrange=
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_L.png)
+Hessian=
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_hessian.png)
+Grad(L)=
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_grad.png)
+
 ```
 Iterativly sovle ... 
 y_0=0.00000 y_1=0.00000 y_2=0.00000 y_3=0.00000 y_4=0.00000 y_5=0.00000 y_6=0.00000 \lambda_0=0.00000 \lambda_1=0.00000 \lambda_2=0.00000 \lambda_3=0.00000 \lambda_4=0.00000 \lambda_5=0.00000 \lambda_6=0.00000 a=0.90000 b=0.20000 
