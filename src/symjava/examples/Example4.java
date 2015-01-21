@@ -1,14 +1,8 @@
 package symjava.examples;
 
-import static symjava.symbolic.Symbol.x;
-import static symjava.symbolic.Symbol.y;
-import static symjava.symbolic.Symbol.z;
-import symjava.matrix.SymMatrix;
-import symjava.matrix.SymVector;
-import symjava.symbolic.Dot;
-import symjava.symbolic.Expr;
-import symjava.symbolic.Func;
-import symjava.symbolic.Grad;
+import static symjava.symbolic.Symbol.*;
+import symjava.matrix.*;
+import symjava.symbolic.*;
 
 /**
  * Example for PDE Constrained Parameters Optimization
@@ -26,8 +20,6 @@ public class Example4 {
 		Expr reg_term = (q-q0)*(q-q0)*0.5*0.1;
 
 		Func L = new Func("L",(u-u0)*(u-u0)/2 + reg_term + q*Dot.apply(Grad.apply(u), Grad.apply(lamd)) - f*lamd);
-		//Func L = new Func("L",Dot.apply(Grad.apply(u), Grad.apply(lamd)));
-		
 		System.out.println("Lagrange L(u, \\lambda, q) = \n"+L);
 		
 		Func phi = new Func("\\phi ", x,y,z);

@@ -186,6 +186,7 @@ package symjava.examples;
 import Jama.Matrix;
 import symjava.matrix.*;
 import symjava.relational.Eq;
+import symjava.symbolic.Expr;
 
 /**
  * A general Gauss Newton solver using SymJava for simbolic computations
@@ -200,17 +201,20 @@ public class GaussNewton {
 		SymVector res = new SymVector(n);
 		SymMatrix J = new SymMatrix(n, eq.getParams().length);
 		
+		Expr[] params = eq.getParams();
 		for(int i=0; i<n; i++) {
 			Eq subEq = eq.subsUnknowns(data[i]);
 			res[i] = subEq.lhs - subEq.rhs; //res[i] =y[i] - a*x[i]/(b + x[i]); 
-			for(int j=0; j<eq.getParams().length; j++)
-				J[i][j] = res[i].diff(eq.getParams()[j]);
+			for(int j=0; j<eq.getParams().length; j++) {
+				Expr df = res[i].diff(params[j]);
+				J[i][j] = df;
+			}
 		}
 		
 		System.out.println("Jacobian Matrix = ");
-		J.print();
+		System.out.println(J);
 		System.out.println("Residuals = ");
-		res.print();
+		System.out.println(res);
 		
 		//Convert symbolic staff to Bytecode staff to speedup evaluation
 		NumVector Nres = new NumVector(res, eq.getParams());
@@ -233,7 +237,6 @@ public class GaussNewton {
 		}		
 	}
 }
-
 ```
 
 ```Java
@@ -308,46 +311,58 @@ x=35.60000
 x=26.39551 
 x=24.79064 
 x=24.73869 
-L(y_0,y_1,y_2,y_3,y_4,y_5,y_6,\lambda_0,\lambda_1,\lambda_2,\lambda_3,\lambda_4,\lambda_5,\lambda_6,a,b)=
-    (0.05 - y_0)^2 + (0.094 - y_2)^2 + (0.127 - y_1)^2 + (0.2122 - y_3)^2 + (0.2665 - y_5)^2 + (0.2729 - y_4)^2 + (0.3317 - y_6)^2 + \lambda_0*y_0 + \lambda_1*y_1 + \lambda_2*y_2 + \lambda_3*y_3 + \lambda_4*y_4 + \lambda_5*y_5 - 3.74*\lambda_6*a/(b + 3.74) + 0.038*\lambda_0*a/(b + 0.038) + 0.194*\lambda_1*a/(b + 0.194) + 0.425*\lambda_2*a/(b + 0.425) + 0.626*\lambda_3*a/(b + 0.626) + 1.253*\lambda_4*a/(b + 1.253) + 2.5*\lambda_5*a/(b + 2.5) + \lambda_6*y_6
-Hessian Matrix = 
-2	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	
-0	2	0	0	0	0	0	0	1	0	0	0	0	0	0	0	
-0	0	2	0	0	0	0	0	0	1	0	0	0	0	0	0	
-0	0	0	2	0	0	0	0	0	0	1	0	0	0	0	0	
-0	0	0	0	2	0	0	0	0	0	0	1	0	0	0	0	
-0	0	0	0	0	2	0	0	0	0	0	0	1	0	0	0	
-0	0	0	0	0	0	2	0	0	0	0	0	0	1	0	0	
-1	0	0	0	0	0	0	0	0	0	0	0	0	0	-0.038/(b + 0.038)	0.038*a*(b + 0.038)^-2	
-0	1	0	0	0	0	0	0	0	0	0	0	0	0	-0.194/(b + 0.194)	0.194*a*(b + 0.194)^-2	
-0	0	1	0	0	0	0	0	0	0	0	0	0	0	-0.425/(b + 0.425)	0.425*a*(b + 0.425)^-2	
-0	0	0	1	0	0	0	0	0	0	0	0	0	0	-0.626/(b + 0.626)	0.626*a*(b + 0.626)^-2	
-0	0	0	0	1	0	0	0	0	0	0	0	0	0	-1.253/(b + 1.253)	1.253*a*(b + 1.253)^-2	
-0	0	0	0	0	1	0	0	0	0	0	0	0	0	-2.5/(b + 2.5)	2.5*a*(b + 2.5)^-2	
-0	0	0	0	0	0	1	0	0	0	0	0	0	0	-3.74/(b + 3.74)	3.74*a*(b + 3.74)^-2	
-0	0	0	0	0	0	0	-0.038/(b + 0.038)	-0.194/(b + 0.194)	-0.425/(b + 0.425)	-0.626/(b + 0.626)	-1.253/(b + 1.253)	-2.5/(b + 2.5)	-3.74/(b + 3.74)	0	3.74*\lambda_6*(b + 3.74)^-2 + 0.038*\lambda_0*(b + 0.038)^-2 + 0.194*\lambda_1*(b + 0.194)^-2 + 0.425*\lambda_2*(b + 0.425)^-2 + 0.626*\lambda_3*(b + 0.626)^-2 + 1.253*\lambda_4*(b + 1.253)^-2 + 2.5*\lambda_5*(b + 2.5)^-2	
-0	0	0	0	0	0	0	0.038*a*(b + 0.038)^-2	0.194*a*(b + 0.194)^-2	0.425*a*(b + 0.425)^-2	0.626*a*(b + 0.626)^-2	1.253*a*(b + 1.253)^-2	2.5*a*(b + 2.5)^-2	3.74*a*(b + 3.74)^-2	0.038*\lambda_0*(b + 0.038)^-2 + 0.194*\lambda_1*(b + 0.194)^-2 + 0.425*\lambda_2*(b + 0.425)^-2 + 0.626*\lambda_3*(b + 0.626)^-2 + 1.253*\lambda_4*(b + 1.253)^-2 + 2.5*\lambda_5*(b + 2.5)^-2 + 3.74*\lambda_6*(b + 3.74)^-2	-0.076*\lambda_0*a*(b + 0.038)^-3 + -0.388*\lambda_1*a*(b + 0.194)^-3 + -0.85*\lambda_2*a*(b + 0.425)^-3 + -1.252*\lambda_3*a*(b + 0.626)^-3 + -2.506*\lambda_4*a*(b + 1.253)^-3 + -5.0*\lambda_5*a*(b + 2.5)^-3 + -7.48*\lambda_6*a*(b + 3.74)^-3	
-Grident = 
--0.1 + \lambda_0 + 2*y_0
--0.254 + \lambda_1 + 2*y_1
--0.188 + \lambda_2 + 2*y_2
--0.4244 + \lambda_3 + 2*y_3
--0.5458 + \lambda_4 + 2*y_4
--0.533 + \lambda_5 + 2*y_5
--0.6634 + \lambda_6 + 2*y_6
--0.038*a/(b + 0.038) + y_0
--0.194*a/(b + 0.194) + y_1
--0.425*a/(b + 0.425) + y_2
--0.626*a/(b + 0.626) + y_3
--1.253*a/(b + 1.253) + y_4
--2.5*a/(b + 2.5) + y_5
--3.74*a/(b + 3.74) + y_6
--(3.74*\lambda_6/(b + 3.74) + 0.038*\lambda_0/(b + 0.038) + 0.194*\lambda_1/(b + 0.194) + 0.425*\lambda_2/(b + 0.425) + 0.626*\lambda_3/(b + 0.626) + 1.253*\lambda_4/(b + 1.253) + 2.5*\lambda_5/(b + 2.5))
-0.038*\lambda_0*a*(b + 0.038)^-2 + 0.194*\lambda_1*a*(b + 0.194)^-2 + 0.425*\lambda_2*a*(b + 0.425)^-2 + 0.626*\lambda_3*a*(b + 0.626)^-2 + 1.253*\lambda_4*a*(b + 1.253)^-2 + 2.5*\lambda_5*a*(b + 2.5)^-2 + 3.74*\lambda_6*a*(b + 3.74)^-2
-Iterativly sovle ... 
-y_0=0.00000 y_1=0.00000 y_2=0.00000 y_3=0.00000 y_4=0.00000 y_5=0.00000 y_6=0.00000 \lambda_0=0.00000 \lambda_1=0.00000 \lambda_2=0.00000 \lambda_3=0.00000 \lambda_4=0.00000 \lambda_5=0.00000 \lambda_6=0.00000 a=0.90000 b=0.20000 
-y_0=0.01678 y_1=0.09612 y_2=0.16729 y_3=0.20243 y_4=0.25473 y_5=0.28945 y_6=0.30273 \lambda_0=0.06643 \lambda_1=0.06176 \lambda_2=-0.14658 \lambda_3=0.01955 \lambda_4=0.03634 \lambda_5=-0.04590 \lambda_6=0.05794 a=0.33266 b=0.26017 
-y_0=0.01624 y_1=0.08735 y_2=0.15765 y_3=0.19518 y_4=0.25469 y_5=0.29667 y_6=0.31327 \lambda_0=0.06752 \lambda_1=0.07930 \lambda_2=-0.12729 \lambda_3=0.03404 \lambda_4=0.03642 \lambda_5=-0.06034 \lambda_6=0.03687 a=0.35178 b=0.46125 
-y_0=0.02256 y_1=0.09240 y_2=0.15593 y_3=0.19116 y_4=0.25076 y_5=0.29644 y_6=0.31550 \lambda_0=0.05487 \lambda_1=0.06919 \lambda_2=-0.12387 \lambda_3=0.04207 \lambda_4=0.04428 \lambda_5=-0.05989 \lambda_6=0.03240 a=0.36223 b=0.55462 
-y_0=0.02314 y_1=0.09356 y_2=0.15671 y_3=0.19159 y_4=0.25059 y_5=0.29598 y_6=0.31499 \lambda_0=0.05373 \lambda_1=0.06689 \lambda_2=-0.12542 \lambda_3=0.04123 \lambda_4=0.04463 \lambda_5=-0.05896 \lambda_6=0.03342 a=0.36185 b=0.55631 
 ```
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_L.png)
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_hessian.png)
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_grad.png)
+
+```Java
+package symjava.examples;
+
+import static symjava.symbolic.Symbol.*;
+import symjava.matrix.*;
+import symjava.symbolic.*;
+
+/**
+ * Example for PDE Constrained Parameters Optimization
+ *
+ */
+public class Example4 {
+	public static void main(String[] args) {
+		Func u =  new Func("u",  x,y,z);
+		Func u0 = new Func("u0", x,y,z);
+		Func q =  new Func("q",  x,y,z);
+		Func q0 = new Func("q0", x,y,z);
+		Func f =  new Func("f",  x,y,z);
+		Func lamd = new Func("\\lambda ", x,y,z);
+		
+		Expr reg_term = (q-q0)*(q-q0)*0.5*0.1;
+
+		Func L = new Func("L",(u-u0)*(u-u0)/2 + reg_term + q*Dot.apply(Grad.apply(u), Grad.apply(lamd)) - f*lamd);
+		System.out.println("Lagrange L(u, \\lambda, q) = \n"+L);
+		
+		Func phi = new Func("\\phi ", x,y,z);
+		Func psi = new Func("\\psi ", x,y,z);
+		Func chi = new Func("\\chi ", x,y,z);
+		Expr[] xs =  new Expr[]{u,   lamd, q   };
+		Expr[] dxs = new Expr[]{phi, psi,  chi };
+		SymVector Lx = Grad.apply(L, xs, dxs);
+		System.out.println("\nGradient Lx = (Lu, Llamd, Lq) =");
+		System.out.println(Lx);
+		
+		Func du = new Func("\\delta{u}", x,y,z);
+		Func dl = new Func("\\delta{\\lambda}", x,y,z);
+		Func dq = new Func("\\delta{q}", x,y,z);
+		Expr[] dxs2 = new Expr[] { du, dl, dq };
+		SymMatrix Lxx = new SymMatrix();
+		for(Expr Lxi : Lx) {
+			Lxx.add(Grad.apply(Lxi, xs, dxs2));
+		}
+		System.out.println("\nHessian Matrix =");
+		System.out.println(Lxx);
+	}
+}
+```
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_L.png)
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_hessian.png)
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_grad.png)
