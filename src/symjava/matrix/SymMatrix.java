@@ -47,7 +47,7 @@ public class SymMatrix {
 //	   1 & 2 & 3 & 4 & 5\\
 //	   3 & 4 & 5 & 6 & 7\\
 //	  \end{array} } \right]
-	public void print() {
+	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\\left[ {\\begin{array}{");
 		for(int j=0; j<colDim(); j++)
@@ -61,6 +61,6 @@ public class SymMatrix {
 			sb.append("\\\\\n");
 		}
 		sb.append("\\end{array} } \\right]");
-		System.out.println(sb.toString());
+		return sb.toString();
 	}
 }

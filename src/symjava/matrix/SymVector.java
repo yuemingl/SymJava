@@ -36,14 +36,14 @@ public class SymVector implements Iterable<Expr> {
 //	   1\\
 //	   3\\
 //	  \end{array} } \right]
-	public void print() {
+	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\\left[ {\\begin{array}{c}");
 		for(int j=0; j<data.size(); j++) {
 			sb.append(data.get(j)+"\\\\\n");
 		}
 		sb.append("\\end{array} } \\right]");
-		System.out.println(sb.toString());
+		return sb.toString();
 	}
 
 	@Override
@@ -57,5 +57,17 @@ public class SymVector implements Iterable<Expr> {
 			rlt.add(e.subs(from, to));
 		}
 		return rlt;
+	}
+	
+	public SymVector diff(Expr expr) {
+		SymVector rlt = new SymVector();
+		for(Expr e : data) {
+			rlt.add(e.diff(expr));
+		}
+		return rlt;
+	}
+	
+	public String getLabel() {
+		return "";
 	}
 }

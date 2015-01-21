@@ -16,13 +16,9 @@ public class Dot extends Expr {
 		left = l;
 		right = r;
 		if(left instanceof Grad && right instanceof Grad) {
-			Grad lg = (Grad)left;
-			Grad rg = (Grad)right;
-			if(lg.isAbstract() && rg.isAbstract()) {
-				label = left.toString() + " \\cdot " + right.toString();
-				sortKey = label;
-				return;
-			}
+			label = left.getLabel() + " \\cdot " + right.getLabel();
+			sortKey = label;
+			return;
 		}
 		List<Expr> list = new ArrayList<Expr>();
 		for(int i=0; i<left.dim(); i++) {
@@ -34,24 +30,38 @@ public class Dot extends Expr {
 	}
 	
 	public static Expr apply(SymVector l, SymVector r) {
-		Dot ret = new Dot(l, r);
-		if(ret.expr != null)
-			return ret.expr;
-		return ret;
+		List<Expr> list = new ArrayList<Expr>();
+		for(int i=0; i<l.dim(); i++) {
+			list.add(l.get(i).multiply(r.get(i)));
+		}
+		Expr ret = Utils.addListToExpr(list).simplify();
+		if(ret instanceof SymReal<?>)
+			return ret;
+		Dot dot = new Dot(l, r);
+		if(dot.expr != null)
+			return dot.expr;
+		return dot;
 	}
 	
 	@Override
 	public Expr diff(Expr expr) {
-		//if(this.expr == null) {
+		if(this.expr == null) {
 			Grad lg = (Grad)left;
 			Grad rg = (Grad)right;
-			//if(lg.isAbstract() && rg.isAbstract()) {
-				Expr d1 = Dot.apply(new Grad(lg.getFunc().diff(expr)), rg);
-				Expr d2 = Dot.apply(lg, new Grad(rg.getFunc().diff(expr)));				
+			if(lg.isAbstract() && rg.isAbstract()) {
+				Expr d1 = Dot.apply(new Grad(lg.getFunc().diff(expr), lg.getFunc().args), rg);
+				Expr d2 = Dot.apply(lg, new Grad(rg.getFunc().diff(expr), rg.getFunc().args));
 				return Add.simplifiedIns(d1, d2);
-			//}
-		//}
-		//return this.expr.diff(expr);
+			}
+		}
+		if(left instanceof Grad && right instanceof Grad) {
+			Grad lg = (Grad)left;
+			Grad rg = (Grad)right;
+			Expr d1 = Dot.apply(lg.diff(expr), rg);
+			Expr d2 = Dot.apply(lg, rg.diff(expr));
+			return Add.simplifiedIns(d1, d2);
+		}
+		return this.expr.diff(expr);
 	}
 
 	@Override
