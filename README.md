@@ -295,6 +295,14 @@ Output in Latex:
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_L.png)
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_hessian.png)
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_grad.png)
+```
+Iterativly sovle ... 
+y_0=0.00000 y_1=0.00000 y_2=0.00000 y_3=0.00000 y_4=0.00000 y_5=0.00000 y_6=0.00000 \lambda_0=0.00000 \lambda_1=0.00000 \lambda_2=0.00000 \lambda_3=0.00000 \lambda_4=0.00000 \lambda_5=0.00000 \lambda_6=0.00000 a=0.90000 b=0.20000 
+y_0=0.01678 y_1=0.09612 y_2=0.16729 y_3=0.20243 y_4=0.25473 y_5=0.28945 y_6=0.30273 \lambda_0=0.06643 \lambda_1=0.06176 \lambda_2=-0.14658 \lambda_3=0.01955 \lambda_4=0.03634 \lambda_5=-0.04590 \lambda_6=0.05794 a=0.33266 b=0.26017 
+y_0=0.01624 y_1=0.08735 y_2=0.15765 y_3=0.19518 y_4=0.25469 y_5=0.29667 y_6=0.31327 \lambda_0=0.06752 \lambda_1=0.07930 \lambda_2=-0.12729 \lambda_3=0.03404 \lambda_4=0.03642 \lambda_5=-0.06034 \lambda_6=0.03687 a=0.35178 b=0.46125 
+y_0=0.02256 y_1=0.09240 y_2=0.15593 y_3=0.19116 y_4=0.25076 y_5=0.29644 y_6=0.31550 \lambda_0=0.05487 \lambda_1=0.06919 \lambda_2=-0.12387 \lambda_3=0.04207 \lambda_4=0.04428 \lambda_5=-0.05989 \lambda_6=0.03240 a=0.36223 b=0.55462 
+y_0=0.02314 y_1=0.09356 y_2=0.15671 y_3=0.19159 y_4=0.25059 y_5=0.29598 y_6=0.31499 \lambda_0=0.05373 \lambda_1=0.06689 \lambda_2=-0.12542 \lambda_3=0.04123 \lambda_4=0.04463 \lambda_5=-0.05896 \lambda_6=0.03342 a=0.36185 b=0.55631 
+```
 
 ```Java
 package symjava.examples;
