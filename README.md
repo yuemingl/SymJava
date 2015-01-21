@@ -127,26 +127,18 @@ public class Example2 {
 		example2();
 	}
 }
+```
+
+Output in Latex:
+
+
+Jacobian Matrix = 
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex2_1_jacobian.png)
+
+Residuals = 
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex2_1_residuals.png)
 
 ```
-Output:
-```
-Jacobian Matrix = 
--0.038/(b + 0.038)	0.038*a*(b + 0.038)^-2	
--0.194/(b + 0.194)	0.194*a*(b + 0.194)^-2	
--0.425/(b + 0.425)	0.425*a*(b + 0.425)^-2	
--0.626/(b + 0.626)	0.626*a*(b + 0.626)^-2	
--1.253/(b + 1.253)	1.253*a*(b + 1.253)^-2	
--2.5/(b + 2.5)	2.5*a*(b + 2.5)^-2	
--3.74/(b + 3.74)	3.74*a*(b + 3.74)^-2	
-Residuals = 
-0.05 - 0.038*a/(b + 0.038)
-0.127 - 0.194*a/(b + 0.194)
-0.094 - 0.425*a/(b + 0.425)
-0.2122 - 0.626*a/(b + 0.626)
-0.2729 - 1.253*a/(b + 1.253)
-0.2665 - 2.5*a/(b + 2.5)
-0.3317 - 3.74*a/(b + 3.74)
 Iterativly sovle ... 
 a=0.33266 b=0.26017 
 a=0.34281 b=0.42608 
@@ -154,28 +146,15 @@ a=0.35778 b=0.52951
 a=0.36141 b=0.55366 
 a=0.36180 b=0.55607 
 a=0.36183 b=0.55625 
+```
+
 Jacobian Matrix = 
--1	-1	-1	
--4.0	-2.0	-1.0	
--9.0	-3.0	-1.0	
--16.0	-4.0	-1.0	
--25.0	-5.0	-1.0	
--36.0	-6.0	-1.0	
--49.0	-7.0	-1.0	
--64.0	-8.0	-1.0	
--81.0	-9.0	-1.0	
--100.0	-10.0	-1.0	
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex2_2_jacobian.png)
+
 Residuals = 
-34.234064369 - c + a + b
-68.2681162306108 - c + 4.0*a + 2.0*b
-118.615899084602 - c + 9.0*a + 3.0*b
-184.138197238557 - c + 16.0*a + 4.0*b
-266.599877916276 - c + 25.0*a + 5.0*b
-364.147735251579 - c + 36.0*a + 6.0*b
-478.019226091914 - c + 49.0*a + 7.0*b
-608.140949270688 - c + 64.0*a + 8.0*b
-754.598868667148 - c + 81.0*a + 9.0*b
-916.128818085883 - c + 100.0*a + 10.0*b
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex2_2_residuals.png)
+
+```
 Iterativly sovle ... 
 a=7.99883 b=10.00184 c=16.32401 
 ```
@@ -312,6 +291,7 @@ x=26.39551
 x=24.79064 
 x=24.73869 
 ```
+Output in Latex:
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_L.png)
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_hessian.png)
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_grad.png)
@@ -363,6 +343,7 @@ public class Example4 {
 	}
 }
 ```
+Output in Latex:
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_L.png)
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_hessian.png)
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_grad.png)
