@@ -2,7 +2,9 @@ package symjava.symbolic;
 
 public class SymPrinting {
 	public static int getPrecedence(Expr expr) {
-		if(expr instanceof Add || expr instanceof Subtract)
+		if(expr instanceof Sum)
+			return 5;
+		else if(expr instanceof Add || expr instanceof Subtract)
 			return 10;
 		if(expr instanceof Multiply || expr instanceof Divide || expr instanceof Negate)
 			return 20;

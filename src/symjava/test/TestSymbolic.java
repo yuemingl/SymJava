@@ -163,26 +163,28 @@ public class TestSymbolic {
 	public static void testSummation() {
 		System.out.println("--------------testSummation-----------------");
 		Expr sum = new Sum( x*x, x, 1, 5);
-		checkResult("\\Sigma_x={1^5}x^2", sum);
-		checkResult("\\Sigma_x={1^5}4", sum.subs(x, 2));
+		//checkResult("\\Sigma_{x=1}^5x^2", sum);
+		checkResult("\\Sigma_{x=1}^5{4.0}", sum.subs(x, 2));
+		checkResult("\\Sigma_{x=1}^5{2*x}", sum.diff(x));
 		
 		Symbol i = new Symbol("i");
-		Symbols ss = new Symbols("x", i);
-		checkResult("x_i", ss);
-		checkResult("x_2", ss.get(2));
+		Symbols xi = new Symbols("x", i);
+		checkResult("x_i", xi);
+		checkResult("x_2", xi.get(2));
 		
-		Sum sum2 = new Sum( ss*ss, i, 1, 5);
-		checkResult("\\Sigma_i=1^5((x_i)^2)",sum2);
+		Sum sum2 = new Sum( xi*xi, i, 1, 5);
+		checkResult("\\Sigma_{i=1}^5{(x_i)^2}",sum2);
+		checkResult("2*x_1",sum2.diff(xi.get(1)));
 		
 		for(int j=sum2.start; j<sum2.end; j++) {
 			checkResult("x_"+j+"^2", sum2.getSummand(j));
 		}
-		Expr summand2 = sum2.getSummand(2).subs(ss.get(2), y);
+		Expr summand2 = sum2.getSummand(2).subs(xi.get(2), y);
 		checkResult("y^2",summand2);
 		
 		int n = 100;
 		Expr sum3 = new Sum(new Reciprocal((x+3.5)*(x+8)), x, 1, n);
-		checkResult("\\Sigma_x=1^100(1/(28.0 + 11.5*x + x^2))", sum3);
+		checkResult("\\Sigma_{x=1}^100{1/(28.0 + 11.5*x + x^2)}", sum3);
 		
 	}
 	
@@ -264,12 +266,12 @@ public class TestSymbolic {
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
-		testBasic();
-		testPrint();
-		testSimplify();
+//		testBasic();
+//		testPrint();
+//		testSimplify();
 		testSummation();
-		testToBytecodeFunc();
-		testDiff();
-		testAbstract();
+//		testToBytecodeFunc();
+//		testDiff();
+//		testAbstract();
 	}
 }

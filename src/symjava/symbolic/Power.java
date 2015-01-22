@@ -12,7 +12,6 @@ public class Power extends UnaryOp {
 				label = "("+base + ")^{" + exponent + "}";
 			else
 				label = base + "^" + exponent + "";
-
 		} else {
 			if(exponent < 0)
 				label = "("+base + ")^{" + exponent + "}";
@@ -25,8 +24,10 @@ public class Power extends UnaryOp {
 	public static Expr simplifiedIns(Expr base, int exponent) {
 		if(exponent == 0)
 			return Symbol.C1;
-		else
-			return new Power(base, exponent);
+		else if(base instanceof SymReal<?>) {
+			return new SymDouble(Math.pow(((SymReal<?>) base).getVal().doubleValue(), exponent));
+		}
+		return new Power(base, exponent);
 	}
 	
 	@Override

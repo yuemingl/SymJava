@@ -61,7 +61,8 @@ public class Symbols extends Expr {
 
 	@Override
 	public boolean symEquals(Expr other) {
-		return this.label.equals(other.label);
+		//TODO May need better way to compare
+		return other.label.startsWith(this.namePrefix);
 	}
 
 	@Override
