@@ -10,7 +10,7 @@ import symjava.symbolic.Symbol;
 import Jama.Matrix;
 
 public class NewtonOptimization {
-	public static void solve(Eq eq, double[] init, int maxIter, double eps) {
+	public static void solve(Eq eq, double[] init, int maxIter, double eps, boolean dislpayOnly) {
 		if(!Symbol.C0.symEquals(eq.rhs)) {
 			System.out.println("The right hand side of the equation must be 0.");
 			return;
@@ -30,11 +30,12 @@ public class NewtonOptimization {
 			}
 		}
 
-		
 		System.out.println("Hessian Matrix = ");
 		System.out.println(hess);
 		System.out.println("Grident = ");
 		System.out.println(grad);
+		
+		if(dislpayOnly) return;
 		
 		//Convert symbolic staff to Bytecode staff to speedup evaluation
 		NumMatrix NH = new NumMatrix(hess, unknowns);
