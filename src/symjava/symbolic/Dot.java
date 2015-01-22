@@ -6,6 +6,10 @@ import java.util.List;
 import symjava.matrix.SymVector;
 import symjava.symbolic.utils.Utils;
 
+/**
+ * Dot Product of two vectors
+ *
+ */
 public class Dot extends Expr {
 	SymVector left;
 	SymVector right;
@@ -16,7 +20,7 @@ public class Dot extends Expr {
 		left = l;
 		right = r;
 		if(left instanceof Grad && right instanceof Grad) {
-			label = left.getLabel() + " \\cdot " + right.getLabel();
+			label = left + " \\cdot " + right;
 			sortKey = label;
 			return;
 		}
