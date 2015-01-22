@@ -163,8 +163,8 @@ public class TestSymbolic {
 	public static void testSummation() {
 		System.out.println("--------------testSummation-----------------");
 		Expr sum = new Sum( x*x, x, 1, 5);
-		checkResult("\\Sigma_x=1^5(x^2)", sum);
-		checkResult("\\Sigma_x=1^5((2)^2)", sum.subs(x, 2));
+		checkResult("\\Sigma_x={1^5}x^2", sum);
+		checkResult("\\Sigma_x={1^5}4", sum.subs(x, 2));
 		
 		Symbol i = new Symbol("i");
 		Symbols ss = new Symbols("x", i);
@@ -255,7 +255,7 @@ public class TestSymbolic {
 		checkResult("\\nabla{u(x,y,z)}",gu.toString());
 		Grad gv = new Grad(v);
 		checkResult("\\nabla{u(x,y,z)} \\dot \\nabla{v(x,y,z)}",new Dot(gu, gv));
-		checkResult("3",new Dot(new Grad(x+y+z), new Grad(x+y+z)));
+		checkResult("3",Dot.apply(new Grad(x+y+z), new Grad(x+y+z)));
 		
 		Func w = new Func("w", x, y, x);
 		checkResult("\\nabla{w(x,y,x)} \\dot \\nabla{v(x,y,z)}", new Dot(gu, gv).fdiff(u,w));

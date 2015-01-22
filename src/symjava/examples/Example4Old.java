@@ -9,7 +9,8 @@ import symjava.symbolic.utils.Utils;
 import static symjava.symbolic.Symbol.*;
 
 /**
- * Example for PDE Constrained Parameters Optimization
+ * An old version of example for PDE Constrained Parameters Optimization
+ * without using fdiff(), Grad and Dot class
  *
  */
 public class Example4Old {

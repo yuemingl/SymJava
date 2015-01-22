@@ -3,6 +3,8 @@ package symjava.symbolic;
 import java.util.HashMap;
 import java.util.List;
 
+import symjava.symbolic.utils.Utils;
+
 public class Symbols extends Expr {
 	String namePrefix;
 	Expr indexSymbol;
@@ -32,9 +34,9 @@ public class Symbols extends Expr {
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
-		if(this == from) {
+		if(Utils.symCompare(this, from)) {
 			return to;
-		} else if(indexSymbol == from) {
+		} else if(Utils.symCompare(indexSymbol,from)) {
 			if(to instanceof SymInteger) {
 				SymInteger index = (SymInteger)to;
 				Symbol s = this.get(index.getVal());
@@ -47,7 +49,7 @@ public class Symbols extends Expr {
 	
 	@Override
 	public Expr diff(Expr expr) {
-		if(this == expr)
+		if(Utils.symCompare(this, expr))
 			return Symbol.C1;
 		return Symbol.C0;
 	}

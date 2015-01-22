@@ -5,10 +5,20 @@ import java.util.List;
 import symjava.matrix.SymVector;
 import symjava.symbolic.utils.Utils;
 
+/**
+ * Gradient of a function or expression
+ *
+ */
 public class Grad extends SymVector {
 	Func func = null;
 	Expr[] args = null;
 	
+	/**
+	 * Construct an instance directly from data and args
+	 * 
+	 * @param data
+	 * @param args
+	 */
 	public Grad(SymVector data, Expr[] args) {
 		for(Expr e : data)
 			this.data.add(e);
@@ -63,16 +73,15 @@ public class Grad extends SymVector {
 	 * @param dfs
 	 */
 	public Grad(Expr F, Expr[] fs, Expr[] dfs) {
-		Func FF = null;
+		if(fs.length != dfs.length)
+			throw new IllegalArgumentException();
+		
 		if(F instanceof Func) {
-			FF = (Func)F;
-		} else {
-			FF = new Func(F.toString(), F);
+			this.func = (Func)F;
 		}
-		this.func = FF;
 		for(int i=0; i<fs.length; i++) {
-			if(fs[i] instanceof Func) {
-				data.add(FF.fdiff(fs[i], dfs[i]));
+			if(fs[i] instanceof Func && dfs[i] instanceof Func) {
+				data.add(F.fdiff(fs[i], dfs[i]));
 			} else {
 				throw new IllegalArgumentException();
 			}
@@ -110,15 +119,16 @@ public class Grad extends SymVector {
 		return new Grad(super.diff(expr), this.args);
 	}
 	
-	public String getLabel() {
+	@Override
+	public String toString() {
 		if(this.func == null) {
 			for(Expr e : this.data) {
-				if(e instanceof Derivative) {
-					return "\\nabla{"+((Derivative)e).func.toString()+"}";
+				if(!(e instanceof Derivative)) {
+					return super.toString();
 				}
 			}
-			return super.toString();
+			return "\\nabla{"+((Derivative)this.data.get(0)).func.toString()+"}";
 		}
-		return "\\nabla{"+func+"}";
+		return "\\nabla{"+this.func.getLabel()+"}";
 	}
 }

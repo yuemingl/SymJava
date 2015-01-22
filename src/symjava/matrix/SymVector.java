@@ -66,8 +66,4 @@ public class SymVector implements Iterable<Expr> {
 		}
 		return rlt;
 	}
-	
-	public String getLabel() {
-		return "";
-	}
 }

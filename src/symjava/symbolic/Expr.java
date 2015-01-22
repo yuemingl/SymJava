@@ -11,8 +11,21 @@ abstract public class Expr implements Cloneable {
 	protected boolean simplified = false;
 	
 	public abstract Expr diff(Expr expr);
+	
+	//Functional derivative
 	public Expr fdiff(Expr f, Expr df) {
-		return null;
+		if(!(f instanceof Func) || !(df instanceof Func))
+			throw new IllegalArgumentException();
+		Func F = (Func)f;
+		Symbol alpha = new Symbol("_alpha_");
+		Expr ff = this.subs(f, f+alpha*df);
+		Expr dff = ff.diff(alpha);
+		if(Symbol.C0.symEquals(dff)) {
+			Func ret = new Func("0", F.args);
+			ret.expr = Symbol.C0;
+			return ret;
+		}
+		return dff.subs(alpha, 0).simplify();
 	}
 	
 	public abstract Expr simplify();

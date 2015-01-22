@@ -4,7 +4,6 @@ import java.util.List;
 
 import symjava.bytecode.BConstant;
 import symjava.bytecode.BytecodeFunc;
-import symjava.matrix.SymVector;
 import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
 
@@ -81,22 +80,6 @@ public class Func extends Expr {
 		} else {
 			return Symbol.C0;
 		}
-	}
-	
-	//Functional derivative
-	public Expr fdiff(Expr f, Expr df) {
-		if(!(f instanceof Func) || !(df instanceof Func))
-			throw new IllegalArgumentException();
-		Func F = (Func)f;
-		Symbol alpha = new Symbol("_alpha_");
-		Expr ff = this.subs(f, f+alpha*df);
-		Expr dff = ff.diff(alpha);
-		if(Symbol.C0.symEquals(dff)) {
-			Func ret = new Func("0", F.args);
-			ret.expr = Symbol.C0;
-			return ret;
-		}
-		return dff.subs(alpha, 0).simplify();
 	}
 	
 	public boolean containsArg(Expr arg) {
