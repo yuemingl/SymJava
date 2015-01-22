@@ -25,37 +25,38 @@ public class LagrangeMultipliers {
 	}
 	
 	public Eq getEqForDisplay() {
-		Symbol i = new Symbol("i");
-		Symbols ys = new Symbols("y", i);
-		Symbols lambdas = new Symbols("\\lambda", i);
+		Symbol idx = new Symbol("i");
+		Symbols lambdas = new Symbols("\\lambda", idx);
 		List<Expr> addList = new ArrayList<Expr>();
 		Expr[] freeVars = eq.getFreeVars();
 		Expr[] depVars = eq.getDependentVars();
 		
-		int depVarIdxStart = freeVars.length;
 		Expr[] freeVarForL = new Expr[data.length*depVars.length + data.length + eq.getParams().length];
 		int lmdIdxStart = data.length*depVars.length;
-		for(int k=0; k<data.length; k++) {
-			//Expr state_eq = eq.lhs;
+		for(int i=0; i<data.length; i++) {
 			for(int j=0; j<depVars.length; j++) {
-				int yIdx = (j*data.length)+k;
-				Expr yi = ys.get(yIdx);
-				freeVarForL[yIdx] = yi;
-				//addList.add(new Power(-ys.get(yIdx) + data[i][depVarIdxStart+j], 2)/2);
-				addList.add(Power.simplifiedIns(-ys.get(yIdx) + data[k][depVarIdxStart+j], 2));
-				//state_eq = state_eq.subs(depVars[j], ys.get(yIdx));
+				int yIdx = (j*data.length)+i;
+				Symbols ys = new Symbols(depVars[j].toString(), idx);
+				freeVarForL[yIdx] = ys.get(yIdx);
 			}
-			Expr lmdi = lambdas.get(k);
-			freeVarForL[lmdIdxStart + k] = lmdi;
-			//for(int j=0; j<freeVars.length; j++)
-			//	state_eq = state_eq.subs(freeVars[j], data[i][j]);
-			//addList.add(lmdi*state_eq);
+			freeVarForL[lmdIdxStart + i] = lambdas.get(i);
 		}
-		Expr state_eq = eq.lhs;
+		
+		List<Expr> targets = new ArrayList<Expr>();
 		for(int j=0; j<depVars.length; j++) {
-			state_eq = state_eq.subs(depVars[j], ys); //??
+			Expr depDataSymbols = new Symbols(depVars[j].toString().toUpperCase(), idx);
+			Expr depSymbols = new Symbols(depVars[j].toString(), idx);
+			targets.add(new Sum(Power.simplifiedIns(depDataSymbols - depSymbols, 2), idx, 0, data.length-1));
 		}
-		Sum sum = new Sum(lambdas*state_eq, i, 0, data.length);
+		addList.addAll(targets);
+		Expr state_eq = eq.lhs;
+		for(int j=0; j<freeVars.length; j++) {
+			state_eq = state_eq.subs(freeVars[j], new Symbols(freeVars[j].toString().toUpperCase(), idx));
+		}
+		for(int j=0; j<depVars.length; j++) {
+			state_eq = state_eq.subs(depVars[j], new Symbols(depVars[j].toString(), idx));
+		}
+		Sum sum = new Sum(lambdas*state_eq, idx, 0, data.length-1);
 		addList.add(sum);
 		for(int k=0; k<eq.getParams().length; k++)
 			freeVarForL[data.length*depVars.length + data.length + k] = eq.getParams()[k];
@@ -65,7 +66,7 @@ public class LagrangeMultipliers {
 	}
 	
 	public Eq getEq() {
-		Symbols ys = new Symbols("y");
+		Symbol idx = new Symbol("i");
 		Symbols lambdas = new Symbols("\\lambda");
 		List<Expr> addList = new ArrayList<Expr>();
 		Expr[] freeVars = eq.getFreeVars();
@@ -78,6 +79,7 @@ public class LagrangeMultipliers {
 			Expr state_eq = eq.lhs;
 			for(int j=0; j<depVars.length; j++) {
 				int yIdx = (j*data.length)+i;
+				Symbols ys = new Symbols(depVars[j].toString(), idx);
 				Expr yi = ys.get(yIdx);
 				freeVarForL[yIdx] = yi;
 				//addList.add(new Power(-ys.get(yIdx) + data[i][depVarIdxStart+j], 2)/2);

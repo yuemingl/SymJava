@@ -283,7 +283,9 @@ public class Example3 {
 
 ```
 Jacobian Matrix = 
-2*x	
+\left[ {\begin{array}{c}
+2*x\\
+\end{array} } \right]
 Iterativly sovle ... 
 x=10.00000 
 x=35.60000 

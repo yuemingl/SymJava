@@ -59,7 +59,7 @@ public class BytecodeUtils {
 			post_order(ue.base, outList);
 		} else if(e instanceof Sum) {
 			Sum se = (Sum)e;
-			for(int i=se.start; i<se.end; i++)
+			for(int i=se.start; i<=se.end; i++)
 				post_order(se.getSummand(i), outList);
 		} else if(e instanceof Dot) {
 			Dot de = (Dot)e;
