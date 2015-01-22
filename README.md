@@ -298,6 +298,8 @@ Output in Latex:
 Lagrange=
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_L.png)
 
+where data array is (X_i, Y_i), i=0...6
+
 Hessian=
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex3_hessian.png)
 
