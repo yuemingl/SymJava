@@ -163,9 +163,12 @@ public class TestSymbolic {
 	public static void testSummation() {
 		System.out.println("--------------testSummation-----------------");
 		Expr sum = new Sum( x*x, x, 1, 5);
-		//checkResult("\\Sigma_{x=1}^5x^2", sum);
+		checkResult("\\Sigma_{x=1}^5{x^2}", sum);
+		checkResult("55.0", sum.simplify());
 		checkResult("\\Sigma_{x=1}^5{4.0}", sum.subs(x, 2));
-		checkResult("\\Sigma_{x=1}^5{2*x}", sum.diff(x));
+		checkResult("20.0", sum.subs(x, 2).simplify());
+		checkResult("0", sum.diff(x));
+		checkResult("5*x^2", new Sum(x*x, y, 1, 5).simplify());
 		
 		Symbol i = new Symbol("i");
 		Symbols xi = new Symbols("x", i);
@@ -256,22 +259,22 @@ public class TestSymbolic {
 		Grad gu = new Grad(u);
 		checkResult("\\nabla{u(x,y,z)}",gu.toString());
 		Grad gv = new Grad(v);
-		checkResult("\\nabla{u(x,y,z)} \\dot \\nabla{v(x,y,z)}",new Dot(gu, gv));
+		checkResult("\\nabla{u(x,y,z)} \\cdot \\nabla{v(x,y,z)}",new Dot(gu, gv));
 		checkResult("3",Dot.apply(new Grad(x+y+z), new Grad(x+y+z)));
 		
 		Func w = new Func("w", x, y, x);
-		checkResult("\\nabla{w(x,y,x)} \\dot \\nabla{v(x,y,z)}", new Dot(gu, gv).fdiff(u,w));
+		checkResult("\\nabla{w(x,y,x)} \\cdot \\nabla{v(x,y,z)}", new Dot(gu, gv).fdiff(u,w));
 	}
 	
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
-//		testBasic();
-//		testPrint();
-//		testSimplify();
+		testBasic();
+		testPrint();
+		testSimplify();
 		testSummation();
-//		testToBytecodeFunc();
-//		testDiff();
-//		testAbstract();
+		testToBytecodeFunc();
+		testDiff();
+		testAbstract();
 	}
 }

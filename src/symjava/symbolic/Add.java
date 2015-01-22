@@ -88,7 +88,13 @@ public class Add extends BinaryOp {
 	
 	@Override
 	public Expr subs(Expr from, Expr to) {
-		return new Add(left.subs(from, to), right.subs(from, to));
+		if(Utils.symCompare(this, from))
+			return to;
+		Expr sl = left.subs(from, to);
+		Expr sr = right.subs(from, to);
+		if(sl == left && sr == right)
+			return this;
+		return new Add(sl, sr);
 	}
 
 	@Override

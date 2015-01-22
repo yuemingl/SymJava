@@ -42,6 +42,8 @@ public class Divide extends BinaryOp {
 	
 	@Override
 	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;
 		return new Divide(left.subs(from, to), right.subs(from, to));
 	}
 

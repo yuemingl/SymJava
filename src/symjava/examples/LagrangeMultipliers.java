@@ -24,7 +24,7 @@ public class LagrangeMultipliers {
 		this.data = data;
 	}
 	
-	public Eq getEq() {
+	public Eq getEqForDisplay() {
 		Symbol i = new Symbol("i");
 		Symbols ys = new Symbols("y", i);
 		Symbols lambdas = new Symbols("\\lambda", i);
@@ -60,12 +60,11 @@ public class LagrangeMultipliers {
 		for(int k=0; k<eq.getParams().length; k++)
 			freeVarForL[data.length*depVars.length + data.length + k] = eq.getParams()[k];
 		Expr addExpr = Utils.addListToExpr(addList);
-		System.out.println(addExpr);
 		Expr ret = Utils.flattenSortAndSimplify(addExpr);
 		return new Eq(ret, C0, freeVarForL , null);
 	}
 	
-	public Eq getEqOld() {
+	public Eq getEq() {
 		Symbols ys = new Symbols("y");
 		Symbols lambdas = new Symbols("\\lambda");
 		List<Expr> addList = new ArrayList<Expr>();

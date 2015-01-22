@@ -2,6 +2,8 @@ package symjava.symbolic;
 
 import java.util.List;
 
+import symjava.symbolic.utils.Utils;
+
 public class Power extends UnaryOp {
 	public int exponent;
 	public Power(Expr base, int exponent) {
@@ -32,6 +34,8 @@ public class Power extends UnaryOp {
 	
 	@Override
 	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;
 		if(base.subs(from,to) == base) 
 			return this;
 		return Power.simplifiedIns(base.subs(from, to), exponent);

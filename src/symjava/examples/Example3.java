@@ -49,6 +49,7 @@ public class Example3 {
 		double[] initialGuess = {0.9, 0.2};
 		
 		LagrangeMultipliers lm = new LagrangeMultipliers(eq, initialGuess, data);
+		//Eq L = lm.getEqForDisplay(); //This is not correct, just for purpose of displaying summation expression
 		Eq L = lm.getEq();
 		System.out.println("L("+SymPrinting.join(L.getUnknowns(),",")+")=\n    "+L.lhs);
 		NewtonOptimization.solve(L, lm.getInitialGuess(), 100, 1e-4);

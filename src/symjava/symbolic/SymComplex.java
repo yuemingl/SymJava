@@ -2,6 +2,8 @@ package symjava.symbolic;
 
 import java.util.List;
 
+import symjava.symbolic.utils.Utils;
+
 public class SymComplex extends Expr {
 	Expr real;
 	Expr imaginary;
@@ -22,6 +24,8 @@ public class SymComplex extends Expr {
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;		
 		return new SymComplex(real.subs(from, to), imaginary.subs(from, to));
 	}
 

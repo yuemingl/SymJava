@@ -2,6 +2,8 @@ package symjava.symbolic;
 
 import java.util.List;
 
+import symjava.symbolic.utils.Utils;
+
 public class SymReal<T extends Number> extends Expr {
 	T val;
 	
@@ -27,6 +29,8 @@ public class SymReal<T extends Number> extends Expr {
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;
 		return this;
 	}
 

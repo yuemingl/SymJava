@@ -117,6 +117,8 @@ public class Multiply extends BinaryOp {
 	
 	@Override
 	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;
 		return new Multiply(left.subs(from, to), right.subs(from, to));
 	}
 
