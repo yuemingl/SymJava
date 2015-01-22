@@ -6,6 +6,8 @@ import java.util.List;
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Power;
+import symjava.symbolic.Sum;
+import symjava.symbolic.Symbol;
 import symjava.symbolic.Symbols;
 import symjava.symbolic.utils.Utils;
 import static symjava.symbolic.Symbol.*;
@@ -23,6 +25,47 @@ public class LagrangeMultipliers {
 	}
 	
 	public Eq getEq() {
+		Symbol i = new Symbol("i");
+		Symbols ys = new Symbols("y", i);
+		Symbols lambdas = new Symbols("\\lambda", i);
+		List<Expr> addList = new ArrayList<Expr>();
+		Expr[] freeVars = eq.getFreeVars();
+		Expr[] depVars = eq.getDependentVars();
+		
+		int depVarIdxStart = freeVars.length;
+		Expr[] freeVarForL = new Expr[data.length*depVars.length + data.length + eq.getParams().length];
+		int lmdIdxStart = data.length*depVars.length;
+		for(int k=0; k<data.length; k++) {
+			//Expr state_eq = eq.lhs;
+			for(int j=0; j<depVars.length; j++) {
+				int yIdx = (j*data.length)+k;
+				Expr yi = ys.get(yIdx);
+				freeVarForL[yIdx] = yi;
+				//addList.add(new Power(-ys.get(yIdx) + data[i][depVarIdxStart+j], 2)/2);
+				addList.add(Power.simplifiedIns(-ys.get(yIdx) + data[k][depVarIdxStart+j], 2));
+				//state_eq = state_eq.subs(depVars[j], ys.get(yIdx));
+			}
+			Expr lmdi = lambdas.get(k);
+			freeVarForL[lmdIdxStart + k] = lmdi;
+			//for(int j=0; j<freeVars.length; j++)
+			//	state_eq = state_eq.subs(freeVars[j], data[i][j]);
+			//addList.add(lmdi*state_eq);
+		}
+		Expr state_eq = eq.lhs;
+		for(int j=0; j<depVars.length; j++) {
+			state_eq = state_eq.subs(depVars[j], ys); //??
+		}
+		Sum sum = new Sum(lambdas*state_eq, i, 0, data.length);
+		addList.add(sum);
+		for(int k=0; k<eq.getParams().length; k++)
+			freeVarForL[data.length*depVars.length + data.length + k] = eq.getParams()[k];
+		Expr addExpr = Utils.addListToExpr(addList);
+		System.out.println(addExpr);
+		Expr ret = Utils.flattenSortAndSimplify(addExpr);
+		return new Eq(ret, C0, freeVarForL , null);
+	}
+	
+	public Eq getEqOld() {
 		Symbols ys = new Symbols("y");
 		Symbols lambdas = new Symbols("\\lambda");
 		List<Expr> addList = new ArrayList<Expr>();

@@ -3,6 +3,8 @@ package symjava.symbolic;
 import java.util.HashMap;
 import java.util.List;
 
+import symjava.symbolic.utils.Utils;
+
 public class Sum extends Expr {
 	public Expr summand;
 	public Symbol indexVar;
@@ -13,9 +15,11 @@ public class Sum extends Expr {
 	public Sum(Expr summandTemplate, Symbol indexVar, int start, int end) {
  		this.summand = summandTemplate;
  		this.indexVar = indexVar;
-		label = "\\Sigma_"+indexVar+"="+start+"^"+end+"(" + summandTemplate + ")";
+ 		
+		label = "\\Sigma_{"+indexVar+"="+start+"}^" + end + "{" + SymPrinting.addParenthsesIfNeeded2(summandTemplate, Add.simplifiedIns(Symbol.C0, Symbol.C0)) + "}";
 		this.start = start;
 		this.end = end;
+		sortKey = label;
 	}
 	
 	public Expr getSummand(int index) {
@@ -32,11 +36,20 @@ public class Sum extends Expr {
 		//if(from == indexVar) {
 		//	return new Summation(summand, to, start, end);
 		//}
-		return new Sum(summand.subs(from, to), indexVar, start, end);
+		return new Sum(summand.subs(from, to).simplify(), indexVar, start, end);
 	}
 
 	@Override
 	public Expr diff(Expr expr) {
+		List<Expr> list = Utils.extractSymbols(this.summand);
+		for(Expr e : list) {
+			if(e instanceof Symbols) {
+				Symbols s = (Symbols)e;
+				if(expr.label.startsWith(s.namePrefix)) {
+					return summand.diff(expr).subs(s, expr);
+				}
+			}
+		}
 		return new Sum(summand.diff(expr), indexVar, start, end);
 	}
 

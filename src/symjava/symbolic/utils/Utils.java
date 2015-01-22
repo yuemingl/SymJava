@@ -1,7 +1,6 @@
 package symjava.symbolic.utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -243,14 +242,16 @@ public class Utils {
 		}		
 	}
 	
-	public static List<Symbol> extractSymbols(Expr ...exprs) {
-		Set<Symbol> set = new HashSet<Symbol>();
+	public static List<Expr> extractSymbols(Expr ...exprs) {
+		Set<Expr> set = new HashSet<Expr>();
 		List<Expr> list = new ArrayList<Expr>();
 		for(int i=0; i<exprs.length; i++) {
 			BytecodeUtils.post_order(exprs[i], list);
 			for(Expr e : list) {
 				if(e instanceof Symbol) {
 					set.add((Symbol)e);
+				} else if(e instanceof Symbols) {
+					set.add((Symbols)e);
 				} else if(e instanceof Func) {
 					Func fe = (Func)e;
 					for(Expr arg : fe.args) {
@@ -260,11 +261,11 @@ public class Utils {
 				}
 			}
 		}
-		List<Symbol> rlt = new ArrayList<Symbol>();
+		List<Expr> rlt = new ArrayList<Expr>();
 		rlt.addAll(set);
-		Collections.sort(rlt, new Comparator<Symbol>() {
+		Collections.sort(rlt, new Comparator<Expr>() {
 			@Override
-			public int compare(Symbol o1, Symbol o2) {
+			public int compare(Expr o1, Expr o2) {
 				return o1.toString().compareTo(o2.toString());
 			}
 		});

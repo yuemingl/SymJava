@@ -19,14 +19,15 @@ public class Eq extends Relation {
 		this.freeVars = freeVars;
 		this.params = params;
 		//Find dependent variables
-		List<Symbol> list = Utils.extractSymbols(lhs, rhs);
+		List<Expr> list = Utils.extractSymbols(lhs, rhs);
 		List<Expr> depList = new ArrayList<Expr>();
-		for(Symbol s : list) {
+		for(Expr s : list) {
 			boolean skip = false;
 			for(int i=0; i<freeVars.length; i++) {
 				if(s.symEquals(freeVars[i])) skip = true;
 			}
 			if(skip) continue;
+			if(params == null) continue;
 			for(int i=0; i<params.length; i++) {
 				if(s.symEquals(params[i])) skip = true;
 			}

@@ -38,8 +38,8 @@ public class Grad extends SymVector {
 				}
 			}
 		} else {
-			List<Symbol> args = Utils.extractSymbols(f);
-			for(Symbol x : args) {
+			List<Expr> args = Utils.extractSymbols(f);
+			for(Expr x : args) {
 				data.add(f.diff(x));
 			}
 		}	
