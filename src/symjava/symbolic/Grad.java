@@ -10,8 +10,8 @@ import symjava.symbolic.utils.Utils;
  *
  */
 public class Grad extends SymVector {
-	Func func = null;
-	Expr[] args = null;
+	public Expr[] args = null;
+	protected Func func = null;
 	
 	/**
 	 * Construct an instance directly from data and args

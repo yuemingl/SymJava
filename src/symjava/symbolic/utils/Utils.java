@@ -254,6 +254,7 @@ public class Utils {
 					set.add((Symbols)e);
 				} else if(e instanceof Func) {
 					Func fe = (Func)e;
+					//Parameters in a function
 					for(Expr arg : fe.args) {
 						if(arg instanceof Symbol)
 							set.add((Symbol)arg);

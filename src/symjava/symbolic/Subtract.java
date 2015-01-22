@@ -13,6 +13,8 @@ public class Subtract extends BinaryOp {
 	
 	@Override
 	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;
 		return new Subtract(left.subs(from, to), right.subs(from, to));
 	}
 

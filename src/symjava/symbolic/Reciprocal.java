@@ -2,6 +2,8 @@ package symjava.symbolic;
 
 import java.util.List;
 
+import symjava.symbolic.utils.Utils;
+
 public class Reciprocal extends UnaryOp {
 
 	public Reciprocal(Expr base) {
@@ -57,6 +59,8 @@ public class Reciprocal extends UnaryOp {
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;
 		if(base.subs(from,to) == base) 
 			return this;
 		return Reciprocal.simplifiedIns(base.subs(from, to));

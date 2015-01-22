@@ -66,7 +66,11 @@ public class BytecodeUtils {
 			post_order(de.getExpr(), outList);
 			return;
 		} else if(e instanceof Func) {
-			//Do nothing
+			Func f = (Func)e;
+			if(!f.isAbstract()) {
+				post_order(f.getExpr(), outList);
+				return;
+			}
 		}
 		outList.add(e);
 	}
@@ -135,13 +139,16 @@ public class BytecodeUtils {
 			argsMap.put(fArgs[i], i);
 		}
 		List<Expr> insList = new ArrayList<Expr>();
-		post_order(fun.expr, insList);
+		post_order(fun.getExpr(), insList);
 
 		for(int i=0; i<insList.size(); i++) {
 			Expr ins = insList.get(i);
 			if(ins instanceof Symbol) {
 				Symbol s = (Symbol)ins;
-				int argIdx = argsMap.get(s);
+				Integer argIdx = argsMap.get(s);
+				if(argIdx == null) {
+					throw new IllegalArgumentException(s+" is not in the argument list of "+fun.getLabel());
+				}
 				il.append(new ALOAD(1));
 				il.append(new PUSH(cp, argIdx));
 				il.append(new DALOAD());

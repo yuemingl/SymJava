@@ -8,7 +8,7 @@ import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
 
 public class Func extends Expr {
-	public Expr expr = null;
+	protected Expr expr = null;
 	public Expr[] args = null;
 
 	/**

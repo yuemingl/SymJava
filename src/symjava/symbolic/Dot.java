@@ -11,9 +11,9 @@ import symjava.symbolic.utils.Utils;
  *
  */
 public class Dot extends Expr {
-	SymVector left;
-	SymVector right;
-	Expr expr = null;
+	protected SymVector left;
+	protected SymVector right;
+	protected Expr expr = null;
 	public Dot(SymVector l, SymVector r) {
 		if(l.dim() != r.dim())
 			throw new IllegalArgumentException("The size of the two vector must be the same!");
@@ -118,6 +118,8 @@ public class Dot extends Expr {
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;		
 		if(expr == null)
 			return new Dot(left.subs(from, to), right.subs(from, to));
 		else

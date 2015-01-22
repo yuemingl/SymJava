@@ -83,6 +83,22 @@ public class Symbol extends Expr {
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
 		outList.add(this);
-	}	
-
+	}
+	
+	public boolean containsSubIndex() {
+		String[] ss = this.toString().split("_");
+		if(ss.length == 2) {
+			Integer.valueOf(ss[1]);
+			return true;
+		}
+		return false;
+	}
+	
+	public int getSubIndex() {
+		String[] ss = this.toString().split("_");
+		if(ss.length == 2) {
+			return Integer.valueOf(ss[1]);
+		}
+		throw new IllegalArgumentException(this+" contains no sub index, use containSubIndex() to check.");
+	}
 }
