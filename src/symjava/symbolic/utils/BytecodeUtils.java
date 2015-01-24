@@ -114,7 +114,7 @@ public class BytecodeUtils {
 		return sb.substring(0, sb.length()-deliminator.length());
 	}
 	
-	public static void genClass(Func fun) {
+	public static ClassGen genClass(Func fun, boolean writeClassFile) {
 		String packageName = "symjava.bytecode";
 		String clsName = fun.getName();
 		String fullClsName = packageName+"."+clsName;
@@ -167,7 +167,7 @@ public class BytecodeUtils {
 				Power p = (Power)ins;
 				il.append(new PUSH(cp, (double)p.exponent));
 				il.append(factory.createInvoke("java.lang.Math", "pow",
-						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));				
+						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
 			} else if(ins instanceof Reciprocal) {
 				il.append(new DDIV());
 			} else if(ins instanceof Negate) {
@@ -188,10 +188,13 @@ public class BytecodeUtils {
 		il.dispose(); // Allow instruction handles to be reused
 		
 		cg.addEmptyConstructor(ACC_PUBLIC);
-		try {
-			cg.getJavaClass().dump("bin/symjava/bytecode/"+clsName+".class");
-		} catch (java.io.IOException e) {
-			System.err.println(e);
-		}			
+		if(writeClassFile) {
+			try {
+				cg.getJavaClass().dump("bin/symjava/bytecode/"+clsName+".class");
+			} catch (java.io.IOException e) {
+				System.err.println(e);
+			}
+		}
+		return cg;
 	}
 }
