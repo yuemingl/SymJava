@@ -266,15 +266,25 @@ public class TestSymbolic {
 		checkResult("\\nabla{w(x,y,x)} \\cdot \\nabla{v(x,y,z)}", new Dot(gu, gv).fdiff(u,w));
 	}
 	
+	public static void testIntegration() {
+		Domain I = Interval.apply(-oo, 1.0);
+		Expr t1 = Int.apply(x, I);
+		checkResult("x + \\int_{-oo}^{1.0}{x}dx", t1 + x);
+		
+		Domain D = new Domain2D("D",x,y);
+		checkResult("\\int_{D}{0.5*x^2 + 0.5*y^2}dxdy", Int.apply(0.5*(x*x+y*y), D));
+	}
+	
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
-		testBasic();
-		testPrint();
-		testSimplify();
-		testSummation();
-		testToBytecodeFunc();
-		testDiff();
-		testAbstract();
+//		testBasic();
+//		testPrint();
+//		testSimplify();
+//		testSummation();
+//		testToBytecodeFunc();
+//		testDiff();
+//		testAbstract();
+		testIntegration();
 	}
 }

@@ -32,9 +32,13 @@ abstract public class Expr implements Cloneable {
 	
 	public abstract boolean symEquals(Expr other);
 
-	public abstract void flattenAdd(List<Expr> outList);
+	public void flattenAdd(List<Expr> outList) {
+		outList.add(this);
+	};
 	
-	public abstract void flattenMultiply(List<Expr> outList);
+	public void flattenMultiply(List<Expr> outList) {
+		outList.add(this);
+	}
 	
 	public boolean isAbstract() {
 		return false;
@@ -232,12 +236,15 @@ abstract public class Expr implements Cloneable {
 	};
 	
 	/**
+	 * Substitution an expression
 	 * 
 	 * @param from
 	 * @param to
 	 * @return
 	 */
-	public abstract Expr subs(Expr from, Expr to);
+	public Expr subs(Expr from, Expr to) {
+		return this;
+	}
 	
 	public Expr subs(Expr from, int to) {
 		return subs(from, new SymInteger(to));

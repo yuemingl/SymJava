@@ -284,4 +284,23 @@ public class Utils {
 		}
 		return false;
 	}
+	
+	public static List<String> toLabelList(List<Expr> list) {
+		List<String> l = new ArrayList<String>();
+		for(Expr e : list) {
+			l.add(e.toString());
+		}
+		return l;
+	}
+	
+	public static String joinLabels(List<Expr> list, String deliminator) {
+		StringBuilder sb = new StringBuilder();
+		if(list == null) return null;
+		for(Expr e : list) {
+			sb.append(e.toString());
+			sb.append(deliminator);
+		}
+		sb.delete(sb.length()-deliminator.length(), sb.length());
+		return sb.toString();
+	}
 }

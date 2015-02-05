@@ -40,6 +40,8 @@ public class Symbol extends Expr {
 	public static SymInteger C1 = new SymInteger(1);
 	public static SymInteger C2 = new SymInteger(2);
 	
+	public static Infinity oo = new Infinity();
+	
 	
 	public Symbol(String name) {
 		this.label = name;
