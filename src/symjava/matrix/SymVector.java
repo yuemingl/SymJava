@@ -9,7 +9,11 @@ public class SymVector implements Iterable<Expr> {
 	protected Vector<Expr> data = new Vector<Expr>();
 	
 	public SymVector() {
-		
+	}
+	
+	public SymVector(Expr[] array) {
+		for(Expr e : array)
+			data.add(e);
 	}
 	
 	public SymVector(int size) {

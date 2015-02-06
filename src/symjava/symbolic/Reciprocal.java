@@ -1,7 +1,5 @@
 package symjava.symbolic;
 
-import java.util.List;
-
 import symjava.symbolic.utils.Utils;
 
 public class Reciprocal extends UnaryOp {
@@ -53,22 +51,12 @@ public class Reciprocal extends UnaryOp {
 	}
 
 	@Override
-	public void flattenAdd(List<Expr> outList) {
-		outList.add(this);
-	}
-
-	@Override
 	public Expr subs(Expr from, Expr to) {
 		if(Utils.symCompare(this, from))
 			return to;
 		if(base.subs(from,to) == base) 
 			return this;
 		return Reciprocal.simplifiedIns(base.subs(from, to));
-	}
-
-	@Override
-	public void flattenMultiply(List<Expr> outList) {
-		outList.add(this);
 	}
 
 }

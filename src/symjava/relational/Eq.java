@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import symjava.symbolic.Expr;
-import symjava.symbolic.Symbol;
 import symjava.symbolic.utils.Utils;
 
 public class Eq extends Relation {
@@ -12,6 +11,16 @@ public class Eq extends Relation {
 	Expr[] dependentVars;
 	Expr[] params;
 	Expr[] unknowns;
+	
+	public Eq(Expr lhs, Expr rhs) {
+		this.lhs = lhs;
+		this.rhs = rhs;	
+	}
+	
+	public Eq(Expr lhs, Expr rhs, Expr[] freeVars) {
+		this.lhs = lhs;
+		this.rhs = rhs;	
+	}
 	
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params) {
 		this.lhs = lhs;
@@ -124,5 +133,9 @@ public class Eq extends Relation {
 	
 	public Expr[] getDependentVars() {
 		return dependentVars;
+	}
+	
+	public Expr solve(Expr var) {
+		return null;
 	}
 }

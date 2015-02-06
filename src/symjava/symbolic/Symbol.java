@@ -1,7 +1,5 @@
 package symjava.symbolic;
 
-import java.util.List;
-
 import symjava.symbolic.utils.Utils;
 
 public class Symbol extends Expr {
@@ -75,16 +73,6 @@ public class Symbol extends Expr {
 	@Override
 	public boolean symEquals(Expr other) {
 		return this.label.equals(other.label);
-	}
-
-	@Override
-	public void flattenAdd(List<Expr> outList) {
-		outList.add(this);
-	}
-
-	@Override
-	public void flattenMultiply(List<Expr> outList) {
-		outList.add(this);
 	}
 	
 	public boolean containsSubIndex() {

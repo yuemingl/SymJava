@@ -7,7 +7,11 @@ import symjava.symbolic.utils.Utils;
 public class Subtract extends BinaryOp {
 	public Subtract(Expr l, Expr r) {
 		super(l, r);
-		label = left + " - " + right;
+		if(right instanceof Add || right instanceof Subtract)
+			label = left + " - (" + right + ")";
+		else
+			label = left + " - " + right;
+
 		sortKey = left.getSortKey()+right.getSortKey();
 	}
 	
@@ -63,10 +67,5 @@ public class Subtract extends BinaryOp {
 	public void flattenAdd(List<Expr> outList) {
 		left.flattenAdd(outList);
 		new Negate(right).flattenAdd(outList);
-	}
-
-	@Override
-	public void flattenMultiply(List<Expr> outList) {
-		outList.add(this);
 	}
 }

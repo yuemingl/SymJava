@@ -3,7 +3,14 @@ package symjava.symbolic;
 import java.util.List;
 
 abstract public class Expr implements Cloneable {
+	/**
+	 * Label(or name) of an expression(Symbol, Func,...)
+	 */
 	String label = null;
+	
+	/**
+	 * A string used to sort terms in an expression
+	 */
 	String sortKey = null;
 	
 	//Number of operations for simplifying an expression
@@ -104,25 +111,25 @@ abstract public class Expr implements Cloneable {
 		return Add.simplifiedIns(this, new SymInteger(other));
 	}
 	public Expr addRev(int other) {
-		return Add.simplifiedIns(this, new SymInteger(other));
+		return Add.simplifiedIns(new SymInteger(other), this);
 	}
 	public Expr add(long other) {
 		return Add.simplifiedIns(this, new SymLong(other));
 	}
 	public Expr addRev(long other) {
-		return Add.simplifiedIns(this, new SymLong(other));
+		return Add.simplifiedIns(new SymLong(other), this);
 	}	
 	public Expr add(float other) {
 		return Add.simplifiedIns(this, new SymFloat(other));
 	}
 	public Expr addRev(float other) {
-		return Add.simplifiedIns(this, new SymFloat(other));
+		return Add.simplifiedIns(new SymFloat(other), this);
 	}	
 	public Expr add(double other) {
 		return Add.simplifiedIns(this, new SymDouble(other));
 	}
 	public Expr addRev(double other) {
-		return Add.simplifiedIns(this, new SymDouble(other));
+		return Add.simplifiedIns(new SymDouble(other), this);
 	}
 	
 	/**
@@ -137,25 +144,25 @@ abstract public class Expr implements Cloneable {
 		return Subtract.simplifiedIns(this, new SymInteger(other));
 	}
 	public Expr subtractRev(int other) {
-		return Subtract.simplifiedIns(this, new SymInteger(other));
+		return Subtract.simplifiedIns(new SymInteger(other), this);
 	}
 	public Expr subtract(long other) {
 		return Subtract.simplifiedIns(this, new SymLong(other));
 	}
 	public Expr subtractRev(long other) {
-		return Subtract.simplifiedIns(this, new SymLong(other));
+		return Subtract.simplifiedIns(new SymLong(other), this);
 	}	
 	public Expr subtract(float other) {
 		return Subtract.simplifiedIns(this, new SymFloat(other));
 	}
 	public Expr subtractRev(float other) {
-		return Subtract.simplifiedIns(this, new SymFloat(other));
+		return Subtract.simplifiedIns(new SymFloat(other), this);
 	}
 	public Expr subtract(double other) {
 		return Subtract.simplifiedIns(this, new SymDouble(other));
 	}
 	public Expr subtractRev(double other) {
-		return Subtract.simplifiedIns(this, new SymDouble(other));
+		return Subtract.simplifiedIns(new SymDouble(other), this);
 	}
 	
 	/**
@@ -170,25 +177,25 @@ abstract public class Expr implements Cloneable {
 		return Multiply.simplifiedIns(this, new SymInteger(other));
 	}
 	public Expr multiplyRev(int other) {
-		return Multiply.simplifiedIns(this, new SymInteger(other));
+		return Multiply.simplifiedIns(new SymInteger(other), this);
 	}
 	public Expr multiply(long other) {
 		return Multiply.simplifiedIns(this, new SymLong(other));
 	}
 	public Expr multiplyRev(long other) {
-		return Multiply.simplifiedIns(this, new SymLong(other));
+		return Multiply.simplifiedIns(new SymLong(other), this);
 	}
 	public Expr multiply(float other) {
 		return Multiply.simplifiedIns(this, new SymFloat(other));
 	}
 	public Expr multiplyRev(float other) {
-		return Multiply.simplifiedIns(this, new SymFloat(other));
+		return Multiply.simplifiedIns(new SymFloat(other), this);
 	}
 	public Expr multiply(double other) {
 		return Multiply.simplifiedIns(this, new SymDouble(other));
 	}
 	public Expr multiplyRev(double other) {
-		return Multiply.simplifiedIns(this, new SymDouble(other));
+		return Multiply.simplifiedIns(new SymDouble(other), this);
 	}
 	
 	/**
@@ -203,25 +210,25 @@ abstract public class Expr implements Cloneable {
 		return Divide.simplifiedIns(this, new SymInteger(other));
 	}
 	public Expr divideRev(int other) {
-		return Divide.simplifiedIns(this, new SymInteger(other));
+		return Divide.simplifiedIns(new SymInteger(other), this);
 	}
 	public Expr divide(long other) {
 		return Divide.simplifiedIns(this, new SymLong(other));
 	}
 	public Expr divideRev(long other) {
-		return Divide.simplifiedIns(this, new SymLong(other));
+		return Divide.simplifiedIns(new SymLong(other), this);
 	}
 	public Expr divide(float other) {
 		return Divide.simplifiedIns(this, new SymFloat(other));
 	}
 	public Expr divideRev(float other) {
-		return Divide.simplifiedIns(this, new SymFloat(other));
+		return Divide.simplifiedIns(new SymFloat(other), this);
 	}
 	public Expr divide(double other) {
 		return Divide.simplifiedIns(this, new SymDouble(other));
 	}
 	public Expr divideRev(double other) {
-		return Divide.simplifiedIns(this, new SymDouble(other));
+		return Divide.simplifiedIns(new SymDouble(other), this);
 	}
 	
 	public Expr negate() {

@@ -44,14 +44,4 @@ public class SymComplex extends Expr {
 		return false;
 	}
 
-	@Override
-	public void flattenAdd(List<Expr> outList) {
-		outList.add(this);
-	}
-
-	@Override
-	public void flattenMultiply(List<Expr> outList) {
-		outList.add(this);
-	}
-
 }

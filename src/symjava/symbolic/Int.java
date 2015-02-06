@@ -1,5 +1,7 @@
 package symjava.symbolic;
 
+import symjava.math.Transformation;
+import symjava.relational.Eq;
 import symjava.symbolic.utils.Utils;
 
 /**
@@ -7,8 +9,8 @@ import symjava.symbolic.utils.Utils;
  * 
  */
 public class Int extends Expr {
-	Expr integrand = null;
-	Domain domain = null;
+	public Expr integrand = null;
+	public Domain domain = null;
 	
 	public Int(Expr integrand, Domain domain) {
 		this.integrand = integrand;
@@ -25,6 +27,29 @@ public class Int extends Expr {
 	
 	public static Expr apply(Expr integrand, Domain domain) {
 		return new Int(integrand, domain);
+	}
+	
+	@Override
+	public Expr subs(Expr from, Expr to) {
+		return new Int(this.integrand.subs(from, to), this.domain);
+	}
+	
+	/**
+	 * Change of Variables
+	 * @param trans
+	 * @return
+	 */
+	public Int changeOfVars(Transformation trans) {
+		Expr tmp = this.integrand;
+		for(Eq e : trans.eqs) {
+			tmp = tmp.subs(e.lhs, e.rhs);
+		}
+		
+		//return new Int(tmp.multiply(new Func("Jac")), 
+		//		this.domain.transform(this.domain.getLabel()+"T", trans));
+		Expr jac = trans.getJacobian();
+		return new Int(tmp.multiply(jac), 
+				this.domain.transform(this.domain.getLabel()+"T", trans));
 	}
 	
 	@Override

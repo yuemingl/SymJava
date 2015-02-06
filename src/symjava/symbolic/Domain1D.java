@@ -1,9 +1,9 @@
 package symjava.symbolic;
 
-import java.util.ArrayList;
-import java.util.List;
+import symjava.math.Transformation;
 
 public class Domain1D implements Domain {
+	String label;
 	Expr coordVar = Symbol.x;
 	Expr start;
 	Expr end;
@@ -15,6 +15,7 @@ public class Domain1D implements Domain {
 		this.start = start;
 		this.end = end;
 		this.coordVar = coordVar;
+		this.label = "["+start+","+end+"]";
 	}	
 	
 	public Expr getStart() {
@@ -46,14 +47,29 @@ public class Domain1D implements Domain {
 	}
 
 	@Override
-	public List<Expr> getCoordVars() {
-		List<Expr> l = new ArrayList<Expr>();
-		l.add(this.coordVar);
-		return l;
+	public Expr[] getCoordVars() {
+		Expr[] rlt = new Expr[1];
+		rlt[0] = this.coordVar;
+		return rlt;
 	}
 	
 	@Override
 	public String toString() {
 		return "["+start+","+end+"]";
+	}
+	@Override
+	public Domain transform(String label, Transformation trans) {
+		Expr from = trans.getFromVars()[0];
+		Expr to = trans.getToVars()[0];
+		Expr toSolve = trans.eqs[0].solve(to);
+		return new Domain1D(
+				toSolve.subs(from, start),
+				toSolve.subs(from, end),
+				to);
+	}
+	
+	@Override
+	public String getLabel() {
+		return label;
 	}
 }

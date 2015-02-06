@@ -104,16 +104,6 @@ public class BytecodeUtils {
 		return rlt;
 	}
 	
-	public static String joinName(Expr[] exprs, String deliminator) {
-		if(exprs.length == 0) return "";
-		StringBuilder sb = new StringBuilder();
-		for(int i=0; i<exprs.length; i++) {
-			sb.append(exprs[i].toString());
-			sb.append(deliminator);
-		}
-		return sb.substring(0, sb.length()-deliminator.length());
-	}
-	
 	public static ClassGen genClass(Func fun, boolean writeClassFile) {
 		String packageName = "symjava.bytecode";
 		String clsName = fun.getName();
@@ -171,8 +161,8 @@ public class BytecodeUtils {
 			} else if(ins instanceof Reciprocal) {
 				il.append(new DDIV());
 			} else if(ins instanceof Negate) {
-				il.append(new PUSH(cp, -1.0));		
-				il.append(new DMUL());				
+				il.append(new PUSH(cp, -1.0));
+				il.append(new DMUL());
 			} else {
 				throw new RuntimeException(ins.getClass() + " is unknown!");
 			}

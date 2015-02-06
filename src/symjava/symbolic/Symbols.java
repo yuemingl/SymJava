@@ -1,7 +1,6 @@
 package symjava.symbolic;
 
 import java.util.HashMap;
-import java.util.List;
 
 import symjava.symbolic.utils.Utils;
 
@@ -65,13 +64,4 @@ public class Symbols extends Expr {
 		return other.label.startsWith(this.namePrefix);
 	}
 
-	@Override
-	public void flattenAdd(List<Expr> outList) {
-		outList.add(this);
-	}
-
-	@Override
-	public void flattenMultiply(List<Expr> outList) {
-		outList.add(this);
-	}	
 }

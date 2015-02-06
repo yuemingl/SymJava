@@ -1,8 +1,10 @@
 package symjava.symbolic;
 
-import java.util.List;
+import symjava.math.Transformation;
 
 public interface Domain {
 	Domain getBoundary();
-	List<Expr> getCoordVars();
+	Expr[] getCoordVars();
+	Domain transform(String label, Transformation trans);
+	String getLabel();
 }
