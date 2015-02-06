@@ -39,7 +39,10 @@ public class TestSymbolic {
 	public static void testBasic() {
 		System.out.println("--------------testBasic-----------------");
 		checkResult(new Symbol("s1"), new Symbol("s1"));
-		
+
+		checkResult("1 + x",1 + x);
+		checkResult("2*x",2*x);
+
 		checkResult("x + y", x + y);
 		checkResult("x - y",x - y);
 		checkResult("x*y",x * y);
@@ -137,6 +140,9 @@ public class TestSymbolic {
 		checkResult("6.0", sub_expr.simplify());
 		
 		expr = (x + 1) + 2; 
+		checkResult("3 + x", expr);
+		
+		expr = 2 + (x + 1); 
 		checkResult("3 + x", expr);
 		
 		expr = (y + z) + (y + 1);

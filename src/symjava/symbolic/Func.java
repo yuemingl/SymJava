@@ -31,6 +31,14 @@ public class Func extends Expr {
 		this.sortKey = label;
 	}
 	
+	public Func(String name, Expr expr, Expr[] args) {
+		//Extract free variables from expr
+		this.label = name;
+		this.expr = expr;
+		this.args = args;
+		this.sortKey = label;
+	}
+	
 	public String getName() {
 		return label;
 	}
@@ -67,11 +75,14 @@ public class Func extends Expr {
 		if(expr != null)
 			return expr.toString();
 		else
-			return label+"("+BytecodeUtils.joinName(args, ",")+")";
+			return getLabel();
 	}
 	
 	public String getLabel() {
-		return label+"("+BytecodeUtils.joinName(args, ",")+")";
+		if(args == null || args.length == 0)
+			return label;
+		else
+			return label+"("+Utils.joinLabels(args, ",")+")";
 	}
 
 	@Override

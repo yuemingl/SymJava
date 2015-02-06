@@ -31,14 +31,27 @@ public class Derivative extends Func {
 		this.sortKey = label;
 	}
 	
-	public Derivative(Derivative other) {
-		super("", other.args);
-		this.expr = other.expr;
-		this.dxyz.addAll(other.dxyz);
-		this.func = other.func;
-		this.label = other.label;
-		this.sortKey = other.sortKey;		
+	public Derivative(Func f, Expr[] xs) {
+		super("", f.args);
+		if(f.expr != null) {
+			this.expr = f.expr;
+			for(Expr x : xs)
+				this.expr = this.expr.diff(x);
+		}
+		this.func = f;
+		for(Expr x : xs)
+			this.dxyz.add(x);
+		this.label = "D" + f.label + "D" + getDxyzLabel();
+		this.sortKey = label;
 	}
+//	public Derivative(Derivative other) {
+//		super("", other.args);
+//		this.expr = other.expr;
+//		this.dxyz.addAll(other.dxyz);
+//		this.func = other.func;
+//		this.label = other.label;
+//		this.sortKey = other.sortKey;		
+//	}
 	
 	public static Expr simplifiedIns(Func f, Expr x) {
 		if(f.expr == null)
@@ -126,8 +139,9 @@ public class Derivative extends Func {
 			return expr.subs(from, to);
 		} else if(Utils.symCompare(func, from)) {
 			if(to instanceof Func) {
-				Derivative rlt = new Derivative(this);
-				rlt.func = (Func)to;
+				Derivative rlt = new Derivative((Func)to, 
+						this.dxyz.toArray(new Expr[0])
+						);
 				return rlt;
 			} else {
 				Expr diffExpr = to;

@@ -1,6 +1,7 @@
 package symjava.symbolic.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -23,18 +24,28 @@ public class Utils {
 	public static List<Expr> flattenAddAndSort(Expr expr) {
 		List<Expr> l = new ArrayList<Expr>();
 		expr.flattenAdd(l);
-		sortExprList(l);
+		sortExprs(l);
 		return l;
 	}
 
 	public static List<Expr> flattenMultiplyAndSort(Expr expr) {
 		List<Expr> l = new ArrayList<Expr>();
 		expr.flattenMultiply(l);
-		sortExprList(l);
+		sortExprs(l);
 		return l;
 	}
 	
-	public static List<Expr> sortExprList(List<Expr> list) {
+	public static Expr[] sortExprs(Expr[] exprs) {
+		Arrays.sort(exprs, new Comparator<Expr>() {
+			@Override
+			public int compare(Expr o1, Expr o2) {
+				return o1.getSortKey().compareTo(o2.getSortKey());
+			}
+		});
+		return exprs;
+	}
+	
+	public static List<Expr> sortExprs(List<Expr> list) {
 		Collections.sort(list, new Comparator<Expr>() {
 			@Override
 			public int compare(Expr o1, Expr o2) {
@@ -163,7 +174,7 @@ public class Utils {
 			return simplifyAddListHelper(l);
 		}
 		
-		sortExprList(l);
+		sortExprs(l);
 		return l;
 	}
 	
@@ -199,7 +210,7 @@ public class Utils {
 			return simplifyMultiplyListHelper(l);
 		}
 		
-		sortExprList(l);
+		sortExprs(l);
 		return l;
 	}
 	
@@ -293,14 +304,19 @@ public class Utils {
 		return l;
 	}
 	
-	public static String joinLabels(List<Expr> list, String deliminator) {
+	public static String joinLabels(Expr[] list, String deliminator) {
 		StringBuilder sb = new StringBuilder();
 		if(list == null) return null;
 		for(Expr e : list) {
 			sb.append(e.toString());
 			sb.append(deliminator);
 		}
-		sb.delete(sb.length()-deliminator.length(), sb.length());
+		if(sb.length() > deliminator.length())
+			sb.delete(sb.length()-deliminator.length(), sb.length());
 		return sb.toString();
+	}
+
+	public static String joinLabels(List<Expr> list, String deliminator) {
+		return joinLabels(list.toArray(new Expr[0]), deliminator);
 	}
 }
