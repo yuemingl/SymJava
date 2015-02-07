@@ -9,8 +9,8 @@ import symjava.symbolic.utils.FuncClassLoader;
 import symjava.symbolic.utils.Utils;
 
 public class Func extends Expr {
-	protected Expr expr = null;
-	public Expr[] args = null;
+	protected Expr expr;
+	public Expr[] args;
 
 	/**
 	 * Construct an abstract function
@@ -18,24 +18,25 @@ public class Func extends Expr {
 	 * @param args
 	 */
 	public Func(String name, Expr ...args) {
-		this.label = name;
+		this.expr = null;
 		this.args = args;
+		this.label = name;
 		this.sortKey = label;
 	}
 	
 	public Func(String name, Expr expr) {
 		//Extract free variables from expr
-		this.label = name;
 		this.expr = expr;
-		args = BytecodeUtils.extractSymbols(expr);
+		this.args = Utils.extractSymbols(expr).toArray(new Expr[0]);
+		this.label = name;
 		this.sortKey = label;
 	}
 	
 	public Func(String name, Expr expr, Expr[] args) {
 		//Extract free variables from expr
-		this.label = name;
 		this.expr = expr;
 		this.args = args;
+		this.label = name;
 		this.sortKey = label;
 	}
 	

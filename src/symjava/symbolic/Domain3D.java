@@ -4,10 +4,7 @@ import java.util.List;
 
 import symjava.math.Transformation;
 
-public class Domain3D implements Domain {
-	String label = null;
-	Expr[] coordVars = null;
-
+public class Domain3D extends Domain {
 	/**
 	 * Construct a 3D domain with a given label(name) and
 	 * a list of coordinate variables
@@ -25,28 +22,12 @@ public class Domain3D implements Domain {
 	}
 	
 	@Override
-	public Domain getBoundary() {
-		return null;
-	}
-
-	@Override
-	public Expr[] getCoordVars() {
-		return this.coordVars;
-	}
-	
-	@Override
-	public String toString() {
-		return this.label;
-	}
-
-	@Override
 	public Domain transform(String label, Transformation trans) {
 		return new Domain3D(label, trans.getToVars());
 	}
 
 	@Override
-	public String getLabel() {
-		return label;
+	public int getDim() {
+		return 3;
 	}
-
 }

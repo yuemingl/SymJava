@@ -119,7 +119,7 @@ public class Dot extends Expr {
 	@Override
 	public Expr subs(Expr from, Expr to) {
 		if(Utils.symCompare(this, from))
-			return to;		
+			return to;
 		if(expr == null)
 			return new Dot(left.subs(from, to), right.subs(from, to));
 		else
