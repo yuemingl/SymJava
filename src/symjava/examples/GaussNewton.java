@@ -2,6 +2,8 @@ package symjava.examples;
 
 import Jama.Matrix;
 import symjava.matrix.*;
+import symjava.numeric.NumMatrix;
+import symjava.numeric.NumVector;
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
 

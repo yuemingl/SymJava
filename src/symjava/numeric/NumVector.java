@@ -1,9 +1,10 @@
-package symjava.matrix;
+package symjava.numeric;
 
 import java.util.Iterator;
 import java.util.Vector;
 
 import symjava.bytecode.BytecodeFunc;
+import symjava.matrix.SymVector;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 import symjava.symbolic.Expr;

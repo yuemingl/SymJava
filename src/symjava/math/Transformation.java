@@ -47,6 +47,10 @@ public class Transformation {
 	}
 	
 	public Expr getJacobian() {
+		return getJacobianMatrix().det();
+	}
+	
+	public SymMatrix getJacobianMatrix() {
 		Expr[] fromVars = this.getFromVars();
 		Expr[] toVars = this.getToVars();
 		SymMatrix m = new SymMatrix(fromVars.length, toVars.length);
@@ -55,7 +59,7 @@ public class Transformation {
 				m.set(i, j, eqs[i].rhs.diff(toVars[j]));
 			}
 		}
-		return m.det();
+		return m;
 	}
 	
 }

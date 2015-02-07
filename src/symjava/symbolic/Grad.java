@@ -107,12 +107,17 @@ public class Grad extends SymVector {
 	}
 	
 	public SymVector subs(Expr from, Expr to) {
-		if(this.func == null) {
+		//if(Utils.symCompare(this, from)) {
+		//	return to;
+		//}
+		if(this.func == null || this.func.isAbstract()) {
 			return new Grad(super.subs(from, to), this.args);
 		}
-		if(this.func == this.func.subs(from, to))
-			return this;
-		return new Grad(this.func.subs(from, to), this.func.args);
+		Expr funcSub = this.func.subs(from, to);
+		if(this.func != funcSub) {
+			return new Grad(funcSub, this.func.args);
+		}
+		return this;
 	}
 	
 	public SymVector diff(Expr expr) {

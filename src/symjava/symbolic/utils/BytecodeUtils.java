@@ -26,6 +26,7 @@ import symjava.symbolic.Sum;
 import symjava.symbolic.SymReal;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.UnaryOp;
+import symjava.symbolic.SymConst;
 
 import com.sun.org.apache.bcel.internal.Constants;
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
@@ -46,6 +47,7 @@ import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class BytecodeUtils {
 	public static void post_order(Expr e, List<Expr> outList) {
+		if(e == null) return;
 		if(e instanceof BinaryOp) {
 			BinaryOp be = (BinaryOp)e; 
 			post_order(be.left, outList);
@@ -75,13 +77,13 @@ public class BytecodeUtils {
 		outList.add(e);
 	}
 	
-	public static Symbol[] extractSymbols(Expr expr) {
-		Set<Symbol> set = new HashSet<Symbol>();
+	public static Expr[] extractArguments(Func func) {
+		Set<Expr> set = new HashSet<Expr>();
 		List<Expr> list = new ArrayList<Expr>();
-		post_order(expr, list);
+		post_order(func, list);
 		for(Expr e : list) {
-			if(e instanceof Symbol) {
-				set.add((Symbol)e);
+			if(e instanceof Symbol || e instanceof SymConst) {
+				set.add(e);
 			} else if(e instanceof Func) {
 				Func fe = (Func)e;
 				for(Expr arg : fe.args) {
@@ -90,14 +92,14 @@ public class BytecodeUtils {
 				}
 			}
 		}
-		Symbol[] rlt = new Symbol[set.size()];
+		Expr[] rlt = new Expr[set.size()];
 		int idx = 0;
-		for(Symbol s : set) {
+		for(Expr s : set) {
 			rlt[idx++] = s;
 		}
-		Arrays.sort(rlt, new Comparator<Symbol>() {
+		Arrays.sort(rlt, new Comparator<Expr>() {
 			@Override
-			public int compare(Symbol o1, Symbol o2) {
+			public int compare(Expr o1, Expr o2) {
 				return o1.toString().compareTo(o2.toString());
 			}
 		});
@@ -123,21 +125,41 @@ public class BytecodeUtils {
 				"apply", fullClsName, // method, class
 				il, cp);
 		
-		Expr[] fArgs = fun.args;
+		Expr[] fExprArgs = extractArguments(fun);
+		if(fExprArgs.length != fun.args.length) {
+			System.out.println(
+				String.format("Warning: Arguments of %s is different from it's expression:\n>>>Defined args:%s \n>>>Express args:%s",
+						fun.getName(),
+						Utils.joinLabels(fun.args, ","),
+						Utils.joinLabels(fExprArgs, ",")));
+			Set<Expr> argSet = new HashSet<Expr>();
+			for(Expr e : fun.args)
+				argSet.add(e);
+			for(Expr e : fExprArgs)
+				argSet.add(e);
+			Expr[] allArgs = argSet.toArray(new Expr[0]);
+			fExprArgs = Utils.sortExprs(allArgs);
+			System.out.println(
+					String.format(">>>Using args: %s", Utils.joinLabels(fExprArgs, ","))
+					);
+		}
 		HashMap<Expr, Integer> argsMap = new HashMap<Expr, Integer>();
-		for(int i=0; i<fArgs.length; i++) {
-			argsMap.put(fArgs[i], i);
+		for(int i=0; i<fExprArgs.length; i++) {
+			argsMap.put(fExprArgs[i], i);
 		}
 		List<Expr> insList = new ArrayList<Expr>();
 		post_order(fun.getExpr(), insList);
+		if(insList.size() == 0) {
+			throw new RuntimeException(String.format("Function %s is an empty function. Nothing to generate!",
+					fun.getName()));
+		}
 
 		for(int i=0; i<insList.size(); i++) {
 			Expr ins = insList.get(i);
-			if(ins instanceof Symbol) {
-				Symbol s = (Symbol)ins;
-				Integer argIdx = argsMap.get(s);
+			if(ins instanceof Symbol || ins instanceof SymConst) {
+				Integer argIdx = argsMap.get(ins);
 				if(argIdx == null) {
-					throw new IllegalArgumentException(s+" is not in the argument list of "+fun.getLabel());
+					throw new IllegalArgumentException(ins+" is not in the argument list of "+fun.getLabel());
 				}
 				il.append(new ALOAD(1));
 				il.append(new PUSH(cp, argIdx));
@@ -164,12 +186,9 @@ public class BytecodeUtils {
 				il.append(new PUSH(cp, -1.0));
 				il.append(new DMUL());
 			} else {
-				throw new RuntimeException(ins.getClass() + " is unknown!");
+				throw new RuntimeException(ins.getClass() + " is not allowed when generating bytecode function!");
 			}
 		}
-		//il.append(new ALOAD(1));
-		//il.append(new ARRAYLENGTH());
-		//il.append(new I2D());
 
 		il.append(InstructionConstants.DRETURN);
 		

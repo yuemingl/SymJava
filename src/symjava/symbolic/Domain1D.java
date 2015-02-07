@@ -2,19 +2,18 @@ package symjava.symbolic;
 
 import symjava.math.Transformation;
 
-public class Domain1D implements Domain {
-	String label;
-	Expr coordVar = Symbol.x;
+public class Domain1D extends Domain {
 	Expr start;
 	Expr end;
 	public Domain1D(Expr start, Expr end) {
 		this.start = start;
 		this.end = end;
+		this.coordVars = new Expr[] { Symbol.x };
 	}
 	public Domain1D(Expr start, Expr end, Expr coordVar) {
 		this.start = start;
 		this.end = end;
-		this.coordVar = coordVar;
+		this.coordVars = new Expr[] { coordVar };
 		this.label = "["+start+","+end+"]";
 	}	
 	
@@ -26,6 +25,12 @@ public class Domain1D implements Domain {
 		return end;
 	}
 	
+	/**
+	 * Define a interval by giving two number of the bounds
+	 * @param start
+	 * @param end
+	 * @return
+	 */
 	public static <T1, T2> Domain apply(T1 start, T2 end) {
 		Expr s = null, e = null;
 		if(start instanceof Number) {
@@ -42,21 +47,10 @@ public class Domain1D implements Domain {
 	}
 	
 	@Override
-	public Domain getBoundary() {
-		return null;
-	}
-
-	@Override
-	public Expr[] getCoordVars() {
-		Expr[] rlt = new Expr[1];
-		rlt[0] = this.coordVar;
-		return rlt;
-	}
-	
-	@Override
 	public String toString() {
 		return "["+start+","+end+"]";
 	}
+	
 	@Override
 	public Domain transform(String label, Transformation trans) {
 		Expr from = trans.getFromVars()[0];
@@ -69,7 +63,7 @@ public class Domain1D implements Domain {
 	}
 	
 	@Override
-	public String getLabel() {
-		return label;
+	public int getDim() {
+		return 1;
 	}
 }

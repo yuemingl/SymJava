@@ -1,9 +1,9 @@
 package symjava.examples;
 
-import symjava.matrix.NumMatrix;
-import symjava.matrix.NumVector;
 import symjava.matrix.SymMatrix;
 import symjava.matrix.SymVector;
+import symjava.numeric.NumMatrix;
+import symjava.numeric.NumVector;
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;

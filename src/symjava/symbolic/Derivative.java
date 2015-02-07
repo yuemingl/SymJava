@@ -135,7 +135,9 @@ public class Derivative extends Func {
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
-		if(expr != null) {
+		if(Utils.symCompare(this, from)) {
+			return to;
+		} else if(expr != null) {
 			return expr.subs(from, to);
 		} else if(Utils.symCompare(func, from)) {
 			if(to instanceof Func) {
