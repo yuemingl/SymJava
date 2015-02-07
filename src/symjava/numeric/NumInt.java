@@ -32,7 +32,7 @@ public class NumInt {
 		for(int k=0; k<pnts.length; k++) {
 			sum += byteFunc.apply(pnts[k])*pnts[k][dim];
 		}
-		return 0.5*sum;
+		return sum;
 	}
 	
 	public double eval(double ...params) {
@@ -49,6 +49,6 @@ public class NumInt {
 			}
 			sum += byteFunc.apply(allArgs)*pnts[k][dim];
 		}
-		return 0.5*sum;
+		return sum;
 	}
 }
