@@ -25,7 +25,7 @@ abstract public class Expr implements Cloneable {
 			throw new IllegalArgumentException();
 		Func F = (Func)f;
 		Symbol alpha = new Symbol("_alpha_");
-		Expr ff = this.subs(f, f+alpha*df);
+		Expr ff = this.subs(f, f.add(alpha.multiply(df)));
 		Expr dff = ff.diff(alpha);
 		if(Symbol.C0.symEquals(dff)) {
 			Func ret = new Func("0", F.args);
