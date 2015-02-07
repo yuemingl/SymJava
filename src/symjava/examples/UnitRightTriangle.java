@@ -4,8 +4,6 @@ import java.util.List;
 
 import symjava.symbolic.Domain2D;
 import symjava.symbolic.Expr;
-import static symjava.symbolic.Symbol.*;
-
 
 public class UnitRightTriangle extends Domain2D {
 
@@ -19,15 +17,27 @@ public class UnitRightTriangle extends Domain2D {
 	
 	@Override
 	public double[][] getIntWeightAndPoints(int order) {
-		double[][] rlt = {
-				{0.10128651, 0.06296959, 0.10128651},
-				{0.47014206, 0.06619708, 0.05971587},
-				{0.79742699, 0.06296959, 0.10128651},
-				{0.47014206, 0.06619708, 0.47014206},
-				{0.10128651, 0.06296959, 0.79742699},
-				{0.05971587, 0.06619708, 0.47014206},
-				{0.33333333, 0.11250000, 0.33333333}
-				};
-		return rlt;
+		//The total weight is 0.5, since the area of the triangle is 0.5
+		if(order == 3) {
+			double[][] rlt = {
+					{0.5, 0.5, 0.5 / 3.0},
+					{0.0, 0.5, 0.5 / 3.0},
+					{0.5, 0.0, 0.5 / 3.0}
+					};
+			return rlt;
+		}
+		if(order == 5) {
+			double[][] rlt = {
+					{0.10128651, 0.10128651, 0.06296959},
+					{0.47014206, 0.05971587, 0.06619708},
+					{0.79742699, 0.10128651, 0.06296959},
+					{0.47014206, 0.47014206, 0.06619708},
+					{0.10128651, 0.79742699, 0.06296959},
+					{0.05971587, 0.47014206, 0.06619708},
+					{0.33333333, 0.33333333, 0.11250000}
+					};
+			return rlt;
+		}
+		return null;
 	}
 }

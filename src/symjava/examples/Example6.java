@@ -4,7 +4,9 @@ import static symjava.math.SymMath.dot;
 import static symjava.math.SymMath.grad;
 import static symjava.symbolic.Symbol.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import Jama.Matrix;
 import symjava.math.Transformation;
@@ -17,22 +19,41 @@ import symjava.symbolic.Func;
 import symjava.symbolic.Int;
 import symjava.symbolic.SymConst;
 
+/**
+ * Finite Element solver
+ * 
+ */
 public class Example6 {
 	public static void main(String[] args) {
-		//Read the mesh
-		Mesh2D mesh = new Mesh2D("mesh1", x,y);
-		mesh.readTriangleMesh("double_hex3.1.node", "double_hex3.1.ele");
-		
-		//Our PDE equation
 		Func u = new Func("u", x, y);
 		Func v = new Func("v", x, y);
-		Eq pde = new Eq(0.5*dot(grad(u), grad(v)) + 0.1*u*v, (x*x+y*y)*v);
-		
-		solve(pde, mesh);
+
+//		//Our PDE equation
+//		Eq pde = new Eq(0.5*dot(grad(u), grad(v)) + 0.1*u*v, (x*x+y*y)*v);
+//		//Read the mesh
+//		Mesh2D mesh = new Mesh2D("mesh1", x, y);
+//		mesh.readTriangleMesh("double_hex3.1.node", "double_hex3.1.ele");
+//		solve(pde, mesh, null, "double_hex3.1.dat");
+
+		//Another PDE equation with Dirichlet condition
+		Eq pde2 = new Eq(dot(grad(u), grad(v)), (-2*(x*x+y*y)+36)*v);
+		Mesh2D mesh2 = new Mesh2D("mesh2", x, y);
+		//mesh2.readGridGenMesh("patch_triangle.grd");
+		mesh2.readGridGenMesh("triangle.grd");
+		//Mark boundary nodes
+		double eps = 0.01;
+		for(Node n : mesh2.nodes) {
+			//if(Math.abs(1-Math.abs(n.coords[0]))<eps || Math.abs(1-Math.abs(n.coords[1]))<eps)
+			if(Math.abs(3-Math.abs(n.coords[0]))<eps || Math.abs(3-Math.abs(n.coords[1]))<eps)
+				n.setType(1);
+		}
+		Map<Integer, Double> diri = new HashMap<Integer, Double>();
+		diri.put(1, 0.0);
+		solve(pde2, mesh2, diri, "triangle.dat");
 	}
 	
-	public static void solve(Eq pde, Mesh2D mesh) {
-		UnitRightTriangle tri = new UnitRightTriangle("Tri", r, s);
+	public static void solve(Eq pde, Mesh2D mesh, Map<Integer, Double> dirichlet, String output) {
+		System.out.println(String.format("PDE Weak Form: %s = %s", pde.lhs, pde.rhs));
 		
 		//Create coordinate transformation
 		SymConst x1 = new SymConst("x1");
@@ -63,6 +84,7 @@ public class Example6 {
 		Expr sx = -jacMat[1][0]/jac; //sx = -yr/jac
 		Expr sy =  jacMat[0][0]/jac; //sy =  xr/jac
 
+		UnitRightTriangle tri = new UnitRightTriangle("Tri", r, s);
 		Int lhsInt[][] = new Int[shapeFuns.length][shapeFuns.length];
 		Int rhsInt[] = new Int[shapeFuns.length];
 		for(int i=0; i<shapeFuns.length; i++) {
@@ -109,9 +131,11 @@ public class Example6 {
 		}
 
 		//Assemble the system
+		System.out.println("Start assemble the system...");
+		long begin = System.currentTimeMillis();
 		List<Domain> eles = mesh.getSubDomains();
 		double[][] matA = new double[mesh.nodes.size()][mesh.nodes.size()];
-		double[][] vecb = new double[1][mesh.nodes.size()];
+		double[] vecb = new double[mesh.nodes.size()];
 		for(Domain d : eles) {
 			Element e = (Element)d;
 			double[] nodeCoords = e.getNodeCoords();
@@ -121,15 +145,47 @@ public class Example6 {
 					int idxJ = e.nodes.get(j).index-1;
 					matA[idxI][idxJ] += lhsNInt[i][j].eval(nodeCoords);
 				}
-				vecb[0][idxI] = rhsNInt[i].eval(nodeCoords);
+				vecb[idxI] = rhsNInt[i].eval(nodeCoords);
 			}
 		}
+		System.out.println("Assemble done! Time: "+(System.currentTimeMillis()-begin)+"ms");
 		
+		System.out.println("Solving...");
+		begin = System.currentTimeMillis();
 		Matrix A = new Matrix(matA);
-		Matrix b = new Matrix(vecb);
-		Matrix x = A.solve(b);
-		for(int i=0; i<x.getRowDimension(); i++) {
-			System.out.println(x.get(i, 0));
+		Matrix b = new Matrix(vecb, vecb.length);
+		if(dirichlet != null) {
+			for(Node n : mesh.nodes) {
+				Double diri = dirichlet.get(n.type);
+				if(diri != null) {
+					setDirichlet(A, b, n.index-1, diri);
+				}
+			}
 		}
+		Matrix x = A.solve(b);
+//		for(int i=0; i<x.getRowDimension(); i++) {
+//			System.out.println(x.get(i, 0));
+//		}
+		mesh.writeTechplot(output, x.getArray());
+		System.out.println("Solved! Time: "+(System.currentTimeMillis()-begin)+"ms");
+		System.out.println("See the output file(Tecplot format) "+output+" for the solution.");
 	}
+	
+	public static void setDirichlet(Matrix A, Matrix b, int nodeIndex, double value) {
+		int row = nodeIndex;
+		int col = nodeIndex;
+		A.set(row, col, 1.0);
+		b.set(row, 0, value);
+		for(int r=0; r<A.getRowDimension(); r++) {
+			if(r != row) {
+				A.set(r, col, 0.0);
+				b.set(r, 0 , b.get(r, 0)-A.get(r, col)*value);
+			}
+		}
+		for(int c=0; c<A.getColumnDimension(); c++) {
+			if(c != col) {
+				A.set(row, c, 0.0);
+			}
+		}
+	}	
 }

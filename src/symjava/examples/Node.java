@@ -3,7 +3,7 @@ package symjava.examples;
 public class Node {
 	int index;
 	double[] coords;
-	int type;
+	int type = 0;
 	public Node(double ...coords) {
 		this.coords = coords;
 	}
