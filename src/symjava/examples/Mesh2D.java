@@ -285,6 +285,7 @@ public class Mesh2D extends Domain2D {
 									nodes.get(Integer.valueOf(line[4])-1),
 									nodes.get(Integer.valueOf(line[5])-1)
 									);
+							ele.nodes = adjustVerticeToCounterClockwise(ele.nodes);
 							eles.add(ele);
 						} else if(type.equalsIgnoreCase("quad")) {
 							ele.setNodes(
@@ -304,4 +305,27 @@ public class Mesh2D extends Domain2D {
 			e.printStackTrace();
 		}
 	}
+	
+	public List<Node> adjustVerticeToCounterClockwise(List<Node> vertices) {
+		double area = getTriangleArea(vertices);
+		if(area < 0) {
+			System.out.println("adjustVerticeToCounterClockwise: area="+area);
+			List<Node> tmp = new ArrayList<Node>();
+			int n = vertices.size();
+			for(int i=n-1; i>0; i--) {
+				tmp.add(vertices.get(i));
+			}
+			return tmp;
+		}
+		return vertices;
+	}
+
+	public static double getTriangleArea(List<Node> vertices) {
+		double area = 0.0;
+		double x1 = vertices.get(0).coords[0] , y1 =  vertices.get(0).coords[1] ;
+		double x2 = vertices.get(1).coords[0] , y2 =  vertices.get(1).coords[1] ;
+		double x3 = vertices.get(2).coords[0] , y3 =  vertices.get(2).coords[1] ;
+		area = ( (x2*y3 - x3*y2) - (x1*y3 - x3*y1) + (x1*y2 - x2*y1) ) / 2.0;
+		return area;
+	}	
 }

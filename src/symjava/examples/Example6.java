@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import Jama.Matrix;
+import symjava.bytecode.BytecodeFunc;
 import symjava.math.Transformation;
 import symjava.matrix.SymMatrix;
 import symjava.numeric.NumInt;
@@ -37,19 +38,22 @@ public class Example6 {
 
 		//Another PDE equation with Dirichlet condition
 		Eq pde2 = new Eq(dot(grad(u), grad(v)), (-2*(x*x+y*y)+36)*v);
+		//Eq pde2 = new Eq(u*v, (-2*(x*x+y*y)+36)*v);
 		Mesh2D mesh2 = new Mesh2D("mesh2", x, y);
 		//mesh2.readGridGenMesh("patch_triangle.grd");
 		mesh2.readGridGenMesh("triangle.grd");
 		//Mark boundary nodes
 		double eps = 0.01;
 		for(Node n : mesh2.nodes) {
-			//if(Math.abs(1-Math.abs(n.coords[0]))<eps || Math.abs(1-Math.abs(n.coords[1]))<eps)
+			//if(1-Math.abs(n.coords[0])<eps || 1-Math.abs(n.coords[1])<eps || Math.abs(n.coords[0])<eps || Math.abs(n.coords[1])<eps )
 			if(Math.abs(3-Math.abs(n.coords[0]))<eps || Math.abs(3-Math.abs(n.coords[1]))<eps)
 				n.setType(1);
 		}
 		Map<Integer, Double> diri = new HashMap<Integer, Double>();
 		diri.put(1, 0.0);
+		//solve(pde2, mesh2, diri, "patch_triangle.dat");
 		solve(pde2, mesh2, diri, "triangle.dat");
+		
 	}
 	
 	public static void solve(Eq pde, Mesh2D mesh, Map<Integer, Double> dirichlet, String output) {
@@ -80,17 +84,26 @@ public class Example6 {
 		
 		Expr jac = trans.getJacobian();
 		Expr rx =  jacMat[1][1]/jac; //rx =  ys/jac
-		Expr ry =  jacMat[0][1]/jac; //ry =  xs/jac
+		Expr ry = -jacMat[0][1]/jac; //ry = -xs/jac //bugfix missed a minus sign!
 		Expr sx = -jacMat[1][0]/jac; //sx = -yr/jac
 		Expr sy =  jacMat[0][0]/jac; //sy =  xr/jac
+//		Expr rx =  jacMat[1][1]; //rx =  ys/jac
+//		Expr ry =  jacMat[0][1]; //ry =  xs/jac
+//		Expr sx = -jacMat[1][0]; //sx = -yr/jac
+//		Expr sy =  jacMat[0][0]; //sy =  xr/jac
+		System.out.println(jac);
+		System.out.println(rx);
+		System.out.println(ry);
+		System.out.println(sx);
+		System.out.println(sy);
 
 		UnitRightTriangle tri = new UnitRightTriangle("Tri", r, s);
 		Int lhsInt[][] = new Int[shapeFuns.length][shapeFuns.length];
 		Int rhsInt[] = new Int[shapeFuns.length];
 		for(int i=0; i<shapeFuns.length; i++) {
-			Func U = shapeFuns[i];
+			Func V = shapeFuns[i]; //test
 			for(int j=0; j<shapeFuns.length; j++) {
-				Func V = shapeFuns[j];
+				Func U = shapeFuns[j]; //trial
 				
 				//Weak form for the left hand side of the PDE
 				Expr lhs = pde.lhs.subs(u, U).subs(v, V);
@@ -104,20 +117,38 @@ public class Example6 {
 					.subs(N1, r).subs(N2, s)
 					.subs(x, trans.eqs[0].rhs)
 					.subs(y, trans.eqs[1].rhs);
+				System.out.println(lhs);
+				System.out.println();
 				
 				//Define the integration on the reference domain
-				lhsInt[i][j] = new Int(new Func("",lhs*jac,new Expr[]{r,s}), tri);
-				//System.out.println(I[i][j]);
+				//lhsInt[i][j] = new Int(new Func("",lhs*jac,new Expr[]{r,s}), tri);
+				lhsInt[i][j] = new Int(new Func(
+						String.format("lhs%d%d",i,j), lhs*jac,new Expr[]{r,s}), tri);
+				System.out.println(lhsInt[i][j]);
+				System.out.println();
 			}
 			//Weak form for the right hand side of the PDE
-			Expr rhs = pde.rhs.subs(v, U).
-					subs(N1, r).subs(N2, s)
+			Expr rhs = pde.rhs.subs(v, V)
+					.subs(N1, r).subs(N2, s)
 					.subs(x, trans.eqs[0].rhs)
 					.subs(y, trans.eqs[1].rhs);
-			System.out.println(rhs);
+			//System.out.println(rhs);
 			System.out.println();
-			rhsInt[i] = new Int(new Func("",rhs*jac,new Expr[]{r,s}), tri);
+			rhsInt[i] = new Int(new Func(
+					String.format("rhs%d",i),rhs*jac,new Expr[]{r,s}), tri);
 		}
+		
+//		Expr ttt = lhsInt[0][1].integrand.subs(x1, -1.996794872)
+//		.subs(x2, -1.786508761)
+//		.subs(x3, -1.381601534)
+//		.subs(y1,  1.996794872)
+//		.subs(y2,  1.395640906)
+//		.subs(y3,  1.747001174).simplify();
+//		System.out.println(ttt);
+//		Func fttt = new Func("fttt",ttt);
+//		BytecodeFunc bfttt = fttt.toBytecodeFunc();
+//		System.out.println(bfttt.apply());
+	
 		
 		//Generate bytecode for the integration
 		//You can save the class to some place for later use
@@ -143,9 +174,12 @@ public class Example6 {
 				int idxI =  e.nodes.get(i).index-1;
 				for(int j=0; j<shapeFuns.length; j++) {
 					int idxJ = e.nodes.get(j).index-1;
-					matA[idxI][idxJ] += lhsNInt[i][j].eval(nodeCoords);
+					double t = lhsNInt[i][j].eval(nodeCoords);
+					System.out.println(idxI+" "+idxJ+" "+t);
+					
+					matA[idxI][idxJ] += t;
 				}
-				vecb[idxI] = rhsNInt[i].eval(nodeCoords);
+				vecb[idxI] += rhsNInt[i].eval(nodeCoords);
 			}
 		}
 		System.out.println("Assemble done! Time: "+(System.currentTimeMillis()-begin)+"ms");
@@ -162,10 +196,15 @@ public class Example6 {
 				}
 			}
 		}
+        for(int i=100; i<=110; i++) {
+        	for(int j=100; j<=110; j++)
+        		System.out.print(A.get(i-1, j-1)+" ");
+        	System.out.println();
+        }
+        
 		Matrix x = A.solve(b);
-//		for(int i=0; i<x.getRowDimension(); i++) {
+//		for(int i=0; i<x.getRowDimension(); i++)
 //			System.out.println(x.get(i, 0));
-//		}
 		mesh.writeTechplot(output, x.getArray());
 		System.out.println("Solved! Time: "+(System.currentTimeMillis()-begin)+"ms");
 		System.out.println("See the output file(Tecplot format) "+output+" for the solution.");
