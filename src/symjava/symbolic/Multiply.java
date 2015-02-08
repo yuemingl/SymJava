@@ -90,7 +90,8 @@ public class Multiply extends BinaryOp {
 	}
 	
 	public static Expr simplifiedIns(Expr l, Expr r) {
-		return Utils.flattenSortAndSimplify(shallowSimplifiedIns(l, r));
+		return shallowSimplifiedIns(l, r);
+		//return Utils.flattenSortAndSimplify(shallowSimplifiedIns(l, r));
 	}
 	
 	boolean isCoeffMulSymbol() {

@@ -37,7 +37,8 @@ public class Divide extends BinaryOp {
 	}
 	
 	public static Expr simplifiedIns(Expr numerator, Expr denominator) {
-		return Utils.flattenSortAndSimplify(shallowSimplifiedIns(numerator, denominator));
+		return shallowSimplifiedIns(numerator, denominator);
+		//return Utils.flattenSortAndSimplify(shallowSimplifiedIns(numerator, denominator));
 	}
 	
 	@Override

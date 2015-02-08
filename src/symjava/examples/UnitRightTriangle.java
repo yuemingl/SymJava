@@ -20,9 +20,18 @@ public class UnitRightTriangle extends Domain2D {
 		//The total weight is 0.5, since the area of the triangle is 0.5
 		if(order == 3) {
 			double[][] rlt = {
-					{0.5, 0.5, 0.5 / 3.0},
-					{0.0, 0.5, 0.5 / 3.0},
-					{0.5, 0.0, 0.5 / 3.0}
+					{0.5, 0.5, 1.0 / 6.0},
+					{0.0, 0.5, 1.0 / 6.0},
+					{0.5, 0.0, 1.0 / 6.0}
+					};
+			return rlt;
+		}
+		if(order == 4) {
+			double[][] rlt = {
+					{    0.6,     0.2,  25.0/96.0},
+					{    0.2,     0.6,  25.0/96.0},
+					{    0.2,     0.2,  25.0/96.0},
+					{1.0/3.0, 1.0/3.0, -27.0/96.0}
 					};
 			return rlt;
 		}

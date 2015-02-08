@@ -2,6 +2,8 @@ package symjava.symbolic;
 
 import java.util.List;
 
+import symjava.symbolic.utils.Utils;
+
 abstract public class Expr implements Cloneable {
 	/**
 	 * Label(or name) of an expression(Symbol, Func,...)
@@ -250,6 +252,9 @@ abstract public class Expr implements Cloneable {
 	 * @return
 	 */
 	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from)) {
+			return to;
+		}
 		return this;
 	}
 	
