@@ -1,4 +1,4 @@
-package symjava.examples;
+package symjava.examples.fem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,13 +9,18 @@ import symjava.symbolic.Expr;
 
 
 public class Element extends Domain {
+	public List<Node> nodes = new ArrayList<Node>();
+	
 	int index;
 	int dim;
-	List<Node> nodes = new ArrayList<Node>();
-	
+
 	public Element(String label, Expr ...coordVars) {
 		this.label = label;
 		this.coordVars = coordVars;
+	}
+	
+	public int getIndex() {
+		return this.index;
 	}
 	
 	public void setIndex(int index) {
@@ -40,7 +45,7 @@ public class Element extends Domain {
 		return dim;
 	}
 	
-	double[] getNodeCoords() {
+	public double[] getNodeCoords() {
 		double[] rlt = new double[nodes.size()*dim];
 		int index = 0;
 		for(int j=0; j<dim; j++) {

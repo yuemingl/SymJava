@@ -10,6 +10,10 @@ import java.util.Map;
 
 import Jama.Matrix;
 import symjava.bytecode.BytecodeFunc;
+import symjava.examples.fem.Element;
+import symjava.examples.fem.Mesh2D;
+import symjava.examples.fem.Node;
+import symjava.examples.fem.UnitRightTriangle;
 import symjava.math.Transformation;
 import symjava.matrix.SymMatrix;
 import symjava.numeric.NumInt;
@@ -168,9 +172,9 @@ public class Example6 {
 			Element e = (Element)d;
 			double[] nodeCoords = e.getNodeCoords();
 			for(int i=0; i<shapeFuns.length; i++) {
-				int idxI =  e.nodes.get(i).index-1;
+				int idxI =  e.nodes.get(i).getIndex()-1;
 				for(int j=0; j<shapeFuns.length; j++) {
-					int idxJ = e.nodes.get(j).index-1;
+					int idxJ = e.nodes.get(j).getIndex()-1;
 					double t = lhsNInt[i][j].eval(nodeCoords);
 					//System.out.println(idxI+" "+idxJ+" "+t);
 					matA[idxI][idxJ] += t;
@@ -186,9 +190,9 @@ public class Example6 {
 		Matrix b = new Matrix(vecb, vecb.length);
 		if(dirichlet != null) {
 			for(Node n : mesh.nodes) {
-				Double diri = dirichlet.get(n.type);
+				Double diri = dirichlet.get(n.getType());
 				if(diri != null) {
-					setDirichlet(A, b, n.index-1, diri);
+					setDirichlet(A, b, n.getIndex()-1, diri);
 				}
 			}
 		}
@@ -271,9 +275,9 @@ public class Example6 {
 					{tx*rx + ty*ry, tx*sx + ty*sy, tx*tx+ty*ty},
 			};
 			for(int i=0; i<3; i++) {
-				int idxI =  e.nodes.get(i).index-1;
+				int idxI =  e.nodes.get(i).getIndex()-1;
 				for(int j=0; j<3; j++) {
-					int idxJ = e.nodes.get(j).index-1;
+					int idxJ = e.nodes.get(j).getIndex()-1;
 					double t = lhs[i][j]*jac*0.5;
 					matA[idxI][idxJ] += t;
 				}
@@ -293,9 +297,9 @@ public class Example6 {
 				double y = y1*r+y2*s+y3*t;
 				//f=-2*(x*x+y*y)+36
 				double f = -2.0*(x*x+y*y)+36.0;
-				vecb[e.nodes.get(0).index - 1] += f*r*jac*w;
-				vecb[e.nodes.get(1).index - 1] += f*s*jac*w;
-				vecb[e.nodes.get(2).index - 1] += f*t*jac*w;
+				vecb[e.nodes.get(0).getIndex() - 1] += f*r*jac*w;
+				vecb[e.nodes.get(1).getIndex() - 1] += f*s*jac*w;
+				vecb[e.nodes.get(2).getIndex() - 1] += f*t*jac*w;
 			}
 
 		}
@@ -307,9 +311,9 @@ public class Example6 {
 		Matrix b = new Matrix(vecb, vecb.length);
 		if(dirichlet != null) {
 			for(Node n : mesh.nodes) {
-				Double diri = dirichlet.get(n.type);
+				Double diri = dirichlet.get(n.getType());
 				if(diri != null) {
-					setDirichlet(A, b, n.index-1, diri);
+					setDirichlet(A, b, n.getIndex()-1, diri);
 				}
 			}
 		}
