@@ -1,4 +1,4 @@
-package symjava.examples;
+package symjava.examples.fem;
 
 import java.io.BufferedReader;
 import java.io.File;
