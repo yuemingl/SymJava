@@ -57,7 +57,18 @@ abstract public class Expr implements Cloneable {
 		return this;
 	}
 	
+	/**
+	 * Return the string expression
+	 */
 	public String toString() {
+		return label;
+	}
+	
+	/**
+	 * Return the label(or name) of the expression
+	 * @return
+	 */
+	public String getLabel() {
 		return label;
 	}
 	
