@@ -381,3 +381,7 @@ Hessian=
 
 Grad(L)=
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_grad.png)
+
+Example6: Finite Element Solver for Laplace Equation
+
+![](https://raw.githubusercontent.com/yuemingl/SymJava/master/images/ex6.png)
