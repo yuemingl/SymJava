@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import Jama.Matrix;
-import symjava.bytecode.BytecodeFunc;
 import symjava.examples.fem.Element;
 import symjava.examples.fem.Mesh2D;
 import symjava.examples.fem.Node;

@@ -1,7 +1,6 @@
 package symjava.examples;
 
 import symjava.relational.Eq;
-import symjava.symbolic.SymConst;
 import symjava.symbolic.Symbol;
 import static symjava.symbolic.Symbol.*;
 
