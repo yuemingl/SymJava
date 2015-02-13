@@ -70,6 +70,9 @@ public class Eq extends Relation {
 		}
 	}
 
+	public static Eq apply(Expr lhs, Expr rhs) {
+		return new Eq(lhs, rhs);
+	}
 	
 	public Expr subsLHS(Expr[] from, Expr[] to) {
 		Expr rlt = lhs;
