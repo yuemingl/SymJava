@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import symjava.relational.Relation;
 import symjava.symbolic.Domain;
 import symjava.symbolic.Domain2D;
 import symjava.symbolic.Expr;
@@ -327,5 +328,15 @@ public class Mesh2D extends Domain2D {
 		double x3 = vertices.get(2).coords[0] , y3 =  vertices.get(2).coords[1] ;
 		area = ( (x2*y3 - x3*y2) - (x1*y3 - x3*y1) + (x1*y2 - x2*y1) ) / 2.0;
 		return area;
-	}	
+	}
+	
+	@Override
+	public Domain getBoundary(int ...marks) {
+		return null;
+	}
+	
+	@Override
+	public Domain getBoundary(Relation ...eqs) {
+		return null;
+	}
 }

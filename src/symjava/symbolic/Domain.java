@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import symjava.math.Transformation;
+import symjava.relational.Relation;
 
 /**
  * Class represents a domain in mathematics
@@ -15,9 +16,19 @@ public abstract class Domain {
 	
 	/**
 	 * Return a sub-domain that represents the boundary of the domain
+	 * The relations specify the conditions that which part of the boundary will be returned
 	 * @return
 	 */
-	public Domain getBoundary() {
+	public Domain getBoundary(Relation ...eqs) {
+		return null;
+	}
+	
+	/**
+	 * Return a sub-domain that represents the boundary of the domain
+	 * The marks specify the conditions that which part of the boundary will be returned
+	 * @return
+	 */	
+	public Domain getBoundary(int ...marks) {
 		return null;
 	}
 	
