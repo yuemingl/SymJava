@@ -185,7 +185,7 @@ public class BytecodeUtils {
 				Sqrt p = (Sqrt)ins;
 				il.append(new PUSH(cp, (double)p.root));
 				il.append(factory.createInvoke("java.lang.Math", "sqrt",
-						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
 			} else if(ins instanceof Reciprocal) {
 				il.append(new DDIV());
 			} else if(ins instanceof Negate) {

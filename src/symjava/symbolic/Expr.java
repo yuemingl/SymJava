@@ -65,11 +65,26 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
+	 * Set the label(or name) of the expression
+	 * @param label
+	 * @return
+	 */
+	public Expr setLabel(String label) {
+		this.label = label;
+		return this;
+	}
+	
+	/**
 	 * Return the label(or name) of the expression
 	 * @return
 	 */
 	public String getLabel() {
 		return label;
+	}
+	
+	public Expr setSortKey(String sortKey) {
+		this.sortKey = sortKey;
+		return this;
 	}
 	
 	public String getSortKey() {

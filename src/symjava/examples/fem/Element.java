@@ -35,11 +35,12 @@ public class Element extends Domain {
 		return -1;
 	}
 	
-	public void setNodes(Node ...nodes) {
+	public Element setNodes(Node ...nodes) {
 		for(Node n : nodes) {
 			this.nodes.add(n);
 		}
 		this.dim = nodes[0].getDim();
+		return this;
 	}
 	
 	@Override

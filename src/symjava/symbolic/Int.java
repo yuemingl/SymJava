@@ -50,10 +50,12 @@ public class Int extends Expr {
 			tmp = tmp.subs(e.lhs, e.rhs);
 		}
 		
+		//For test
 		//return new Int(tmp.multiply(new Func("Jac")), 
 		//		this.domain.transform(this.domain.getLabel()+"T", trans));
+		
 		Expr jac = trans.getJacobian();
-		return new Int(tmp.multiply(jac), 
+		return new Int(new Func(this.integrand.getLabel(), tmp.multiply(jac), trans.getToVars()), 
 				this.domain.transform(this.domain.getLabel()+"T", trans));
 	}
 	
@@ -62,7 +64,10 @@ public class Int extends Expr {
 		for(ExprPair p : subsList) {
 			tmp = tmp.subs(p.e1, p.e2);
 		}
-		return new Int(tmp.multiply(jac), target);
+		return new Int(new Func(
+				this.label, tmp.multiply(jac), 
+				target.getCoordVars()
+				), target);
 	}
 	
 	@Override
