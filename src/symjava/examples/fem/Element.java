@@ -3,8 +3,8 @@ package symjava.examples.fem;
 import java.util.ArrayList;
 import java.util.List;
 
+import symjava.domains.Domain;
 import symjava.math.Transformation;
-import symjava.symbolic.Domain;
 import symjava.symbolic.Expr;
 
 
@@ -25,6 +25,14 @@ public class Element extends Domain {
 	
 	public void setIndex(int index) {
 		this.index = index;
+	}
+	
+	public int getLocalIndex(Node node) {
+		for(int i=0; i<nodes.size(); i++) {
+			if(nodes.get(i) == node)
+				return i;
+		}
+		return -1;
 	}
 	
 	public void setNodes(Node ...nodes) {

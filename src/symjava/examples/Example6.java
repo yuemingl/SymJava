@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 import Jama.Matrix;
+import symjava.domains.Domain;
 import symjava.examples.fem.Element;
 import symjava.examples.fem.Mesh2D;
 import symjava.examples.fem.Node;
-import symjava.examples.fem.UnitRightTriangle;
+import symjava.examples.fem.RefTriangle;
 import symjava.math.Transformation;
 import symjava.matrix.SymMatrix;
 import symjava.numeric.NumInt;
 import symjava.relational.Eq;
-import symjava.symbolic.Domain;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 import symjava.symbolic.Int;
@@ -42,7 +42,7 @@ public class Example6 {
 		//Another PDE equation with Dirichlet condition
 		Eq pde2 = new Eq(dot(grad(u), grad(v)), (-2*(x*x+y*y)+36)*v);
 		//Eq pde2 = new Eq(u*v, (-2*(x*x+y*y)+36)*v);
-		Mesh2D mesh2 = new Mesh2D("mesh2", x, y);
+		Mesh2D mesh2 = new Mesh2D("mesh2");
 		//mesh2.readGridGenMesh("patch_triangle.grd");
 		mesh2.readGridGenMesh("triangle.grd");
 		//Mark boundary nodes
@@ -97,7 +97,7 @@ public class Example6 {
 		System.out.println(sx);
 		System.out.println(sy);
 
-		UnitRightTriangle tri = new UnitRightTriangle("Tri", r, s);
+		RefTriangle tri = new RefTriangle("Tri", r, s);
 		Int lhsInt[][] = new Int[shapeFuns.length][shapeFuns.length];
 		Int rhsInt[] = new Int[shapeFuns.length];
 		for(int i=0; i<shapeFuns.length; i++) {
