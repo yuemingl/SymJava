@@ -354,12 +354,15 @@ public class Mesh2D extends Domain2D {
 				Integer t1 = (Integer)func.apply(n1.coords);
 				Integer t2 = (Integer)func.apply(n2.coords);
 				Integer t3 = (Integer)func.apply(n3.coords);
-				if(t1 > 0 && t2 >0)
-					rlt.eles.add(new Element(String.format("BE%d%d",n1.getIndex(), n2.getIndex()), x));
-				if(t2 > 0 && t3 >0)
-					rlt.eles.add(new Element(String.format("BE%d%d",n2.getIndex(), n3.getIndex()), x));
-				if(t3 > 0 && t1 >0)
-					rlt.eles.add(new Element(String.format("BE%d%d",n3.getIndex(), n1.getIndex()), x));
+				if(t1 > 0 && t2 >0) {
+					rlt.eles.add(new Element(String.format("EB%d%d",n1.getIndex(), n2.getIndex()), x).setNodes(n1, n2));
+				}
+				if(t2 > 0 && t3 >0) {
+					rlt.eles.add(new Element(String.format("EB%d%d",n2.getIndex(), n3.getIndex()), x).setNodes(n2, n3));
+				}
+				if(t3 > 0 && t1 >0) {
+					rlt.eles.add(new Element(String.format("EB%d%d",n3.getIndex(), n1.getIndex()), x).setNodes(n3, n1));
+				}
 			} else {
 				throw new RuntimeException("Not supported now!");
 			}

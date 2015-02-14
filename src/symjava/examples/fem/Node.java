@@ -30,4 +30,20 @@ public class Node {
 	public int getDim() {
 		return coords.length;
 	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("N");
+		sb.append(index);
+		sb.append("[");
+		sb.append(type);
+		sb.append("]=(");
+		for(double d : coords) {
+			sb.append(d);
+			sb.append(",");
+		}
+		sb.delete(sb.length()-1, sb.length());
+		sb.append(")");
+		return sb.toString();
+	}
 }
