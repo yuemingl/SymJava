@@ -1,11 +1,16 @@
 package symjava.symbolic;
 
+import java.util.List;
+
+import symjava.domains.Domain;
+import symjava.domains.Interval;
 import symjava.math.Transformation;
 import symjava.relational.Eq;
+import symjava.symbolic.utils.ExprPair;
 import symjava.symbolic.utils.Utils;
 
 /**
- * Integration class
+ * Class represents an integration
  * 
  */
 public class Int extends Expr {
@@ -16,8 +21,8 @@ public class Int extends Expr {
 		this.integrand = integrand;
 		this.domain = domain;
 		String postfix = "d" + Utils.joinLabels(domain.getCoordVars(),"d");
-		if(domain instanceof Domain1D) {
-			Domain1D o = (Domain1D)domain;
+		if(domain instanceof Interval) {
+			Interval o = (Interval)domain;
 			this.label = "\\int_{"+o.getStart()+"}^{"+o.getEnd()+"}{"+integrand+"}" + postfix;
 		}
 		else
@@ -50,6 +55,14 @@ public class Int extends Expr {
 		Expr jac = trans.getJacobian();
 		return new Int(tmp.multiply(jac), 
 				this.domain.transform(this.domain.getLabel()+"T", trans));
+	}
+	
+	public Int changeOfVars(List<ExprPair> subsList, Expr jac, Domain target) {
+		Expr tmp = this.integrand;
+		for(ExprPair p : subsList) {
+			tmp = tmp.subs(p.e1, p.e2);
+		}
+		return new Int(tmp.multiply(jac), target);
 	}
 	
 	@Override

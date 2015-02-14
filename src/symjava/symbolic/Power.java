@@ -20,7 +20,7 @@ public class Power extends UnaryOp {
 			else
 				label = "("+base + ")^" + exponent;
 		}
-		sortKey = base.getSortKey()+String.valueOf(exponent);
+		sortKey = base.getSortKey()+"power"+String.valueOf(exponent);
 	}
 	
 	public static Expr simplifiedIns(Expr base, int exponent) {

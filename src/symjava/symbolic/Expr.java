@@ -8,12 +8,12 @@ abstract public class Expr implements Cloneable {
 	/**
 	 * Label(or name) of an expression(Symbol, Func,...)
 	 */
-	String label = null;
+	protected String label = null;
 	
 	/**
 	 * A string used to sort terms in an expression
 	 */
-	String sortKey = null;
+	protected String sortKey = null;
 	
 	//Number of operations for simplifying an expression
 	protected int simplifyOps = 0;

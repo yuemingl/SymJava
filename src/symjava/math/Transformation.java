@@ -47,6 +47,7 @@ public class Transformation {
 	}
 	
 	public Expr getJacobian() {
+		
 		return getJacobianMatrix().det();
 	}
 	

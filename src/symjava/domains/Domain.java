@@ -1,10 +1,11 @@
-package symjava.symbolic;
+package symjava.domains;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import symjava.math.Transformation;
-import symjava.relational.Relation;
+import symjava.numeric.NumFunc;
+import symjava.symbolic.Expr;
 
 /**
  * Class represents a domain in mathematics
@@ -19,16 +20,7 @@ public abstract class Domain {
 	 * The relations specify the conditions that which part of the boundary will be returned
 	 * @return
 	 */
-	public Domain getBoundary(Relation ...eqs) {
-		return null;
-	}
-	
-	/**
-	 * Return a sub-domain that represents the boundary of the domain
-	 * The marks specify the conditions that which part of the boundary will be returned
-	 * @return
-	 */	
-	public Domain getBoundary(int ...marks) {
+	public Domain getBoundary(NumFunc<?> func) {
 		return null;
 	}
 	

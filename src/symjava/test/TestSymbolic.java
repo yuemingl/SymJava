@@ -2,6 +2,9 @@ package symjava.test;
 
 import static symjava.symbolic.Symbol.*;
 import symjava.bytecode.BytecodeFunc;
+import symjava.domains.Domain;
+import symjava.domains.Domain2D;
+import symjava.domains.Interval;
 import symjava.symbolic.*;
 
 

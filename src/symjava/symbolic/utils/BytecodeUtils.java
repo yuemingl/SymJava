@@ -21,6 +21,7 @@ import symjava.symbolic.Multiply;
 import symjava.symbolic.Negate;
 import symjava.symbolic.Power;
 import symjava.symbolic.Reciprocal;
+import symjava.symbolic.Sqrt;
 import symjava.symbolic.Subtract;
 import symjava.symbolic.Sum;
 import symjava.symbolic.SymReal;
@@ -179,6 +180,11 @@ public class BytecodeUtils {
 				Power p = (Power)ins;
 				il.append(new PUSH(cp, (double)p.exponent));
 				il.append(factory.createInvoke("java.lang.Math", "pow",
+						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+			} else if(ins instanceof Sqrt) {
+				Sqrt p = (Sqrt)ins;
+				il.append(new PUSH(cp, (double)p.root));
+				il.append(factory.createInvoke("java.lang.Math", "sqrt",
 						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
 			} else if(ins instanceof Reciprocal) {
 				il.append(new DDIV());

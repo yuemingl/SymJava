@@ -30,5 +30,4 @@ public class Node {
 	public int getDim() {
 		return coords.length;
 	}
-
 }

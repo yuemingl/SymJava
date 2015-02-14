@@ -99,4 +99,14 @@ public class SymMatrix {
 		
 		return null;
 	}
+	
+//	public Expr norm2() {
+//		
+////		for(int j=0; j<this.colDim(); j++) {
+////			for(int i=0; i<this.rowDim(); i++) {
+////				Expr e = data.get(i).get(j);
+////				e.multiply(e)
+////			}
+////		}
+//	}
 }
