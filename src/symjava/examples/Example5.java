@@ -1,5 +1,8 @@
 package symjava.examples;
 
+import symjava.domains.Domain;
+import symjava.domains.Domain2D;
+import symjava.domains.Domain3D;
 import symjava.math.SymMath;
 import symjava.math.Transformation;
 import symjava.relational.Eq;

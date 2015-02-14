@@ -1,8 +1,9 @@
-package symjava.symbolic;
+package symjava.domains;
 
 import java.util.List;
 
 import symjava.math.Transformation;
+import symjava.symbolic.Expr;
 
 public class Domain2D extends Domain {
 	/**
@@ -14,7 +15,7 @@ public class Domain2D extends Domain {
 	public Domain2D(String label, Expr ...coordVars) {
 		this.label = label;
 		this.coordVars = coordVars;
-	}	
+	}
 	
 	public Domain2D(String label, List<Expr> coordVars) {
 		this.label = label;
