@@ -1,20 +1,24 @@
-package symjava.symbolic;
+package symjava.domains;
 
 import symjava.math.Transformation;
+import symjava.symbolic.Expr;
+import symjava.symbolic.SymDouble;
+import static symjava.symbolic.Symbol.x;
 
-public class Domain1D extends Domain {
+public class Interval extends Domain1D {
 	Expr start;
 	Expr end;
-	public Domain1D(Expr start, Expr end) {
+	
+	public Interval(Expr start, Expr end) {
+		super("["+start+","+end+"]", x);
 		this.start = start;
 		this.end = end;
-		this.coordVars = new Expr[] { Symbol.x };
 	}
-	public Domain1D(Expr start, Expr end, Expr coordVar) {
+	
+	public Interval(Expr start, Expr end, Expr coordVar) {
+		super("["+start+","+end+"]", x);
 		this.start = start;
 		this.end = end;
-		this.coordVars = new Expr[] { coordVar };
-		this.label = "["+start+","+end+"]";
 	}	
 	
 	public Expr getStart() {
@@ -43,7 +47,7 @@ public class Domain1D extends Domain {
 		} else {
 			e = (Expr)end;
 		}
-		return new Domain1D(s, e);
+		return new Interval(s, e);
 	}
 	
 	@Override
@@ -56,14 +60,10 @@ public class Domain1D extends Domain {
 		Expr from = trans.getFromVars()[0];
 		Expr to = trans.getToVars()[0];
 		Expr toSolve = trans.eqs[0].solve(to);
-		return new Domain1D(
+		return new Interval(
 				toSolve.subs(from, start),
 				toSolve.subs(from, end),
 				to);
 	}
-	
-	@Override
-	public int getDim() {
-		return 1;
-	}
+
 }

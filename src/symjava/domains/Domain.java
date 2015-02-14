@@ -1,9 +1,11 @@
-package symjava.symbolic;
+package symjava.domains;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import symjava.math.Transformation;
+import symjava.numeric.NumFunc;
+import symjava.symbolic.Expr;
 
 /**
  * Class represents a domain in mathematics
@@ -17,7 +19,7 @@ public abstract class Domain {
 	 * Return a sub-domain that represents the boundary of the domain
 	 * @return
 	 */
-	public Domain getBoundary() {
+	public Domain getBoundary(NumFunc<?> func) {
 		return null;
 	}
 	
