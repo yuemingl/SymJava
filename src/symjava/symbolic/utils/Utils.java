@@ -85,6 +85,15 @@ public class Utils {
 		return expr1.symEquals(expr2);
 	}
 	
+	public static Boolean symCompareNull(Expr expr1, Expr expr2) {
+		if( (expr1 == null && expr2 != null) || (expr1 != null && expr2 == null) )
+			return false;
+		else if(expr1 == null || expr2 == null)
+			return null;
+		else 
+			return symCompare(expr1, expr2);
+	}
+	
 	public static int getMultiplyGlobalSign(List<Expr> list) {
 		int count = 0;
 		for(Expr e : list) {

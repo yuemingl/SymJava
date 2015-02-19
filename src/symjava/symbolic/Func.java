@@ -137,22 +137,18 @@ public class Func extends Expr {
 	public boolean symEquals(Expr other) {
 		if(other instanceof Func) {
 			Func o = (Func)other;
-			if(this.expr == null && o.expr != null)
-				return false;
-			if(this.expr != null && o.expr == null)
+			Boolean rlt = Utils.symCompareNull(this.expr, o.expr);
+			if(rlt != null && rlt == false)
 				return false;
 			if(!this.label.equals(o.label))
 				return false;
-			if( (this.expr == null && o.expr == null) ||
-				 Utils.symCompare(this.expr, o.expr) ) {
-				if(args.length != o.args.length)
+			if(args.length != o.args.length)
+				return false;
+			for(int i=0; i<args.length; i++) {
+				if(!args[i].symEquals(o.args[i]))
 					return false;
-				for(int i=0; i<args.length; i++) {
-					if(!args[i].symEquals(o.args[i]))
-						return false;
-				}
-				return true;
 			}
+			return true;
 		}
 		return false;
 	}

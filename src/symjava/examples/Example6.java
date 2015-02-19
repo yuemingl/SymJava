@@ -14,6 +14,7 @@ import symjava.examples.fem.Element;
 import symjava.examples.fem.Mesh2D;
 import symjava.examples.fem.Node;
 import symjava.examples.fem.RefTriangle;
+import symjava.examples.fem.WeakForm;
 import symjava.math.Transformation;
 import symjava.matrix.SymMatrix;
 import symjava.numeric.NumInt;
@@ -40,7 +41,7 @@ public class Example6 {
 //		solve(pde, mesh, null, "double_hex3.1.dat");
 
 		//Another PDE equation with Dirichlet condition
-		Eq pde2 = new Eq(dot(grad(u), grad(v)), (-2*(x*x+y*y)+36)*v);
+		WeakForm wf = new WeakForm(dot(grad(u), grad(v)), (-2*(x*x+y*y)+36)*v, u, v);
 		//Eq pde2 = new Eq(u*v, (-2*(x*x+y*y)+36)*v);
 		Mesh2D mesh2 = new Mesh2D("mesh2");
 		//mesh2.readGridGenMesh("patch_triangle.grd");
@@ -55,13 +56,13 @@ public class Example6 {
 		Map<Integer, Double> diri = new HashMap<Integer, Double>();
 		diri.put(1, 0.0);
 		//solve(pde2, mesh2, diri, "patch_triangle.dat");
-		solve(pde2, mesh2, diri, "triangle.dat");
-		solve2(pde2, mesh2, diri, "triangle_hardcode.dat");
+		solve(wf, mesh2, diri, "triangle.dat");
+		solve2(mesh2, diri, "triangle_hardcode.dat");
 		
 	}
 	
-	public static void solve(Eq pde, Mesh2D mesh, Map<Integer, Double> dirichlet, String output) {
-		System.out.println(String.format("PDE Weak Form: %s = %s", pde.lhs, pde.rhs));
+	public static void solve(WeakForm wf, Mesh2D mesh, Map<Integer, Double> dirichlet, String output) {
+		System.out.println(String.format("PDE Weak Form: %s = %s", wf.lhs, wf.rhs));
 		
 		//Create coordinate transformation
 		SymConst x1 = new SymConst("x1");
@@ -106,17 +107,18 @@ public class Example6 {
 				Func U = shapeFuns[j]; //trial
 				
 				//Weak form for the left hand side of the PDE
-				Expr lhs = pde.lhs.subs(u, U).subs(v, V);
+				Expr lhs = wf.lhs.subs(wf.trial, U).subs(wf.test, V);
 				System.out.println(lhs);
 				System.out.println();
 				
 				//Replace the derivatives with it's concrete expression
-				lhs = lhs
-					.subs(N1.diff(x), rx).subs(N1.diff(y), ry)
-					.subs(N2.diff(x), sx).subs(N2.diff(y), sy)
-					.subs(N1, r).subs(N2, s)
-					.subs(x, trans.eqs[0].rhs)
-					.subs(y, trans.eqs[1].rhs);
+				lhs = lhs.subs(N1.diff(x), rx)
+						.subs(N1.diff(y), ry)
+						.subs(N2.diff(x), sx)
+						.subs(N2.diff(y), sy)
+						.subs(N1, r).subs(N2, s)
+						.subs(x, trans.eqs[0].rhs)
+						.subs(y, trans.eqs[1].rhs);
 				System.out.println(lhs);
 				System.out.println();
 				
@@ -128,10 +130,10 @@ public class Example6 {
 				System.out.println();
 			}
 			//Weak form for the right hand side of the PDE
-			Expr rhs = pde.rhs.subs(v, V)
-					.subs(N1, r).subs(N2, s)
-					.subs(x, trans.eqs[0].rhs)
-					.subs(y, trans.eqs[1].rhs);
+			Expr rhs = wf.rhs.subs(wf.test, V)
+							.subs(N1, r).subs(N2, s)
+							.subs(x, trans.eqs[0].rhs)
+							.subs(y, trans.eqs[1].rhs);
 			//System.out.println(rhs);
 			System.out.println();
 			rhsInt[i] = new Int(new Func(
@@ -231,12 +233,11 @@ public class Example6 {
 	 * 
 	 * dot(grad(u), grad(v)) == (-2*(x*x+y*y)+36)*v)
 	 * 
-	 * @param pde
 	 * @param mesh
 	 * @param dirichlet
 	 * @param output
 	 */
-	public static void solve2(Eq pde, Mesh2D mesh, Map<Integer, Double> dirichlet, String output) {
+	public static void solve2(Mesh2D mesh, Map<Integer, Double> dirichlet, String output) {
 		//Assemble the system
 		System.out.println("Start assemble the system...");
 		long begin = System.currentTimeMillis();
