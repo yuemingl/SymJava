@@ -1,5 +1,7 @@
 package symjava.symbolic;
 
+import symjava.symbolic.utils.Utils;
+
 public class Sqrt extends UnaryOp {
 	public int root = 2;
 	
@@ -32,5 +34,14 @@ public class Sqrt extends UnaryOp {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	@Override
+	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;
+		if(base.subs(from,to) == base) 
+			return this;
+		return new Sqrt(base.subs(from, to), root);
+	}	
 
 }
