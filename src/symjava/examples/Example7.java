@@ -45,9 +45,10 @@ public class Example7 {
 			}
 		});
 		
-		Eq pde = new Eq(
+		WeakForm pde = new WeakForm(
 					Int.apply(1.0*dot(grad(u), grad(v)), mesh) + Int.apply((1.0*u-0)*v, neumannBC),
-					Int.apply((-2*(x*x+y*y)+36)*v, mesh)
+					Int.apply((-2*(x*x+y*y)+36)*v, mesh),
+					u, v
 				);
 		
 		//Mark boundary nodes
@@ -63,7 +64,7 @@ public class Example7 {
 		
 	}
 	
-	public static void solve(Eq pde, Map<Integer, Double> dirichlet, String outputFile) {
+	public static void solve(WeakForm pde, Map<Integer, Double> dirichlet, String outputFile) {
 		System.out.println(String.format("Solving: %s == %s", pde.lhs, pde.rhs));
 		
 		//Create coordinate transformation for a template element
@@ -136,8 +137,8 @@ public class Example7 {
 						//Create substitution list for change of variables
 						List<ExprPair> subsList = new ArrayList<ExprPair>();
 						//Substitute u, v to shape functions
-						subsList.add(new ExprPair(u, U));
-						subsList.add(new ExprPair(v, V));
+						subsList.add(new ExprPair(pde.trial, U));
+						subsList.add(new ExprPair(pde.test, V));
 						subsList.add(new ExprPair(N1.diff(x), rx));
 						subsList.add(new ExprPair(N1.diff(y), ry));
 						subsList.add(new ExprPair(N2.diff(x), sx));
@@ -150,7 +151,7 @@ public class Example7 {
 						lhsInt[i][j].integrand.setLabel("LHS"+i+j);
 					}
 					List<ExprPair> subsList = new ArrayList<ExprPair>();
-					subsList.add(new ExprPair(v, V));
+					subsList.add(new ExprPair(pde.test, V));
 					subsList.add(new ExprPair(N1, r));
 					subsList.add(new ExprPair(N2, s));
 					subsList.add(new ExprPair(x, trans.eqs[0].rhs));
@@ -170,8 +171,8 @@ public class Example7 {
 						//Create substitution list for change of variables
 						List<ExprPair> subsListB = new ArrayList<ExprPair>();
 						//Substitute u, v to shape functions
-						subsListB.add(new ExprPair(u, U));
-						subsListB.add(new ExprPair(v, V));
+						subsListB.add(new ExprPair(pde.trial, U));
+						subsListB.add(new ExprPair(pde.test, V));
 						subsListB.add(new ExprPair(NB1, r));
 						subsListB.add(new ExprPair(NB2, s));
 						subsListB.add(new ExprPair(x, transB.eqs[0].rhs));

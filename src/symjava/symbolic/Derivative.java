@@ -91,28 +91,24 @@ public class Derivative extends Func {
 	public boolean symEquals(Expr other) {
 		if(other instanceof Derivative) {
 			Derivative o = (Derivative)other;
-			if(this.expr == null && o.expr != null)
-				return false;
-			if(this.expr != null && o.expr == null)
+			Boolean rlt = Utils.symCompareNull(this.expr, o.expr);
+			if(rlt != null && rlt == false)
 				return false;
 			if(!this.label.equals(o.label))
 				return false;
-			if( (this.expr == null && o.expr == null) ||
-				(Utils.symCompare(this.expr, o.expr)) ){
-				if(this.args.length != o.args.length)
+			if(this.args.length != o.args.length)
+				return false;
+			for(int i=0; i<this.args.length; i++) {
+				if(!Utils.symCompare(this.args[i],o.args[i]))
 					return false;
-				for(int i=0; i<this.args.length; i++) {
-					if(!Utils.symCompare(this.args[i],o.args[i]))
-						return false;
-				}
-				if(this.dxyz.size() != o.dxyz.size())
-					return false;
-				for(int i=0; i<this.dxyz.size(); i++) {
-					if(!Utils.symCompare(this.dxyz.get(i), o.dxyz.get(i)))
-						return false;
-				}
-				return true;
 			}
+			if(this.dxyz.size() != o.dxyz.size())
+				return false;
+			for(int i=0; i<this.dxyz.size(); i++) {
+				if(!Utils.symCompare(this.dxyz.get(i), o.dxyz.get(i)))
+					return false;
+			}
+			return true;
 		}
 		return false;
 	}

@@ -72,7 +72,9 @@ public class Symbol extends Expr {
 
 	@Override
 	public boolean symEquals(Expr other) {
-		return this.label.equals(other.label);
+		if(other instanceof Symbol)
+			return this.label.equals(other.label);
+		return false;
 	}
 	
 	public boolean containsSubIndex() {
