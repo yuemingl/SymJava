@@ -77,7 +77,7 @@ public class Int extends Expr {
 
 	@Override
 	public Expr simplify() {
-		return null;
+		return this;
 	}
 
 	@Override
