@@ -178,9 +178,16 @@ public class BytecodeUtils {
 				il.append(new DDIV());
 			} else if(ins instanceof Power) {
 				Power p = (Power)ins;
-				il.append(new PUSH(cp, (double)p.exponent));
-				il.append(factory.createInvoke("java.lang.Math", "pow",
-						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+				double remain = p.exponent - Math.floor(p.exponent);
+				if(remain == 0) {
+					il.append(new PUSH(cp, (int)p.exponent));
+					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "powi",
+							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.INT }, Constants.INVOKESTATIC));
+				} else {
+					il.append(new PUSH(cp, (double)p.exponent));
+					il.append(factory.createInvoke("java.lang.Math", "pow",
+							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+				}
 			} else if(ins instanceof Sqrt) {
 				Sqrt p = (Sqrt)ins;
 				il.append(new PUSH(cp, (double)p.root));

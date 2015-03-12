@@ -17,19 +17,21 @@ public class Sqrt extends UnaryOp {
 
 	@Override
 	public Expr diff(Expr expr) {
-		// TODO Auto-generated method stub
-		return null;
+		return Power.simplifiedIns(base, 1.0/root).diff(expr);
 	}
 
 	@Override
 	public Expr simplify() {
-		// TODO Auto-generated method stub
 		return this;
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		// TODO Auto-generated method stub
+		if(other instanceof Sqrt) {
+			Sqrt o = (Sqrt)other;
+			if(base.symEquals(o.base) && root == o.root)
+				return true;
+		}
 		return false;
 	}
 

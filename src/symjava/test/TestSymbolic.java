@@ -1,6 +1,8 @@
 package symjava.test;
 
 import static symjava.symbolic.Symbol.*;
+import static symjava.math.SymMath.*;
+
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
@@ -284,6 +286,19 @@ public class TestSymbolic {
 		checkResult("\\int_{D}{0.5*x^2 + 0.5*y^2}dxdy", Int.apply(0.5*(x*x+y*y), D));
 	}
 	
+	public static void testPower() {
+		Expr expr = pow(x, 2.1) * pow(x,2);
+		checkResult("x^4.100000", expr);
+		checkResult("x^0.500000", pow(x,0.5));
+		
+		checkResult("", sqrt(x));
+		checkResult("", new Sqrt(x,3));
+		
+		Func fun = new Func("fexpr",pow(x,2));
+		BytecodeFunc bfun = fun.toBytecodeFunc();
+		checkResult("",String.valueOf(bfun.apply(3)));
+	}
+	
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
@@ -294,6 +309,7 @@ public class TestSymbolic {
 //		testToBytecodeFunc();
 //		testDiff();
 //		testAbstract();
-		testIntegration();
+//		testIntegration();
+		testPower();
 	}
 }

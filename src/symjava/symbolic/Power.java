@@ -5,26 +5,31 @@ import java.util.List;
 import symjava.symbolic.utils.Utils;
 
 public class Power extends UnaryOp {
-	public int exponent;
-	public Power(Expr base, int exponent) {
+	public double exponent;
+	public Power(Expr base, double exponent) {
 		super(base);
 		this.exponent = exponent;
+		double remain = exponent - Math.floor(exponent);
+		String disExp = String.format("%f", this.exponent);
+		if(remain == 0.0)
+			disExp = String.format("%d", (int)this.exponent);
+			
 		if(base instanceof Symbol) {
-			if(exponent < 0)
-				label = "("+base + ")^{" + exponent + "}";
+			if(exponent < 0.0)
+				label = "("+base + ")^{" + disExp + "}";
 			else
-				label = base + "^" + exponent + "";
+				label = base + "^" + disExp + "";
 		} else {
-			if(exponent < 0)
-				label = "("+base + ")^{" + exponent + "}";
+			if(exponent < 0.0)
+				label = "("+base + ")^{" + disExp + "}";
 			else
-				label = "("+base + ")^" + exponent;
+				label = "("+base + ")^" + disExp;
 		}
-		sortKey = base.getSortKey()+"power"+String.valueOf(exponent);
+		sortKey = base.getSortKey()+"power"+String.valueOf(disExp);
 	}
 	
-	public static Expr simplifiedIns(Expr base, int exponent) {
-		if(exponent == 0)
+	public static Expr simplifiedIns(Expr base, double exponent) {
+		if(exponent == 0.0 || exponent == -0.0)
 			return Symbol.C1;
 		else if(base instanceof SymReal<?>) {
 			return new SymDouble(Math.pow(((SymReal<?>) base).getVal().doubleValue(), exponent));
@@ -43,10 +48,10 @@ public class Power extends UnaryOp {
 
 	@Override
 	public Expr diff(Expr expr) {
-		if(exponent == 2)
+		if(exponent == 2.0)
 			return Symbol.C2.multiply(base).multiply(base.diff(expr));
 		else {
-			SymInteger i = new SymInteger(exponent);
+			SymDouble i = new SymDouble(exponent);
 			return i.multiply(Power.simplifiedIns(base, exponent - 1)).multiply(base.diff(expr));
 		}
 	}
@@ -68,19 +73,19 @@ public class Power extends UnaryOp {
 
 	@Override
 	public void flattenAdd(List<Expr> outList) {
-//		List<Expr> list = new ArrayList<Expr>();
-//		for(int i=0; i<exponent; i++)
-//			list.add(this.base);
-//		Expr mul = Utils.multiplyListToExpr(list);
-//		mul.flattenAdd(outList);
+		//TODO
+		//Do we need to do this: (a+b)^2 => a^2 +2ab+b^2
 		outList.add(this);
 	}
 
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
 		if(exponent > 0) {
-			for(int i=0; i<exponent; i++)
+			for(int i=0; i<(int)exponent; i++)
 				outList.add(base);
+			double remain = exponent - Math.floor(exponent);
+			if(remain > 0.0)
+				outList.add(new Power(base, remain));
 		} else
 			outList.add(this);
 	}
