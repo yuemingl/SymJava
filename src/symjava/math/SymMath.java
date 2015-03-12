@@ -8,7 +8,7 @@ import symjava.symbolic.Power;
 import symjava.symbolic.Sqrt;
 
 public class SymMath {
-	public static Expr pow(Expr base, int exponent) {
+	public static Expr pow(Expr base, double exponent) {
 		return Power.simplifiedIns(base, exponent);
 	}
 	
