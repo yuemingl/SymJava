@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import Jama.Matrix;
 import symjava.domains.Domain;
@@ -18,6 +19,7 @@ import symjava.numeric.NumInt;
 import symjava.relational.Eq;
 import symjava.symbolic.*;
 import symjava.symbolic.utils.ExprPair;
+import symjava.symbolic.utils.Utils;
 
 /**
  * Finite Element solver
@@ -39,21 +41,25 @@ public class Example7 {
 			@Override
 			public Integer apply(double ...args) {
 				double x = args[0]; //, y = args[1];
-				if(3.0-Math.abs(x) < eps)
+				if(3.0-x < eps)
 					return 2; //
 				return 0;
 			}
 		});
 		
 		WeakForm pde = new WeakForm(
-					Int.apply(1.0*dot(grad(u), grad(v)), mesh) + Int.apply((1.0*u-0)*v, neumannBC),
+					//Int.apply(1.0*dot(grad(u), grad(v))+sqrt(x*x+y*y)*u*v, mesh) + Int.apply((1.0*u-1.0)*v, neumannBC),
+					//Int.apply(dot(grad(u), grad(v)), mesh) + Int.apply(u*v, neumannBC),
+					//Int.apply(dot(grad(u), grad(v)), mesh),
+					Int.apply(u.diff(x)*v.diff(x), mesh) + Int.apply(u.diff(y)*v.diff(y), mesh),
 					Int.apply((-2*(x*x+y*y)+36)*v, mesh),
 					u, v
 				);
 		
 		//Mark boundary nodes
 		for(Node n : mesh.nodes) {
-			if(3.0-Math.abs(n.coords[1]) < eps)
+			if(3.0-Math.abs(n.coords[1]) < eps || 3.0+n.coords[0] < eps ||
+					3.0-n.coords[0] < eps)
 				n.setType(1);
 		}
 		Map<Integer, Double> diri = new HashMap<Integer, Double>();
@@ -97,15 +103,16 @@ public class Example7 {
 		Expr sy =  jacMat[0][0]/jac; //sy =  xr/jac
 
 		//Create coordinate transformation for the boundary of a template element
+		//r=[-1,1]
 		Transformation transB = new Transformation(
-				new Eq(x, x1*r+x2*(1-r)),
-				new Eq(y, y1*r+y2*(1-r))
+				new Eq(x, x1*(1-r)/2.0+x2*(1+r)/2.0),
+				new Eq(y, y1*(1-r)/2.0+y2*(1+r)/2.0)
 				);
 		//Shape functions on the bounary
 		Func NB1 = new Func("RB");
 		Func NB2 = new Func("SB", 1 - NB1);
 		Func[] shapeFunsB = {NB1, NB2};
-		Expr jacB = sqrt(pow(x1-x2,2)+pow(y1-y2,2)); //transB.getJacobian();
+		Expr jacB = sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))/2.0; //transB.getJacobian();
 		
 		//Define reference elements
 		RefTriangle refTri = new RefTriangle("RefT", r, s);
@@ -116,13 +123,11 @@ public class Example7 {
 		Int lhsIntB[][] = new Int[shapeFunsB.length][shapeFunsB.length];
 		Int rhsInt[] = new Int[shapeFuns.length];
 		
-		//Get a list of the integration terms in the equation
-		List<Expr> addList = new ArrayList<Expr>();
-		pde.lhs.flattenAdd(addList);
 
 		Mesh2D mesh = null;
 		Mesh2DBoundary meshB = null;
 		
+		List<Expr> addList = normalizeTerms(pde.lhs);
 		//Change of variables
 		for(Expr term : addList) {
 			Int intTerm = (Int)term; // Integration term
@@ -149,6 +154,7 @@ public class Example7 {
 						subsList.add(new ExprPair(y, trans.eqs[1].rhs));
 						lhsInt[i][j] = intTerm.changeOfVars(subsList, jac, refTri);
 						lhsInt[i][j].integrand.setLabel("LHS"+i+j);
+						System.out.println(lhsInt[i][j]+"\n");
 					}
 					List<ExprPair> subsList = new ArrayList<ExprPair>();
 					subsList.add(new ExprPair(pde.test, V));
@@ -158,6 +164,7 @@ public class Example7 {
 					subsList.add(new ExprPair(y, trans.eqs[1].rhs));
 					rhsInt[i] = ((Int)pde.rhs).changeOfVars(subsList, jac, refTri);
 					rhsInt[i].integrand.setLabel("RHS"+i);
+					System.out.println(rhsInt[i]+"\n");
 				}
 			//Integrate on the boundary of the domain	
 			} else if(intTerm.domain instanceof Mesh2DBoundary) {
@@ -179,6 +186,7 @@ public class Example7 {
 						subsListB.add(new ExprPair(y, transB.eqs[1].rhs));
 						lhsIntB[i][j] = intTerm.changeOfVars(subsListB, jacB, refLine);
 						lhsIntB[i][j].integrand.setLabel("LHSB"+i+j);
+						System.out.println(lhsIntB[i][j]+"\n");
 					}
 				}
 			}
@@ -195,11 +203,11 @@ public class Example7 {
 			}
 			rhsNInt[i] = new NumInt(rhsInt[i]);
 		}
-		for(int i=0; i<shapeFunsB.length; i++) {
-			for(int j=0; j<shapeFunsB.length; j++) {
-				lhsNIntB[i][j] = new NumInt(lhsIntB[i][j]);
-			}
-		}
+//		for(int i=0; i<shapeFunsB.length; i++) {
+//			for(int j=0; j<shapeFunsB.length; j++) {
+//				lhsNIntB[i][j] = new NumInt(lhsIntB[i][j]);
+//			}
+//		}
 
 		//Assemble the system
 		System.out.println("Start assemble the system...");
@@ -220,19 +228,19 @@ public class Example7 {
 				vecb[idxI] += rhsNInt[i].eval(nodeCoords);
 			}
 		}
-		for(Domain db : meshB.getSubDomains()) {
-			Element eb = (Element)db;
-			double[] nodeCoords = eb.getNodeCoords();
-			for(int i=0; i<shapeFunsB.length; i++) {
-				int idxI =  eb.nodes.get(i).getIndex()-1;
-				for(int j=0; j<shapeFunsB.length; j++) {
-					int idxJ = eb.nodes.get(j).getIndex()-1;
-					double t = lhsNIntB[i][j].eval(nodeCoords);
-					//System.out.println(idxI+" "+idxJ+" "+t);
-					matA[idxI][idxJ] += t;
-				}
-			}
-		}
+//		for(Domain db : meshB.getSubDomains()) {
+//			Element eb = (Element)db;
+//			double[] nodeCoords = eb.getNodeCoords();
+//			for(int i=0; i<shapeFunsB.length; i++) {
+//				int idxI =  eb.nodes.get(i).getIndex()-1;
+//				for(int j=0; j<shapeFunsB.length; j++) {
+//					int idxJ = eb.nodes.get(j).getIndex()-1;
+//					double t = lhsNIntB[i][j].eval(nodeCoords);
+//					//System.out.println(idxI+" "+idxJ+" "+t);
+//					matA[idxI][idxJ] += t;
+//				}
+//			}
+//		}
 		System.out.println("Assemble done! Time: "+(System.currentTimeMillis()-begin)+"ms");
 		
 		System.out.println("Solving...");
@@ -271,5 +279,33 @@ public class Example7 {
 				A.set(row, c, 0.0);
 			}
 		}
-	}	
+	}
+	
+	/**
+	 * Get a list of the integration terms in the equation and
+	 * put the terms together according to the integration domains
+	 * @param intTerms
+	 * @return
+	 */
+	public static List<Expr> normalizeTerms(Expr intTerms) {
+		List<Expr> addList = new ArrayList<Expr>();
+		intTerms.flattenAdd(addList);
+		Map<Domain, List<Expr>> map = new HashMap<Domain, List<Expr>>();
+		for(int i=0; i<addList.size(); i++) {
+			Int tmp = (Int)addList.get(i);
+			List<Expr> list = map.get(tmp.domain);
+			if(list == null) {
+				list = new ArrayList<Expr>();
+				map.put(tmp.domain, list);
+			}
+			list.add(tmp.integrand);
+		}
+		List<Expr> rlt = new ArrayList<Expr>();
+		for(Entry<Domain, List<Expr>> entry : map.entrySet()) {
+			rlt.add(
+				Int.apply(Utils.addListToExpr(entry.getValue()), entry.getKey())
+			);
+		}
+		return rlt;
+	}
 }
