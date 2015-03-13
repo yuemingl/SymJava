@@ -302,14 +302,14 @@ public class TestSymbolic {
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
-//		testBasic();
-//		testPrint();
-//		testSimplify();
-//		testSummation();
-//		testToBytecodeFunc();
-//		testDiff();
-//		testAbstract();
-//		testIntegration();
+		testBasic();
+		testPrint();
+		testSimplify();
+		testSummation();
+		testToBytecodeFunc();
+		testDiff();
+		testAbstract();
+		testIntegration();
 		testPower();
 	}
 }
