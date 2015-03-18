@@ -15,13 +15,36 @@ abstract public class Expr implements Cloneable {
 	 */
 	protected String sortKey = null;
 	
-	//Number of operations for simplifying an expression
-	protected int simplifyOps = 0;
-	protected boolean simplified = false;
+	/**
+	 * Number of operations for simplifying an expression
+	 */
+	public int simplifyOpNum = 0;
 	
+	public boolean isSimplified = false;
+	
+	public abstract Expr simplify();
+	
+	public abstract boolean symEquals(Expr other);
+	
+	/**
+	 * Return the arguments of the expr
+	 * @return
+	 */
+	public Expr[] args() { return new Expr[0]; }
+
+	/**
+	 * Derivative of expr
+	 * @param expr
+	 * @return
+	 */
 	public abstract Expr diff(Expr expr);
 	
-	//Functional derivative
+	/**
+	 * Functional derivative of f with respect to df
+	 * @param f
+	 * @param df
+	 * @return
+	 */
 	public Expr fdiff(Expr f, Expr df) {
 		if(!(f instanceof Func) || !(df instanceof Func))
 			throw new IllegalArgumentException();
@@ -37,10 +60,6 @@ abstract public class Expr implements Cloneable {
 		return dff.subs(alpha, 0).simplify();
 	}
 	
-	public abstract Expr simplify();
-	
-	public abstract boolean symEquals(Expr other);
-
 	public void flattenAdd(List<Expr> outList) {
 		outList.add(this);
 	};
@@ -51,10 +70,6 @@ abstract public class Expr implements Cloneable {
 	
 	public boolean isAbstract() {
 		return false;
-	}
-	
-	public Expr getExpr() {
-		return this;
 	}
 	
 	/**
@@ -92,25 +107,27 @@ abstract public class Expr implements Cloneable {
 	}
 
 	public int getSimplifyOps() {
-		return simplifyOps;
+		return simplifyOpNum;
 	}
 	public Expr setSimplifyOps(int n) {
-		if(n > simplifyOps)
-			simplified = true;
-		simplifyOps = n;
+		if(n > simplifyOpNum)
+			isSimplified = true;
+		simplifyOpNum = n;
 		return this;
 	}
 	public Expr incSimplifyOps(int n) {
-		simplifyOps += n;
-		simplified = true;
+		simplifyOpNum += n;
+		isSimplified = true;
 		return this;
 	}
 	public Expr setAsSimplified() {
-		simplified = true;
+		isSimplified = true;
 		return this;
 	}
 	
 	/**
+	 * Operator overload support:
+	 * Expr a = 5;
 	 * 
 	 * @param v
 	 * @return
@@ -128,7 +145,8 @@ abstract public class Expr implements Cloneable {
 		return new SymDouble(v);
 	}
 	/**
-	 * 
+	 * Operator overload support:
+	 * a+b
 	 * @param other
 	 * @return
 	 */
@@ -161,7 +179,8 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * 
+	 * Operator overload support:
+	 * a-b
 	 * @param other
 	 * @return
 	 */
@@ -194,7 +213,8 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * 
+	 * Operator overload support:
+	 * a*b
 	 * @param other
 	 * @return
 	 */
@@ -227,7 +247,8 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * 
+	 * Operator overload support:
+	 * a/b
 	 * @param other
 	 * @return
 	 */
@@ -259,6 +280,11 @@ abstract public class Expr implements Cloneable {
 		return Divide.simplifiedIns(new SymDouble(other), this);
 	}
 	
+	/**
+	 * Operator overload support:
+	 * -a
+	 * 
+	 */
 	public Expr negate() {
 		if(this instanceof SymReal<?>) {
 			SymReal<?> dd = (SymReal<?>)this;
@@ -271,7 +297,7 @@ abstract public class Expr implements Cloneable {
 	};
 	
 	/**
-	 * Substitution an expression
+	 * Substitution
 	 * 
 	 * @param from
 	 * @param to
@@ -306,6 +332,10 @@ abstract public class Expr implements Cloneable {
 		return null;
 	}
 	
+	/**
+	 * If the labels of two expressions are the same they are considered as
+	 * the same symbolic expressions 
+	 */
     @Override
     public int hashCode() {
         return this.label.hashCode();
