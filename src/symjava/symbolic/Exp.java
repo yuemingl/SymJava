@@ -1,31 +1,45 @@
 package symjava.symbolic;
 
 import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.utils.Utils;
 
 public class Exp extends BinaryOp {
-	public static SymDouble e = new SymDouble(2.718281828459);
+	public static SymDouble e = new SymDouble(Math.E);
 	
-	public Exp(Expr arg1, Expr arg2) {
-		super(arg1, arg2);
-		// TODO Auto-generated constructor stub
+	public Exp(Expr arg) {
+		super(e, arg);
+		String displayExp = String.format("%s", this.arg2);
+		if(arg instanceof SymReal<?>) {
+			SymReal<?> realExp = (SymReal<?>)arg;
+			if(realExp.isInteger()) {
+				displayExp = String.format("%d", realExp.getIntValue());
+			}
+			if(realExp.isNegative())
+				displayExp = "{"+displayExp+"}";
+		}
+		label = "e^" + displayExp + "";
+		sortKey = "epower"+String.valueOf(displayExp);
 	}
 
+	public static Expr simplifiedIns(Expr expr) {
+		return new Exp(expr);
+	}
+	
 	@Override
 	public Expr simplify() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		// TODO Auto-generated method stub
+		if(other instanceof Exp) {
+			return Utils.symCompare(this.arg2, other.args()[0]);
+		}
 		return false;
 	}
 
 	@Override
 	public Expr diff(Expr expr) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.multiply(arg2.diff(expr));
 	}
-
 }

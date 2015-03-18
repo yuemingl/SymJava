@@ -1,6 +1,7 @@
 package symjava.symbolic;
 
 import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.utils.Utils;
 
 public class Log extends BinaryOp {
 	
@@ -10,6 +11,8 @@ public class Log extends BinaryOp {
 	 */
 	public Log(Expr expr) {
 		super(Exp.e, expr);
+		label = "log(" + expr + ")";
+		sortKey = label;
 	}
 	
 	/**
@@ -19,6 +22,8 @@ public class Log extends BinaryOp {
 	 */
 	public Log(Expr base, Expr expr) {
 		super(base, expr);
+		label = "log_{" + base + "}(" + expr + ")";
+		sortKey = label;
 	}
 	
 	public static Expr simplifiedIns(Expr base, Expr expr) {
@@ -44,19 +49,19 @@ public class Log extends BinaryOp {
 	
 	@Override
 	public Expr diff(Expr expr) {
-		// TODO Auto-generated method stub
+		if(Utils.symCompare(Exp.e, arg1)) {
+			return this.multiply(arg2.diff(expr));
+		}
 		return null;
 	}
 
 	@Override
 	public Expr simplify() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

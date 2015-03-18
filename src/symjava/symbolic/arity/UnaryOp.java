@@ -5,8 +5,8 @@ import symjava.symbolic.Expr;
 public abstract class UnaryOp extends Expr {
 	public Expr arg;
 	
-	public UnaryOp(Expr base) {
-		this.arg = base;
+	public UnaryOp(Expr arg) {
+		this.arg = arg;
 		setSimplifyOps(
 				arg.getSimplifyOps()
 				);
