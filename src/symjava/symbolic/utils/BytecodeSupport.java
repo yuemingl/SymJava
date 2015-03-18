@@ -25,6 +25,11 @@ public class BytecodeSupport {
 		return Math.pow(expr, 1.0/root);
 	}
 	
+
+	public static double log(double base, double expr) {
+		return Math.log(expr)/Math.log(base);
+	}
+
 	public static void main(String[] args) {
 		System.out.println(powi(2,-3));
 		System.out.println(powi(2,0));

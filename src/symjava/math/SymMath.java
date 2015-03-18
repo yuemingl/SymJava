@@ -3,8 +3,12 @@ package symjava.math;
 import symjava.matrix.SymVector;
 import symjava.symbolic.Cos;
 import symjava.symbolic.Dot;
+import symjava.symbolic.Exp;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Grad;
+import symjava.symbolic.Log;
+import symjava.symbolic.Log10;
+import symjava.symbolic.Log2;
 import symjava.symbolic.Pow;
 import symjava.symbolic.Sin;
 import symjava.symbolic.Sqrt;
@@ -22,14 +26,6 @@ public class SymMath {
 		return Pow.simplifiedIns(base, exponent);
 	}
 	
-	public static Expr dot(SymVector l, SymVector r) {
-		return Dot.apply(l, r);
-	}
-	
-	public static SymVector grad(Expr f) {
-		return Grad.apply(f);
-	}
-	
 	public static Expr sqrt(Expr arg) {
 		return new Sqrt(arg);
 	}
@@ -41,6 +37,40 @@ public class SymMath {
 	public static Expr sqrt(Expr arg, Expr root) {
 		return Sqrt.simplifiedIns(arg, root);
 	}
+
+	public static Expr exp(Expr x) {
+		return Exp.simplifiedIns(x);
+	}
+
+	public static Expr exp(double x) {
+		return Exp.simplifiedIns(Expr.valueOf(x));
+	}
+	
+	public static Expr log(Expr x) {
+		return Log.simplifiedIns(x);
+	}
+	
+	public static Expr log(Expr base, double expr) {
+		return Log.simplifiedIns(base, Expr.valueOf(expr));
+	}
+
+	public static Expr log(double base, Expr expr) {
+		return Log.simplifiedIns(Expr.valueOf(base), expr);
+	}
+	
+	public static Expr log(Expr base, Expr expr) {
+		return Log.simplifiedIns(base, expr);
+	}
+
+	public static Expr log10(Expr x) {
+		return Log10.simplifiedIns(x);
+	}
+	
+	public static Expr log2(Expr x) {
+		return Log2.simplifiedIns(x);
+	}
+	
+	///////////////////////////////////////////////////////////////
 	
 	public static Expr sin(Expr x) {
 		return Sin.simplifiedIns(x);
@@ -53,4 +83,15 @@ public class SymMath {
 	public static Expr tan(Expr x) {
 		return Tan.simplifiedIns(x);
 	}
+	
+	//////////////////////////////////////////////////////////////
+	
+	public static Expr dot(SymVector l, SymVector r) {
+		return Dot.apply(l, r);
+	}
+	
+	public static SymVector grad(Expr f) {
+		return Grad.apply(f);
+	}
+	
 }

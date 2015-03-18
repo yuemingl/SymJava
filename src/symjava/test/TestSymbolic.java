@@ -2,12 +2,12 @@ package symjava.test;
 
 import static symjava.symbolic.Symbol.*;
 import static symjava.math.SymMath.*;
-
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
 import symjava.domains.Interval;
 import symjava.symbolic.*;
+import symjava.symbolic.utils.JIT;
 
 
 public class TestSymbolic {
@@ -24,7 +24,7 @@ public class TestSymbolic {
 			System.out.println("FAIL: " + expr1 +" != " + expr2);
 	}
 	public static void checkResult(double d1, double d2, Expr expr) {
-		if( d1 == d2 )
+		if( Math.abs(d1 - d2) < 1e-10 )
 			System.out.println(true);
 		else {
 			if(expr != null)
@@ -298,6 +298,12 @@ public class TestSymbolic {
 		checkResult("\\sqrt{x}", sqrt(x));
 		checkResult("\\sqrt[3]{x}", sqrt(x,3));
 		
+		checkResult("e^x", exp(x));
+		checkResult("e^x", exp(x).diff(x));
+		checkResult("e^x^2*2*x", exp(x*x).diff(x));
+		checkResult("e^2", exp(2));
+		
+		
 		Func fun = new Func("fexpr",pow(x,3));
 		BytecodeFunc bfun = fun.toBytecodeFunc();
 		checkResult("8.0",String.valueOf(bfun.apply(2)));
@@ -305,6 +311,31 @@ public class TestSymbolic {
 		Func fun2 = new Func("fexpr",pow(x,0.5));
 		BytecodeFunc bfun2 = fun2.toBytecodeFunc();
 		checkResult("2.0",String.valueOf(bfun2.apply(4)));
+
+		checkResult(1.0,JIT.compile(sin(x)).apply(Math.PI/2), sin(x));
+		checkResult(0.0,JIT.compile(sin(x)).apply(0), sin(x));
+
+		checkResult(0.0,JIT.compile(cos(x)).apply(Math.PI/2), cos(x));
+		checkResult(1.0,JIT.compile(cos(x)).apply(0), cos(x));
+
+		checkResult(Math.tan(Math.PI/4),JIT.compile(tan(x)).apply(Math.PI/4), tan(x));
+		checkResult(0.0,JIT.compile(tan(x)).apply(0), tan(x));
+
+		checkResult(0.0,JIT.compile(log(x)).apply(1), log(x));
+		checkResult(0.0,JIT.compile(log10(x)).apply(1), log10(x));
+		checkResult(0.0,JIT.compile(log2(x)).apply(1), log2(x));
+
+		checkResult(1.0,JIT.compile(log(x)).apply(Math.E), log(x));
+		checkResult(1.0,JIT.compile(log10(x)).apply(10), log10(x));
+		checkResult(1.0,JIT.compile(log2(x)).apply(2), log2(x));
+
+		checkResult(3.0,JIT.compile(log(x,y)).apply(3,27), log(x,y));
+		checkResult(3.0,JIT.compile(log10(x)).apply(1000), log10(x));
+		checkResult(3.0,JIT.compile(log2(x)).apply(8), log2(x));
+		
+		checkResult(Math.E*Math.E,JIT.compile(exp(x)).apply(2), exp(x));
+		checkResult(1.0,JIT.compile(exp(x)).apply(0), exp(x));
+
 	}
 	
 	public static void testSinCosTan() {
@@ -342,9 +373,9 @@ public class TestSymbolic {
 //		testDiff();
 //		testAbstract();
 //		testIntegration();
-//		testPower();
+		testPower();
 //		testSymReal();
-		testSinCosTan();
+//		testSinCosTan();
 
 		
 	}

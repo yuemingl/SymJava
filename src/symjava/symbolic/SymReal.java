@@ -92,7 +92,9 @@ public class SymReal<T extends Number> extends Expr {
 
 	@Override
 	public boolean symEquals(Expr other) {
-		if(other instanceof SymReal<?>) {
+		if(this == other)
+			return true;
+		else if(other instanceof SymReal<?>) {
 			SymReal<?> o = (SymReal<?>)other;
 			Number t1 = (Number)value;
 			Number t2 = (Number)o.getValue();

@@ -10,6 +10,8 @@ public class Benchmark {
 
 	public static void main(String[] args) {
 		Expr expr = 2.0 * pow(x, 5) + 3.0 * x * y;
+		System.out.println(expr);
+		
 		Func fun = new Func("fun", expr);
 		BytecodeFunc bfun = fun.toBytecodeFunc();
 		System.out.println(bfun.apply(2.0, 3.0));
@@ -20,6 +22,7 @@ public class Benchmark {
 		int N = 1000000;
 		long start, end;
 		
+		System.out.println("Run "+N+" times:");
 		start = System.currentTimeMillis();
 		for(int i=0; i<N; i++)
 			bfun.apply(2.0, 3.0);

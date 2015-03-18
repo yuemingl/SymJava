@@ -12,20 +12,26 @@ import java.util.List;
 import java.util.Set;
 
 import symjava.symbolic.Add;
+import symjava.symbolic.Cos;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Dot;
+import symjava.symbolic.Exp;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
+import symjava.symbolic.Log;
+import symjava.symbolic.Log10;
 import symjava.symbolic.Multiply;
 import symjava.symbolic.Negate;
 import symjava.symbolic.Pow;
 import symjava.symbolic.Reciprocal;
+import symjava.symbolic.Sin;
 import symjava.symbolic.Sqrt;
 import symjava.symbolic.Subtract;
 import symjava.symbolic.Sum;
 import symjava.symbolic.SymReal;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.SymConst;
+import symjava.symbolic.Tan;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.arity.UnaryOp;
 
@@ -205,6 +211,28 @@ public class BytecodeUtils {
 				}
 				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "sqrt",
 						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+			} else if(ins instanceof Sin) {
+				il.append(factory.createInvoke("java.lang.Math", "sin",
+						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+			} else if(ins instanceof Cos) {
+				il.append(factory.createInvoke("java.lang.Math", "cos",
+						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+			} else if(ins instanceof Tan) {
+				il.append(factory.createInvoke("java.lang.Math", "tan",
+						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+//			} else if(ins instanceof Log10) {
+//				il.append(factory.createInvoke("java.lang.Math", "log10",
+//						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+//				il.append(new POP2()); //this pop out the result of log10, not the base
+			} else if(ins instanceof Log) {
+//				if(Utils.symCompare(((Log) ins).arg1, Exp.E)) {
+//					il.append(factory.createInvoke("java.lang.Math", "log",
+//							Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+//					il.append(new POP2());
+//				} else {
+					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
+							Type.DOUBLE, new Type[] { Type.DOUBLE,  Type.DOUBLE }, Constants.INVOKESTATIC));
+//				}
 			} else if(ins instanceof Reciprocal) {
 				il.append(new DDIV());
 			} else if(ins instanceof Negate) {

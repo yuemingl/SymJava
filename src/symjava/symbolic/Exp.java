@@ -1,13 +1,12 @@
 package symjava.symbolic;
 
-import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
-public class Exp extends BinaryOp {
-	public static SymDouble e = new SymDouble(Math.E);
+public class Exp extends Pow {
+	public static SymDouble E = new SymDouble(Math.E);
 	
 	public Exp(Expr arg) {
-		super(e, arg);
+		super(E, arg);
 		String displayExp = String.format("%s", this.arg2);
 		if(arg instanceof SymReal<?>) {
 			SymReal<?> realExp = (SymReal<?>)arg;
