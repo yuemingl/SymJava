@@ -18,14 +18,14 @@ public class Add extends BinaryOp {
 			if(l instanceof SymInteger && r instanceof SymInteger) {
 				SymInteger il = (SymInteger)l;
 				SymInteger ir = (SymInteger)r;
-				return new SymInteger(il.getVal()+ir.getVal()).setSimplifyOps(simOps);
+				return new SymInteger(il.getValue()+ir.getValue()).setSimplifyOps(simOps);
 			} else if(l instanceof SymLong && r instanceof SymLong) {
 				SymLong il = (SymLong)l;
 				SymLong ir = (SymLong)r;
-				return new SymLong(il.getVal()+ir.getVal()).setSimplifyOps(simOps);
+				return new SymLong(il.getValue()+ir.getValue()).setSimplifyOps(simOps);
 			}
-			Number t1 = (Number)((SymReal<?>)l).getVal();
-			Number t2 = (Number)((SymReal<?>)r).getVal();
+			Number t1 = (Number)((SymReal<?>)l).getValue();
+			Number t2 = (Number)((SymReal<?>)r).getValue();
 			return new SymDouble(t1.doubleValue() + t2.doubleValue()).setSimplifyOps(simOps);
 		} else if(Symbol.C0.symEquals(l))
 			return r.clone().setSimplifyOps(simOps);

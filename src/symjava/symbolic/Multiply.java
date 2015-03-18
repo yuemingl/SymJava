@@ -33,14 +33,14 @@ public class Multiply extends BinaryOp {
 			if(l instanceof SymInteger && r instanceof SymInteger) {
 				SymInteger il = (SymInteger)l;
 				SymInteger ir = (SymInteger)r;
-				return new SymInteger(il.getVal()*ir.getVal()).setSimplifyOps(simOps);
+				return new SymInteger(il.getValue()*ir.getValue()).setSimplifyOps(simOps);
 			} else if(l instanceof SymLong && r instanceof SymLong) {
 				SymLong il = (SymLong)l;
 				SymLong ir = (SymLong)r;
-				return new SymLong(il.getVal()*ir.getVal()).setSimplifyOps(simOps);
+				return new SymLong(il.getValue()*ir.getValue()).setSimplifyOps(simOps);
 			}
-			Number t1 = (Number)((SymReal<?>)l).getVal();
-			Number t2 = (Number)((SymReal<?>)r).getVal();
+			Number t1 = (Number)((SymReal<?>)l).getValue();
+			Number t2 = (Number)((SymReal<?>)r).getValue();
 			return new SymDouble(t1.doubleValue() * t2.doubleValue()).setSimplifyOps(simOps);
 		} else if(Symbol.C1.symEquals(l))
 			return r.clone().setSimplifyOps(simOps);
@@ -68,24 +68,24 @@ public class Multiply extends BinaryOp {
 		} else if(l instanceof Pow && r instanceof Pow) {
 			Pow lp = (Pow)l;
 			Pow rp = (Pow)r;
-			if(Utils.symCompare(lp.base, rp.base)) {
-				return Pow.simplifiedIns( lp.base, lp.exponent+rp.exponent).setSimplifyOps(simOps);
-			} else if(lp.exponent == rp.exponent) {
-				return Pow.simplifiedIns( simplifiedIns(lp.base, rp.base), lp.exponent).setSimplifyOps(simOps);
+			if(Utils.symCompare(lp.arg1, rp.arg1)) {
+				return Pow.simplifiedIns( lp.arg1, lp.arg2+rp.arg2).setSimplifyOps(simOps);
+			} else if(lp.arg2 == rp.arg2) {
+				return Pow.simplifiedIns( simplifiedIns(lp.arg1, rp.arg1), lp.arg2).setSimplifyOps(simOps);
 			}
 		} else if(l instanceof Pow) {
 			Pow lp = (Pow)l;
-			if(Utils.symCompare(lp.base, r)) {
-				return new Pow(lp.base, lp.exponent + 1).setSimplifyOps(simOps);
+			if(Utils.symCompare(lp.arg1, r)) {
+				return new Pow(lp.arg1, lp.arg2 + 1).setSimplifyOps(simOps);
 			}
 		} else if(r instanceof Pow) {
 			Pow rp = (Pow)r;
-			if(Utils.symCompare(rp.base, l)) {
-				return new Pow(rp.base, rp.exponent + 1).setSimplifyOps(simOps);
+			if(Utils.symCompare(rp.arg1, l)) {
+				return new Pow(rp.arg1, rp.arg2 + 1).setSimplifyOps(simOps);
 			}
 		}
 		if(Utils.symCompare(l, r)) {
-			return new Pow(l, 2).setSimplifyOps(simOps);
+			return new Pow(l, Expr.valueOf(2)).setSimplifyOps(simOps);
 		}
 		return new Multiply(l, r).setAsSimplified();
 	}

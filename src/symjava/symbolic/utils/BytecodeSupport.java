@@ -21,6 +21,10 @@ public class BytecodeSupport {
 		}
 	}
 	
+	public static double sqrt(double expr, double root) {
+		return Math.pow(expr, 1.0/root);
+	}
+	
 	public static void main(String[] args) {
 		System.out.println(powi(2,-3));
 		System.out.println(powi(2,0));

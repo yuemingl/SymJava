@@ -288,7 +288,7 @@ abstract public class Expr implements Cloneable {
 	public Expr negate() {
 		if(this instanceof SymReal<?>) {
 			SymReal<?> dd = (SymReal<?>)this;
-			double dv = dd.getVal().doubleValue();
+			double dv = dd.getValue().doubleValue();
 			if(dv == 0)
 				return Symbol.C0;
 			return new SymDouble(-dv);

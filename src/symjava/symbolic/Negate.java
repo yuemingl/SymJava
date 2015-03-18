@@ -19,13 +19,13 @@ public class Negate extends UnaryOp {
 		Expr d = arg.diff(expr);
 		if(d instanceof SymReal<?>) {
 			if(d instanceof SymInteger) {
-				return new SymInteger(-((SymInteger)d).getVal());
+				return new SymInteger(-((SymInteger)d).getValue());
 			}
 			if(d instanceof SymLong) {
-				return new SymLong(-((SymLong)d).getVal());
+				return new SymLong(-((SymLong)d).getValue());
 			}
 			SymReal<?> dd = (SymReal<?>)d;
-			double dv = dd.getVal().doubleValue();
+			double dv = dd.getValue().doubleValue();
 			if(dv == 0.0)
 				return new SymDouble(0.0);
 			return new SymDouble(-dv);
@@ -35,7 +35,7 @@ public class Negate extends UnaryOp {
 	
 	public static Expr simplifiedIns(Expr expr) {
 		if(expr instanceof SymReal<?>) {
-			Number n = ((SymReal<?>)expr).getVal();
+			Number n = ((SymReal<?>)expr).getValue();
 			return new SymDouble(-n.doubleValue());
 		} else if(expr instanceof Negate) {
 			Negate n = (Negate)expr;

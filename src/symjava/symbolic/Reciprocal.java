@@ -13,7 +13,7 @@ public class Reciprocal extends UnaryOp {
 	
 	@Override
 	public Expr diff(Expr expr) {
-		return new Negate(Pow.simplifiedIns(arg,-2)).multiply(arg.diff(expr));
+		return new Negate(Pow.simplifiedIns(arg,Expr.valueOf(-2))).multiply(arg.diff(expr));
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public class Reciprocal extends UnaryOp {
 		if(arg instanceof Pow) {
 			Pow p = (Pow)arg.simplify();
 			p.isSimplified = true;
-			Expr rlt = Pow.simplifiedIns(p.base, -p.exponent);
+			Expr rlt = Pow.simplifiedIns(p.arg1, -p.arg2);
 			rlt.isSimplified = true;
 			return rlt;
 		}
@@ -33,7 +33,7 @@ public class Reciprocal extends UnaryOp {
 	
 	public static Expr simplifiedIns(Expr expr) {
 		if(expr instanceof SymReal<?>) {
-			Number n = (Number)((SymReal<?>)expr).getVal();
+			Number n = (Number)((SymReal<?>)expr).getValue();
 			return new SymDouble(1.0/n.doubleValue());
 		}
 		return new Reciprocal(expr);

@@ -38,7 +38,7 @@ public class Symbols extends Expr {
 		} else if(Utils.symCompare(indexSymbol,from)) {
 			if(to instanceof SymInteger) {
 				SymInteger index = (SymInteger)to;
-				Symbol s = this.get(index.getVal());
+				Symbol s = this.get(index.getValue());
 				return s;
 			}
 			return new Symbol(namePrefix+"_"+to);
