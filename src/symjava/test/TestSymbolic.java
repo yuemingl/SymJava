@@ -53,7 +53,7 @@ public class TestSymbolic {
 		checkResult("x*y",x * y);
 		checkResult("x/y",x / y);
 		checkResult("-x",- x);
-		checkResult("x^2",new Pow(x,2));
+		checkResult("x^2",pow(x,2));
 
 		checkResult("0", Symbol.Cm1 + Symbol.C1);
 		checkResult("0", x + (-x));
@@ -124,7 +124,7 @@ public class TestSymbolic {
 		checkResult("y^2",ny * ny);
 		checkResult(y*y, ny * ny);
 		
-		checkResult("x^5*y*z", x * y * x * z * x * new Pow(x,2));
+		checkResult("x^5*y*z", x * y * x * z * x * pow(x,2));
 		
 		checkResult("x^3*y*z + 2*(y*z)^2", (x * y * x * z * x) + (y * z * y * z) + (z * y * z * y));
 	
@@ -204,7 +204,7 @@ public class TestSymbolic {
 	
 	public static void testToBytecodeFunc() {
 		System.out.println("--------------testToBytecodeFunc-----------------");
-		Expr expr = new Pow(x + y * z, 2);
+		Expr expr = pow(x + y * z, 2);
 		checkResult("(x + y*z)^2", expr);
 		
 //		List<Expr> list = new ArrayList<Expr>();
@@ -292,15 +292,19 @@ public class TestSymbolic {
 	
 	public static void testPower() {
 		Expr expr = pow(x, 2.1) * pow(x,2);
-		checkResult("x^4.100000", expr);
-		checkResult("x^0.500000", pow(x,0.5));
+		checkResult("x^4.1", expr);
+		checkResult("x^0.5", pow(x,0.5));
 		
-		checkResult("", sqrt(x));
-		checkResult("", new Sqrt(x,3));
+		checkResult("\\sqrt{x}", sqrt(x));
+		checkResult("\\sqrt[3]{x}", sqrt(x,3));
 		
-		Func fun = new Func("fexpr",pow(x,2));
+		Func fun = new Func("fexpr",pow(x,3));
 		BytecodeFunc bfun = fun.toBytecodeFunc();
-		checkResult("",String.valueOf(bfun.apply(3)));
+		checkResult("8.0",String.valueOf(bfun.apply(2)));
+
+		Func fun2 = new Func("fexpr",pow(x,0.5));
+		BytecodeFunc bfun2 = fun2.toBytecodeFunc();
+		checkResult("2.0",String.valueOf(bfun2.apply(4)));
 	}
 	
 	public static void testSymReal() {
@@ -314,15 +318,15 @@ public class TestSymbolic {
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
-//		testBasic();
-//		testPrint();
-//		testSimplify();
-//		testSummation();
-//		testToBytecodeFunc();
-//		testDiff();
-//		testAbstract();
+		testBasic();
+		testPrint();
+		testSimplify();
+		testSummation();
+		testToBytecodeFunc();
+		testDiff();
+		testAbstract();
 		testIntegration();
-//		testPower();
+		testPower();
 		testSymReal();
 
 		

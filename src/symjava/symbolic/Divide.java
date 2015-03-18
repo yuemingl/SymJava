@@ -25,8 +25,8 @@ public class Divide extends BinaryOp {
 		if(Symbol.C0.symEquals(numerator))
 			return new SymInteger(0).setSimplifyOps(simOps);
 		else if(numerator instanceof SymReal<?> && denominator instanceof SymReal<?>) {
-			Number t1 = (Number)((SymReal<?>)numerator).getVal();
-			Number t2 = (Number)((SymReal<?>)denominator).getVal();
+			Number t1 = (Number)((SymReal<?>)numerator).getValue();
+			Number t2 = (Number)((SymReal<?>)denominator).getValue();
 			return new SymDouble(t1.doubleValue() / t2.doubleValue()).setSimplifyOps(simOps);
 		} else if(denominator.symEquals(Symbol.C0))
 			throw new IllegalArgumentException("Argument 'divisor' is 0");

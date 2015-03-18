@@ -5,12 +5,13 @@ import java.util.List;
 
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
-import symjava.symbolic.Pow;
 import symjava.symbolic.Sum;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.Symbols;
 import symjava.symbolic.utils.Utils;
 import static symjava.symbolic.Symbol.*;
+import static symjava.math.SymMath.*;
+
 
 public class LagrangeMultipliers {
 	Eq eq;
@@ -46,7 +47,7 @@ public class LagrangeMultipliers {
 		for(int j=0; j<depVars.length; j++) {
 			Expr depDataSymbols = new Symbols(depVars[j].toString().toUpperCase(), idx);
 			Expr depSymbols = new Symbols(depVars[j].toString(), idx);
-			targets.add(new Sum(Pow.simplifiedIns(depDataSymbols - depSymbols, 2), idx, 0, data.length-1));
+			targets.add(new Sum(pow(depDataSymbols - depSymbols, 2), idx, 0, data.length-1));
 		}
 		addList.addAll(targets);
 		Expr state_eq = eq.lhs;
@@ -83,7 +84,7 @@ public class LagrangeMultipliers {
 				Expr yi = ys.get(yIdx);
 				freeVarForL[yIdx] = yi;
 				//addList.add(new Power(-ys.get(yIdx) + data[i][depVarIdxStart+j], 2)/2);
-				addList.add(Pow.simplifiedIns(-ys.get(yIdx) + data[i][depVarIdxStart+j], 2));
+				addList.add(pow(-ys.get(yIdx) + data[i][depVarIdxStart+j], 2));
 				state_eq = state_eq.subs(depVars[j], ys.get(yIdx));
 			}
 			Expr lmdi = lambdas.get(i);

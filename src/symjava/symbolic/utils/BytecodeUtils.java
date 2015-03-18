@@ -43,6 +43,8 @@ import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.POP;
+import com.sun.org.apache.bcel.internal.generic.POP2;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
@@ -166,7 +168,7 @@ public class BytecodeUtils {
 				il.append(new PUSH(cp, argIdx));
 				il.append(new DALOAD());
 			} else if(ins instanceof SymReal<?>) {
-				Number s = (Number)((SymReal<?>)ins).getVal();
+				Number s = (Number)((SymReal<?>)ins).getValue();
 				il.append(new PUSH(cp, s.doubleValue()));
 			} else if(ins instanceof Add) {
 				il.append(new DADD());
@@ -178,21 +180,31 @@ public class BytecodeUtils {
 				il.append(new DDIV());
 			} else if(ins instanceof Pow) {
 				Pow p = (Pow)ins;
-				double remain = p.exponent - Math.floor(p.exponent);
-				if(remain == 0) {
-					il.append(new PUSH(cp, (int)p.exponent));
-					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "powi",
-							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.INT }, Constants.INVOKESTATIC));
-				} else {
-					il.append(new PUSH(cp, (double)p.exponent));
-					il.append(factory.createInvoke("java.lang.Math", "pow",
-							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+				if(p.arg2 instanceof SymReal<?>) {
+					SymReal<?> realExp = (SymReal<?>)p.arg2;
+					if(realExp.isInteger()) {
+						il.append(new POP2()); //Replace double value to integer
+						il.append(new PUSH(cp, realExp.getIntValue()));
+						il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "powi",
+								Type.DOUBLE, new Type[] { Type.DOUBLE, Type.INT }, Constants.INVOKESTATIC));
+						continue;
+					}
 				}
+				il.append(factory.createInvoke("java.lang.Math", "pow",
+						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
 			} else if(ins instanceof Sqrt) {
 				Sqrt p = (Sqrt)ins;
-				il.append(new PUSH(cp, (double)p.root));
-				il.append(factory.createInvoke("java.lang.Math", "sqrt",
-						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+				if(p.arg2 instanceof SymReal<?>) {
+					SymReal<?> realRoot = (SymReal<?>)p.arg2;
+					if(realRoot.getIntValue() == 2) {
+						il.append(new POP2());
+						il.append(factory.createInvoke("java.lang.Math", "sqrt",
+								Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+						continue;
+					}
+				}
+				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "sqrt",
+						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
 			} else if(ins instanceof Reciprocal) {
 				il.append(new DDIV());
 			} else if(ins instanceof Negate) {
