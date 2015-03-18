@@ -1,23 +1,35 @@
 package symjava.symbolic;
 
-public class Tan extends Expr {
+import symjava.symbolic.arity.UnaryOp;
+import symjava.symbolic.utils.Utils;
 
-	@Override
-	public Expr diff(Expr expr) {
-		// TODO Auto-generated method stub
-		return null;
+public class Tan extends UnaryOp {
+
+	public Tan(Expr arg) {
+		super(arg);
+		label = "tan(" + arg + ")";
+		sortKey = label;
 	}
 
 	@Override
+	public Expr diff(Expr expr) {
+		return arg.diff(expr).multiply(new Pow(this, Expr.valueOf(2)).add(1));
+	}
+
+	public static Expr simplifiedIns(Expr expr) {
+		return new Tan(expr);
+	}
+	
+	@Override
 	public Expr simplify() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		// TODO Auto-generated method stub
+		if(other instanceof Tan) {
+			return Utils.symCompare(this.arg, ((Tan) other).arg);
+		}
 		return false;
 	}
-
 }

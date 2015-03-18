@@ -307,6 +307,21 @@ public class TestSymbolic {
 		checkResult("2.0",String.valueOf(bfun2.apply(4)));
 	}
 	
+	public static void testSinCosTan() {
+		
+		checkResult("sin(x)",sin(x));
+		checkResult("cos(x)",sin(x).diff(x));
+		checkResult("cos(x)",cos(x));
+		checkResult("-sin(x)",cos(x).diff(x));
+		checkResult("tan(x)",tan(x));
+		checkResult("1 + (tan(x))^2",tan(x).diff(x));
+		
+		checkResult("cos(cos(x))*-sin(x)",sin(cos(x)).diff(x));
+		checkResult("-sin(x)*cos(x)",cos(sin(x)).diff(x));
+		checkResult("cos(x)*(1 + (tan(sin(x)))^2)",tan(sin(x)).diff(x));
+
+	}
+	
 	public static void testSymReal() {
 		SymReal<Double> a = new SymReal<Double>(0.0);
 		SymReal<Double> aa = new SymReal<Double>(-0.0);
@@ -315,19 +330,21 @@ public class TestSymbolic {
 		System.out.println(aa.symEquals(b));
 		System.out.println(a.symEquals(aa));
 	}
+	
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
-		testBasic();
-		testPrint();
-		testSimplify();
-		testSummation();
-		testToBytecodeFunc();
-		testDiff();
-		testAbstract();
-		testIntegration();
-		testPower();
-		testSymReal();
+//		testBasic();
+//		testPrint();
+//		testSimplify();
+//		testSummation();
+//		testToBytecodeFunc();
+//		testDiff();
+//		testAbstract();
+//		testIntegration();
+//		testPower();
+//		testSymReal();
+		testSinCosTan();
 
 		
 	}

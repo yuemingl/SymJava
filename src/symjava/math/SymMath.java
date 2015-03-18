@@ -1,11 +1,14 @@
 package symjava.math;
 
 import symjava.matrix.SymVector;
+import symjava.symbolic.Cos;
 import symjava.symbolic.Dot;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Grad;
 import symjava.symbolic.Pow;
+import symjava.symbolic.Sin;
 import symjava.symbolic.Sqrt;
+import symjava.symbolic.Tan;
 
 public class SymMath {
 	public static Expr pow(Expr base, double exponent) {
@@ -37,5 +40,17 @@ public class SymMath {
 	
 	public static Expr sqrt(Expr arg, Expr root) {
 		return Sqrt.simplifiedIns(arg, root);
+	}
+	
+	public static Expr sin(Expr x) {
+		return Sin.simplifiedIns(x);
+	}
+
+	public static Expr cos(Expr x) {
+		return Cos.simplifiedIns(x);
+	}
+
+	public static Expr tan(Expr x) {
+		return Tan.simplifiedIns(x);
 	}
 }

@@ -1,23 +1,33 @@
 package symjava.symbolic;
 
-public class Cos extends Expr {
-	protected Expr arg;
-	
-	@Override
-	public Expr diff(Expr expr) {
-		// TODO Auto-generated method stub
-		return null;
+import symjava.symbolic.arity.UnaryOp;
+import symjava.symbolic.utils.Utils;
+
+public class Cos extends UnaryOp {
+	public Cos(Expr arg) {
+		super(arg);
+		label = "cos(" + arg + ")";
 	}
 
 	@Override
+	public Expr diff(Expr expr) {
+		return Negate.simplifiedIns(Sin.simplifiedIns(expr)).multiply(arg.diff(expr));
+	}
+
+	public static Expr simplifiedIns(Expr expr) {
+		return new Cos(expr);
+	}
+	
+	@Override
 	public Expr simplify() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		// TODO Auto-generated method stub
+		if(other instanceof Cos) {
+			Utils.symCompare(this.arg, ((Cos) other).arg);
+		}
 		return false;
 	}
 
