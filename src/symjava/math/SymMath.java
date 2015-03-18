@@ -4,12 +4,12 @@ import symjava.matrix.SymVector;
 import symjava.symbolic.Dot;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Grad;
-import symjava.symbolic.Power;
+import symjava.symbolic.Pow;
 import symjava.symbolic.Sqrt;
 
 public class SymMath {
 	public static Expr pow(Expr base, double exponent) {
-		return Power.simplifiedIns(base, exponent);
+		return Pow.simplifiedIns(base, exponent);
 	}
 	
 	public static Expr dot(SymVector l, SymVector r) {

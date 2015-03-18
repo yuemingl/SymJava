@@ -11,7 +11,7 @@ public class SymReal<T extends Number> extends Expr {
 		this.val = val;
 		label = String.valueOf(val);
 		sortKey = label;
-		simplified = true;
+		isSimplified = true;
 	}
 
 	public T getVal() {
@@ -45,6 +45,8 @@ public class SymReal<T extends Number> extends Expr {
 			SymReal<?> o = (SymReal<?>)other;
 			Number t1 = (Number)val;
 			Number t2 = (Number)o.getVal();
+			//if(t1.equals(t2))
+			//	return true;
 			if(t1.doubleValue() == t2.doubleValue())
 				return true;
 		}

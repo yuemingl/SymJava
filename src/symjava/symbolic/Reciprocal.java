@@ -1,5 +1,6 @@
 package symjava.symbolic;
 
+import symjava.symbolic.arity.UnaryOp;
 import symjava.symbolic.utils.Utils;
 
 public class Reciprocal extends UnaryOp {
@@ -12,21 +13,21 @@ public class Reciprocal extends UnaryOp {
 	
 	@Override
 	public Expr diff(Expr expr) {
-		return new Negate(Power.simplifiedIns(base,-2)).multiply(base.diff(expr));
+		return new Negate(Pow.simplifiedIns(arg,-2)).multiply(arg.diff(expr));
 	}
 
 	@Override
 	public Expr simplify() {
-		if(this.simplified)
+		if(this.isSimplified)
 			return this;
-		if(base instanceof Power) {
-			Power p = (Power)base.simplify();
-			p.simplified = true;
-			Expr rlt = Power.simplifiedIns(p.base, -p.exponent);
-			rlt.simplified = true;
+		if(arg instanceof Pow) {
+			Pow p = (Pow)arg.simplify();
+			p.isSimplified = true;
+			Expr rlt = Pow.simplifiedIns(p.base, -p.exponent);
+			rlt.isSimplified = true;
 			return rlt;
 		}
-		this.simplified = true;
+		this.isSimplified = true;
 		return this;
 	}
 	
@@ -42,10 +43,10 @@ public class Reciprocal extends UnaryOp {
 	public boolean symEquals(Expr other) {
 		if(other instanceof Reciprocal) {
 			Reciprocal o = (Reciprocal)other;
-			return base.symEquals(o.base);
+			return arg.symEquals(o.arg);
 		} else if(other instanceof Divide) {
 			Divide o = (Divide)other;
-			return o.left.symEquals(Symbol.C1) && base.symEquals(o.right);
+			return o.arg1.symEquals(Symbol.C1) && arg.symEquals(o.arg2);
 		}
 		return false;
 	}
@@ -54,9 +55,9 @@ public class Reciprocal extends UnaryOp {
 	public Expr subs(Expr from, Expr to) {
 		if(Utils.symCompare(this, from))
 			return to;
-		if(base.subs(from,to) == base) 
+		if(arg.subs(from,to) == arg) 
 			return this;
-		return Reciprocal.simplifiedIns(base.subs(from, to));
+		return Reciprocal.simplifiedIns(arg.subs(from, to));
 	}
 
 }

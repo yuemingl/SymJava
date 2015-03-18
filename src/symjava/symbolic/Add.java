@@ -2,13 +2,14 @@ package symjava.symbolic;
 
 import java.util.List;
 
+import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
 public class Add extends BinaryOp {
 	public Add(Expr l, Expr r) {
 		super(l, r);
 		label = l + " + " + r;
-		sortKey = left.getSortKey()+right.getSortKey();
+		sortKey = arg1.getSortKey()+arg2.getSortKey();
 	}
 	
 	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
@@ -33,13 +34,13 @@ public class Add extends BinaryOp {
 		} else if(l instanceof Negate && r instanceof Negate) {
 			Negate nl = (Negate)l;
 			Negate nr = (Negate)r;
-			return new Negate(Add.shallowSimplifiedIns(nl.base, nr.base)).setSimplifyOps(simOps);
+			return new Negate(Add.shallowSimplifiedIns(nl.arg, nr.arg)).setSimplifyOps(simOps);
 		} else if(l instanceof Negate) {
 			Negate nl = (Negate)l;
-			return Subtract.shallowSimplifiedIns(r, nl.base); //Do not increase simplifyOps
+			return Subtract.shallowSimplifiedIns(r, nl.arg); //Do not increase simplifyOps
 		} else if(r instanceof Negate) {
 			Negate nr = (Negate)r;
-			return Subtract.shallowSimplifiedIns(l, nr.base); //Do not increase simplifyOps
+			return Subtract.shallowSimplifiedIns(l, nr.arg); //Do not increase simplifyOps
 		} else if(l instanceof Multiply && r instanceof Multiply) {
 			Multiply ml = (Multiply)l;
 			Multiply mr = (Multiply)r;
@@ -91,33 +92,37 @@ public class Add extends BinaryOp {
 	public Expr subs(Expr from, Expr to) {
 		if(Utils.symCompare(this, from))
 			return to;
-		Expr sl = left.subs(from, to);
-		Expr sr = right.subs(from, to);
-		if(sl == left && sr == right)
+		Expr sl = arg1.subs(from, to);
+		Expr sr = arg2.subs(from, to);
+		if(sl == arg1 && sr == arg2)
 			return this;
 		return new Add(sl, sr);
 	}
 
 	@Override
 	public Expr diff(Expr expr) {
-		return left.diff(expr).add(right.diff(expr));
+		return arg1.diff(expr).add(arg2.diff(expr));
 	}
 
 	@Override
 	public Expr simplify() {
-		if(this.simplified)
+		if(this.isSimplified)
 			return this;
-		return simplifiedIns(left, right);
+		return simplifiedIns(arg1, arg2);
 	}
 
 	public void flattenAdd(List<Expr> outList) {
-		left.flattenAdd(outList);
-		right.flattenAdd(outList);
+		arg1.flattenAdd(outList);
+		arg2.flattenAdd(outList);
 	}
 
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
 		outList.add(this);
 	}
-		
+	
+	public boolean symEquals(Expr other) {
+		//return Utils.flattenSortAndCompare(this, other);
+		return Utils.flattenSortAndCompare(this.simplify(), other.simplify());
+	}
 }

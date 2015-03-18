@@ -21,7 +21,7 @@ import symjava.numeric.NumInt;
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
-import symjava.symbolic.Int;
+import symjava.symbolic.Integrate;
 import symjava.symbolic.SymConst;
 
 /**
@@ -99,8 +99,8 @@ public class Example6 {
 		System.out.println(sy);
 
 		RefTriangle tri = new RefTriangle("Tri", r, s);
-		Int lhsInt[][] = new Int[shapeFuns.length][shapeFuns.length];
-		Int rhsInt[] = new Int[shapeFuns.length];
+		Integrate lhsInt[][] = new Integrate[shapeFuns.length][shapeFuns.length];
+		Integrate rhsInt[] = new Integrate[shapeFuns.length];
 		for(int i=0; i<shapeFuns.length; i++) {
 			Func V = shapeFuns[i]; //test
 			for(int j=0; j<shapeFuns.length; j++) {
@@ -124,7 +124,7 @@ public class Example6 {
 				
 				//Define the integration on the reference domain
 				//lhsInt[i][j] = new Int(new Func("",lhs*jac,new Expr[]{r,s}), tri);
-				lhsInt[i][j] = new Int(new Func(
+				lhsInt[i][j] = new Integrate(new Func(
 						String.format("lhs%d%d",i,j), lhs*jac,new Expr[]{r,s}), tri);
 				System.out.println(lhsInt[i][j]);
 				System.out.println();
@@ -136,7 +136,7 @@ public class Example6 {
 							.subs(y, trans.eqs[1].rhs);
 			//System.out.println(rhs);
 			System.out.println();
-			rhsInt[i] = new Int(new Func(
+			rhsInt[i] = new Integrate(new Func(
 					String.format("rhs%d",i),rhs*jac,new Expr[]{r,s}), tri);
 		}
 		

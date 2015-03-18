@@ -111,7 +111,7 @@ public class Utils {
 		for(Expr e : list) {
 			if(e instanceof Negate) {
 				Negate ee = (Negate)e;
-				rlt.add(ee.base);
+				rlt.add(ee.arg);
 			} else {
 				rlt.add(e);
 			}
@@ -233,7 +233,7 @@ public class Utils {
 				if(e instanceof Negate) {
 					Negate ee = (Negate)e;
 					//rlt = Subtract.shallowSimplifiedIns(rlt, ee.base);
-					rlt = new Subtract(rlt, ee.base);
+					rlt = new Subtract(rlt, ee.arg);
 				} else
 					//rlt = Add.shallowSimplifiedIns(rlt, e);
 					rlt = new Add(rlt, e);
@@ -252,7 +252,7 @@ public class Utils {
 				if(e instanceof Reciprocal) {
 					Reciprocal ee = (Reciprocal)e;
 					//rlt = Divide.shallowSimplifiedIns(rlt, ee.base);
-					rlt = new Divide(rlt, ee.base);
+					rlt = new Divide(rlt, ee.arg);
 				} else {
 					//rlt = Multiply.shallowSimplifiedIns(rlt, e);
 					rlt = new Multiply(rlt, e);

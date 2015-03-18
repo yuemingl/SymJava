@@ -3,6 +3,7 @@ package symjava.symbolic;
 import java.util.ArrayList;
 import java.util.List;
 
+import symjava.symbolic.arity.UnaryOp;
 import symjava.symbolic.utils.Utils;
 
 public class Negate extends UnaryOp {
@@ -10,12 +11,12 @@ public class Negate extends UnaryOp {
 	public Negate(Expr expr) {
 		super(expr);
 		label = "-" + SymPrinting.addParenthsesIfNeeded(expr, this);
-		sortKey = base.getSortKey();
+		sortKey = arg.getSortKey();
 	}
 	
 	@Override
 	public Expr diff(Expr expr) {
-		Expr d = base.diff(expr);
+		Expr d = arg.diff(expr);
 		if(d instanceof SymReal<?>) {
 			if(d instanceof SymInteger) {
 				return new SymInteger(-((SymInteger)d).getVal());
@@ -29,7 +30,7 @@ public class Negate extends UnaryOp {
 				return new SymDouble(0.0);
 			return new SymDouble(-dv);
 		}
-		return Negate.simplifiedIns(base.diff(expr));
+		return Negate.simplifiedIns(arg.diff(expr));
 	}
 	
 	public static Expr simplifiedIns(Expr expr) {
@@ -38,32 +39,32 @@ public class Negate extends UnaryOp {
 			return new SymDouble(-n.doubleValue());
 		} else if(expr instanceof Negate) {
 			Negate n = (Negate)expr;
-			return n.base;
+			return n.arg;
 		}
 		return new Negate(expr);
 	}
 
 	@Override
 	public Expr subs(Expr from, Expr to) {
-		if(base.subs(from,to) == base) 
+		if(arg.subs(from,to) == arg) 
 			return this;
-		return Negate.simplifiedIns(base.subs(from, to));
+		return Negate.simplifiedIns(arg.subs(from, to));
 	}
 
 	@Override
 	public Expr simplify() {
-		if(this.simplified)
+		if(this.isSimplified)
 			return this;
-		Expr nb = base.simplify();
-		nb.simplified = true;
+		Expr nb = arg.simplify();
+		nb.isSimplified = true;
 		Expr rlt = new Negate(nb);
-		rlt.simplified = true;
+		rlt.isSimplified = true;
 		return rlt;
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		if(other instanceof Negate && base.symEquals(((Negate)other).base))
+		if(other instanceof Negate && arg.symEquals(((Negate)other).arg))
 			return true;
 		return false;
 	}
@@ -71,7 +72,7 @@ public class Negate extends UnaryOp {
 	@Override
 	public void flattenAdd(List<Expr> outList) {
 		List<Expr> list1 = new ArrayList<Expr>();
-		base.flattenAdd(list1);
+		arg.flattenAdd(list1);
 		if(list1.size() == 1) { 
 			outList.add(this);
 		} else {
@@ -84,7 +85,7 @@ public class Negate extends UnaryOp {
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
 		List<Expr> tmp = new ArrayList<Expr>();
-		base.flattenMultiply(tmp);
+		arg.flattenMultiply(tmp);
 		if(tmp.size() == 1)
 			outList.add(this);
 		else {

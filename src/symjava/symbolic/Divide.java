@@ -3,6 +3,7 @@ package symjava.symbolic;
 import java.util.ArrayList;
 import java.util.List;
 
+import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
 /**
@@ -13,10 +14,10 @@ import symjava.symbolic.utils.Utils;
 public class Divide extends BinaryOp {
 	public Divide(Expr numerator, Expr denominator) {
 		super(numerator, denominator);
-		label =  SymPrinting.addParenthsesIfNeeded(left, this) 
+		label =  SymPrinting.addParenthsesIfNeeded(arg1, this) 
 				+ "/" + 
-				SymPrinting.addParenthsesIfNeeded2(right, this);
-		sortKey = left.getSortKey()+right.getSortKey();
+				SymPrinting.addParenthsesIfNeeded2(arg2, this);
+		sortKey = arg1.getSortKey()+arg2.getSortKey();
 	}
 	
 	public static Expr shallowSimplifiedIns(Expr numerator, Expr denominator) {
@@ -45,28 +46,28 @@ public class Divide extends BinaryOp {
 	public Expr subs(Expr from, Expr to) {
 		if(Utils.symCompare(this, from))
 			return to;
-		return new Divide(left.subs(from, to), right.subs(from, to));
+		return new Divide(arg1.subs(from, to), arg2.subs(from, to));
 	}
 
 	@Override
 	public Expr diff(Expr expr) {
 		//For debug purpose
 		if(expr instanceof Symbol) {
-			boolean bl = Utils.containSymbol(left, (Symbol)expr);
-			boolean br = Utils.containSymbol(right, (Symbol)expr);
+			boolean bl = Utils.containSymbol(arg1, (Symbol)expr);
+			boolean br = Utils.containSymbol(arg2, (Symbol)expr);
 			if(!bl && !br) {
 				return Symbol.C0;
 			} else if(!bl) {
-				return left.multiply(Reciprocal.simplifiedIns(right).diff(expr));
+				return arg1.multiply(Reciprocal.simplifiedIns(arg2).diff(expr));
 			} else if(!br) {
-				return left.diff(expr).multiply(Reciprocal.simplifiedIns(right));
+				return arg1.diff(expr).multiply(Reciprocal.simplifiedIns(arg2));
 			}
 		}
-		Expr n0 = left.diff(expr);
-		Expr n1 = n0.multiply(right);
-		Expr n2 = left.multiply(right.diff(expr));
+		Expr n0 = arg1.diff(expr);
+		Expr n1 = n0.multiply(arg2);
+		Expr n2 = arg1.multiply(arg2.diff(expr));
 		Expr n3 = n1.subtract(n2);
-		Expr n4 = right.multiply(right);
+		Expr n4 = arg2.multiply(arg2);
 		Expr n5 = n3.divide(n4);
 		return n5;
 		
@@ -74,8 +75,8 @@ public class Divide extends BinaryOp {
 
 	@Override
 	public Expr simplify() {
-		if(!this.simplified) {
-			return simplifiedIns(left, right);
+		if(!this.isSimplified) {
+			return simplifiedIns(arg1, arg2);
 		}
 		return this;
 	}
@@ -83,8 +84,8 @@ public class Divide extends BinaryOp {
 	@Override
 	public void flattenAdd(List<Expr> outList) {
 		List<Expr> list1 = new ArrayList<Expr>();
-		left.flattenAdd(list1);
-		Expr r = Reciprocal.simplifiedIns(right);
+		arg1.flattenAdd(list1);
+		Expr r = Reciprocal.simplifiedIns(arg2);
 		for(Expr e : list1) {
 			outList.add( new Multiply(e, r) );
 		}
@@ -92,8 +93,13 @@ public class Divide extends BinaryOp {
 
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
-		left.flattenMultiply(outList);
-		Reciprocal.simplifiedIns(right).flattenMultiply(outList);
+		arg1.flattenMultiply(outList);
+		Reciprocal.simplifiedIns(arg2).flattenMultiply(outList);
+	}
+	
+	public boolean symEquals(Expr other) {
+		//return Utils.flattenSortAndCompare(this, other);
+		return Utils.flattenSortAndCompare(this.simplify(), other.simplify());
 	}
 
 }

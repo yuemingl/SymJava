@@ -10,7 +10,7 @@ public class SymPrinting {
 			return 20;
 		if( expr instanceof Reciprocal )
 			return 25;
-		if(expr instanceof Power)
+		if(expr instanceof Pow)
 			return 30;
 		if(expr instanceof Func) {
 			Func f = (Func)expr;

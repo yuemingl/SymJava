@@ -2,24 +2,25 @@ package symjava.symbolic;
 
 import java.util.List;
 
+import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
 public class Subtract extends BinaryOp {
 	public Subtract(Expr l, Expr r) {
 		super(l, r);
-		if(right instanceof Add || right instanceof Subtract)
-			label = left + " - (" + right + ")";
+		if(arg2 instanceof Add || arg2 instanceof Subtract)
+			label = arg1 + " - (" + arg2 + ")";
 		else
-			label = left + " - " + right;
+			label = arg1 + " - " + arg2;
 
-		sortKey = left.getSortKey()+right.getSortKey();
+		sortKey = arg1.getSortKey()+arg2.getSortKey();
 	}
 	
 	@Override
 	public Expr subs(Expr from, Expr to) {
 		if(Utils.symCompare(this, from))
 			return to;
-		return new Subtract(left.subs(from, to), right.subs(from, to));
+		return new Subtract(arg1.subs(from, to), arg2.subs(from, to));
 	}
 
 	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
@@ -53,20 +54,25 @@ public class Subtract extends BinaryOp {
 	
 	@Override
 	public Expr diff(Expr expr) {
-		return left.diff(expr).subtract(right.diff(expr));
+		return arg1.diff(expr).subtract(arg2.diff(expr));
 	}
 
 	@Override
 	public Expr simplify() {
-		if(!this.simplified) {
-			return simplifiedIns(left, right);
+		if(!this.isSimplified) {
+			return simplifiedIns(arg1, arg2);
 		}
 		return this;
 	}
 
 	@Override
 	public void flattenAdd(List<Expr> outList) {
-		left.flattenAdd(outList);
-		new Negate(right).flattenAdd(outList);
+		arg1.flattenAdd(outList);
+		new Negate(arg2).flattenAdd(outList);
+	}
+	
+	public boolean symEquals(Expr other) {
+		//return Utils.flattenSortAndCompare(this, other);
+		return Utils.flattenSortAndCompare(this.simplify(), other.simplify());
 	}
 }

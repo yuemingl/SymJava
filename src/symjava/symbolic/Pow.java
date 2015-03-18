@@ -2,12 +2,14 @@ package symjava.symbolic;
 
 import java.util.List;
 
+import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
-public class Power extends UnaryOp {
+public class Pow extends BinaryOp {
+	public Expr base;
 	public double exponent;
-	public Power(Expr base, double exponent) {
-		super(base);
+	public Pow(Expr base, double exponent) {
+		this.base = base;
 		this.exponent = exponent;
 		double remain = exponent - Math.floor(exponent);
 		String disExp = String.format("%f", this.exponent);
@@ -34,7 +36,7 @@ public class Power extends UnaryOp {
 		else if(base instanceof SymReal<?>) {
 			return new SymDouble(Math.pow(((SymReal<?>) base).getVal().doubleValue(), exponent));
 		}
-		return new Power(base, exponent);
+		return new Pow(base, exponent);
 	}
 	
 	@Override
@@ -43,7 +45,7 @@ public class Power extends UnaryOp {
 			return to;
 		if(base.subs(from,to) == base) 
 			return this;
-		return Power.simplifiedIns(base.subs(from, to), exponent);
+		return Pow.simplifiedIns(base.subs(from, to), exponent);
 	}
 
 	@Override
@@ -52,19 +54,19 @@ public class Power extends UnaryOp {
 			return Symbol.C2.multiply(base).multiply(base.diff(expr));
 		else {
 			SymDouble i = new SymDouble(exponent);
-			return i.multiply(Power.simplifiedIns(base, exponent - 1)).multiply(base.diff(expr));
+			return i.multiply(Pow.simplifiedIns(base, exponent - 1)).multiply(base.diff(expr));
 		}
 	}
 
 	@Override
 	public Expr simplify() {
-		return Power.simplifiedIns(base.simplify(), exponent);
+		return Pow.simplifiedIns(base.simplify(), exponent);
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		if(other instanceof Power) {
-			Power o = (Power)other;
+		if(other instanceof Pow) {
+			Pow o = (Pow)other;
 			if(base.symEquals(o.base) && exponent == o.exponent)
 				return true;
 		}
@@ -85,9 +87,8 @@ public class Power extends UnaryOp {
 				outList.add(base);
 			double remain = exponent - Math.floor(exponent);
 			if(remain > 0.0)
-				outList.add(new Power(base, remain));
+				outList.add(new Pow(base, remain));
 		} else
 			outList.add(this);
 	}
-
 }

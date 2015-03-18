@@ -2,17 +2,17 @@ package symjava.numeric;
 
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.Func;
-import symjava.symbolic.Int;
+import symjava.symbolic.Integrate;
 
 /**
  * Numerical Integration
  * 
  */
 public class NumInt {
-	Int integrate;
+	Integrate integrate;
 	BytecodeFunc byteFunc;
 
-	public NumInt(Int integrate) {
+	public NumInt(Integrate integrate) {
 		this.integrate = integrate;
 		if(this.integrate.integrand instanceof Func) {
 			Func f = (Func) this.integrate.integrand;

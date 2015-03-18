@@ -12,22 +12,22 @@ import java.util.List;
 import java.util.Set;
 
 import symjava.symbolic.Add;
-import symjava.symbolic.BinaryOp;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Dot;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 import symjava.symbolic.Multiply;
 import symjava.symbolic.Negate;
-import symjava.symbolic.Power;
+import symjava.symbolic.Pow;
 import symjava.symbolic.Reciprocal;
 import symjava.symbolic.Sqrt;
 import symjava.symbolic.Subtract;
 import symjava.symbolic.Sum;
 import symjava.symbolic.SymReal;
 import symjava.symbolic.Symbol;
-import symjava.symbolic.UnaryOp;
 import symjava.symbolic.SymConst;
+import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.arity.UnaryOp;
 
 import com.sun.org.apache.bcel.internal.Constants;
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
@@ -51,15 +51,15 @@ public class BytecodeUtils {
 		if(e == null) return;
 		if(e instanceof BinaryOp) {
 			BinaryOp be = (BinaryOp)e; 
-			post_order(be.left, outList);
-			post_order(be.right, outList);
+			post_order(be.arg1, outList);
+			post_order(be.arg2, outList);
 		} else if(e instanceof Reciprocal) {
 			Reciprocal ue = (Reciprocal)e;
 			outList.add(Symbol.C1);
-			post_order(ue.base, outList);
+			post_order(ue.arg, outList);
 		} else if(e instanceof UnaryOp) {
 			UnaryOp ue = (UnaryOp)e; 
-			post_order(ue.base, outList);
+			post_order(ue.arg, outList);
 		} else if(e instanceof Sum) {
 			Sum se = (Sum)e;
 			for(int i=se.start; i<=se.end; i++)
@@ -176,8 +176,8 @@ public class BytecodeUtils {
 				il.append(new DMUL());
 			} else if(ins instanceof Divide) {
 				il.append(new DDIV());
-			} else if(ins instanceof Power) {
-				Power p = (Power)ins;
+			} else if(ins instanceof Pow) {
+				Pow p = (Pow)ins;
 				double remain = p.exponent - Math.floor(p.exponent);
 				if(remain == 0) {
 					il.append(new PUSH(cp, (int)p.exponent));

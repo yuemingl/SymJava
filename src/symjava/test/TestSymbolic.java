@@ -53,7 +53,7 @@ public class TestSymbolic {
 		checkResult("x*y",x * y);
 		checkResult("x/y",x / y);
 		checkResult("-x",- x);
-		checkResult("x^2",new Power(x,2));
+		checkResult("x^2",new Pow(x,2));
 
 		checkResult("0", Symbol.Cm1 + Symbol.C1);
 		checkResult("0", x + (-x));
@@ -124,7 +124,7 @@ public class TestSymbolic {
 		checkResult("y^2",ny * ny);
 		checkResult(y*y, ny * ny);
 		
-		checkResult("x^5*y*z", x * y * x * z * x * new Power(x,2));
+		checkResult("x^5*y*z", x * y * x * z * x * new Pow(x,2));
 		
 		checkResult("x^3*y*z + 2*(y*z)^2", (x * y * x * z * x) + (y * z * y * z) + (z * y * z * y));
 	
@@ -204,7 +204,7 @@ public class TestSymbolic {
 	
 	public static void testToBytecodeFunc() {
 		System.out.println("--------------testToBytecodeFunc-----------------");
-		Expr expr = new Power(x + y * z, 2);
+		Expr expr = new Pow(x + y * z, 2);
 		checkResult("(x + y*z)^2", expr);
 		
 //		List<Expr> list = new ArrayList<Expr>();
@@ -279,11 +279,15 @@ public class TestSymbolic {
 	
 	public static void testIntegration() {
 		Domain I = Interval.apply(-oo, 1.0);
-		Expr t1 = Int.apply(x, I);
+		Expr t1 = Integrate.apply(x, I);
 		checkResult("x + \\int_{-oo}^{1.0}{x}dx", t1 + x);
+
+//		Domain I2 = Interval.apply(-oo, x);
+//		Expr t1 = Int.apply(new Pow(e,x), I);
+//		checkResult("x + \\int_{-oo}^{1.0}{x}dx", t1 + x);
 		
 		Domain D = new Domain2D("D",x,y);
-		checkResult("\\int_{D}{0.5*x^2 + 0.5*y^2}dxdy", Int.apply(0.5*(x*x+y*y), D));
+		checkResult("\\int_{D}{0.5*x^2 + 0.5*y^2}dxdy", Integrate.apply(0.5*(x*x+y*y), D));
 	}
 	
 	public static void testPower() {
@@ -299,17 +303,28 @@ public class TestSymbolic {
 		checkResult("",String.valueOf(bfun.apply(3)));
 	}
 	
+	public static void testSymReal() {
+		SymReal<Double> a = new SymReal<Double>(0.0);
+		SymReal<Double> aa = new SymReal<Double>(-0.0);
+		SymReal<Long> b = new SymReal<Long>(0L);
+		System.out.println(a.symEquals(b));
+		System.out.println(aa.symEquals(b));
+		System.out.println(a.symEquals(aa));
+	}
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
-		testBasic();
-		testPrint();
-		testSimplify();
-		testSummation();
-		testToBytecodeFunc();
-		testDiff();
-		testAbstract();
+//		testBasic();
+//		testPrint();
+//		testSimplify();
+//		testSummation();
+//		testToBytecodeFunc();
+//		testDiff();
+//		testAbstract();
 		testIntegration();
-		testPower();
+//		testPower();
+		testSymReal();
+
+		
 	}
 }

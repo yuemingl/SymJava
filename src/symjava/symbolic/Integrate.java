@@ -13,11 +13,11 @@ import symjava.symbolic.utils.Utils;
  * Class represents an integration
  * 
  */
-public class Int extends Expr {
+public class Integrate extends Expr {
 	public Expr integrand = null;
 	public Domain domain = null;
 	
-	public Int(Expr integrand, Domain domain) {
+	public Integrate(Expr integrand, Domain domain) {
 		this.integrand = integrand;
 		this.domain = domain;
 		String postfix = "d" + Utils.joinLabels(domain.getCoordVars(),"d");
@@ -31,12 +31,12 @@ public class Int extends Expr {
 	}
 	
 	public static Expr apply(Expr integrand, Domain domain) {
-		return new Int(integrand, domain);
+		return new Integrate(integrand, domain);
 	}
 	
 	@Override
 	public Expr subs(Expr from, Expr to) {
-		return new Int(this.integrand.subs(from, to), this.domain);
+		return new Integrate(this.integrand.subs(from, to), this.domain);
 	}
 	
 	/**
@@ -44,7 +44,7 @@ public class Int extends Expr {
 	 * @param trans
 	 * @return
 	 */
-	public Int changeOfVars(Transformation trans) {
+	public Integrate changeOfVars(Transformation trans) {
 		Expr tmp = this.integrand;
 		for(Eq e : trans.eqs) {
 			tmp = tmp.subs(e.lhs, e.rhs);
@@ -55,16 +55,16 @@ public class Int extends Expr {
 		//		this.domain.transform(this.domain.getLabel()+"T", trans));
 		
 		Expr jac = trans.getJacobian();
-		return new Int(new Func(this.integrand.getLabel(), tmp.multiply(jac), trans.getToVars()), 
+		return new Integrate(new Func(this.integrand.getLabel(), tmp.multiply(jac), trans.getToVars()), 
 				this.domain.transform(this.domain.getLabel()+"T", trans));
 	}
 	
-	public Int changeOfVars(List<ExprPair> subsList, Expr jac, Domain target) {
+	public Integrate changeOfVars(List<ExprPair> subsList, Expr jac, Domain target) {
 		Expr tmp = this.integrand;
 		for(ExprPair p : subsList) {
 			tmp = tmp.subs(p.e1, p.e2);
 		}
-		return new Int(new Func(
+		return new Integrate(new Func(
 				this.label, tmp.multiply(jac), 
 				target.getCoordVars()
 				), target);
