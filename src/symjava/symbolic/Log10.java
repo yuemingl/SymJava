@@ -7,5 +7,8 @@ public class Log10 extends Log {
 		label = "log10(" + expr + ")";
 		sortKey = label;
 	}
-
+	
+	public static Expr simplifiedIns(Expr expr) {
+		return new Log10(expr);
+	}
 }

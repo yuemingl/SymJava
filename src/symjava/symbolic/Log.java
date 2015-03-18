@@ -10,7 +10,7 @@ public class Log extends BinaryOp {
 	 * @param expr
 	 */
 	public Log(Expr expr) {
-		super(Exp.e, expr);
+		super(Exp.E, expr);
 		label = "log(" + expr + ")";
 		sortKey = label;
 	}
@@ -44,12 +44,12 @@ public class Log extends BinaryOp {
 	}
 	
 	public static Expr simplifiedIns(Expr expr) {
-		return simplifiedIns(Exp.e, expr);
-	}	
+		return new Log(expr);
+	}
 	
 	@Override
 	public Expr diff(Expr expr) {
-		if(Utils.symCompare(Exp.e, arg1)) {
+		if(Utils.symCompare(Exp.E, arg1)) {
 			return this.multiply(arg2.diff(expr));
 		}
 		return null;
