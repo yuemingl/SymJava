@@ -31,10 +31,12 @@ public class BlackScholez {
 
 		//Domain I1 = Interval.apply(-oo, phi*dp, z);
 		Domain I1 = Interval.apply(-10, phi*dp, z); //Good enough for -10, it will take a long time to use -oo
+		I1.setStep(1e-5);
 		Expr cdf1 = Integrate.apply(exp(-0.5*pow(z,2)), I1)/sqrt(PI2);
 		
 		//Domain I2 = Interval.apply(-oo, phi*dm, z);
 		Domain I2 = Interval.apply(-10, phi*dm, z);
+		I2.setStep(1e-5);
 		Expr cdf2 = Integrate.apply(exp(-0.5*pow(z,2)), I2)/sqrt(PI2);
 		
 		Expr res = phi*domDf*(fwd*cdf1-strike*cdf2);
@@ -56,7 +58,7 @@ public class BlackScholez {
 		
 		double[] guess = new double[]{ 0.10 };
 		double[] constParams = new double[] {100.0, 110.0, 0.002, 0.01, 0.5, 1};
-		Newton.solve(eq, guess, constParams, 1000, 1e-5);
+		Newton.solve(eq, guess, constParams, 100, 1e-5);
 	}
 
 }

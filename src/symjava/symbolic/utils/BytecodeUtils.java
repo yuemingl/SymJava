@@ -266,8 +266,8 @@ public class BytecodeUtils {
 				Func f = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand);
 				//System.out.println(f);
 				f.toBytecodeFunc(true, true); //Load class, could be better method to load a class
-				//http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
-				il.append(new PUSH(cp, 0.001)); //step, could be provide by INT
+				//TODO read this: http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
+				il.append(new PUSH(cp, INT.domain.getSetp())); //
 				il.append(new PUSH(cp, f.getName()));
 				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate1D",
 						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, Type.STRING }, Constants.INVOKESTATIC));
