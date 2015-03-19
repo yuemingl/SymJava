@@ -1,7 +1,6 @@
 package symjava.symbolic.utils;
 
-import static com.sun.org.apache.bcel.internal.Constants.ACC_PUBLIC;
-import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
+import static com.sun.org.apache.bcel.internal.Constants.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,7 +126,7 @@ public class BytecodeUtils {
 		return rlt;
 	}
 	
-	public static ClassGen genClass(Func fun, boolean writeClassFile) {
+	public static ClassGen genClass(Func fun, boolean writeClassFile, boolean staticMethod) {
 		String packageName = "symjava.bytecode";
 		String clsName = fun.getName();
 		String fullClsName = packageName+"."+clsName;
@@ -137,7 +136,10 @@ public class BytecodeUtils {
 		InstructionList il = new InstructionList();
 		InstructionFactory factory = new InstructionFactory(cg);
 		
-		MethodGen mg = new MethodGen(ACC_PUBLIC, // access flags
+		short acc_flags = ACC_PUBLIC;
+		if(staticMethod)
+			acc_flags |= ACC_STATIC;
+		MethodGen mg = new MethodGen(acc_flags, // access flags
 				Type.DOUBLE, // return type
 				new Type[] { // argument types
 					new ArrayType(Type.DOUBLE, 1) 
@@ -163,6 +165,8 @@ public class BytecodeUtils {
 			System.out.println(
 					String.format(">>>Using args: %s", Utils.joinLabels(fExprArgs, ","))
 					);
+		} else {
+			fExprArgs = fun.args;
 		}
 		HashMap<Expr, Integer> argsMap = new HashMap<Expr, Integer>();
 		for(int i=0; i<fExprArgs.length; i++) {
@@ -182,7 +186,10 @@ public class BytecodeUtils {
 				if(argIdx == null) {
 					throw new IllegalArgumentException(ins+" is not in the argument list of "+fun.getLabel());
 				}
-				il.append(new ALOAD(1));
+				if(staticMethod)
+					il.append(new ALOAD(0)); //for static method
+				else
+					il.append(new ALOAD(1));
 				il.append(new PUSH(cp, argIdx));
 				il.append(new DALOAD());
 			} else if(ins instanceof SymReal<?>) {
@@ -255,12 +262,15 @@ public class BytecodeUtils {
 			} else if(ins instanceof Infinity) {
 				il.append(new PUSH(cp, Double.NaN));
 			} else if(ins instanceof Integrate) {
-				Func f = new Func("integrand"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),((Integrate) ins).integrand);
-				BytecodeFunc ff = f.toBytecodeFunc();
+				Integrate INT = (Integrate)ins;
+				Func f = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand);
+				//System.out.println(f);
+				f.toBytecodeFunc(true, true); //Load class, could be better method to load a class
 				//http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
-				il.append(new PUSH());
-				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate",
-						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.OBJECT }, Constants.INVOKESTATIC));
+				il.append(new PUSH(cp, 0.001)); //step, could be provide by INT
+				il.append(new PUSH(cp, f.getName()));
+				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate1D",
+						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, Type.STRING }, Constants.INVOKESTATIC));
 			} else {
 				throw new RuntimeException(ins.getClass() + " is not allowed when generating bytecode function!");
 			}

@@ -337,7 +337,12 @@ public class TestSymbolic {
 		
 		checkResult(Math.E*Math.E,JIT.compile(exp(x)).apply(2), exp(x));
 		checkResult(1.0,JIT.compile(exp(x)).apply(0), exp(x));
-
+		
+		checkResult(1.0,JIT.compile(exp(-0.5*pow(z,2))).apply(2), exp(-0.5*pow(z,2)));
+		
+		Domain I = Interval.apply(-oo, x, z);
+		Expr cdf = Integrate.apply(exp(-0.5*pow(z,2)), I)/sqrt(PI2);
+		checkResult(1.0,JIT.compile(cdf).apply(10), cdf);
 	}
 	
 	public static void testSinCosTan() {
@@ -374,11 +379,10 @@ public class TestSymbolic {
 //		testToBytecodeFunc();
 //		testDiff();
 //		testAbstract();
-		testIntegration();
-//		testPower();
+//		testIntegration();
+		testPower();
 //		testSymReal();
 //		testSinCosTan();
-
 		
 	}
 }
