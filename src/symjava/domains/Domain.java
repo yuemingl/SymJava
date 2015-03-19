@@ -14,10 +14,11 @@ import symjava.symbolic.Expr;
 public abstract class Domain {
 	protected String label;
 	protected Expr[] coordVars;
+	double step;
 	
 	/**
 	 * Return a sub-domain that represents the boundary of the domain
-	 * The relations specify the conditions that which part of the boundary will be returned
+	 * The parameter specify the conditions which part of the boundary will be returned
 	 * @return
 	 */
 	public Domain getBoundary(NumFunc<?> func) {
@@ -64,7 +65,7 @@ public abstract class Domain {
 	public abstract int getDim();
 	
 	/**
-	 * Return and integration points and weights
+	 * Return the integration points and weights in the following format:
 	 * 
 	 * x1,y1,z1,w1
 	 * x2,y2,z2,w2
@@ -75,6 +76,20 @@ public abstract class Domain {
 	 */
 	public double[][] getIntWeightAndPoints(int order) {
 		return null;
+	}
+	
+	/**
+	 * Split the domain evenly with size step in each direction
+	 * @param step
+	 * @return
+	 */
+	public Domain setStep(double step) {
+		this.step = step;
+		return this;
+	}
+	
+	public double getSetp() {
+		return step;
 	}
 	
 	/**
