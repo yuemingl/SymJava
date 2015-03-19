@@ -75,7 +75,7 @@ public class Integrate extends Expr {
 		if(domain instanceof Interval) {
 			Interval I = (Interval)domain;
 			Expr end = I.getEnd();
-			Expr intSubs = integrand.subs(domain.getCoordVars()[0], expr);
+			Expr intSubs = integrand.subs(domain.getCoordVars()[0], end);
 			return intSubs.multiply(end.diff(expr));
 		}
 		return null;

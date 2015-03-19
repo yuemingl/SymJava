@@ -15,11 +15,15 @@ public class Eq extends Relation {
 	public Eq(Expr lhs, Expr rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;	
+		this.freeVars = new Expr[0];;
+		this.params = new Expr[0];
 	}
 	
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars) {
 		this.lhs = lhs;
 		this.rhs = rhs;	
+		this.freeVars = freeVars;
+		this.params = new Expr[0];
 		//Find dependent variables
 		List<Expr> list = Utils.extractSymbols(lhs, rhs);
 		List<Expr> depList = new ArrayList<Expr>();

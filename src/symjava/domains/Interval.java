@@ -16,7 +16,7 @@ public class Interval extends Domain1D {
 	}
 	
 	public Interval(Expr start, Expr end, Expr coordVar) {
-		super("["+start+","+end+"]", x);
+		super("["+start+","+end+"]", coordVar);
 		this.start = start;
 		this.end = end;
 	}	
