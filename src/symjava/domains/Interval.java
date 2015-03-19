@@ -50,6 +50,21 @@ public class Interval extends Domain1D {
 		return new Interval(s, e);
 	}
 	
+	public static <T1, T2> Domain apply(T1 start, T2 end, Expr coordVar) {
+		Expr s = null, e = null;
+		if(start instanceof Number) {
+			s = new SymDouble(((Number)start).doubleValue());
+		} else {
+			s = (Expr)start;
+		}
+		if(end instanceof Number) {
+			e = new SymDouble(((Number)end).doubleValue());
+		} else {
+			e = (Expr)end;
+		}
+		return new Interval(s, e, coordVar);
+	}	
+	
 	@Override
 	public String toString() {
 		return "["+start+","+end+"]";

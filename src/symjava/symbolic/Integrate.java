@@ -72,6 +72,12 @@ public class Integrate extends Expr {
 	
 	@Override
 	public Expr diff(Expr expr) {
+		if(domain instanceof Interval) {
+			Expr end = ((Interval) domain).getEnd();
+			if(Utils.symCompare(end, expr)) {
+				return this.integrand;
+			}
+		}
 		return null;
 	}
 

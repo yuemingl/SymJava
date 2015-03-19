@@ -1,20 +1,19 @@
 package symjava.symbolic;
 
+import symjava.math.SymMath;
 import symjava.symbolic.utils.Utils;
 
 public class Exp extends Pow {
-	public static SymDouble E = new SymDouble(Math.E);
-	
 	public Exp(Expr arg) {
-		super(E, arg);
-		String displayExp = String.format("%s", this.arg2);
+		super(SymMath.E, arg);
+		String displayExp = String.format("{%s}", this.arg2);
 		if(arg instanceof SymReal<?>) {
 			SymReal<?> realExp = (SymReal<?>)arg;
 			if(realExp.isInteger()) {
 				displayExp = String.format("%d", realExp.getIntValue());
 			}
-			if(realExp.isNegative())
-				displayExp = "{"+displayExp+"}";
+			//if(realExp.isNegative())
+			//	displayExp = "{"+displayExp+"}";
 		}
 		label = "e^" + displayExp + "";
 		sortKey = "epower"+String.valueOf(displayExp);
