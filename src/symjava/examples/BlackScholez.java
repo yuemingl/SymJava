@@ -1,8 +1,11 @@
 package symjava.examples;
 
+import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Interval;
+import symjava.relational.Eq;
 import symjava.symbolic.*;
+import symjava.symbolic.utils.JIT;
 import static symjava.symbolic.Symbol.*;
 import static symjava.math.SymMath.*;
 
@@ -35,6 +38,24 @@ public class BlackScholez {
 		
 		Expr res = phi*domDf*(fwd*cdf1-strike*cdf2);
 		System.out.println(res);
+		
+		System.out.println(res.diff(vol));
+		
+		
+		// Calculate Black-Scholes price for a given vol
+		BytecodeFunc blackScholesPrice = JIT.compile(new Expr[]{spot, strike, rd, rf, vol, tau, phi}, res);
+		double price = blackScholesPrice.apply(100.0, 110.0, 0.002, 0.01, 0.1423, 0.5, 1);
+		
+		System.out.println("Newtom method:");
+		Expr[] freeVars = {vol};
+		Expr[] params = {spot, strike, rd, rf, tau, phi};
+		Eq[] eq = new Eq[] {
+				new Eq(res-price, C0, freeVars, params)
+		};
+		
+		double[] guess = new double[]{ 0.10 };
+		
+		Newton.solve(eq, guess, 1000, 1e-5);		
 	}
 
 }

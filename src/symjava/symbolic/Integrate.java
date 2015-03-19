@@ -73,10 +73,10 @@ public class Integrate extends Expr {
 	@Override
 	public Expr diff(Expr expr) {
 		if(domain instanceof Interval) {
-			Expr end = ((Interval) domain).getEnd();
-			if(Utils.symCompare(end, expr)) {
-				return this.integrand;
-			}
+			Interval I = (Interval)domain;
+			Expr end = I.getEnd();
+			Expr intSubs = integrand.subs(domain.getCoordVars()[0], expr);
+			return intSubs.multiply(end.diff(expr));
 		}
 		return null;
 	}

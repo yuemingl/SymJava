@@ -7,10 +7,10 @@ import symjava.symbolic.Expr;
 import symjava.symbolic.utils.Utils;
 
 public class Eq extends Relation {
-	Expr[] freeVars;
-	Expr[] dependentVars;
-	Expr[] params;
-	Expr[] unknowns;
+	Expr[] freeVars; //for example: x in y=a*x+b
+	Expr[] dependentVars; //for example: y in y=a*x+b
+	Expr[] params; //paramters in the equation, for example: a, b in y=a*x+b
+	Expr[] unknowns; //freeVars + dependentVars, for example: x, y in y=a*x+b
 	
 	public Eq(Expr lhs, Expr rhs) {
 		this.lhs = lhs;
@@ -20,8 +20,28 @@ public class Eq extends Relation {
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars) {
 		this.lhs = lhs;
 		this.rhs = rhs;	
+		//Find dependent variables
+		List<Expr> list = Utils.extractSymbols(lhs, rhs);
+		List<Expr> depList = new ArrayList<Expr>();
+		for(Expr s : list) {
+			boolean skip = false;
+			for(int i=0; i<freeVars.length; i++) {
+				if(s.symEquals(freeVars[i])) skip = true;
+			}
+			if(skip) continue;
+			depList.add(s);
+		}
+		dependentVars = depList.toArray(new Expr[0]);
+		this.unknowns = new Expr[freeVars.length + dependentVars.length];
+		int idx = 0;
+		for(int i=0; i<freeVars.length; i++) {
+			unknowns[idx++] = freeVars[i];
+		}
+		for(int i=0; i<dependentVars.length; i++) {
+			unknowns[idx++] = dependentVars[i];
+		}
 	}
-	
+
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params) {
 		this.lhs = lhs;
 		this.rhs = rhs;
@@ -72,6 +92,18 @@ public class Eq extends Relation {
 
 	public static Eq apply(Expr lhs, Expr rhs) {
 		return new Eq(lhs, rhs);
+	}
+
+	public static Eq apply(Expr lhs, Expr rhs, Expr[] freeVars) {
+		return new Eq(lhs, rhs, freeVars);
+	}
+	
+	public static Eq apply(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params) {
+		return new Eq(lhs, rhs, freeVars, params);
+	}
+	
+	public static Eq apply(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params, Expr[] dependentVars) {
+		return new Eq(lhs, rhs, freeVars, params, dependentVars);
 	}
 	
 	public Expr subsLHS(Expr[] from, Expr[] to) {
