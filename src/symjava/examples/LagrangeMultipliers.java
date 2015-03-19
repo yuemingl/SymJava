@@ -63,7 +63,7 @@ public class LagrangeMultipliers {
 			freeVarForL[data.length*depVars.length + data.length + k] = eq.getParams()[k];
 		Expr addExpr = Utils.addListToExpr(addList);
 		Expr ret = Utils.flattenSortAndSimplify(addExpr);
-		return new Eq(ret, C0, freeVarForL , null);
+		return new Eq(ret, C0, freeVarForL);
 	}
 	
 	public Eq getEq() {
@@ -96,7 +96,7 @@ public class LagrangeMultipliers {
 		for(int i=0; i<eq.getParams().length; i++)
 			freeVarForL[data.length*depVars.length + data.length + i] = eq.getParams()[i];
 		Expr ret = Utils.flattenSortAndSimplify(Utils.addListToExpr(addList));
-		return new Eq(ret, C0, freeVarForL , null);
+		return new Eq(ret, C0, freeVarForL);
 	}
 	
 	public Expr[] getUnknows() {

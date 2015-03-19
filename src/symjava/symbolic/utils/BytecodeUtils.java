@@ -149,7 +149,7 @@ public class BytecodeUtils {
 				il, cp);
 		
 		Expr[] fExprArgs = extractArguments(fun);
-		if(fExprArgs.length != fun.args.length) {
+		if(fExprArgs.length > fun.args.length) {
 			System.out.println(
 				String.format("Warning: Arguments of %s is different from it's expression:\n>>>Defined args:%s \n>>>Express args:%s",
 						fun.getName(),
