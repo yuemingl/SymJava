@@ -1,5 +1,6 @@
 package symjava.symbolic;
 
+import symjava.math.SymMath;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
@@ -10,7 +11,7 @@ public class Log extends BinaryOp {
 	 * @param expr
 	 */
 	public Log(Expr expr) {
-		super(Exp.E, expr);
+		super(SymMath.E, expr);
 		label = "log(" + expr + ")";
 		sortKey = label;
 	}
@@ -49,7 +50,7 @@ public class Log extends BinaryOp {
 	
 	@Override
 	public Expr diff(Expr expr) {
-		if(Utils.symCompare(Exp.E, arg1)) {
+		if(Utils.symCompare(SymMath.E, arg1)) {
 			return this.multiply(arg2.diff(expr));
 		}
 		return null;

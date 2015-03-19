@@ -282,9 +282,11 @@ public class TestSymbolic {
 		Expr t1 = Integrate.apply(x, I);
 		checkResult("x + \\int_{-oo}^{1.0}{x}dx", t1 + x);
 
-//		Domain I2 = Interval.apply(-oo, x);
-//		Expr t1 = Int.apply(new Pow(e,x), I);
-//		checkResult("x + \\int_{-oo}^{1.0}{x}dx", t1 + x);
+		Domain I2 = Interval.apply(-oo, x);
+		Expr t2 = Integrate.apply(pow(e,r), I2);
+		checkResult("\\int_{-oo}^{x}{e^r}dx", t2);
+		
+		checkResult("e^r", t2.diff(x));
 		
 		Domain D = new Domain2D("D",x,y);
 		checkResult("\\int_{D}{0.5*x^2 + 0.5*y^2}dxdy", Integrate.apply(0.5*(x*x+y*y), D));
@@ -372,8 +374,8 @@ public class TestSymbolic {
 //		testToBytecodeFunc();
 //		testDiff();
 //		testAbstract();
-//		testIntegration();
-		testPower();
+		testIntegration();
+//		testPower();
 //		testSymReal();
 //		testSinCosTan();
 

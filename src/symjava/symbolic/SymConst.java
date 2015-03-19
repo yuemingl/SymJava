@@ -1,10 +1,16 @@
 package symjava.symbolic;
 
+/**
+ * Represent constants such as PI, E
+ * 
+ */
 public class SymConst extends Expr {
-
-	public SymConst(String label) {
+	double value;
+	
+	public SymConst(String label, double value) {
 		this.label = label;
 		this.sortKey = label;
+		this.value = value;
 	}
 	
 	@Override
