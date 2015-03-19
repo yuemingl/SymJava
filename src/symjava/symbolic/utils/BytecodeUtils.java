@@ -11,12 +11,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import symjava.bytecode.BytecodeFunc;
+import symjava.domains.Interval;
 import symjava.symbolic.Add;
 import symjava.symbolic.Cos;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Dot;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
+import symjava.symbolic.Infinity;
+import symjava.symbolic.Integrate;
 import symjava.symbolic.Log;
 import symjava.symbolic.Multiply;
 import symjava.symbolic.Negate;
@@ -80,6 +84,16 @@ public class BytecodeUtils {
 				post_order(f.getExpr(), outList);
 				return;
 			}
+		} else if(e instanceof Integrate) {
+			Integrate INT = (Integrate)e;
+			if(INT.domain instanceof Interval) {
+				Interval I = (Interval)INT.domain;
+				post_order(I.getStart(), outList);
+				post_order(I.getEnd(), outList);
+				//outList.add(new Func("integrand"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand));
+			} else {
+				throw new RuntimeException("Unsupported Integrate: "+e);
+			}
 		}
 		outList.add(e);
 	}
@@ -89,7 +103,7 @@ public class BytecodeUtils {
 		List<Expr> list = new ArrayList<Expr>();
 		post_order(func, list);
 		for(Expr e : list) {
-			if(e instanceof Symbol || e instanceof SymConst) {
+			if(e instanceof Symbol) {
 				set.add(e);
 			} else if(e instanceof Func) {
 				Func fe = (Func)e;
@@ -163,7 +177,7 @@ public class BytecodeUtils {
 
 		for(int i=0; i<insList.size(); i++) {
 			Expr ins = insList.get(i);
-			if(ins instanceof Symbol || ins instanceof SymConst) {
+			if(ins instanceof Symbol) {
 				Integer argIdx = argsMap.get(ins);
 				if(argIdx == null) {
 					throw new IllegalArgumentException(ins+" is not in the argument list of "+fun.getLabel());
@@ -174,6 +188,8 @@ public class BytecodeUtils {
 			} else if(ins instanceof SymReal<?>) {
 				Number s = (Number)((SymReal<?>)ins).getValue();
 				il.append(new PUSH(cp, s.doubleValue()));
+			} else if(ins instanceof SymConst) {
+				il.append(new PUSH(cp, ((SymConst)ins).getValue()));
 			} else if(ins instanceof Add) {
 				il.append(new DADD());
 			} else if(ins instanceof Subtract) {
@@ -236,6 +252,15 @@ public class BytecodeUtils {
 			} else if(ins instanceof Negate) {
 				il.append(new PUSH(cp, -1.0));
 				il.append(new DMUL());
+			} else if(ins instanceof Infinity) {
+				il.append(new PUSH(cp, Double.NaN));
+			} else if(ins instanceof Integrate) {
+				Func f = new Func("integrand"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),((Integrate) ins).integrand);
+				BytecodeFunc ff = f.toBytecodeFunc();
+				//http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
+				il.append(new PUSH());
+				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate",
+						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.OBJECT }, Constants.INVOKESTATIC));
 			} else {
 				throw new RuntimeException(ins.getClass() + " is not allowed when generating bytecode function!");
 			}

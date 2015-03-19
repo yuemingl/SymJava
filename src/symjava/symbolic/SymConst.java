@@ -13,6 +13,10 @@ public class SymConst extends Expr {
 		this.value = value;
 	}
 	
+	public double getValue() {
+		return value;
+	}
+	
 	@Override
 	public Expr diff(Expr expr) {
 		return Symbol.C0;
