@@ -12,7 +12,7 @@ import static symjava.math.SymMath.*;
 public class BlackScholez {
 
 	public static void main(String[] args) {
-		//Construct the Balck-Scholez equation
+		// Define symbols to construct the Black-Scholes formula
 		Symbol spot = new Symbol("spot"); //spot price
 		Symbol strike = new Symbol("strike"); //strike price
 		Symbol rd = new Symbol("rd");
@@ -29,14 +29,13 @@ public class BlackScholez {
 		Expr dp = (log(fwd/strike)+0.5*pow(stdDev,2))/stdDev;
 		Expr dm = (log(fwd/strike)-0.5*pow(stdDev,2))/stdDev;
 
-		//Domain I1 = Interval.apply(-oo, phi*dp, z);
-		Domain I1 = Interval.apply(-10, phi*dp, z); //Good enough for -10, it will take a long time to use -oo
-		I1.setStep(1e-5);
+		//we use -10 instead of -oo for numerical computation
+		Domain I1 = Interval.apply(-10, phi*dp, z); 
+		Domain I2 = Interval.apply(-10, phi*dm, z); 
+		double stepSize = 1e-3;
+		I1.setStep(stepSize);
+		I2.setStep(stepSize);
 		Expr cdf1 = Integrate.apply(exp(-0.5*pow(z,2)), I1)/sqrt(PI2);
-		
-		//Domain I2 = Interval.apply(-oo, phi*dm, z);
-		Domain I2 = Interval.apply(-10, phi*dm, z);
-		I2.setStep(1e-5);
 		Expr cdf2 = Integrate.apply(exp(-0.5*pow(z,2)), I2)/sqrt(PI2);
 		
 		Expr res = phi*domDf*(fwd*cdf1-strike*cdf2);
@@ -56,6 +55,7 @@ public class BlackScholez {
 			new Eq(res-price, C0, freeVars, params)
 		};
 		
+		// Use Newton's method to find the root
 		double[] guess = new double[]{ 0.10 };
 		double[] constParams = new double[] {100.0, 110.0, 0.002, 0.01, 0.5, 1};
 		Newton.solve(eq, guess, constParams, 100, 1e-5);
