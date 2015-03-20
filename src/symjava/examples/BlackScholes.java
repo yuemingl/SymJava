@@ -9,7 +9,7 @@ import symjava.symbolic.utils.JIT;
 import static symjava.symbolic.Symbol.*;
 import static symjava.math.SymMath.*;
 
-public class BlackScholez {
+public class BlackScholes {
 
 	public static void main(String[] args) {
 		test1(); //Example from QuantLib
