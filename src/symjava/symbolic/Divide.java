@@ -23,17 +23,17 @@ public class Divide extends BinaryOp {
 	public static Expr shallowSimplifiedIns(Expr numerator, Expr denominator) {
 		int simOps = numerator.getSimplifyOps() + denominator.getSimplifyOps() + 1;
 		if(Symbol.C0.symEquals(numerator))
-			return new SymInteger(0).setSimplifyOps(simOps);
+			return new SymInteger(0).setSimplifyOps(simOps).setAsSimplified();
 		else if(numerator instanceof SymReal<?> && denominator instanceof SymReal<?>) {
 			Number t1 = (Number)((SymReal<?>)numerator).getValue();
 			Number t2 = (Number)((SymReal<?>)denominator).getValue();
-			return new SymDouble(t1.doubleValue() / t2.doubleValue()).setSimplifyOps(simOps);
+			return new SymDouble(t1.doubleValue() / t2.doubleValue()).setSimplifyOps(simOps).setAsSimplified();
 		} else if(denominator.symEquals(Symbol.C0))
 			throw new IllegalArgumentException("Argument 'divisor' is 0");
 		 else if(Symbol.C1.symEquals(numerator))
-			return Reciprocal.simplifiedIns(denominator).setSimplifyOps(simOps);
+			return Reciprocal.simplifiedIns(denominator).setSimplifyOps(simOps).setAsSimplified();
 		 else if(Symbol.C1.symEquals(denominator))
-			return numerator.clone().setSimplifyOps(simOps);
+			return numerator.clone().setSimplifyOps(simOps).setAsSimplified();
 		return new Divide(numerator, denominator).setAsSimplified();
 	}
 	

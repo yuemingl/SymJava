@@ -77,7 +77,7 @@ public class Newton {
 			Matrix b = new Matrix(NG.eval(funArgs), NG.dim());
 			Matrix x = A.solve(b); //Lease Square solution
 			for(int j=0; j<init.length; j++) {
-				System.out.print(String.format("%s=%.5f",unknowns[j], funArgs[j])+" ");
+				System.out.print(String.format("%s=%.7f",unknowns[j], funArgs[j])+" ");
 			}
 			System.out.println();
 			if(x.norm2() < eps) 

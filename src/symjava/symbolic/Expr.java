@@ -60,14 +60,27 @@ abstract public class Expr implements Cloneable {
 		return dff.subs(alpha, 0).simplify();
 	}
 	
+	/**
+	 * Split the terms into a list for Add and Subtract
+	 * @param outList
+	 */
 	public void flattenAdd(List<Expr> outList) {
 		outList.add(this);
 	};
-	
+
+	/**
+	 * Split the terms into a list for Multiply and Divide
+	 * @param outList
+	 */
 	public void flattenMultiply(List<Expr> outList) {
 		outList.add(this);
 	}
 	
+	/**
+	 * Return true if the expression is an abstract thing.
+	 * for example, a abstract function
+	 * @return
+	 */
 	public boolean isAbstract() {
 		return false;
 	}
@@ -97,21 +110,36 @@ abstract public class Expr implements Cloneable {
 		return label;
 	}
 	
+	/**
+	 * Set a string key for arranging terms in an expression
+	 * @param sortKey
+	 * @return
+	 */
 	public Expr setSortKey(String sortKey) {
 		this.sortKey = sortKey;
 		return this;
 	}
 	
+	/**
+	 * Get the string key used to arrange terms in an expression
+	 * @param sortKey
+	 * @return
+	 */
 	public String getSortKey() {
 		return sortKey;
 	}
 
+	/**
+	 * Count number of operations for simplification
+	 * @return
+	 */
 	public int getSimplifyOps() {
 		return simplifyOpNum;
 	}
 	public Expr setSimplifyOps(int n) {
-		if(n > simplifyOpNum)
-			isSimplified = true;
+		//Make no sense, call setAsSimplified() explicitly
+		//if(n > simplifyOpNum)
+		//	isSimplified = true;
 		simplifyOpNum = n;
 		return this;
 	}

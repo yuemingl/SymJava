@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Interval;
 import symjava.symbolic.Add;
 import symjava.symbolic.Cos;
@@ -34,6 +33,8 @@ import symjava.symbolic.Symbol;
 import symjava.symbolic.SymConst;
 import symjava.symbolic.Tan;
 import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.arity.NaryOp;
+import symjava.symbolic.arity.TernaryOp;
 import symjava.symbolic.arity.UnaryOp;
 
 import com.sun.org.apache.bcel.internal.Constants;
@@ -50,7 +51,6 @@ import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
-import com.sun.org.apache.bcel.internal.generic.POP;
 import com.sun.org.apache.bcel.internal.generic.POP2;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
@@ -95,6 +95,10 @@ public class BytecodeUtils {
 				//TODO
 				//Support multi-variable integrate
 			}
+		} else if(e instanceof NaryOp || e instanceof TernaryOp) {
+			Expr[] args = e.args();
+			for(int i=0; i<args.length; i++)
+				post_order(args[i], outList);
 		}
 		outList.add(e);
 	}

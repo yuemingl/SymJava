@@ -19,7 +19,7 @@ public class Grad extends SymVector {
 	 * @param data
 	 * @param args
 	 */
-	public Grad(SymVector data, Expr[] args) {
+	public Grad(SymVector data, Expr... args) {
 		for(Expr e : data)
 			this.data.add(e);
 		this.args = args;

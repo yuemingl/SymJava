@@ -33,32 +33,32 @@ public class Multiply extends BinaryOp {
 			if(l instanceof SymInteger && r instanceof SymInteger) {
 				SymInteger il = (SymInteger)l;
 				SymInteger ir = (SymInteger)r;
-				return new SymInteger(il.getValue()*ir.getValue()).setSimplifyOps(simOps);
+				return new SymInteger(il.getValue()*ir.getValue()).setSimplifyOps(simOps).setAsSimplified();
 			} else if(l instanceof SymLong && r instanceof SymLong) {
 				SymLong il = (SymLong)l;
 				SymLong ir = (SymLong)r;
-				return new SymLong(il.getValue()*ir.getValue()).setSimplifyOps(simOps);
+				return new SymLong(il.getValue()*ir.getValue()).setSimplifyOps(simOps).setAsSimplified();
 			}
 			Number t1 = (Number)((SymReal<?>)l).getValue();
 			Number t2 = (Number)((SymReal<?>)r).getValue();
-			return new SymDouble(t1.doubleValue() * t2.doubleValue()).setSimplifyOps(simOps);
+			return new SymDouble(t1.doubleValue() * t2.doubleValue()).setSimplifyOps(simOps).setAsSimplified();
 		} else if(Symbol.C1.symEquals(l))
-			return r.clone().setSimplifyOps(simOps);
+			return r.clone().setSimplifyOps(simOps).setAsSimplified();
 		else if(Symbol.C1.symEquals(r))
-			return l.clone().setSimplifyOps(simOps);
+			return l.clone().setSimplifyOps(simOps).setAsSimplified();
 		else if(Symbol.C0.symEquals(l) || Symbol.C0.symEquals(r)) {
 			//Here we need a new instance of 0 to hold the number of simplify operations
-			return new SymInteger(0).setSimplifyOps(simOps);
+			return new SymInteger(0).setSimplifyOps(simOps).setAsSimplified();
 		} else if(Symbol.Cm1.symEquals(l)) {
-			return new Negate(r).setSimplifyOps(simOps);
+			return new Negate(r).setSimplifyOps(simOps).setAsSimplified();
 		} else if(Symbol.Cm1.symEquals(r)) {
-			return new Negate(l).setSimplifyOps(simOps);
+			return new Negate(l).setSimplifyOps(simOps).setAsSimplified();
 		} else if(l instanceof Reciprocal && r instanceof Reciprocal) {
 			Reciprocal rl = (Reciprocal)l;
 			Reciprocal rr = (Reciprocal)r;
 			Expr newBase = simplifiedIns(rl.arg, rr.arg);
 			//SimplifyOps=? 
-			return Reciprocal.simplifiedIns( newBase ).setSimplifyOps(simOps + newBase.getSimplifyOps() + 1);
+			return Reciprocal.simplifiedIns( newBase ).setSimplifyOps(simOps + newBase.getSimplifyOps() + 1).setAsSimplified();
 		} else if(l instanceof Reciprocal) {
 			Reciprocal rl = (Reciprocal)l;
 			return Divide.shallowSimplifiedIns(r, rl.arg);
@@ -69,23 +69,23 @@ public class Multiply extends BinaryOp {
 			Pow lp = (Pow)l;
 			Pow rp = (Pow)r;
 			if(Utils.symCompare(lp.arg1, rp.arg1)) {
-				return Pow.simplifiedIns( lp.arg1, lp.arg2+rp.arg2).setSimplifyOps(simOps);
+				return Pow.simplifiedIns( lp.arg1, lp.arg2+rp.arg2).setSimplifyOps(simOps).setAsSimplified();
 			} else if(lp.arg2 == rp.arg2) {
-				return Pow.simplifiedIns( simplifiedIns(lp.arg1, rp.arg1), lp.arg2).setSimplifyOps(simOps);
+				return Pow.simplifiedIns( simplifiedIns(lp.arg1, rp.arg1), lp.arg2).setSimplifyOps(simOps).setAsSimplified();
 			}
 		} else if(l instanceof Pow) {
 			Pow lp = (Pow)l;
 			if(Utils.symCompare(lp.arg1, r)) {
-				return new Pow(lp.arg1, lp.arg2 + 1).setSimplifyOps(simOps);
+				return new Pow(lp.arg1, lp.arg2 + 1).setSimplifyOps(simOps).setAsSimplified();
 			}
 		} else if(r instanceof Pow) {
 			Pow rp = (Pow)r;
 			if(Utils.symCompare(rp.arg1, l)) {
-				return new Pow(rp.arg1, rp.arg2 + 1).setSimplifyOps(simOps);
+				return new Pow(rp.arg1, rp.arg2 + 1).setSimplifyOps(simOps).setAsSimplified();
 			}
 		}
 		if(Utils.symCompare(l, r)) {
-			return new Pow(l, Expr.valueOf(2)).setSimplifyOps(simOps);
+			return new Pow(l, Expr.valueOf(2)).setSimplifyOps(simOps).setAsSimplified();
 		}
 		return new Multiply(l, r).setAsSimplified();
 	}
