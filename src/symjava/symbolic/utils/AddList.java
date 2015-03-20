@@ -8,6 +8,7 @@ import symjava.symbolic.Expr;
 public class AddList {
 	int sign = 1;
 	List<Expr> list = new ArrayList<Expr>();
+	
 	public AddList(Expr expr) {
 		expr.flattenAdd(list);
 	}
@@ -16,4 +17,3 @@ public class AddList {
 		return sign == -1;
 	}
 }
- 

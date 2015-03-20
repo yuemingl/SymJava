@@ -18,23 +18,23 @@ public class Add extends BinaryOp {
 			if(l instanceof SymInteger && r instanceof SymInteger) {
 				SymInteger il = (SymInteger)l;
 				SymInteger ir = (SymInteger)r;
-				return new SymInteger(il.getValue()+ir.getValue()).setSimplifyOps(simOps);
+				return new SymInteger(il.getValue()+ir.getValue()).setSimplifyOps(simOps).setAsSimplified();
 			} else if(l instanceof SymLong && r instanceof SymLong) {
 				SymLong il = (SymLong)l;
 				SymLong ir = (SymLong)r;
-				return new SymLong(il.getValue()+ir.getValue()).setSimplifyOps(simOps);
+				return new SymLong(il.getValue()+ir.getValue()).setSimplifyOps(simOps).setAsSimplified();
 			}
 			Number t1 = (Number)((SymReal<?>)l).getValue();
 			Number t2 = (Number)((SymReal<?>)r).getValue();
-			return new SymDouble(t1.doubleValue() + t2.doubleValue()).setSimplifyOps(simOps);
+			return new SymDouble(t1.doubleValue() + t2.doubleValue()).setSimplifyOps(simOps).setAsSimplified();
 		} else if(Symbol.C0.symEquals(l))
-			return r.clone().setSimplifyOps(simOps);
+			return r.clone().setSimplifyOps(simOps).setAsSimplified();
 		else if(Symbol.C0.symEquals(r)) {
-			return l.clone().setSimplifyOps(simOps);
+			return l.clone().setSimplifyOps(simOps).setAsSimplified();
 		} else if(l instanceof Negate && r instanceof Negate) {
 			Negate nl = (Negate)l;
 			Negate nr = (Negate)r;
-			return new Negate(Add.shallowSimplifiedIns(nl.arg, nr.arg)).setSimplifyOps(simOps);
+			return new Negate(Add.shallowSimplifiedIns(nl.arg, nr.arg)).setSimplifyOps(simOps).setAsSimplified();
 		} else if(l instanceof Negate) {
 			Negate nl = (Negate)l;
 			return Subtract.shallowSimplifiedIns(r, nl.arg); //Do not increase simplifyOps

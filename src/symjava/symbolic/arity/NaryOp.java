@@ -2,10 +2,10 @@ package symjava.symbolic.arity;
 
 import symjava.symbolic.Expr;
 
-public abstract class NAryOp extends Expr {
+public abstract class NaryOp extends Expr {
 	public Expr[] args;
 	
-	public NAryOp(Expr[] args) {
+	public NaryOp(Expr[] args) {
 		this.args = args;
 	}
 	

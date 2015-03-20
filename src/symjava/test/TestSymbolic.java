@@ -6,6 +6,7 @@ import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
 import symjava.domains.Interval;
+import symjava.matrix.SymVector;
 import symjava.symbolic.*;
 import symjava.symbolic.utils.JIT;
 
@@ -275,6 +276,15 @@ public class TestSymbolic {
 		
 		Func w = new Func("w", x, y, x);
 		checkResult("\\nabla{w(x,y,x)} \\cdot \\nabla{v(x,y,z)}", new Dot(gu, gv).fdiff(u,w));
+		
+		Func f = new Func("F");
+		SymVector grad = Grad.apply(f);
+		Div div = new Div(grad);
+		//checkResult("\\nabla \\cdot \\nabla{F}", div);
+		checkResult("div(\\nabla{F})", div);
+
+		Expr expr = x*x + y*y +z*z;
+		checkResult("div(\\nabla{F})", Div.apply(Grad.apply(expr)));
 	}
 	
 	public static void testIntegration() {
@@ -381,9 +391,9 @@ public class TestSymbolic {
 //		testSummation();
 //		testToBytecodeFunc();
 //		testDiff();
-//		testAbstract();
+		testAbstract();
 //		testIntegration();
-		testPower();
+//		testPower();
 //		testSymReal();
 //		testSinCosTan();
 	}

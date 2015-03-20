@@ -26,24 +26,24 @@ public class Subtract extends BinaryOp {
 	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
 		int simOps = l.getSimplifyOps() + r.getSimplifyOps() + 1;
 		if(Utils.symCompare(l, r)) {
-			return new SymInteger(0).setSimplifyOps(simOps);
+			return new SymInteger(0).setSimplifyOps(simOps).setAsSimplified();
 		} else if(l instanceof SymReal<?> && r instanceof SymReal<?>) {
 			if(l instanceof SymInteger && r instanceof SymInteger) {
 				SymInteger il = (SymInteger)l;
 				SymInteger ir = (SymInteger)r;
-				return new SymInteger(il.getValue()-ir.getValue()).setSimplifyOps(simOps);
+				return new SymInteger(il.getValue()-ir.getValue()).setSimplifyOps(simOps).setAsSimplified();
 			} else if(l instanceof SymLong && r instanceof SymLong) {
 				SymLong il = (SymLong)l;
 				SymLong ir = (SymLong)r;
-				return new SymLong(il.getValue()-ir.getValue()).setSimplifyOps(simOps);
+				return new SymLong(il.getValue()-ir.getValue()).setSimplifyOps(simOps).setAsSimplified();
 			}
 			Number t1 = (Number)((SymReal<?>)l).getValue();
 			Number t2 = (Number)((SymReal<?>)r).getValue();
-			return new SymDouble(t1.doubleValue() - t2.doubleValue()).setSimplifyOps(simOps);
+			return new SymDouble(t1.doubleValue() - t2.doubleValue()).setSimplifyOps(simOps).setAsSimplified();
 		} else if(Symbol.C0.symEquals(r))
-			return l.clone().setSimplifyOps(simOps);
+			return l.clone().setSimplifyOps(simOps).setAsSimplified();
 		else if(Symbol.C0.symEquals(l))
-			return new Negate(r).setSimplifyOps(simOps);
+			return new Negate(r).setSimplifyOps(simOps).setAsSimplified();
 		return new Subtract(l, r).setAsSimplified();
 	}
 	

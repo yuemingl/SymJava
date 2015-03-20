@@ -36,6 +36,10 @@ public class SymVector implements Iterable<Expr> {
 		return data.size();
 	}
 	
+	public Expr[] getData() {
+		return data.toArray(new Expr[0]);
+	}
+	
 //	  \left[ {\begin{array}{c}
 //	   1\\
 //	   3\\
