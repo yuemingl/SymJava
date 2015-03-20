@@ -1,7 +1,9 @@
 package symjava.symbolic;
 
 /**
- * Represent constants such as PI, E
+ * An object of SymConst represent a mathematical constant such as PI, E.
+ * The constant is displayed as its label but used as a double number 
+ * in numerical computation.
  * 
  */
 public class SymConst extends Expr {

@@ -10,10 +10,11 @@ import symjava.symbolic.Symbol;
 import symjava.symbolic.utils.Utils;
 
 /**
- * The equations that define the change of variables
- * e.g.
+ * Transformation is a system of equations that define the change of variables
+ * For example:
  * x = r + s
  * y = r - s
+ * This will change (x,y) to (r+s, r-s)
  *
  */
 public class Transformation {
@@ -39,7 +40,9 @@ public class Transformation {
 		Expr[] rlt = new Expr[eqs.length];
 		HashSet<Expr> set = new HashSet<Expr>();
 		for(Eq e : eqs) {
-			set.addAll(Utils.extractSymbols(e.rhs));
+			Expr[] freeVars = e.getFreeVars();
+			for(Expr expr : freeVars)
+				set.add(expr);
 		}
 		rlt = set.toArray(new Expr[0]);
 		Utils.sortExprs(rlt);

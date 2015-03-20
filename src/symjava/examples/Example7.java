@@ -73,16 +73,16 @@ public class Example7 {
 	public static void solve(WeakForm pde, Map<Integer, Double> dirichlet, String outputFile) {
 		System.out.println(String.format("Solving: %s == %s", pde.lhs, pde.rhs));
 		
-		//Create coordinate transformation for a template element
-		SymConst x1 = new SymConst("x1");
-		SymConst x2 = new SymConst("x2");
-		SymConst x3 = new SymConst("x3");
-		SymConst y1 = new SymConst("y1");
-		SymConst y2 = new SymConst("y2");
-		SymConst y3 = new SymConst("y3");
+		//Create coordinate transformation
+		Symbol x1 = new Symbol("x1");
+		Symbol x2 = new Symbol("x2");
+		Symbol x3 = new Symbol("x3");
+		Symbol y1 = new Symbol("y1");
+		Symbol y2 = new Symbol("y2");
+		Symbol y3 = new Symbol("y3");
 		Transformation trans = new Transformation(
-				new Eq(x, x1*r+x2*s+x3*(1-r-s)),
-				new Eq(y, y1*r+y2*s+y3*(1-r-s))
+				new Eq(x, x1*r+x2*s+x3*(1-r-s), new Expr[]{r, s}),
+				new Eq(y, y1*r+y2*s+y3*(1-r-s), new Expr[]{r, s})
 				);
 		//Jacobian matrix of the transformation
 		// jacMat = (xr xs)
