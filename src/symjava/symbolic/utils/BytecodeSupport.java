@@ -41,11 +41,26 @@ public class BytecodeSupport {
 					getMethod("apply", new Class[] {double[].class});
 			double[] args = { 0 };
 			double sum = 0.0;
-			for(double i=begin; i<=end; i+=step) {
+//			for(double i=begin; i<=end; i+=step) {
+//				args[0] = i;
+//				Double val = (Double)method.invoke(null, args);
+//				//Double val = test_pdf(args);
+//				sum += val*step;
+//			}
+			
+			args[0] = begin;
+			Double val1 = (Double)method.invoke(null, args);
+			double i = begin + step;
+			for(; i<=end; i+=step) {
 				args[0] = i;
-				Double val = (Double)method.invoke(null, args);
-				//Double val = test_pdf(args);
-				sum += val*step;
+				Double val2 = (Double)method.invoke(null, args);
+				sum += (val1+val2)*step/2.0;
+				val1 = val2;
+			}
+			if(i - end > 0.0) {
+				args[0] = end;
+				Double val2 = (Double)method.invoke(null, args);
+				sum += (val1+val2)*(step-(i-end))/2.0;
 			}
 			return sum;
 		} catch (Exception e) {

@@ -89,9 +89,11 @@ public class BytecodeUtils {
 				Interval I = (Interval)INT.domain;
 				post_order(I.getStart(), outList);
 				post_order(I.getEnd(), outList);
+				//Integrand will not be added to the outList since we don't want the dummy variable to be exposed
 				//outList.add(new Func("integrand"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand));
 			} else {
-				throw new RuntimeException("Unsupported Integrate: "+e);
+				//TODO
+				//Support multi-variable integrate
 			}
 		}
 		outList.add(e);
@@ -259,23 +261,31 @@ public class BytecodeUtils {
 			} else if(ins instanceof Negate) {
 				il.append(new PUSH(cp, -1.0));
 				il.append(new DMUL());
-//			} else if(ins instanceof Infinity) {
-//				il.append(new PUSH(cp, Double.NaN));
+			} else if(ins instanceof Infinity) {
+				throw new RuntimeException(ins.getClass() + "Infinity cannot be used in numerical computation, use a proper number instead!");
 			} else if(ins instanceof Integrate) {
 				Integrate INT = (Integrate)ins;
-				Func f = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand);
-				//System.out.println(f);
-				f.toBytecodeFunc(true, true); //Load class, could be better method to load a class
-				//TODO read this: http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
-				if(INT.domain.getStep() == null) {
-					throw new RuntimeException("Please specifiy the step size for you integral: "+INT);
+				if(INT.domain instanceof Interval) {
+					//Compile the integrand
+					Func f = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand);
+					//System.out.println(f);
+					f.toBytecodeFunc(true, true); //Load class, could be better method to load a class
+					
+					//TODO read this: http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
+					if(INT.domain.getStep() == null) {
+						throw new RuntimeException("Please specifiy the step size for you integral: "+INT);
+					}
+					
+					il.append(new PUSH(cp, INT.domain.getStep()));
+					il.append(new PUSH(cp, f.getName()));
+					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate1D",
+							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, Type.STRING }, Constants.INVOKESTATIC));
+				} else {
+					//TODO
+					throw new RuntimeException("Unsupported Integrate: "+INT);
 				}
-				il.append(new PUSH(cp, INT.domain.getStep())); //
-				il.append(new PUSH(cp, f.getName()));
-				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate1D",
-						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, Type.STRING }, Constants.INVOKESTATIC));
 			} else {
-				throw new RuntimeException(ins.getClass() + " is not allowed when generating bytecode function!");
+				throw new RuntimeException(ins.getClass() + " is not supported in this version when generating bytecode function!");
 			}
 		}
 
