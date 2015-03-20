@@ -342,7 +342,10 @@ public class TestSymbolic {
 		
 		Domain I = Interval.apply(-oo, x, z);
 		Expr cdf = Integrate.apply(exp(-0.5*pow(z,2)), I)/sqrt(PI2);
-		checkResult(1.0,JIT.compile(cdf).apply(10), cdf);
+		checkResult("1/\\sqrt{2\\pi}*\\int_{-oo}^{x}{e^{-0.5*z^2}}dz",cdf);
+		Domain I2 = Interval.apply(-10, x, z).setStep(0.001);
+		Expr cdf2 = Integrate.apply(exp(-0.5*pow(z,2)), I2)/sqrt(PI2);
+		checkResult(1.0,JIT.compile(cdf2).apply(10), cdf);
 	}
 	
 	public static void testSinCosTan() {
@@ -383,6 +386,5 @@ public class TestSymbolic {
 		testPower();
 //		testSymReal();
 //		testSinCosTan();
-		
 	}
 }
