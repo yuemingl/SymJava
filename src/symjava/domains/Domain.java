@@ -14,7 +14,7 @@ import symjava.symbolic.Expr;
 public abstract class Domain {
 	protected String label;
 	protected Expr[] coordVars;
-	double step;
+	Double step = null;
 	
 	/**
 	 * Return a sub-domain that represents the boundary of the domain
@@ -88,7 +88,7 @@ public abstract class Domain {
 		return this;
 	}
 	
-	public double getSetp() {
+	public Double getStep() {
 		return step;
 	}
 	
