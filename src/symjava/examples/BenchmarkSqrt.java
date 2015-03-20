@@ -24,6 +24,7 @@ public class BenchmarkSqrt {
 		ArrayList<Expr> exprs = new ArrayList<Expr>();
 		for(int i=1; i<=n; i++) {
 			term = (pow(x, 1.0/i));
+			//term = (sqrt(x, i));
 			//System.out.println(term);
 			expr = expr + term;
 			exprs.add(expr);

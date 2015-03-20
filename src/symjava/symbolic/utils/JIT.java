@@ -5,6 +5,9 @@ import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 
 public class JIT {
+	
+	private JIT() {}
+	
 	public static BytecodeFunc compile(Expr[] args, Expr expr) {
 		if(expr instanceof Func) {
 			Func func = (Func)expr;

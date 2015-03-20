@@ -77,6 +77,12 @@ public class Utils {
 		return true;
 	}
 	
+	/**
+	 * Return true if expr1 is equal expr2
+	 * @param expr1
+	 * @param expr2
+	 * @return
+	 */
 	public static boolean symCompare(Expr expr1, Expr expr2) {
 		if( expr1 instanceof Symbol || expr1 instanceof Symbols)
 			return expr1.symEquals(expr2);
@@ -111,7 +117,7 @@ public class Utils {
 		for(Expr e : list) {
 			if(e instanceof Negate) {
 				Negate ee = (Negate)e;
-				rlt.add(ee.base);
+				rlt.add(ee.arg);
 			} else {
 				rlt.add(e);
 			}
@@ -233,14 +239,14 @@ public class Utils {
 				if(e instanceof Negate) {
 					Negate ee = (Negate)e;
 					//rlt = Subtract.shallowSimplifiedIns(rlt, ee.base);
-					rlt = new Subtract(rlt, ee.base);
+					rlt = new Subtract(rlt, ee.arg);
 				} else
 					//rlt = Add.shallowSimplifiedIns(rlt, e);
 					rlt = new Add(rlt, e);
 			}
 			return rlt;
 		}
-	}	
+	}
 	
 	public static Expr multiplyListToExpr(List<Expr> list) {
 		if(list.size() == 1)
@@ -252,7 +258,7 @@ public class Utils {
 				if(e instanceof Reciprocal) {
 					Reciprocal ee = (Reciprocal)e;
 					//rlt = Divide.shallowSimplifiedIns(rlt, ee.base);
-					rlt = new Divide(rlt, ee.base);
+					rlt = new Divide(rlt, ee.arg);
 				} else {
 					//rlt = Multiply.shallowSimplifiedIns(rlt, e);
 					rlt = new Multiply(rlt, e);

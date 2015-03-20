@@ -9,6 +9,7 @@ import symjava.symbolic.Negate;
 public class MulList {
 	int sign = 1;
 	List<Expr> list = new ArrayList<Expr>();
+	
 	public MulList(Expr expr) {
 		expr.flattenMultiply(list);
 		sign = getGlobalSign();

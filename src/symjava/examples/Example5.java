@@ -18,7 +18,7 @@ public class Example5 {
 	
 	public static void example1() {
 		Domain D = new Domain2D("D",x,y);
-		Int I1 = new Int(0.5*(x+y), D);
+		Integrate I1 = new Integrate(0.5*(x+y), D);
 		System.out.println(I1);
 		
 		Transformation trans = new Transformation(
@@ -39,7 +39,7 @@ public class Example5 {
 				new Eq(y, G),
 				new Eq(z, H)
 				);
-		Int I = new Int(SymMath.pow(x+y+z,2), D).changeOfVars(trans);
+		Integrate I = new Integrate(SymMath.pow(x+y+z,2), D).changeOfVars(trans);
 		System.out.println(I);
 	}
 	

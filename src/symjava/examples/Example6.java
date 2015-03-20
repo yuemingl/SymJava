@@ -21,8 +21,9 @@ import symjava.numeric.NumInt;
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
-import symjava.symbolic.Int;
+import symjava.symbolic.Integrate;
 import symjava.symbolic.SymConst;
+import symjava.symbolic.Symbol;
 
 /**
  * Finite Element solver
@@ -65,15 +66,15 @@ public class Example6 {
 		System.out.println(String.format("PDE Weak Form: %s = %s", wf.lhs, wf.rhs));
 		
 		//Create coordinate transformation
-		SymConst x1 = new SymConst("x1");
-		SymConst x2 = new SymConst("x2");
-		SymConst x3 = new SymConst("x3");
-		SymConst y1 = new SymConst("y1");
-		SymConst y2 = new SymConst("y2");
-		SymConst y3 = new SymConst("y3");
+		Symbol x1 = new Symbol("x1");
+		Symbol x2 = new Symbol("x2");
+		Symbol x3 = new Symbol("x3");
+		Symbol y1 = new Symbol("y1");
+		Symbol y2 = new Symbol("y2");
+		Symbol y3 = new Symbol("y3");
 		Transformation trans = new Transformation(
-				new Eq(x, x1*r+x2*s+x3*(1-r-s)),
-				new Eq(y, y1*r+y2*s+y3*(1-r-s))
+				new Eq(x, x1*r+x2*s+x3*(1-r-s), new Expr[]{r, s}),
+				new Eq(y, y1*r+y2*s+y3*(1-r-s), new Expr[]{r, s})
 				);
 		// jac = (xr xs)
 		//       (yr ys)
@@ -99,8 +100,8 @@ public class Example6 {
 		System.out.println(sy);
 
 		RefTriangle tri = new RefTriangle("Tri", r, s);
-		Int lhsInt[][] = new Int[shapeFuns.length][shapeFuns.length];
-		Int rhsInt[] = new Int[shapeFuns.length];
+		Integrate lhsInt[][] = new Integrate[shapeFuns.length][shapeFuns.length];
+		Integrate rhsInt[] = new Integrate[shapeFuns.length];
 		for(int i=0; i<shapeFuns.length; i++) {
 			Func V = shapeFuns[i]; //test
 			for(int j=0; j<shapeFuns.length; j++) {
@@ -124,7 +125,7 @@ public class Example6 {
 				
 				//Define the integration on the reference domain
 				//lhsInt[i][j] = new Int(new Func("",lhs*jac,new Expr[]{r,s}), tri);
-				lhsInt[i][j] = new Int(new Func(
+				lhsInt[i][j] = new Integrate(new Func(
 						String.format("lhs%d%d",i,j), lhs*jac,new Expr[]{r,s}), tri);
 				System.out.println(lhsInt[i][j]);
 				System.out.println();
@@ -136,7 +137,7 @@ public class Example6 {
 							.subs(y, trans.eqs[1].rhs);
 			//System.out.println(rhs);
 			System.out.println();
-			rhsInt[i] = new Int(new Func(
+			rhsInt[i] = new Integrate(new Func(
 					String.format("rhs%d",i),rhs*jac,new Expr[]{r,s}), tri);
 		}
 		
