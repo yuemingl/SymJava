@@ -51,8 +51,8 @@ public class Example7 {
 					//Int.apply(1.0*dot(grad(u), grad(v))+sqrt(x*x+y*y)*u*v, mesh) + Int.apply((1.0*u-1.0)*v, neumannBC),
 					//Int.apply(dot(grad(u), grad(v)), mesh) + Int.apply(u*v, neumannBC),
 					//Int.apply(dot(grad(u), grad(v)), mesh),
-					Int.apply(u.diff(x)*v.diff(x), mesh) + Int.apply(u.diff(y)*v.diff(y), mesh),
-					Int.apply((-2*(x*x+y*y)+36)*v, mesh),
+					Integrate.apply(u.diff(x)*v.diff(x), mesh) + Integrate.apply(u.diff(y)*v.diff(y), mesh),
+					Integrate.apply((-2*(x*x+y*y)+36)*v, mesh),
 					u, v
 				);
 		
@@ -73,16 +73,16 @@ public class Example7 {
 	public static void solve(WeakForm pde, Map<Integer, Double> dirichlet, String outputFile) {
 		System.out.println(String.format("Solving: %s == %s", pde.lhs, pde.rhs));
 		
-		//Create coordinate transformation for a template element
-		SymConst x1 = new SymConst("x1");
-		SymConst x2 = new SymConst("x2");
-		SymConst x3 = new SymConst("x3");
-		SymConst y1 = new SymConst("y1");
-		SymConst y2 = new SymConst("y2");
-		SymConst y3 = new SymConst("y3");
+		//Create coordinate transformation
+		Symbol x1 = new Symbol("x1");
+		Symbol x2 = new Symbol("x2");
+		Symbol x3 = new Symbol("x3");
+		Symbol y1 = new Symbol("y1");
+		Symbol y2 = new Symbol("y2");
+		Symbol y3 = new Symbol("y3");
 		Transformation trans = new Transformation(
-				new Eq(x, x1*r+x2*s+x3*(1-r-s)),
-				new Eq(y, y1*r+y2*s+y3*(1-r-s))
+				new Eq(x, x1*r+x2*s+x3*(1-r-s), new Expr[]{r, s}),
+				new Eq(y, y1*r+y2*s+y3*(1-r-s), new Expr[]{r, s})
 				);
 		//Jacobian matrix of the transformation
 		// jacMat = (xr xs)
@@ -119,9 +119,9 @@ public class Example7 {
 		RefLine refLine = new RefLine("RefL", r);
 		
 		
-		Int lhsInt[][] = new Int[shapeFuns.length][shapeFuns.length];
-		Int lhsIntB[][] = new Int[shapeFunsB.length][shapeFunsB.length];
-		Int rhsInt[] = new Int[shapeFuns.length];
+		Integrate lhsInt[][] = new Integrate[shapeFuns.length][shapeFuns.length];
+		Integrate lhsIntB[][] = new Integrate[shapeFunsB.length][shapeFunsB.length];
+		Integrate rhsInt[] = new Integrate[shapeFuns.length];
 		
 
 		Mesh2D mesh = null;
@@ -130,7 +130,7 @@ public class Example7 {
 		List<Expr> addList = normalizeTerms(pde.lhs);
 		//Change of variables
 		for(Expr term : addList) {
-			Int intTerm = (Int)term; // Integration term
+			Integrate intTerm = (Integrate)term; // Integration term
 			//Integrate on the domain
 			if(intTerm.domain instanceof Mesh2D) {
 				if(mesh == null)
@@ -162,7 +162,7 @@ public class Example7 {
 					subsList.add(new ExprPair(N2, s));
 					subsList.add(new ExprPair(x, trans.eqs[0].rhs));
 					subsList.add(new ExprPair(y, trans.eqs[1].rhs));
-					rhsInt[i] = ((Int)pde.rhs).changeOfVars(subsList, jac, refTri);
+					rhsInt[i] = ((Integrate)pde.rhs).changeOfVars(subsList, jac, refTri);
 					rhsInt[i].integrand.setLabel("RHS"+i);
 					System.out.println(rhsInt[i]+"\n");
 				}
@@ -292,7 +292,7 @@ public class Example7 {
 		intTerms.flattenAdd(addList);
 		Map<Domain, List<Expr>> map = new HashMap<Domain, List<Expr>>();
 		for(int i=0; i<addList.size(); i++) {
-			Int tmp = (Int)addList.get(i);
+			Integrate tmp = (Integrate)addList.get(i);
 			List<Expr> list = map.get(tmp.domain);
 			if(list == null) {
 				list = new ArrayList<Expr>();
@@ -303,7 +303,7 @@ public class Example7 {
 		List<Expr> rlt = new ArrayList<Expr>();
 		for(Entry<Domain, List<Expr>> entry : map.entrySet()) {
 			rlt.add(
-				Int.apply(Utils.addListToExpr(entry.getValue()), entry.getKey())
+				Integrate.apply(Utils.addListToExpr(entry.getValue()), entry.getKey())
 			);
 		}
 		return rlt;

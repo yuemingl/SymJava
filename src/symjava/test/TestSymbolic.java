@@ -2,12 +2,13 @@ package symjava.test;
 
 import static symjava.symbolic.Symbol.*;
 import static symjava.math.SymMath.*;
-
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
 import symjava.domains.Interval;
+import symjava.matrix.SymVector;
 import symjava.symbolic.*;
+import symjava.symbolic.utils.JIT;
 
 
 public class TestSymbolic {
@@ -24,7 +25,7 @@ public class TestSymbolic {
 			System.out.println("FAIL: " + expr1 +" != " + expr2);
 	}
 	public static void checkResult(double d1, double d2, Expr expr) {
-		if( d1 == d2 )
+		if( Math.abs(d1 - d2) < 1e-10 )
 			System.out.println(true);
 		else {
 			if(expr != null)
@@ -53,7 +54,7 @@ public class TestSymbolic {
 		checkResult("x*y",x * y);
 		checkResult("x/y",x / y);
 		checkResult("-x",- x);
-		checkResult("x^2",new Power(x,2));
+		checkResult("x^2",pow(x,2));
 
 		checkResult("0", Symbol.Cm1 + Symbol.C1);
 		checkResult("0", x + (-x));
@@ -124,7 +125,7 @@ public class TestSymbolic {
 		checkResult("y^2",ny * ny);
 		checkResult(y*y, ny * ny);
 		
-		checkResult("x^5*y*z", x * y * x * z * x * new Power(x,2));
+		checkResult("x^5*y*z", x * y * x * z * x * pow(x,2));
 		
 		checkResult("x^3*y*z + 2*(y*z)^2", (x * y * x * z * x) + (y * z * y * z) + (z * y * z * y));
 	
@@ -204,7 +205,7 @@ public class TestSymbolic {
 	
 	public static void testToBytecodeFunc() {
 		System.out.println("--------------testToBytecodeFunc-----------------");
-		Expr expr = new Power(x + y * z, 2);
+		Expr expr = pow(x + y * z, 2);
 		checkResult("(x + y*z)^2", expr);
 		
 //		List<Expr> list = new ArrayList<Expr>();
@@ -275,41 +276,125 @@ public class TestSymbolic {
 		
 		Func w = new Func("w", x, y, x);
 		checkResult("\\nabla{w(x,y,x)} \\cdot \\nabla{v(x,y,z)}", new Dot(gu, gv).fdiff(u,w));
+		
+		Func f = new Func("F");
+		SymVector grad = Grad.apply(f);
+		Div div = new Div(grad);
+		//checkResult("\\nabla \\cdot \\nabla{F}", div);
+		checkResult("div(\\nabla{F})", div);
+
+		Expr expr = x*x + y*y +z*z;
+		checkResult("div(\\nabla{F})", Div.apply(Grad.apply(expr)));
 	}
 	
 	public static void testIntegration() {
 		Domain I = Interval.apply(-oo, 1.0);
-		Expr t1 = Int.apply(x, I);
+		Expr t1 = Integrate.apply(x, I);
 		checkResult("x + \\int_{-oo}^{1.0}{x}dx", t1 + x);
+
+		Domain I2 = Interval.apply(-oo, x);
+		Expr t2 = Integrate.apply(pow(e,r), I2);
+		checkResult("\\int_{-oo}^{x}{e^r}dx", t2);
+		
+		checkResult("e^r", t2.diff(x));
 		
 		Domain D = new Domain2D("D",x,y);
-		checkResult("\\int_{D}{0.5*x^2 + 0.5*y^2}dxdy", Int.apply(0.5*(x*x+y*y), D));
+		checkResult("\\int_{D}{0.5*x^2 + 0.5*y^2}dxdy", Integrate.apply(0.5*(x*x+y*y), D));
 	}
 	
 	public static void testPower() {
 		Expr expr = pow(x, 2.1) * pow(x,2);
-		checkResult("x^4.100000", expr);
-		checkResult("x^0.500000", pow(x,0.5));
+		checkResult("x^4.1", expr);
+		checkResult("x^0.5", pow(x,0.5));
 		
-		checkResult("", sqrt(x));
-		checkResult("", new Sqrt(x,3));
+		checkResult("\\sqrt{x}", sqrt(x));
+		checkResult("\\sqrt[3]{x}", sqrt(x,3));
 		
-		Func fun = new Func("fexpr",pow(x,2));
+		checkResult("e^x", exp(x));
+		checkResult("e^x", exp(x).diff(x));
+		checkResult("e^x^2*2*x", exp(x*x).diff(x));
+		checkResult("e^2", exp(2));
+		
+		
+		Func fun = new Func("fexpr",pow(x,3));
 		BytecodeFunc bfun = fun.toBytecodeFunc();
-		checkResult("",String.valueOf(bfun.apply(3)));
+		checkResult("8.0",String.valueOf(bfun.apply(2)));
+
+		Func fun2 = new Func("fexpr",pow(x,0.5));
+		BytecodeFunc bfun2 = fun2.toBytecodeFunc();
+		checkResult("2.0",String.valueOf(bfun2.apply(4)));
+
+		checkResult(1.0,JIT.compile(sin(x)).apply(Math.PI/2), sin(x));
+		checkResult(0.0,JIT.compile(sin(x)).apply(0), sin(x));
+
+		checkResult(0.0,JIT.compile(cos(x)).apply(Math.PI/2), cos(x));
+		checkResult(1.0,JIT.compile(cos(x)).apply(0), cos(x));
+
+		checkResult(Math.tan(Math.PI/4),JIT.compile(tan(x)).apply(Math.PI/4), tan(x));
+		checkResult(0.0,JIT.compile(tan(x)).apply(0), tan(x));
+
+		checkResult(0.0,JIT.compile(log(x)).apply(1), log(x));
+		checkResult(0.0,JIT.compile(log10(x)).apply(1), log10(x));
+		checkResult(0.0,JIT.compile(log2(x)).apply(1), log2(x));
+
+		checkResult(1.0,JIT.compile(log(x)).apply(Math.E), log(x));
+		checkResult(1.0,JIT.compile(log10(x)).apply(10), log10(x));
+		checkResult(1.0,JIT.compile(log2(x)).apply(2), log2(x));
+
+		checkResult(3.0,JIT.compile(log(x,y)).apply(3,27), log(x,y));
+		checkResult(3.0,JIT.compile(log10(x)).apply(1000), log10(x));
+		checkResult(3.0,JIT.compile(log2(x)).apply(8), log2(x));
+		
+		checkResult(Math.E*Math.E,JIT.compile(exp(x)).apply(2), exp(x));
+		checkResult(1.0,JIT.compile(exp(x)).apply(0), exp(x));
+		
+		checkResult(1.0,JIT.compile(exp(-0.5*pow(z,2))).apply(2), exp(-0.5*pow(z,2)));
+		
+		Domain I = Interval.apply(-oo, x, z);
+		Expr cdf = Integrate.apply(exp(-0.5*pow(z,2)), I)/sqrt(PI2);
+		checkResult("1/\\sqrt{2\\pi}*\\int_{-oo}^{x}{e^{-0.5*z^2}}dz",cdf);
+		Domain I2 = Interval.apply(-10, x, z).setStep(0.001);
+		Expr cdf2 = Integrate.apply(exp(-0.5*pow(z,2)), I2)/sqrt(PI2);
+		checkResult(1.0,JIT.compile(cdf2).apply(10), cdf);
+	}
+	
+	public static void testSinCosTan() {
+		
+		checkResult("sin(x)",sin(x));
+		checkResult("cos(x)",sin(x).diff(x));
+		checkResult("cos(x)",cos(x));
+		checkResult("-sin(x)",cos(x).diff(x));
+		checkResult("tan(x)",tan(x));
+		checkResult("1 + (tan(x))^2",tan(x).diff(x));
+		
+		checkResult("cos(cos(x))*-sin(x)",sin(cos(x)).diff(x));
+		checkResult("-sin(x)*cos(x)",cos(sin(x)).diff(x));
+		checkResult("cos(x)*(1 + (tan(sin(x)))^2)",tan(sin(x)).diff(x));
+
+	}
+	
+	public static void testSymReal() {
+		SymReal<Double> a = new SymReal<Double>(0.0);
+		SymReal<Double> aa = new SymReal<Double>(-0.0);
+		SymReal<Long> b = new SymReal<Long>(0L);
+		System.out.println(a.symEquals(b));
+		System.out.println(aa.symEquals(b));
+		System.out.println(a.symEquals(aa));
 	}
 	
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
-		testBasic();
-		testPrint();
-		testSimplify();
-		testSummation();
-		testToBytecodeFunc();
-		testDiff();
+//		testBasic();
+//		testPrint();
+//		testSimplify();
+//		testSummation();
+//		testToBytecodeFunc();
+//		testDiff();
 		testAbstract();
-		testIntegration();
-		testPower();
+//		testIntegration();
+//		testPower();
+//		testSymReal();
+//		testSinCosTan();
 	}
 }

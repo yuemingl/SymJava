@@ -1,7 +1,7 @@
 package symjava.bytecode;
 
 public class TestByteCode {
-	public double fun(double[] args) {
+	public static double fun(double[] args) {
 //		return args[0] + args[1];
 		double s = Math.pow(2, 3);
 		return s;

@@ -2,6 +2,12 @@ package symjava.symbolic;
 
 import symjava.symbolic.utils.Utils;
 
+/**
+ * An object of Symbol has a string name which is its unique id.
+ * Two objects of Symbol with the same name are the same thing in SymJava. 
+ * see method symEquals()
+ * 
+ */
 public class Symbol extends Expr {
 	public static Symbol a = new Symbol("a");
 	public static Symbol b = new Symbol("b");

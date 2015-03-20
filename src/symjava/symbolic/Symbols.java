@@ -4,17 +4,39 @@ import java.util.HashMap;
 
 import symjava.symbolic.utils.Utils;
 
+/**
+ * An object of Symbols can represents a list of symbols
+ * For example:
+ * Symbols ss = new Symbols("x"); //x_i, i=...,1,2,3...
+ * Symbol x1 = ss.get(1); //x_1
+ * Symbol x8 = ss.get(8); //x_8
+ * 
+ * This can be used to generate a list of symbols in summation or parameter list in an equation.
+ * 
+ * @author yuemingliu
+ *
+ */
 public class Symbols extends Expr {
 	String namePrefix;
 	Expr indexSymbol;
 	HashMap<Integer, Symbol> cache = new HashMap<Integer, Symbol>();
 	
+	/**
+	 * x_i, i=...,1,2,3,...
+	 * @param namePrefix
+	 */
 	public Symbols(String namePrefix) {
 		this.namePrefix = namePrefix;
-		this.label = namePrefix + "_?";
+		this.indexSymbol = new Symbol("i");
+		this.label = namePrefix + indexSymbol;
 		sortKey = label;
 	}
 	
+	/**
+	 * 
+	 * @param namePrefix
+	 * @param indexSymbol
+	 */
 	public Symbols(String namePrefix, Expr indexSymbol) {
 		this.namePrefix = namePrefix;
 		this.indexSymbol = indexSymbol;
@@ -38,10 +60,10 @@ public class Symbols extends Expr {
 		} else if(Utils.symCompare(indexSymbol,from)) {
 			if(to instanceof SymInteger) {
 				SymInteger index = (SymInteger)to;
-				Symbol s = this.get(index.getVal());
-				return s;
+				Symbol s = this.get(index.getValue());
+				return s; //ss.subs(i,3): x_i => x_3
 			}
-			return new Symbol(namePrefix+"_"+to);
+			return new Symbol(namePrefix+"_"+to); //ss.subs(i,j): x_i => x_j
 		}
 		return this;
 	}

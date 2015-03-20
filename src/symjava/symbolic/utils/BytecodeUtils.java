@@ -1,7 +1,6 @@
 package symjava.symbolic.utils;
 
-import static com.sun.org.apache.bcel.internal.Constants.ACC_PUBLIC;
-import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
+import static com.sun.org.apache.bcel.internal.Constants.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,23 +10,32 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import symjava.domains.Interval;
 import symjava.symbolic.Add;
-import symjava.symbolic.BinaryOp;
+import symjava.symbolic.Cos;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Dot;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
+import symjava.symbolic.Infinity;
+import symjava.symbolic.Integrate;
+import symjava.symbolic.Log;
 import symjava.symbolic.Multiply;
 import symjava.symbolic.Negate;
-import symjava.symbolic.Power;
+import symjava.symbolic.Pow;
 import symjava.symbolic.Reciprocal;
+import symjava.symbolic.Sin;
 import symjava.symbolic.Sqrt;
 import symjava.symbolic.Subtract;
 import symjava.symbolic.Sum;
 import symjava.symbolic.SymReal;
 import symjava.symbolic.Symbol;
-import symjava.symbolic.UnaryOp;
 import symjava.symbolic.SymConst;
+import symjava.symbolic.Tan;
+import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.arity.NaryOp;
+import symjava.symbolic.arity.TernaryOp;
+import symjava.symbolic.arity.UnaryOp;
 
 import com.sun.org.apache.bcel.internal.Constants;
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
@@ -43,6 +51,7 @@ import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.POP2;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
@@ -51,15 +60,15 @@ public class BytecodeUtils {
 		if(e == null) return;
 		if(e instanceof BinaryOp) {
 			BinaryOp be = (BinaryOp)e; 
-			post_order(be.left, outList);
-			post_order(be.right, outList);
+			post_order(be.arg1, outList);
+			post_order(be.arg2, outList);
 		} else if(e instanceof Reciprocal) {
 			Reciprocal ue = (Reciprocal)e;
 			outList.add(Symbol.C1);
-			post_order(ue.base, outList);
+			post_order(ue.arg, outList);
 		} else if(e instanceof UnaryOp) {
 			UnaryOp ue = (UnaryOp)e; 
-			post_order(ue.base, outList);
+			post_order(ue.arg, outList);
 		} else if(e instanceof Sum) {
 			Sum se = (Sum)e;
 			for(int i=se.start; i<=se.end; i++)
@@ -74,6 +83,22 @@ public class BytecodeUtils {
 				post_order(f.getExpr(), outList);
 				return;
 			}
+		} else if(e instanceof Integrate) {
+			Integrate INT = (Integrate)e;
+			if(INT.domain instanceof Interval) {
+				Interval I = (Interval)INT.domain;
+				post_order(I.getStart(), outList);
+				post_order(I.getEnd(), outList);
+				//Integrand will not be added to the outList since we don't want the dummy variable to be exposed
+				//outList.add(new Func("integrand"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand));
+			} else {
+				//TODO
+				//Support multi-variable integrate
+			}
+		} else if(e instanceof NaryOp || e instanceof TernaryOp) {
+			Expr[] args = e.args();
+			for(int i=0; i<args.length; i++)
+				post_order(args[i], outList);
 		}
 		outList.add(e);
 	}
@@ -83,7 +108,7 @@ public class BytecodeUtils {
 		List<Expr> list = new ArrayList<Expr>();
 		post_order(func, list);
 		for(Expr e : list) {
-			if(e instanceof Symbol || e instanceof SymConst) {
+			if(e instanceof Symbol) {
 				set.add(e);
 			} else if(e instanceof Func) {
 				Func fe = (Func)e;
@@ -107,7 +132,7 @@ public class BytecodeUtils {
 		return rlt;
 	}
 	
-	public static ClassGen genClass(Func fun, boolean writeClassFile) {
+	public static ClassGen genClass(Func fun, boolean writeClassFile, boolean staticMethod) {
 		String packageName = "symjava.bytecode";
 		String clsName = fun.getName();
 		String fullClsName = packageName+"."+clsName;
@@ -117,7 +142,10 @@ public class BytecodeUtils {
 		InstructionList il = new InstructionList();
 		InstructionFactory factory = new InstructionFactory(cg);
 		
-		MethodGen mg = new MethodGen(ACC_PUBLIC, // access flags
+		short acc_flags = ACC_PUBLIC;
+		if(staticMethod)
+			acc_flags |= ACC_STATIC;
+		MethodGen mg = new MethodGen(acc_flags, // access flags
 				Type.DOUBLE, // return type
 				new Type[] { // argument types
 					new ArrayType(Type.DOUBLE, 1) 
@@ -127,7 +155,7 @@ public class BytecodeUtils {
 				il, cp);
 		
 		Expr[] fExprArgs = extractArguments(fun);
-		if(fExprArgs.length != fun.args.length) {
+		if(fExprArgs.length > fun.args.length) {
 			System.out.println(
 				String.format("Warning: Arguments of %s is different from it's expression:\n>>>Defined args:%s \n>>>Express args:%s",
 						fun.getName(),
@@ -143,6 +171,8 @@ public class BytecodeUtils {
 			System.out.println(
 					String.format(">>>Using args: %s", Utils.joinLabels(fExprArgs, ","))
 					);
+		} else {
+			fExprArgs = fun.args;
 		}
 		HashMap<Expr, Integer> argsMap = new HashMap<Expr, Integer>();
 		for(int i=0; i<fExprArgs.length; i++) {
@@ -157,17 +187,22 @@ public class BytecodeUtils {
 
 		for(int i=0; i<insList.size(); i++) {
 			Expr ins = insList.get(i);
-			if(ins instanceof Symbol || ins instanceof SymConst) {
+			if(ins instanceof Symbol) {
 				Integer argIdx = argsMap.get(ins);
 				if(argIdx == null) {
 					throw new IllegalArgumentException(ins+" is not in the argument list of "+fun.getLabel());
 				}
-				il.append(new ALOAD(1));
+				if(staticMethod)
+					il.append(new ALOAD(0)); //for static method
+				else
+					il.append(new ALOAD(1));
 				il.append(new PUSH(cp, argIdx));
 				il.append(new DALOAD());
 			} else if(ins instanceof SymReal<?>) {
-				Number s = (Number)((SymReal<?>)ins).getVal();
+				Number s = (Number)((SymReal<?>)ins).getValue();
 				il.append(new PUSH(cp, s.doubleValue()));
+			} else if(ins instanceof SymConst) {
+				il.append(new PUSH(cp, ((SymConst)ins).getValue()));
 			} else if(ins instanceof Add) {
 				il.append(new DADD());
 			} else if(ins instanceof Subtract) {
@@ -176,30 +211,85 @@ public class BytecodeUtils {
 				il.append(new DMUL());
 			} else if(ins instanceof Divide) {
 				il.append(new DDIV());
-			} else if(ins instanceof Power) {
-				Power p = (Power)ins;
-				double remain = p.exponent - Math.floor(p.exponent);
-				if(remain == 0) {
-					il.append(new PUSH(cp, (int)p.exponent));
-					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "powi",
-							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.INT }, Constants.INVOKESTATIC));
-				} else {
-					il.append(new PUSH(cp, (double)p.exponent));
-					il.append(factory.createInvoke("java.lang.Math", "pow",
-							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+			} else if(ins instanceof Pow) {
+				Pow p = (Pow)ins;
+				if(p.arg2 instanceof SymReal<?>) {
+					SymReal<?> realExp = (SymReal<?>)p.arg2;
+					if(realExp.isInteger()) {
+						il.append(new POP2()); //Replace double value to integer
+						il.append(new PUSH(cp, realExp.getIntValue()));
+						il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "powi",
+								Type.DOUBLE, new Type[] { Type.DOUBLE, Type.INT }, Constants.INVOKESTATIC));
+						continue;
+					}
 				}
+				il.append(factory.createInvoke("java.lang.Math", "pow",
+						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
 			} else if(ins instanceof Sqrt) {
 				Sqrt p = (Sqrt)ins;
-				il.append(new PUSH(cp, (double)p.root));
-				il.append(factory.createInvoke("java.lang.Math", "sqrt",
+				if(p.arg2 instanceof SymReal<?>) {
+					SymReal<?> realRoot = (SymReal<?>)p.arg2;
+					if(realRoot.getIntValue() == 2) {
+						il.append(new POP2());
+						il.append(factory.createInvoke("java.lang.Math", "sqrt",
+								Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+						continue;
+					}
+				}
+				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "sqrt",
+						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+			} else if(ins instanceof Sin) {
+				il.append(factory.createInvoke("java.lang.Math", "sin",
 						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+			} else if(ins instanceof Cos) {
+				il.append(factory.createInvoke("java.lang.Math", "cos",
+						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+			} else if(ins instanceof Tan) {
+				il.append(factory.createInvoke("java.lang.Math", "tan",
+						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+//			} else if(ins instanceof Log10) {
+//				il.append(factory.createInvoke("java.lang.Math", "log10",
+//						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+//				il.append(new POP2()); //this pop out the result of log10, not the base
+			} else if(ins instanceof Log) {
+//				if(Utils.symCompare(((Log) ins).arg1, Exp.E)) {
+//					il.append(factory.createInvoke("java.lang.Math", "log",
+//							Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+//					il.append(new POP2());
+//				} else {
+					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
+							Type.DOUBLE, new Type[] { Type.DOUBLE,  Type.DOUBLE }, Constants.INVOKESTATIC));
+//				}
 			} else if(ins instanceof Reciprocal) {
 				il.append(new DDIV());
 			} else if(ins instanceof Negate) {
 				il.append(new PUSH(cp, -1.0));
 				il.append(new DMUL());
+			} else if(ins instanceof Infinity) {
+				throw new RuntimeException(ins.getClass() + "Infinity cannot be used in numerical computation, use a proper number instead!");
+			} else if(ins instanceof Integrate) {
+				Integrate INT = (Integrate)ins;
+				if(INT.domain instanceof Interval) {
+					//Compile the integrand
+					Func f = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand);
+					//System.out.println(f);
+					f.toBytecodeFunc(true, true); //Load class, could be better method to load a class
+					
+					//TODO read this: http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
+					if(INT.domain.getStep() == null) {
+						throw new RuntimeException("Please specifiy the step size for you integral: "+INT);
+					}
+					
+					il.append(new PUSH(cp, INT.domain.getStep()));
+					il.append(new PUSH(cp, f.getName()));
+					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate1D",
+							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, Type.STRING }, Constants.INVOKESTATIC));
+				} else {
+					//TODO
+					throw new RuntimeException("Unsupported Integrate: "+INT);
+				}
 			} else {
-				throw new RuntimeException(ins.getClass() + " is not allowed when generating bytecode function!");
+				throw new RuntimeException(ins.getClass() + " is not supported in this version when generating bytecode function!");
 			}
 		}
 

@@ -1,10 +1,22 @@
 package symjava.symbolic;
 
+/**
+ * An object of SymConst represent a mathematical constant such as PI, E.
+ * The constant is displayed as its label but used as a double number 
+ * in numerical computation.
+ * 
+ */
 public class SymConst extends Expr {
-
-	public SymConst(String label) {
+	double value;
+	
+	public SymConst(String label, double value) {
 		this.label = label;
 		this.sortKey = label;
+		this.value = value;
+	}
+	
+	public double getValue() {
+		return value;
 	}
 	
 	@Override

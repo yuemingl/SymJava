@@ -6,22 +6,74 @@ import java.util.List;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.Utils;
 
+/**
+ * An object of Eq represents a equation like
+ * y = a*x+b
+ * 
+ */
 public class Eq extends Relation {
-	Expr[] freeVars;
-	Expr[] dependentVars;
-	Expr[] params;
-	Expr[] unknowns;
+	Expr[] freeVars; //for example: x in y=a*x+b
+	Expr[] dependentVars; //for example: y in y=a*x+b
+	Expr[] params; //paramters in the equation, for example: a, b in y=a*x+b
+	Expr[] unknowns; //freeVars + dependentVars, for example: x, y in y=a*x+b
 	
+	/**
+	 * Create an equation like y=... without any parameters
+	 * For example:
+	 * Eq e = new Eq(y, 2*x+1); //y = 2*x+1
+	 * 
+	 * @param lhs
+	 * @param rhs
+	 */
 	public Eq(Expr lhs, Expr rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;	
+		this.freeVars = Utils.extractSymbols(rhs).toArray(new Expr[0]);
+		this.params = new Expr[0];
+		this.dependentVars = Utils.extractSymbols(lhs).toArray(new Expr[0]);
+		setUnknowns();
 	}
 	
+	/**
+	 * Create an equation like y=... 
+	 * The free variables are specified on the right hand side (rhs).
+	 * It may contain parameters on the right hand side and the paramters
+	 * can be extracted automatically.
+	 * For example:
+	 * Eq e = Eq(y, a*x+b, new Expr[]{x}); 
+	 * This will create equation y=a*x+b with
+	 *   freeVars = [x]
+	 *   params = [a,b]
+	 *   dependentVars = [y]
+	 *   unkonws = [x,y]
+	 * 
+	 * @param lhs
+	 * @param rhs
+	 * @param freeVars
+	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars) {
 		this.lhs = lhs;
 		this.rhs = rhs;	
+		this.freeVars = freeVars;
+		this.dependentVars = Utils.extractSymbols(lhs).toArray(new Expr[0]);
+		//Find params
+		List<Expr> list = Utils.extractSymbols(rhs);
+		List<Expr> paramList = new ArrayList<Expr>();
+		for(Expr s : list) {
+			boolean skip = false;
+			for(int i=0; i<freeVars.length; i++) {
+				if(s.symEquals(freeVars[i])) {
+					skip = true;
+					break;
+				}
+			}
+			if(skip) continue;
+			paramList.add(s);
+		}
+		this.params = paramList.toArray(new Expr[0]);
+		setUnknowns();
 	}
-	
+
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params) {
 		this.lhs = lhs;
 		this.rhs = rhs;
@@ -44,22 +96,27 @@ public class Eq extends Relation {
 			depList.add(s);
 		}
 		dependentVars = depList.toArray(new Expr[0]);
-		this.unknowns = new Expr[freeVars.length + dependentVars.length];
-		int idx = 0;
-		for(int i=0; i<freeVars.length; i++) {
-			unknowns[idx++] = freeVars[i];
-		}
-		for(int i=0; i<dependentVars.length; i++) {
-			unknowns[idx++] = dependentVars[i];
-		}
+		setUnknowns();
 	}
 	
+	/**
+	 * 
+	 * @param lhs
+	 * @param rhs
+	 * @param freeVars
+	 * @param params
+	 * @param dependentVars
+	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params, Expr[] dependentVars) {
 		this.lhs = lhs;
 		this.rhs = rhs;
 		this.freeVars = freeVars;
-		this.dependentVars = dependentVars;
 		this.params = params;
+		this.dependentVars = dependentVars;
+		setUnknowns();
+	}
+	
+	private void setUnknowns() {
 		this.unknowns = new Expr[freeVars.length + dependentVars.length];
 		int idx = 0;
 		for(int i=0; i<freeVars.length; i++) {
@@ -72,6 +129,18 @@ public class Eq extends Relation {
 
 	public static Eq apply(Expr lhs, Expr rhs) {
 		return new Eq(lhs, rhs);
+	}
+
+	public static Eq apply(Expr lhs, Expr rhs, Expr[] freeVars) {
+		return new Eq(lhs, rhs, freeVars);
+	}
+	
+	public static Eq apply(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params) {
+		return new Eq(lhs, rhs, freeVars, params);
+	}
+	
+	public static Eq apply(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params, Expr[] dependentVars) {
+		return new Eq(lhs, rhs, freeVars, params, dependentVars);
 	}
 	
 	public Expr subsLHS(Expr[] from, Expr[] to) {
@@ -141,4 +210,9 @@ public class Eq extends Relation {
 	public Expr solve(Expr var) {
 		return null;
 	}
+	
+	public String toString() {
+		return lhs + " = " + rhs;
+	}	
 }
+
