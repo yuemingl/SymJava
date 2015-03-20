@@ -41,6 +41,7 @@ public class BytecodeSupport {
 					getMethod("apply", new Class[] {double[].class});
 			double[] args = { 0 };
 			double sum = 0.0;
+			
 //			for(double i=begin; i<=end; i+=step) {
 //				args[0] = i;
 //				Double val = (Double)method.invoke(null, args);
@@ -48,6 +49,7 @@ public class BytecodeSupport {
 //				sum += val*step;
 //			}
 			
+			// Use trapezoid rule 
 			args[0] = begin;
 			Double val1 = (Double)method.invoke(null, args);
 			double i = begin + step;
