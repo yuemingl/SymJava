@@ -13,6 +13,11 @@ import symjava.math.Div;
 import symjava.math.Dot;
 import symjava.math.Grad;
 import symjava.matrix.SymVector;
+import symjava.relational.Ge;
+import symjava.relational.Gt;
+import symjava.relational.Le;
+import symjava.relational.Lt;
+import symjava.relational.Neq;
 import symjava.symbolic.*;
 import symjava.symbolic.utils.JIT;
 
@@ -395,6 +400,11 @@ public class TestSymbolic {
 		System.out.println(~x);
 		//System.out.println(x < y);
 		
+		System.out.println(Gt.apply(x, y) | Gt.apply(x, z));
+		System.out.println(Ge.apply(x, y) | Ge.apply(x, z));
+		System.out.println(Le.apply(x, y) | Le.apply(x, z));
+		System.out.println(Lt.apply(x, y) | Lt.apply(x, z));
+		System.out.println(Neq.apply(x, y) | Neq.apply(x, z));
 		
 	}
 	public static void main(String[] args) {
