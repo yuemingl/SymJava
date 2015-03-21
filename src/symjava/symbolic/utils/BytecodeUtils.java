@@ -276,11 +276,11 @@ public class BytecodeUtils {
 					f.toBytecodeFunc(true, true); //Load class, could be better method to load a class
 					
 					//TODO read this: http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
-					if(INT.domain.getStep() == null) {
+					if(INT.domain.getStepSize() == null) {
 						throw new RuntimeException("Please specifiy the step size for you integral: "+INT);
 					}
 					
-					il.append(new PUSH(cp, INT.domain.getStep()));
+					il.append(new PUSH(cp, INT.domain.getStepSize()));
 					il.append(new PUSH(cp, f.getName()));
 					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate1D",
 							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, Type.STRING }, Constants.INVOKESTATIC));

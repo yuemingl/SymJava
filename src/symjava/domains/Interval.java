@@ -50,7 +50,7 @@ public class Interval extends Domain1D {
 		return new Interval(s, e);
 	}
 	
-	public static <T1, T2> Domain apply(T1 start, T2 end, Expr coordVar) {
+	public static <T1, T2> Interval apply(T1 start, T2 end, Expr coordVar) {
 		Expr s = null, e = null;
 		if(start instanceof Number) {
 			s = new SymDouble(((Number)start).doubleValue());

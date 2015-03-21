@@ -18,7 +18,7 @@ public class NumericalIntegration {
 	
 	public static void test_1D() {
 		//Define the interal
-		Domain I = Interval.apply(-10, 0).setStep(0.01);
+		Domain I = Interval.apply(-10, 0).setStepSize(0.01);
 		//Define the integral: cumulative distribution function
 		Expr cdf = Integrate.apply(exp(-0.5*pow(x,2))/sqrt(2*PI), I);
 		System.out.println(cdf); //\int_{-10.0}^{10.0}{1/\sqrt{2*\pi}*e^{-0.5*x^2}}dx
