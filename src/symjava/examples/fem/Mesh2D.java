@@ -332,8 +332,10 @@ public class Mesh2D extends Domain2D {
 	}
 	
 	/**
-	 * If the return integer of func > 0, the edge that contains the node will be returned and
-	 * the type of the node is marked as the return value 
+	 * Need a function as parameter served as a marker function
+	 * 
+	 * If the returned value of func(x,y) > 0, the edge that contains the node (x,y) will be returned and
+	 * the type of the node (x,y) is marked as the return value 
 	 */
 	@Override
 	public Domain getBoundary(NumFunc<?> func) {
