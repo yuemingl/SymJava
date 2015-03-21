@@ -1,7 +1,9 @@
 package symjava.domains;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import symjava.math.Transformation;
 import symjava.numeric.NumFunc;
@@ -14,7 +16,15 @@ import symjava.symbolic.Expr;
 public abstract class Domain {
 	protected String label;
 	protected Expr[] coordVars;
-	Double step = null;
+	
+	public static class CoordVarInfo {
+		double stepSize;
+		double minBound;
+		double maxBound;
+	}
+	
+	protected Map<Expr, CoordVarInfo> infoMap = new HashMap<Expr, CoordVarInfo>();
+	
 	
 	/**
 	 * Return a (n-1) dim domain that represents the boundary of the domain
@@ -79,17 +89,44 @@ public abstract class Domain {
 	}
 	
 	/**
-	 * Split the domain evenly with size step in each direction
+	 * Split the domain evenly with size step in the given direction
 	 * @param step
 	 * @return
 	 */
-	public Domain setStep(double step) {
-		this.step = step;
+	public Domain setStepSize(Expr x, double stepSize) {
+		CoordVarInfo info = infoMap.get(x);
+		if(info == null) {
+			info = new CoordVarInfo();
+			infoMap.put(x, info);
+		}
+		info.stepSize = stepSize;
 		return this;
 	}
 	
-	public Double getStep() {
-		return step;
+	/**
+	 * Get the step size of the given direction
+	 * @param x
+	 * @return
+	 */
+	public Double getStepSize(Expr x) {
+		CoordVarInfo info = infoMap.get(x);
+		if(info == null)
+			return null;
+		return info.stepSize;
+	}
+	
+	public Domain setStepSize(double stepSize) {
+		for(Expr x : this.coordVars) {
+			setStepSize(x, stepSize);
+		}
+		return this;
+	}
+	
+	public Double getStepSize() {
+		for(Expr x : this.coordVars) {
+			return getStepSize(x);
+		}
+		return null;
 	}
 	
 	/**

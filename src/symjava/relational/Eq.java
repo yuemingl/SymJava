@@ -28,6 +28,8 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Eq(Expr lhs, Expr rhs) {
 		super(lhs, rhs);
+		this.label = arg1 + " = " + arg2;
+		this.sortKey = this.label;
 		this.freeVars = Utils.extractSymbols(rhs).toArray(new Expr[0]);
 		this.params = new Expr[0];
 		this.dependentVars = Utils.extractSymbols(lhs).toArray(new Expr[0]);
@@ -246,10 +248,6 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Expr solve(Expr var) {
 		return null;
-	}
-	
-	public String toString() {
-		return arg1 + " = " + arg2;
 	}
 
 	@Override

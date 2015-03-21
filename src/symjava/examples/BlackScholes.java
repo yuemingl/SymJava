@@ -42,11 +42,9 @@ public class BlackScholes {
 		Expr dm = (log(fwd/strike)-0.5*pow(stdDev,2))/stdDev;
 
 		//we use -10 instead of -oo for numerical computation
-		Domain I1 = Interval.apply(-10, phi*dp, z); 
-		Domain I2 = Interval.apply(-10, phi*dm, z); 
-		double stepSize = 1e-3;
-		I1.setStep(stepSize);
-		I2.setStep(stepSize);
+		double step = 1e-3;
+		Domain I1 = Interval.apply(-10, phi*dp, z).setStepSize(step); 
+		Domain I2 = Interval.apply(-10, phi*dm, z).setStepSize(step); 
 		Expr cdf1 = Integrate.apply(exp(-0.5*pow(z,2)), I1)/sqrt(PI2);
 		Expr cdf2 = Integrate.apply(exp(-0.5*pow(z,2)), I2)/sqrt(PI2);
 		
@@ -126,11 +124,9 @@ public class BlackScholes {
 		Expr d2 = d1-sigma*sqrt(t);
 		
 		//we use -10 instead of -oo for numerical computation
-		Domain I1 = Interval.apply(-10, d1, z); 
-		Domain I2 = Interval.apply(-10, d2, z); 
-		double stepSize = 1e-3;
-		I1.setStep(stepSize);
-		I2.setStep(stepSize);
+		double step = 1e-3;
+		Domain I1 = Interval.apply(-10, d1, z).setStepSize(step); 
+		Domain I2 = Interval.apply(-10, d2, z).setStepSize(step); 
 		Expr cdf1 = Integrate.apply(exp(-0.5*pow(z,2)), I1)/sqrt(PI2);
 		Expr cdf2 = Integrate.apply(exp(-0.5*pow(z,2)), I2)/sqrt(PI2);
 		Expr f = s0*cdf1-E*exp(-r*t)*cdf2-c;
