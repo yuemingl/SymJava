@@ -22,7 +22,7 @@ public class Transformation {
 	
 	public Transformation(Eq ...eqs) {
 		for(Eq e : eqs) {
-			if(!(e.lhs instanceof Symbol || e.lhs instanceof Func))
+			if(!(e.arg1 instanceof Symbol || e.arg1 instanceof Func))
 				throw new RuntimeException("The left hand side must be a symbol or function!");
 		}
 		this.eqs = eqs;
@@ -31,7 +31,7 @@ public class Transformation {
 	public Expr[] getFromVars() {
 		Expr[] rlt = new Expr[eqs.length];
 		for(int i=0; i<rlt.length; i++) {
-			rlt[i] = eqs[i].lhs;
+			rlt[i] = eqs[i].arg1;
 		}
 		return rlt;
 	}
@@ -60,7 +60,7 @@ public class Transformation {
 		SymMatrix m = new SymMatrix(fromVars.length, toVars.length);
 		for(int i=0; i<fromVars.length; i++) {
 			for(int j=0; j<toVars.length; j++) {
-				m.set(i, j, eqs[i].rhs.diff(toVars[j]));
+				m.set(i, j, eqs[i].arg2.diff(toVars[j]));
 			}
 		}
 		return m;

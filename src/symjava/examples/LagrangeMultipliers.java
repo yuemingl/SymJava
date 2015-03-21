@@ -50,7 +50,7 @@ public class LagrangeMultipliers {
 			targets.add(new Sum(pow(depDataSymbols - depSymbols, 2), idx, 0, data.length-1));
 		}
 		addList.addAll(targets);
-		Expr state_eq = eq.lhs;
+		Expr state_eq = eq.arg1;
 		for(int j=0; j<freeVars.length; j++) {
 			state_eq = state_eq.subs(freeVars[j], new Symbols(freeVars[j].toString().toUpperCase(), idx));
 		}
@@ -77,7 +77,7 @@ public class LagrangeMultipliers {
 		Expr[] freeVarForL = new Expr[data.length*depVars.length + data.length + eq.getParams().length];
 		int lmdIdxStart = data.length*depVars.length;
 		for(int i=0; i<data.length; i++) {
-			Expr state_eq = eq.lhs;
+			Expr state_eq = eq.arg1;
 			for(int j=0; j<depVars.length; j++) {
 				int yIdx = (j*data.length)+i;
 				Symbols ys = new Symbols(depVars[j].toString(), idx);

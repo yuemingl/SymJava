@@ -1,8 +1,11 @@
-package symjava.symbolic;
+package symjava.math;
 
 import java.util.List;
 
 import symjava.matrix.SymVector;
+import symjava.symbolic.Derivative;
+import symjava.symbolic.Expr;
+import symjava.symbolic.Func;
 import symjava.symbolic.utils.Utils;
 
 /**
@@ -132,7 +135,7 @@ public class Grad extends SymVector {
 					return super.toString();
 				}
 			}
-			return "\\nabla{"+((Derivative)this.data.get(0)).func.toString()+"}";
+			return "\\nabla{"+((Derivative)this.data.get(0)).getFunc().toString()+"}";
 		}
 		return "\\nabla{"+this.func.getLabel()+"}";
 	}

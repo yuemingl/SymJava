@@ -63,7 +63,7 @@ public class Example6 {
 	}
 	
 	public static void solve(WeakForm wf, Mesh2D mesh, Map<Integer, Double> dirichlet, String output) {
-		System.out.println(String.format("PDE Weak Form: %s = %s", wf.lhs, wf.rhs));
+		System.out.println(String.format("PDE Weak Form: %s = %s", wf.lhs(), wf.rhs()));
 		
 		//Create coordinate transformation
 		Symbol x1 = new Symbol("x1");
@@ -108,7 +108,7 @@ public class Example6 {
 				Func U = shapeFuns[j]; //trial
 				
 				//Weak form for the left hand side of the PDE
-				Expr lhs = wf.lhs.subs(wf.trial, U).subs(wf.test, V);
+				Expr lhs = wf.lhs().subs(wf.trial, U).subs(wf.test, V);
 				System.out.println(lhs);
 				System.out.println();
 				
@@ -118,8 +118,8 @@ public class Example6 {
 						.subs(N2.diff(x), sx)
 						.subs(N2.diff(y), sy)
 						.subs(N1, r).subs(N2, s)
-						.subs(x, trans.eqs[0].rhs)
-						.subs(y, trans.eqs[1].rhs);
+						.subs(x, trans.eqs[0].rhs())
+						.subs(y, trans.eqs[1].rhs());
 				System.out.println(lhs);
 				System.out.println();
 				
@@ -131,10 +131,10 @@ public class Example6 {
 				System.out.println();
 			}
 			//Weak form for the right hand side of the PDE
-			Expr rhs = wf.rhs.subs(wf.test, V)
+			Expr rhs = wf.rhs().subs(wf.test, V)
 							.subs(N1, r).subs(N2, s)
-							.subs(x, trans.eqs[0].rhs)
-							.subs(y, trans.eqs[1].rhs);
+							.subs(x, trans.eqs[0].rhs())
+							.subs(y, trans.eqs[1].rhs());
 			//System.out.println(rhs);
 			System.out.println();
 			rhsInt[i] = new Integrate(new Func(

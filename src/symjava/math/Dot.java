@@ -1,9 +1,12 @@
-package symjava.symbolic;
+package symjava.math;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import symjava.matrix.SymVector;
+import symjava.symbolic.Add;
+import symjava.symbolic.Expr;
+import symjava.symbolic.SymReal;
 import symjava.symbolic.utils.Utils;
 
 /**

@@ -1,9 +1,10 @@
-package symjava.symbolic;
+package symjava.math;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import symjava.matrix.SymVector;
+import symjava.symbolic.Expr;
 import symjava.symbolic.arity.NaryOp;
 import symjava.symbolic.utils.Utils;
 

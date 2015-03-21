@@ -11,7 +11,7 @@ import Jama.Matrix;
 
 public class NewtonOptimization {
 	public static void solve(Eq eq, double[] init, int maxIter, double eps, boolean dislpayOnly) {
-		if(!Symbol.C0.symEquals(eq.rhs)) {
+		if(!Symbol.C0.symEquals(eq.arg2)) {
 			System.out.println("The right hand side of the equation must be 0.");
 			return;
 		}
@@ -21,7 +21,7 @@ public class NewtonOptimization {
 		//Construct Hessian Matrix
 		SymVector grad = new SymVector(n);
 		SymMatrix hess = new SymMatrix(n, n);
-		Expr L = eq.lhs;
+		Expr L = eq.arg1;
 		for(int i=0; i<n; i++) {
 			grad[i] = L.diff(unknowns[i]);
 			for(int j=0; j<n; j++) {

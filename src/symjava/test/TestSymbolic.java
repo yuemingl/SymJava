@@ -2,10 +2,16 @@ package symjava.test;
 
 import static symjava.symbolic.Symbol.*;
 import static symjava.math.SymMath.*;
+
+import java.math.BigInteger;
+
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
 import symjava.domains.Interval;
+import symjava.math.Div;
+import symjava.math.Dot;
+import symjava.math.Grad;
 import symjava.matrix.SymVector;
 import symjava.symbolic.*;
 import symjava.symbolic.utils.JIT;
@@ -381,7 +387,14 @@ public class TestSymbolic {
 		System.out.println(aa.symEquals(b));
 		System.out.println(a.symEquals(aa));
 	}
-	
+
+	public static void testLogic() {
+		System.out.println(x & y);
+		System.out.println(x | y);
+		System.out.println(x ^ y);
+		System.out.println(~x);
+		//System.out.println(x < y);		
+	}
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
@@ -391,10 +404,11 @@ public class TestSymbolic {
 //		testSummation();
 //		testToBytecodeFunc();
 //		testDiff();
-		testAbstract();
+//		testAbstract();
 //		testIntegration();
 //		testPower();
 //		testSymReal();
 //		testSinCosTan();
+		testLogic();
 	}
 }

@@ -1,6 +1,8 @@
 package symjava.examples;
 
 import static symjava.symbolic.Symbol.*;
+import symjava.math.Dot;
+import symjava.math.Grad;
 import symjava.matrix.*;
 import symjava.symbolic.*;
 

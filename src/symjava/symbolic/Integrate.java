@@ -47,7 +47,7 @@ public class Integrate extends Expr {
 	public Integrate changeOfVars(Transformation trans) {
 		Expr tmp = this.integrand;
 		for(Eq e : trans.eqs) {
-			tmp = tmp.subs(e.lhs, e.rhs);
+			tmp = tmp.subs(e.arg1, e.arg2);
 		}
 		
 		//For test

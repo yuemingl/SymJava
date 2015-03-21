@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Set;
 
 import symjava.domains.Interval;
+import symjava.math.Dot;
 import symjava.symbolic.Add;
 import symjava.symbolic.Cos;
 import symjava.symbolic.Divide;
-import symjava.symbolic.Dot;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 import symjava.symbolic.Infinity;
