@@ -17,8 +17,8 @@ public abstract class Domain {
 	Double step = null;
 	
 	/**
-	 * Return a sub-domain that represents the boundary of the domain
-	 * The parameter specify the conditions which part of the boundary will be returned
+	 * Return a (n-1) dim domain that represents the boundary of the domain
+	 * The parameter specifies the conditions for which part of the boundary will be returned
 	 * @return
 	 */
 	public Domain getBoundary(NumFunc<?> func) {

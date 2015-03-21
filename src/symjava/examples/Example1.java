@@ -22,6 +22,7 @@ public class Example1 {
 		Func f = new Func("f1", expr2.diff(y));
 		System.out.println(f); //2*y + z
 		
+		//A function can be `compiled` to a bytecode function
 		BytecodeFunc func = f.toBytecodeFunc();
 		System.out.println(func.apply(1,2)); //4.0
 	}

@@ -11,6 +11,7 @@ public class Example0 {
 		Expr Rdy = R.diff(y);
 		System.out.println(Rdy);
 		
+		//Just-In-Time compile the symbolic expression to native code
 		BytecodeFunc func = JIT.compile(new Expr[]{x,y}, Rdy);
 		System.out.println(func.apply(0.362, 0.556));
 	}
