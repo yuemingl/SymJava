@@ -71,7 +71,7 @@ public class Example7 {
 	}
 	
 	public static void solve(WeakForm pde, Map<Integer, Double> dirichlet, String outputFile) {
-		System.out.println(String.format("Solving: %s == %s", pde.lhs, pde.rhs));
+		System.out.println(String.format("Solving: %s == %s", pde.lhs(), pde.rhs()));
 		
 		//Create coordinate transformation
 		Symbol x1 = new Symbol("x1");
@@ -127,7 +127,7 @@ public class Example7 {
 		Mesh2D mesh = null;
 		Mesh2DBoundary meshB = null;
 		
-		List<Expr> addList = normalizeTerms(pde.lhs);
+		List<Expr> addList = normalizeTerms(pde.lhs());
 		//Change of variables
 		for(Expr term : addList) {
 			Integrate intTerm = (Integrate)term; // Integration term
@@ -150,8 +150,8 @@ public class Example7 {
 						subsList.add(new ExprPair(N2.diff(y), sy));
 						subsList.add(new ExprPair(N1, r));
 						subsList.add(new ExprPair(N2, s));
-						subsList.add(new ExprPair(x, trans.eqs[0].rhs));
-						subsList.add(new ExprPair(y, trans.eqs[1].rhs));
+						subsList.add(new ExprPair(x, trans.eqs[0].rhs()));
+						subsList.add(new ExprPair(y, trans.eqs[1].rhs()));
 						lhsInt[i][j] = intTerm.changeOfVars(subsList, jac, refTri);
 						lhsInt[i][j].integrand.setLabel("LHS"+i+j);
 						System.out.println(lhsInt[i][j]+"\n");
@@ -160,9 +160,9 @@ public class Example7 {
 					subsList.add(new ExprPair(pde.test, V));
 					subsList.add(new ExprPair(N1, r));
 					subsList.add(new ExprPair(N2, s));
-					subsList.add(new ExprPair(x, trans.eqs[0].rhs));
-					subsList.add(new ExprPair(y, trans.eqs[1].rhs));
-					rhsInt[i] = ((Integrate)pde.rhs).changeOfVars(subsList, jac, refTri);
+					subsList.add(new ExprPair(x, trans.eqs[0].rhs()));
+					subsList.add(new ExprPair(y, trans.eqs[1].rhs()));
+					rhsInt[i] = ((Integrate)pde.rhs()).changeOfVars(subsList, jac, refTri);
 					rhsInt[i].integrand.setLabel("RHS"+i);
 					System.out.println(rhsInt[i]+"\n");
 				}
@@ -182,8 +182,8 @@ public class Example7 {
 						subsListB.add(new ExprPair(pde.test, V));
 						subsListB.add(new ExprPair(NB1, r));
 						subsListB.add(new ExprPair(NB2, s));
-						subsListB.add(new ExprPair(x, transB.eqs[0].rhs));
-						subsListB.add(new ExprPair(y, transB.eqs[1].rhs));
+						subsListB.add(new ExprPair(x, transB.eqs[0].rhs()));
+						subsListB.add(new ExprPair(y, transB.eqs[1].rhs()));
 						lhsIntB[i][j] = intTerm.changeOfVars(subsListB, jacB, refLine);
 						lhsIntB[i][j].integrand.setLabel("LHSB"+i+j);
 						System.out.println(lhsIntB[i][j]+"\n");

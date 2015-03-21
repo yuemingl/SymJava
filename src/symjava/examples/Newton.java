@@ -20,7 +20,7 @@ public class Newton {
 	
 	public static void solve(Eq[] eqs, double[] init, double[] params, int maxIter, double eps) {
 		for(Eq eq : eqs) {
-			if(!Symbol.C0.symEquals(eq.rhs)) {
+			if(!Symbol.C0.symEquals(eq.arg2)) {
 				System.out.println("The right hand side of the equation must be 0.");
 				return;
 			}
@@ -38,7 +38,7 @@ public class Newton {
 		SymMatrix hess = new SymMatrix(m, n);
 		for(int i=0; i<n; i++) {
 			for(int j=0; j<n; j++) {
-				lhss[i] = eqs[i].lhs;
+				lhss[i] = eqs[i].lhs();
 				Expr df = lhss[i].diff(unknowns[j]);
 				hess[i][j] = df;
 			}

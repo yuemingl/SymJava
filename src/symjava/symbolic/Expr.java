@@ -1,7 +1,13 @@
 package symjava.symbolic;
 
+import java.math.BigInteger;
 import java.util.List;
 
+import symjava.logic.And;
+import symjava.logic.Not;
+import symjava.logic.Or;
+import symjava.logic.Xor;
+import symjava.relational.Ge;
 import symjava.symbolic.utils.Utils;
 
 abstract public class Expr implements Cloneable {
@@ -323,6 +329,58 @@ abstract public class Expr implements Cloneable {
 		}
 		return Negate.simplifiedIns(this);
 	};
+	
+	/**
+	 * x%y
+	 * @return
+	 */
+	public Expr remainder(Expr other) {
+		return new Remainder(this, other);
+	}
+	
+	/*
+	 * !x
+	 */
+	public Expr not() {
+		return Not.simplifiedIns(this);
+	}
+	
+	/**
+	 * x&y
+	 * @param other
+	 * @return
+	 */
+	public Expr and(Expr other) {
+		return And.simplifiedIns(this, other);
+	}
+	
+	/**
+	 * x|y
+	 * @param other
+	 * @return
+	 */
+	public Expr or(Expr other) {
+		return Or.simplifiedIns(this, other);
+	}
+	
+	/**
+	 * x^y
+	 * @param other
+	 * @return
+	 */
+	public Expr xor(Expr other) {
+		return Xor.simplifiedIns(this, other);
+	}
+	
+//	/**
+//	 * TODO We cannot use the comparison operator overload in java-oo for our use case
+//	 * @param other
+//	 * @return
+//	 */
+//	public int compareTo(Expr other) {
+//		return 1;
+//	}
+	
 	
 	/**
 	 * Substitution

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import symjava.symbolic.Expr;
+import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
 /**
@@ -11,7 +12,7 @@ import symjava.symbolic.utils.Utils;
  * y = a*x+b
  * 
  */
-public class Eq extends Relation {
+public class Eq extends BinaryOp implements Relation {
 	Expr[] freeVars; //for example: x in y=a*x+b
 	Expr[] dependentVars; //for example: y in y=a*x+b
 	Expr[] params; //paramters in the equation, for example: a, b in y=a*x+b
@@ -26,8 +27,7 @@ public class Eq extends Relation {
 	 * @param rhs
 	 */
 	public Eq(Expr lhs, Expr rhs) {
-		this.lhs = lhs;
-		this.rhs = rhs;	
+		super(lhs, rhs);
 		this.freeVars = Utils.extractSymbols(rhs).toArray(new Expr[0]);
 		this.params = new Expr[0];
 		this.dependentVars = Utils.extractSymbols(lhs).toArray(new Expr[0]);
@@ -52,12 +52,22 @@ public class Eq extends Relation {
 	 * @param freeVars
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars) {
-		this.lhs = lhs;
-		this.rhs = rhs;	
+		super(lhs, rhs);
 		this.freeVars = freeVars;
-		this.dependentVars = Utils.extractSymbols(lhs).toArray(new Expr[0]);
+		List<Expr> list = Utils.extractSymbols(lhs, rhs);
+		List<Expr> depList = new ArrayList<Expr>();
+		for(Expr s : list) {
+			boolean skip = false;
+			for(int i=0; i<freeVars.length; i++) {
+				if(s.symEquals(freeVars[i])) skip = true;
+			}
+			if(skip) continue;
+			depList.add(s);
+		}
+		dependentVars = depList.toArray(new Expr[0]);
+		
 		//Find params
-		List<Expr> list = Utils.extractSymbols(rhs);
+		list = Utils.extractSymbols(rhs);
 		List<Expr> paramList = new ArrayList<Expr>();
 		for(Expr s : list) {
 			boolean skip = false;
@@ -75,8 +85,7 @@ public class Eq extends Relation {
 	}
 
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params) {
-		this.lhs = lhs;
-		this.rhs = rhs;
+		super(lhs, rhs);
 		this.freeVars = freeVars;
 		this.params = params;
 		//Find dependent variables
@@ -108,8 +117,7 @@ public class Eq extends Relation {
 	 * @param dependentVars
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params, Expr[] dependentVars) {
-		this.lhs = lhs;
-		this.rhs = rhs;
+		super(lhs, rhs);
 		this.freeVars = freeVars;
 		this.params = params;
 		this.dependentVars = dependentVars;
@@ -144,28 +152,28 @@ public class Eq extends Relation {
 	}
 	
 	public Expr subsLHS(Expr[] from, Expr[] to) {
-		Expr rlt = lhs;
+		Expr rlt = arg1;
 		for(int i=0; i<from.length; i++)
 			rlt = rlt.subs(from[i], to[i]);
 		return rlt;
 	}
 	
 	public Expr subsRHS(Expr[] from, Expr[] to) {
-		Expr rlt = rhs;
+		Expr rlt = arg2;
 		for(int i=0; i<from.length; i++)
 			rlt = rlt.subs(from[i], to[i]);
 		return rlt;
 	}
 	
 	public Expr subsLHS(Expr[] from, double[] to) {
-		Expr rlt = lhs;
+		Expr rlt = arg1;
 		for(int i=0; i<from.length; i++)
 			rlt = rlt.subs(from[i], to[i]);
 		return rlt;
 	}
 	
 	public Expr subsRHS(Expr[] from, double[] to) {
-		Expr rlt = rhs;
+		Expr rlt = arg2;
 		for(int i=0; i<from.length; i++)
 			rlt = rlt.subs(from[i], to[i]);
 		return rlt;
@@ -212,7 +220,30 @@ public class Eq extends Relation {
 	}
 	
 	public String toString() {
-		return lhs + " = " + rhs;
-	}	
+		return arg1 + " = " + arg2;
+	}
+
+	@Override
+	public Expr simplify() {
+		return this;
+	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		return false;
+	}
+
+	@Override
+	public Expr diff(Expr expr) {
+		return new Eq(arg1.diff(expr), arg2.diff(expr), this.freeVars, this.params, this.dependentVars);
+	}
+	
+	public Expr lhs() {
+		return arg1;
+	}
+	
+	public Expr rhs() {
+		return arg2;
+	}
 }
 

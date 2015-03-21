@@ -2,10 +2,8 @@ package symjava.math;
 
 import symjava.matrix.SymVector;
 import symjava.symbolic.Cos;
-import symjava.symbolic.Dot;
 import symjava.symbolic.Exp;
 import symjava.symbolic.Expr;
-import symjava.symbolic.Grad;
 import symjava.symbolic.Log;
 import symjava.symbolic.Log10;
 import symjava.symbolic.Log2;
