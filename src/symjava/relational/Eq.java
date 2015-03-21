@@ -8,7 +8,7 @@ import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
 /**
- * An object of Eq represents a equation like
+ * An object of Eq represents an equation like
  * y = a*x+b
  * 
  */
