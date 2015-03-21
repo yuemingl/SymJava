@@ -31,7 +31,7 @@ public class Eq extends BinaryOp implements Relation {
 		this.freeVars = Utils.extractSymbols(rhs).toArray(new Expr[0]);
 		this.params = new Expr[0];
 		this.dependentVars = Utils.extractSymbols(lhs).toArray(new Expr[0]);
-		setUnknowns();
+		computeUnknowns();
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class Eq extends BinaryOp implements Relation {
 			paramList.add(s);
 		}
 		this.params = paramList.toArray(new Expr[0]);
-		setUnknowns();
+		computeUnknowns();
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class Eq extends BinaryOp implements Relation {
 			depList.add(s);
 		}
 		dependentVars = depList.toArray(new Expr[0]);
-		setUnknowns();
+		computeUnknowns();
 	}
 	
 	/**
@@ -129,10 +129,10 @@ public class Eq extends BinaryOp implements Relation {
 		this.freeVars = freeVars;
 		this.params = params;
 		this.dependentVars = dependentVars;
-		setUnknowns();
+		computeUnknowns();
 	}
 	
-	private void setUnknowns() {
+	private void computeUnknowns() {
 		this.unknowns = new Expr[freeVars.length + dependentVars.length];
 		int idx = 0;
 		for(int i=0; i<freeVars.length; i++) {
@@ -207,22 +207,43 @@ public class Eq extends BinaryOp implements Relation {
 				);
 	}
 	
+	/**
+	 * Return an array of variables that contains free variables and dependent variables
+	 * @return
+	 */
 	public Expr[] getUnknowns() {
 		return unknowns;
 	}
 	
+	/**
+	 * Return an array of symbols parameters in the expression of the equation
+	 * @return
+	 */
 	public Expr[] getParams() {
 		return params;
 	}
 	
+	/**
+	 * Return an array of free variables in the equation
+	 * @return
+	 */
 	public Expr[] getFreeVars () {
 		return freeVars;
 	}
 	
+	/**
+	 * Return an array of dependent variables in the equation
+	 * @return
+	 */
 	public Expr[] getDependentVars() {
 		return dependentVars;
 	}
 	
+	/**
+	 * TODO
+	 * @param var
+	 * @return
+	 */
 	public Expr solve(Expr var) {
 		return null;
 	}
@@ -241,17 +262,13 @@ public class Eq extends BinaryOp implements Relation {
 		return false;
 	}
 
+	/**
+	 * Differentiate both side of the equation
+	 */
 	@Override
 	public Expr diff(Expr expr) {
 		return new Eq(arg1.diff(expr), arg2.diff(expr), this.freeVars, this.params, this.dependentVars);
 	}
 	
-	public Expr lhs() {
-		return arg1;
-	}
-	
-	public Expr rhs() {
-		return arg2;
-	}
 }
 

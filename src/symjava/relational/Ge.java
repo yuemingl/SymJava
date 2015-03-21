@@ -27,5 +27,4 @@ public class Ge extends BinaryOp implements Relation {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
