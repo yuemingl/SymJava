@@ -19,9 +19,9 @@ public class Eq extends BinaryOp implements Relation {
 	Expr[] unknowns; //freeVars + dependentVars, for example: x, y in y=a*x+b
 	
 	/**
-	 * Create an equation like y=... without any parameters
+	 * Create an equation without any symbolic parameters except free variables
 	 * For example:
-	 * Eq e = new Eq(y, 2*x+1); //y = 2*x+1
+	 * Eq eq = new Eq(y, 2*x+1); //y = 2*x+1
 	 * 
 	 * @param lhs
 	 * @param rhs
@@ -35,12 +35,11 @@ public class Eq extends BinaryOp implements Relation {
 	}
 	
 	/**
-	 * Create an equation like y=... 
-	 * The free variables are specified on the right hand side (rhs).
-	 * It may contain parameters on the right hand side and the paramters
-	 * can be extracted automatically.
+	 * Create an equation that may contain symbolic parameters on the right hand side
+	 * The free variables are specified by the parameter freeVars
+	 * The paramters on the right hand side of the equation can be extracted automatically.
 	 * For example:
-	 * Eq e = Eq(y, a*x+b, new Expr[]{x}); 
+	 * Eq eq = Eq(y, a*x+b, new Expr[]{x}); 
 	 * This will create equation y=a*x+b with
 	 *   freeVars = [x]
 	 *   params = [a,b]
@@ -84,6 +83,14 @@ public class Eq extends BinaryOp implements Relation {
 		setUnknowns();
 	}
 
+	/**
+	 * Create an equation by specifying free variables and symbolic parameters
+	 * 
+	 * @param lhs
+	 * @param rhs
+	 * @param freeVars
+	 * @param params
+	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params) {
 		super(lhs, rhs);
 		this.freeVars = freeVars;
@@ -109,6 +116,7 @@ public class Eq extends BinaryOp implements Relation {
 	}
 	
 	/**
+	 * Create an equation by specifying free variables, symbolic parameters and dependent variables
 	 * 
 	 * @param lhs
 	 * @param rhs
