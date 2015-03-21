@@ -35,7 +35,7 @@ public class Interval extends Domain1D {
 	 * @param end
 	 * @return
 	 */
-	public static <T1, T2> Domain apply(T1 start, T2 end) {
+	public static <T1, T2> Interval apply(T1 start, T2 end) {
 		Expr s = null, e = null;
 		if(start instanceof Number) {
 			s = new SymDouble(((Number)start).doubleValue());
