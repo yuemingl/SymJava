@@ -19,4 +19,12 @@ public abstract class BinaryOp extends Expr {
 	public Expr[] args() {
 		return new Expr[] { arg1, arg2 };
 	}
+	
+	public Expr lhs() {
+		return arg1;
+	}
+	
+	public Expr rhs() {
+		return arg2;
+	}	
 }
