@@ -14,9 +14,30 @@ import symjava.symbolic.SymConst;
 import symjava.symbolic.Tan;
 
 public class SymMath {
+	/**
+	 * Pre defined constant symbols
+	 */
 	public static SymConst PI = new SymConst("\\pi", Math.PI);
 	public static SymConst PI2 = new SymConst("2\\pi", 2*Math.PI);
 	public static SymConst E = new SymConst("e", Math.E);
+	
+	/**
+	 * A quick way to define constant real number symbols
+	 * @param v
+	 * @return
+	 */
+	public static Expr C(double v) {
+		return Expr.valueOf(v);
+	}
+	public static Expr C(float v) {
+		return Expr.valueOf(v);
+	}
+	public static Expr C(int v) {
+		return Expr.valueOf(v);
+	}
+	public static Expr C(long v) {
+		return Expr.valueOf(v);
+	}
 	
 	public static Expr pow(Expr base, double exponent) {
 		return Pow.simplifiedIns(base, Expr.valueOf(exponent));

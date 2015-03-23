@@ -32,12 +32,13 @@ public class BytecodeSupport {
 		return Math.log(expr)/Math.log(base);
 	}
 
-	public static double numIntegrate1D(double begin, double end, double step, String className) {
+	public static double numIntegrate1D(double begin, double end, double step, 
+			String integrandFunc) {
 
 		Method method;
 		try {
 			method = BytecodeSupport.class.getClassLoader().
-					loadClass("symjava.bytecode."+className).
+					loadClass("symjava.bytecode."+integrandFunc).
 					getMethod("apply", new Class[] {double[].class});
 			double[] args = { 0 };
 			double sum = 0.0;
@@ -78,6 +79,152 @@ public class BytecodeSupport {
 		return 0.0;
 	}
 
+	public static double numIntegrate1D(double begin, double end, double step, 
+			String integrandFunc, double param) {
+
+		Method method;
+		try {
+			method = BytecodeSupport.class.getClassLoader().
+					loadClass("symjava.bytecode."+integrandFunc).
+					getMethod("apply", new Class[] {double[].class});
+			double[] args = { 0, param };
+			double sum = 0.0;
+			
+//			for(double i=begin; i<=end; i+=step) {
+//				args[0] = i;
+//				Double val = (Double)method.invoke(null, args);
+//				//Double val = test_pdf(args);
+//				sum += val*step;
+//			}
+			
+			// Use trapezoid rule 
+			args[0] = begin;
+			Double val1 = (Double)method.invoke(null, args);
+			double i = begin + step;
+			for(; i<=end; i+=step) {
+				args[0] = i;
+				Double val2 = (Double)method.invoke(null, args);
+				sum += (val1+val2)*step/2.0;
+				val1 = val2;
+			}
+			if(i - end > 0.0) {
+				args[0] = end;
+				Double val2 = (Double)method.invoke(null, args);
+				sum += (val1+val2)*(step-(i-end))/2.0;
+			}
+			return sum;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+//		for (Method m : methods) {
+//		    if (methodName.equals(m.getName())) {
+//		        // for static methods we can use null as instance of class
+//		        m.invoke(null, new Object[] {args});
+//		        break;
+//		    }
+//		}
+		return 0.0;
+	}
+	
+	public static double numIntegrate2D(double begin, double end, double step, 
+			String lowerBoundFunc, String upperBoundFunc, double stepInner, 
+			String integrandFunc) {
+		Method mLower, mUpper;
+		try {
+			mLower = BytecodeSupport.class.getClassLoader().
+					loadClass("symjava.bytecode."+lowerBoundFunc).
+					getMethod("apply", new Class[] {double[].class});
+			mUpper = BytecodeSupport.class.getClassLoader().
+					loadClass("symjava.bytecode."+upperBoundFunc).
+					getMethod("apply", new Class[] {double[].class});
+			
+			double[] args = { 0 };
+			double sum = 0.0;
+			
+			// Use trapezoid rule 
+			args[0] = begin;
+			Double valLower = (Double)mLower.invoke(null, args);
+			Double valUpper = (Double)mUpper.invoke(null, args);
+			Double val1 = numIntegrate1D(valLower, valUpper, stepInner, integrandFunc, begin);
+			
+			double i = begin + step;
+			for(; i<=end; i+=step) {
+				args[0] = i;
+				valLower = (Double)mLower.invoke(null, args);
+				valUpper = (Double)mUpper.invoke(null, args);
+				Double val2 = numIntegrate1D(valLower, valUpper, stepInner, integrandFunc, i);
+				sum += (val1+val2)*step/2.0;
+				val1 = val2;
+			}
+			if(i - end > 0.0) {
+				args[0] = end;
+				valLower = (Double)mLower.invoke(null, args);
+				valUpper = (Double)mUpper.invoke(null, args);
+				Double val2 = numIntegrate1D(valLower, valUpper, stepInner, integrandFunc, step-(i-end));
+				sum += (val1+val2)*(step-(i-end))/2.0;
+			}
+			return sum;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0.0;
+	}
+	
+	public static double numIntegrateND(double begin, double end, double step, 
+			String[] lowerBoundFunc, String[] upperBoundFunc, double[] stepInner, 
+			String integrandFunc, int level) {
+		if(level == 1) {
+			return numIntegrate1D(begin, end, step, integrandFunc);
+		}
+		
+		int idx = stepInner.length-level;
+		level--;
+		
+		Method mLower, mUpper;
+		try {
+			mLower = BytecodeSupport.class.getClassLoader().
+					loadClass("symjava.bytecode."+lowerBoundFunc).
+					getMethod("apply", new Class[] {double[].class});
+			mUpper = BytecodeSupport.class.getClassLoader().
+					loadClass("symjava.bytecode."+upperBoundFunc).
+					getMethod("apply", new Class[] {double[].class});
+			
+			double[] args = { 0 };
+			double sum = 0.0;
+			
+			// Use trapezoid rule 
+			args[0] = begin;
+			Double valLower = (Double)mLower.invoke(null, args);
+			Double valUpper = (Double)mUpper.invoke(null, args);
+			double valStep = stepInner[idx];
+			Double val1 = numIntegrateND(valLower, valUpper, valStep, 
+					lowerBoundFunc, upperBoundFunc, stepInner, integrandFunc, level);
+			
+			double i = begin + step;
+			for(; i<=end; i+=step) {
+				args[0] = i;
+				valLower = (Double)mLower.invoke(null, args);
+				valUpper = (Double)mUpper.invoke(null, args);
+				Double val2 = numIntegrateND(valLower, valUpper, valStep, 
+						lowerBoundFunc, upperBoundFunc, stepInner, integrandFunc, level);
+				sum += (val1+val2)*step/2.0;
+				val1 = val2;
+			}
+			if(i - end > 0.0) {
+				args[0] = end;
+				valLower = (Double)mLower.invoke(null, args);
+				valUpper = (Double)mUpper.invoke(null, args);
+				Double val2 = numIntegrateND(valLower, valUpper, valStep, 
+						lowerBoundFunc, upperBoundFunc, stepInner, integrandFunc, level);
+				sum += (val1+val2)*(step-(i-end))/2.0;
+			}
+			return sum;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0.0;
+	}
+	
 	public static double test_pdf(double[] args) {
 		double x = args[0];
 		return Math.exp(-0.5*x*x);
@@ -92,3 +239,4 @@ public class BytecodeSupport {
 		System.out.println(numIntegrate1D(-10,10,0.1,"integrand_ae3c65a143de42739270977b140b4fdf")/Math.sqrt(2*Math.PI));
 	}
 }
+

@@ -1,11 +1,22 @@
 package symjava.domains;
 
-import java.util.List;
-
 import symjava.math.Transformation;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Symbol;
 
 public class Domain2D extends Domain {
+
+	/**
+	 * Construct a 2D domain with a given label(name) and with
+	 * default coordinate variables x and y
+	 * 
+	 * @param label
+	 */
+	public Domain2D(String label) {
+		this.label = label;
+		this.coordVars = new Expr[]{Symbol.x, Symbol.y};
+	}
+	
 	/**
 	 * Construct a 2D domain with a given label(name) and
 	 * a list of coordinate variables
@@ -15,11 +26,6 @@ public class Domain2D extends Domain {
 	public Domain2D(String label, Expr ...coordVars) {
 		this.label = label;
 		this.coordVars = coordVars;
-	}
-	
-	public Domain2D(String label, List<Expr> coordVars) {
-		this.label = label;
-		this.coordVars = coordVars.toArray(new Expr[0]);
 	}
 	
 	@Override

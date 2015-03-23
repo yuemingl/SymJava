@@ -1,5 +1,6 @@
 package symjava.examples;
 
+import symjava.relational.Le;
 import symjava.symbolic.*;
 import static symjava.math.SymMath.*;
 import static symjava.symbolic.Symbol.*;
@@ -58,12 +59,38 @@ public class NumericalIntegration {
 		ans =
 		0.5679196
 		*/
-		Domain omega = new Domain2D("\\Omega", x,y);
-		Expr ii = Integrate.apply(sin(sqrt(log(x+y+1))), omega);
-		System.out.println(ii);
+//		Domain omega = new Domain2D("\\Omega", x, y)
+//				.setConstraint( Le.apply((x-0.5)*(x-0.5) + (y-0.5)*(y-0.5), C(1/4)) )
+//				.setBound(x, Cm1, C1)
+//				.setBound(y, Cm1, C1);
+		Domain omega = new Domain2D("\\Omega", x, y)
+		//.setConstraint( Le.apply((x-0.5)*(x-0.5) + (y-0.5)*(y-0.5), C(1/4)) )
+		.setBound(x, Cm1, C1) 
+		.setBound(y, Cm1, C1) //TODO How to deal with parameters? e.g. setBound(x, a, b); call f.apply(-1,1)
+		.setStepSize(0.001);
 		
+		Expr ii = Integrate.apply(sin(x*x+y*y), omega);
+		System.out.println(ii);
+		BytecodeFunc f = JIT.compile(ii);
+		System.out.println(f.apply());
+		test_2D_verifiy();
 		
 		
 	}
+	
+	public static void test_2D_verifiy() {
+		double xMin=-1, xMax=1, xStep=0.0001;
+		double yMin=-1, yMax=1, yStep=0.0001;
+		double sum = 0.0;
+		for(double x=xMin; x<=xMax; x+=xStep) {
+			for(double y=yMin; y<=yMax; y+=yStep) {
+				sum += Math.sin(x*x+y*y)*xStep*yStep;
+			}
+		}
+		System.out.println("verify="+sum);
+	}
 
 }
+
+
+
