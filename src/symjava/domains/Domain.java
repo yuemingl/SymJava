@@ -16,11 +16,12 @@ import symjava.symbolic.Expr;
 public abstract class Domain {
 	protected String label;
 	protected Expr[] coordVars;
+	protected Expr constraint;
 	
 	public static class CoordVarInfo {
 		double stepSize;
-		double minBound;
-		double maxBound;
+		Expr minBound;
+		Expr maxBound;
 	}
 	
 	protected Map<Expr, CoordVarInfo> infoMap = new HashMap<Expr, CoordVarInfo>();
@@ -130,6 +131,62 @@ public abstract class Domain {
 	}
 	
 	/**
+	 * Set the lower bound and upper bound for coordinate variable x
+	 * 
+	 * @param x
+	 * @param minBound
+	 * @param maxBound
+	 * @return
+	 */
+	public Domain setBound(Expr x, Expr minBound, Expr maxBound) {
+		CoordVarInfo info = infoMap.get(x);
+		if(info == null) {
+			info = new CoordVarInfo();
+			infoMap.put(x, info);
+		}
+		info.minBound = minBound;
+		info.maxBound = maxBound;
+		return this;
+	}
+	
+	/**
+	 * Set a logic expression of equations to repreent the domain 
+	 * For example, parameter logicalExpr:
+	 * 
+	 *  Expr logicalExpr = Ge.apply(x*x + y*y, 0.5) & Le.apply(x*x + y*y, 1.0)
+	 *  //x*x + y*y >= 0.5 and x*x + y*y <= 1.0
+	 *  
+	 *  Define a domain object mydomain ...
+	 *  mydomain.setConstraint(logicalExpr); 
+	 *  //mydomain will be an annular shape
+	 *  
+	 * @param logicalExpr
+	 * @return
+	 */
+	public Domain setConstraint(Expr logicalExpr) {
+		this.constraint = logicalExpr;
+		return this;
+	}
+	
+	public Expr getConstraint() {
+		return this.constraint;
+	}
+	
+	public Expr getMinBound(Expr x) {
+		CoordVarInfo info = infoMap.get(x);
+		if(info == null)
+			return null;
+		return info.minBound;
+	}
+	
+	public Expr getMaxBound(Expr x) {
+		CoordVarInfo info = infoMap.get(x);
+		if(info == null)
+			return null;
+		return info.maxBound;
+	}
+
+	/**
 	 * Return an array of sub-domains. If the domain has no sub-domains, return itself. 
 	 * @return
 	 */
@@ -143,3 +200,4 @@ public abstract class Domain {
 		return this.label;
 	}
 }
+

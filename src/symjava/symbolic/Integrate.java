@@ -90,5 +90,9 @@ public class Integrate extends Expr {
 	public boolean symEquals(Expr other) {
 		return false;
 	}
+	
+	public boolean isMultipleIntegral() {
+		return this.domain.getConstraint() == null;
+	}
 
 }

@@ -10,8 +10,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import symjava.domains.Domain2D;
 import symjava.domains.Interval;
+import symjava.logic.And;
+import symjava.logic.Logic;
+import symjava.logic.Not;
+import symjava.logic.Or;
+import symjava.logic.Xor;
 import symjava.math.Dot;
+import symjava.relational.Eq;
+import symjava.relational.Ge;
+import symjava.relational.Gt;
+import symjava.relational.Le;
+import symjava.relational.Lt;
+import symjava.relational.Neq;
+import symjava.relational.Relation;
 import symjava.symbolic.Add;
 import symjava.symbolic.Cos;
 import symjava.symbolic.Divide;
@@ -44,13 +57,28 @@ import com.sun.org.apache.bcel.internal.generic.ClassGen;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.DADD;
 import com.sun.org.apache.bcel.internal.generic.DALOAD;
+import com.sun.org.apache.bcel.internal.generic.DCMPL;
 import com.sun.org.apache.bcel.internal.generic.DDIV;
 import com.sun.org.apache.bcel.internal.generic.DMUL;
 import com.sun.org.apache.bcel.internal.generic.DSUB;
+import com.sun.org.apache.bcel.internal.generic.GOTO;
+import com.sun.org.apache.bcel.internal.generic.I2D;
+import com.sun.org.apache.bcel.internal.generic.IAND;
+import com.sun.org.apache.bcel.internal.generic.IFEQ;
+import com.sun.org.apache.bcel.internal.generic.IFGE;
+import com.sun.org.apache.bcel.internal.generic.IFGT;
+import com.sun.org.apache.bcel.internal.generic.IFLE;
+import com.sun.org.apache.bcel.internal.generic.IFLT;
+import com.sun.org.apache.bcel.internal.generic.IFNE;
+import com.sun.org.apache.bcel.internal.generic.IOR;
+import com.sun.org.apache.bcel.internal.generic.IXOR;
+import com.sun.org.apache.bcel.internal.generic.Instruction;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.NOP;
 import com.sun.org.apache.bcel.internal.generic.POP2;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
@@ -91,7 +119,14 @@ public class BytecodeUtils {
 				post_order(I.getEnd(), outList);
 				//Integrand will not be added to the outList since we don't want the dummy variable to be exposed
 				//outList.add(new Func("integrand"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand));
-			} else {
+			} else if(INT.domain instanceof Domain2D) {
+				if(INT.isMultipleIntegral()) {
+					Expr[] coord = INT.domain.getCoordVars();
+					Expr lastVar = coord[coord.length-1];
+					post_order(INT.domain.getMinBound(lastVar), outList);
+					post_order(INT.domain.getMaxBound(lastVar), outList);
+				}
+			}else {
 				//TODO
 				//Support multi-variable integrate
 			}
@@ -279,20 +314,105 @@ public class BytecodeUtils {
 					if(INT.domain.getStepSize() == null) {
 						throw new RuntimeException("Please specifiy the step size for you integral: "+INT);
 					}
-					
+					//We have begin,end parameters on the top of the VM stack
 					il.append(new PUSH(cp, INT.domain.getStepSize()));
 					il.append(new PUSH(cp, f.getName()));
 					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate1D",
 							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, Type.STRING }, Constants.INVOKESTATIC));
+				} else if(INT.domain instanceof Domain2D) {
+					Func f = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand);
+					f.toBytecodeFunc(true, true);
+					
+					Expr[] coord = INT.domain.getCoordVars();
+					Expr x = coord[0];
+					Expr y = coord[1];
+					Expr xMin = INT.domain.getMinBound(x);
+					Expr xMax = INT.domain.getMaxBound(y);
+//					Expr yMin = INT.domain.getMinBound(x);
+//					Expr yMax = INT.domain.getMaxBound(y);
+					Func fxMin = new Func("integrate_bound_"+x+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMin);
+					Func fxMax = new Func("integrate_bound_"+x+"Max_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMax);
+//					Func fyMin = new Func("integrate_bound_"+y+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), yMin);
+//					Func fyMax = new Func("integrate_bound_"+y+"Maz_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), yMax);
+					System.out.println("integrand="+f);
+					System.out.println("fxMin="+fxMin);
+					System.out.println("fxMax="+fxMax);
+					fxMin.toBytecodeFunc(true, true);
+					fxMax.toBytecodeFunc(true, true);
+//					fyMin.toBytecodeFunc(true, true);
+//					fyMax.toBytecodeFunc(true, true);
+					//We have begin,end parameters on the top of the VM stack
+					il.append(new PUSH(cp, INT.domain.getStepSize(y)));
+					il.append(new PUSH(cp, fxMin.getName()));
+					il.append(new PUSH(cp, fxMax.getName()));
+					il.append(new PUSH(cp, INT.domain.getStepSize(x)));
+					il.append(new PUSH(cp, f.getName()));
+					//Now the paramters are ready, call the function
+					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate2D",
+							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, Type.STRING, Type.STRING, Type.DOUBLE, Type.STRING }, Constants.INVOKESTATIC));
 				} else {
 					//TODO
 					throw new RuntimeException("Unsupported Integrate: "+INT);
 				}
+			} else if(ins instanceof Gt) {
+				il.append(new DCMPL());
+				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+				InstructionHandle nop = il.append(new NOP());
+				il.insert(iconst1, new IFLE(iconst0));
+				il.insert(iconst0, new GOTO(nop));
+			} else if(ins instanceof Ge) {
+				il.append(new DCMPL());
+				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+				InstructionHandle nop = il.append(new NOP());
+				il.insert(iconst1, new IFLT(iconst0));
+				il.insert(iconst0, new GOTO(nop));
+			} else if(ins instanceof Lt) {
+				il.append(new DCMPL());
+				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+				InstructionHandle nop = il.append(new NOP());
+				il.insert(iconst1, new IFGE(iconst0));
+				il.insert(iconst0, new GOTO(nop));
+			} else if(ins instanceof Le) {
+				il.append(new DCMPL());
+				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+				InstructionHandle nop = il.append(new NOP());
+				il.insert(iconst1, new IFGT(iconst0));
+				il.insert(iconst0, new GOTO(nop));
+			} else if(ins instanceof Eq) {
+				il.append(new DCMPL());
+				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+				InstructionHandle nop = il.append(new NOP());
+				il.insert(iconst1, new IFNE(iconst0));
+				il.insert(iconst0, new GOTO(nop));
+			} else if(ins instanceof Neq) {
+				il.append(new DCMPL());
+				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+				InstructionHandle nop = il.append(new NOP());
+				il.insert(iconst1, new IFEQ(iconst0));
+				il.insert(iconst0, new GOTO(nop));
+			} else if(ins instanceof And) {
+				il.append(new IAND());
+			} else if(ins instanceof Or) {
+				il.append(new IOR());
+			} else if(ins instanceof Xor) {
+				il.append(new IXOR());
+			} else if(ins instanceof Not) {
+				il.append(new PUSH(cp, 1));
+				il.append(new IXOR());
 			} else {
 				throw new RuntimeException(ins.getClass() + " is not supported in this version when generating bytecode function!");
 			}
 		}
 
+		if(fun.getExpr() instanceof Relation || fun.getExpr() instanceof Logic) {
+			il.append(new I2D());
+		}
 		il.append(InstructionConstants.DRETURN);
 		
 		mg.setMaxStack();
@@ -310,3 +430,5 @@ public class BytecodeUtils {
 		return cg;
 	}
 }
+
+

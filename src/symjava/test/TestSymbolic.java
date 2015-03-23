@@ -13,6 +13,7 @@ import symjava.math.Div;
 import symjava.math.Dot;
 import symjava.math.Grad;
 import symjava.matrix.SymVector;
+import symjava.relational.Eq;
 import symjava.relational.Ge;
 import symjava.relational.Gt;
 import symjava.relational.Le;
@@ -405,6 +406,20 @@ public class TestSymbolic {
 		System.out.println(Le.apply(x, y) | Le.apply(x, z));
 		System.out.println(Lt.apply(x, y) | Lt.apply(x, z));
 		System.out.println(Neq.apply(x, y) | Neq.apply(x, z));
+		
+//		Func f1 = new Func("fun1", Gt.apply(x, y));
+//		Func f1 = new Func("fun1", Ge.apply(x, y));
+//		Func f1 = new Func("fun1", Lt.apply(x, y));
+//		Func f1 = new Func("fun1", Le.apply(x, y));
+//		Func f1 = new Func("fun1", Eq.apply(x, y));
+//		Func f1 = new Func("fun1", Neq.apply(x, y));
+//		Func f1 = new Func("fun1", Gt.apply(x, y) & Gt.apply(x, z));
+//		Func f1 = new Func("fun1", Gt.apply(x, y) | Gt.apply(x, z));
+//		Func f1 = new Func("fun1", Gt.apply(x, y) ^ Gt.apply(x, z));
+		Func f1 = new Func("fun1", ~Gt.apply(x, y));
+//		Func f1 = new Func("fun1", ~x); //NOT Supported
+		BytecodeFunc ff1 = f1.toBytecodeFunc();
+		System.out.println(ff1.apply(5,3));
 		
 	}
 	public static void main(String[] args) {
