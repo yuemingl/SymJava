@@ -13,7 +13,7 @@ public class JIT {
 			Func func = (Func)expr;
 			return func.toBytecodeFunc();
 		} else {
-			Func func = new Func("JIT"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), expr);
+			Func func = new Func("JITFunc_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), expr);
 			func.args = args;
 			return func.toBytecodeFunc(true, false);
 		}
@@ -24,7 +24,7 @@ public class JIT {
 			Func func = (Func)expr;
 			return func.toBytecodeFunc();
 		} else {
-			Func func = new Func("JIT"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), expr);
+			Func func = new Func("JITFunc_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), expr);
 			return func.toBytecodeFunc(true, false);
 		}
 	}	

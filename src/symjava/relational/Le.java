@@ -30,4 +30,10 @@ public class Le extends BinaryOp implements Relation  {
 	public static Le apply(Expr lhs, Expr rhs) {
 		return new Le(lhs, rhs);
 	}
+	public static Le apply(double lhs, Expr rhs) {
+		return new Le(Expr.valueOf(lhs), rhs);
+	}
+	public static Le apply(Expr lhs, double rhs) {
+		return new Le(lhs, Expr.valueOf(rhs));
+	}
 }

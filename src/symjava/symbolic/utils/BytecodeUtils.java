@@ -51,7 +51,10 @@ import symjava.symbolic.arity.TernaryOp;
 import symjava.symbolic.arity.UnaryOp;
 
 import com.sun.org.apache.bcel.internal.Constants;
+import com.sun.org.apache.bcel.internal.generic.AASTORE;
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
+import com.sun.org.apache.bcel.internal.generic.ANEWARRAY;
+import com.sun.org.apache.bcel.internal.generic.ASTORE;
 import com.sun.org.apache.bcel.internal.generic.ArrayType;
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
@@ -78,10 +81,13 @@ import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.LocalVariableGen;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.NEWARRAY;
 import com.sun.org.apache.bcel.internal.generic.NOP;
 import com.sun.org.apache.bcel.internal.generic.POP2;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
+import com.sun.org.apache.bcel.internal.generic.SASTORE;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class BytecodeUtils {
@@ -213,7 +219,9 @@ public class BytecodeUtils {
 		} else {
 			fExprArgs = fun.args;
 		}
-		System.out.println(Utils.joinLabels(fExprArgs, ","));
+		System.out.println(fun.getLabel()+": "+fun.getExpr());
+		//System.out.println(Utils.joinLabels(fExprArgs, ","));
+		
 		HashMap<Expr, Integer> argsMap = new HashMap<Expr, Integer>();
 		for(int i=0; i<fExprArgs.length; i++) {
 			argsMap.put(fExprArgs[i], i);
@@ -309,76 +317,128 @@ public class BytecodeUtils {
 				throw new RuntimeException(ins.getClass() + "Infinity cannot be used in numerical computation, use a proper number instead!");
 			} else if(ins instanceof Integrate) {
 				Integrate INT = (Integrate)ins;
+				//Reorder args for integrand
+				Expr[] integrandArgs = new Expr[fun.args().length + INT.domain.getDim()];
+				int count = 0;
+				for(Expr ee : INT.domain.getCoordVars())
+					integrandArgs[count++] = ee;
+				for(Expr ee : fun.args()) 
+					integrandArgs[count++] = ee;
+				//Compile the integrand
+				Func integrand = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand, integrandArgs);
+				//System.out.println(f);
+				integrand.toBytecodeFunc(true, true); //Load class, could be better method to load a class
+
 				if(INT.domain instanceof Interval) {
-					//Reorder args for integrand
-					Expr[] integrandArgs = new Expr[fun.args().length + INT.domain.getDim()];
-					int count = 0;
-					for(Expr ee : INT.domain.getCoordVars())
-						integrandArgs[count++] = ee;
-					for(Expr ee : fun.args()) 
-						integrandArgs[count++] = ee;
-					//Compile the integrand
-					Func f = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand, integrandArgs);
-					//System.out.println(f);
-					f.toBytecodeFunc(true, true); //Load class, could be better method to load a class
-					
 					//TODO read this: http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
 					if(INT.domain.getStepSize() == null) {
 						throw new RuntimeException("Please specifiy the step size for you integral: "+INT);
 					}
 					//We have begin,end parameters on the top of the VM stack
 					il.append(new PUSH(cp, INT.domain.getStepSize()));
-					il.append(new PUSH(cp, f.getName()));
+					il.append(new PUSH(cp, integrand.getName()));
 					il.append((new ALOAD(1))); //additional parameters from user's call
 					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate1D",
-							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, Type.STRING, new ArrayType(Type.DOUBLE, 1) }, Constants.INVOKESTATIC));
-				} else if(INT.domain instanceof Domain2D) {
-					if(INT.isMultipleIntegral()) {
-						Func f = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand);
-						f.toBytecodeFunc(true, true);
-						Expr[] coord = INT.domain.getCoordVars();
-						Expr x = coord[0];
-						Expr y = coord[1];
+							Type.DOUBLE, new Type[] { 
+							Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, 
+							Type.STRING, 
+							new ArrayType(Type.DOUBLE, 1) 
+							}, Constants.INVOKESTATIC));
+				} else if(INT.domain instanceof Domain2D && INT.isMultipleIntegral()) {
+					Expr[] coord = INT.domain.getCoordVars();
+					Expr x = coord[0];
+					Expr y = coord[1];
+					Expr xMin = INT.domain.getMinBound(x);
+					Expr xMax = INT.domain.getMaxBound(y);
+					//Expr yMin = INT.domain.getMinBound(x);
+					//Expr yMax = INT.domain.getMaxBound(y);
+					Func fxMin = new Func("integrate_bound_"+x+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMin);
+					Func fxMax = new Func("integrate_bound_"+x+"Max_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMax);
+					//Func fyMin = new Func("integrate_bound_"+y+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), yMin);
+					//Func fyMax = new Func("integrate_bound_"+y+"Maz_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), yMax);
+					//System.out.println("integrand="+f);
+					//System.out.println("fxMin="+fxMin);
+					//System.out.println("fxMax="+fxMax);
+					fxMin.toBytecodeFunc(true, true);
+					fxMax.toBytecodeFunc(true, true);
+					//fyMin.toBytecodeFunc(true, true);
+					//fyMax.toBytecodeFunc(true, true);
+					//We have begin,end parameters on the top of the VM stack
+					il.append(new PUSH(cp, INT.domain.getStepSize(y)));
+					il.append(new PUSH(cp, fxMin.getName()));
+					il.append(new PUSH(cp, fxMax.getName()));
+					il.append(new PUSH(cp, INT.domain.getStepSize(x)));
+					il.append(new PUSH(cp, integrand.getName()));
+					il.append((new ALOAD(1))); //additional parameters from user's call
+					//Now the paramters are ready, call the function
+					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate2D",
+							Type.DOUBLE, new Type[] { 
+							Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, 
+							Type.STRING, Type.STRING, Type.DOUBLE, 
+							Type.STRING,
+							new ArrayType(Type.DOUBLE, 1)
+					}, Constants.INVOKESTATIC));
+				} else if(!INT.isMultipleIntegral()) {
+					Expr[] coords = INT.domain.getCoordVars();
+					LocalVariableGen lg;
+					
+					lg = mg.addLocalVariable("minBound",
+						new ArrayType(Type.STRING, 1), null, null);
+					int idxMinBound = lg.getIndex();
+					il.append(InstructionConstants.ACONST_NULL);
+					lg.setStart(il.append(new ASTORE(idxMinBound))); // "minBound" valid from here
+					
+					lg = mg.addLocalVariable("maxBound",
+						new ArrayType(Type.STRING, 1), null, null);
+					int idxMaxBound = lg.getIndex();
+					il.append(InstructionConstants.ACONST_NULL);
+					lg.setStart(il.append(new ASTORE(idxMaxBound))); // "maxBound" valid from here
+					
+					il.append(new PUSH(cp, coords.length));
+					il.append(new ANEWARRAY(cp.addClass(Type.STRING)));
+					il.append(new ASTORE(idxMinBound));
+					
+					il.append(new PUSH(cp, coords.length));
+					il.append(new ANEWARRAY(cp.addClass(Type.STRING)));
+					il.append(new ASTORE(idxMaxBound));
+					
+					for(int i=0; i<coords.length; i++) {
+						Expr x = coords[i];
 						Expr xMin = INT.domain.getMinBound(x);
-						Expr xMax = INT.domain.getMaxBound(y);
-						//Expr yMin = INT.domain.getMinBound(x);
-						//Expr yMax = INT.domain.getMaxBound(y);
+						Expr xMax = INT.domain.getMaxBound(x);
 						Func fxMin = new Func("integrate_bound_"+x+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMin);
 						Func fxMax = new Func("integrate_bound_"+x+"Max_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMax);
-						//Func fyMin = new Func("integrate_bound_"+y+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), yMin);
-						//Func fyMax = new Func("integrate_bound_"+y+"Maz_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), yMax);
-						System.out.println("integrand="+f);
-						System.out.println("fxMin="+fxMin);
-						System.out.println("fxMax="+fxMax);
+						System.out.println("min bound="+fxMin);
+						System.out.println("max bound="+fxMax);
+						il.append(new ALOAD(idxMinBound));
+						il.append(new PUSH(cp,i));
+						il.append(new PUSH(cp, fxMin.getName()));
+						il.append(new AASTORE());
+
+						il.append(new ALOAD(idxMaxBound));
+						il.append(new PUSH(cp,i));
+						il.append(new PUSH(cp, fxMax.getName()));
+						il.append(new AASTORE());
+
 						fxMin.toBytecodeFunc(true, true);
 						fxMax.toBytecodeFunc(true, true);
-						//fyMin.toBytecodeFunc(true, true);
-						//fyMax.toBytecodeFunc(true, true);
-						//We have begin,end parameters on the top of the VM stack
-						il.append(new PUSH(cp, INT.domain.getStepSize(y)));
-						il.append(new PUSH(cp, fxMin.getName()));
-						il.append(new PUSH(cp, fxMax.getName()));
-						il.append(new PUSH(cp, INT.domain.getStepSize(x)));
-						il.append(new PUSH(cp, f.getName()));
-						//Now the paramters are ready, call the function
-						il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate2D",
-								Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, Type.STRING, Type.STRING, Type.DOUBLE, Type.STRING }, Constants.INVOKESTATIC));
-					} else {
-						Expr[] coords = INT.domain.getCoordVars();
-						for(int i=0; i<coords.length; i++) {
-							Expr x = coords[i];
-							Expr xMin = INT.domain.getMinBound(x);
-							Expr xMax = INT.domain.getMaxBound(x);
-							Func fxMin = new Func("integrate_bound_"+x+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMin);
-							Func fxMax = new Func("integrate_bound_"+x+"Max_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMax);
-							System.out.println("min bound="+fxMin);
-							System.out.println("max bound="+fxMax);
-							fxMin.toBytecodeFunc(true, true);
-							fxMax.toBytecodeFunc(true, true);
-							
-							
-						}
 					}
+					
+					Func constr = new Func("constr_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), INT.domain.getConstraint(), integrandArgs);
+					constr.toBytecodeFunc(true, true);
+					
+					il.append(new ALOAD(idxMinBound));
+					il.append(new ALOAD(idxMaxBound));
+					il.append(new PUSH(cp, integrand.getName()));
+					il.append(new PUSH(cp, constr.getName()));
+					il.append((new ALOAD(1))); //additional parameters from user's call
+					//Now the paramters are ready, call the function
+					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrateMonteCarloND",
+							Type.DOUBLE, new Type[] { 
+							new ArrayType(Type.STRING,1),new ArrayType(Type.STRING,1), 
+							Type.STRING,Type.STRING,
+							new ArrayType(Type.DOUBLE, 1)
+					}, Constants.INVOKESTATIC));
 				} else {
 					//TODO
 					throw new RuntimeException("Unsupported Integrate: "+INT);

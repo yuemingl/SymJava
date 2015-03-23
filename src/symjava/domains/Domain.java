@@ -148,6 +148,18 @@ public abstract class Domain {
 		info.maxBound = maxBound;
 		return this;
 	}
+	public Domain setBound(Expr x, double minBound, Expr maxBound) {
+		setBound(x, Expr.valueOf(minBound), maxBound);
+		return this;
+	}
+	public Domain setBound(Expr x, Expr minBound, double maxBound) {
+		setBound(x, minBound, Expr.valueOf(maxBound));
+		return this;
+	}
+	public Domain setBound(Expr x, double minBound, double maxBound) {
+		setBound(x, Expr.valueOf(minBound), Expr.valueOf(maxBound));
+		return this;
+	}
 	
 	/**
 	 * Set a logic expression of equations to repreent the domain 

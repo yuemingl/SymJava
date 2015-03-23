@@ -30,4 +30,10 @@ public class Lt extends BinaryOp implements Relation {
 	public static Lt apply(Expr lhs, Expr rhs) {
 		return new Lt(lhs, rhs);
 	}
+	public static Lt apply(double lhs, Expr rhs) {
+		return new Lt(Expr.valueOf(lhs), rhs);
+	}
+	public static Lt apply(Expr lhs, double rhs) {
+		return new Lt(lhs, Expr.valueOf(rhs));
+	}
 }
