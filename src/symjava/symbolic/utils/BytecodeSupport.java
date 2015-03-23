@@ -33,14 +33,20 @@ public class BytecodeSupport {
 	}
 
 	public static double numIntegrate1D(double begin, double end, double step, 
-			String integrandFunc) {
+			String integrandFunc, double[] additionalParams) {
 
 		Method method;
 		try {
 			method = BytecodeSupport.class.getClassLoader().
 					loadClass("symjava.bytecode."+integrandFunc).
 					getMethod("apply", new Class[] {double[].class});
-			double[] args = { 0 };
+			double[] args;
+			if(additionalParams != null) {
+				args = new double[additionalParams.length+1];
+				System.arraycopy(additionalParams, 0, args, 1, additionalParams.length);
+			} else {
+				args = new double[] { 0 };
+			}
 			double sum = 0.0;
 			
 //			for(double i=begin; i<=end; i+=step) {
@@ -174,7 +180,7 @@ public class BytecodeSupport {
 			String[] lowerBoundFunc, String[] upperBoundFunc, double[] stepInner, 
 			String integrandFunc, int level) {
 		if(level == 1) {
-			return numIntegrate1D(begin, end, step, integrandFunc);
+			return numIntegrate1D(begin, end, step, integrandFunc, null);
 		}
 		
 		int idx = stepInner.length-level;
@@ -236,7 +242,8 @@ public class BytecodeSupport {
 		System.out.println(powi(2,0));
 		System.out.println(powi(2,3));
 		
-		System.out.println(numIntegrate1D(-10,10,0.1,"integrand_ae3c65a143de42739270977b140b4fdf")/Math.sqrt(2*Math.PI));
+		System.out.println(numIntegrate1D(-10,10,0.1,"integrand_ae3c65a143de42739270977b140b4fdf", null)/Math.sqrt(2*Math.PI));
 	}
 }
 
+ 

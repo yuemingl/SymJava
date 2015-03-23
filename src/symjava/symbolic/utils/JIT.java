@@ -15,7 +15,7 @@ public class JIT {
 		} else {
 			Func func = new Func("JIT"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), expr);
 			func.args = args;
-			return func.toBytecodeFunc();
+			return func.toBytecodeFunc(true, false);
 		}
 	}
 	
@@ -25,7 +25,7 @@ public class JIT {
 			return func.toBytecodeFunc();
 		} else {
 			Func func = new Func("JIT"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), expr);
-			return func.toBytecodeFunc();
+			return func.toBytecodeFunc(true, false);
 		}
 	}	
 }

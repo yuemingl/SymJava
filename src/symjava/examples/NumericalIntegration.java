@@ -14,19 +14,28 @@ public class NumericalIntegration {
 
 	public static void main(String[] args) {
 		test_1D();
-		test_2D();
+		//test_2D();
 	}
 	
 	public static void test_1D() {
 		//Define the interal
 		Domain I = Interval.apply(-10, 0).setStepSize(0.01);
-		//Define the integral: cumulative distribution function
+		//Define the integral: cumulative distribution function for standard normal distribution
 		Expr cdf = Integrate.apply(exp(-0.5*pow(x,2))/sqrt(2*PI), I);
 		System.out.println(cdf); //\int_{-10.0}^{10.0}{1/\sqrt{2*\pi}*e^{-0.5*x^2}}dx
-		
 		//Compile cdf to perform numerical integration
 		BytecodeFunc f = JIT.compile(cdf);
-		System.out.println(f.apply()); //1.0
+		System.out.println(f.apply()); //0.5
+		
+		//Define the integral: cumulative distribution function for a general normal distribution
+		Symbol mu = new Symbol("\\mu");
+		Symbol sigma = new Symbol("\\sigma");
+		Expr cdf2 = Integrate.apply(exp(-pow(x-mu,2)/(2*sigma*sigma))/(sigma*sqrt(2*PI)), I);
+		System.out.println(cdf2); //\int_{-10.0}^{0.0}{1/(\sigma*\sqrt{2*\pi})*e^{-(-\mu + x)^2/(2*\sigma*\sigma)}}dx
+		//Compile cdf2 to perform numerical integration
+		BytecodeFunc f2 = JIT.compile(new Expr[]{mu, sigma}, cdf2);
+		System.out.println(f2.apply(-5.0, 1.0)); //~1.0
+		
 	}
 	
 	public static void test_2D() {
