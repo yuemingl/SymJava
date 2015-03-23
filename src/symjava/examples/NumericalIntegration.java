@@ -7,14 +7,17 @@ import static symjava.symbolic.Symbol.*;
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
+import symjava.domains.Domain3D;
+import symjava.domains.DomainND;
 import symjava.domains.Interval;
 import symjava.symbolic.utils.JIT;
 
 public class NumericalIntegration {
 
 	public static void main(String[] args) {
-		test_1D();
+		//test_1D();
 		//test_2D();
+		test_ND();
 	}
 	
 	public static void test_1D() {
@@ -68,35 +71,59 @@ public class NumericalIntegration {
 		ans =
 		0.5679196
 		*/
-//		Domain omega = new Domain2D("\\Omega", x, y)
-//				.setConstraint( Le.apply((x-0.5)*(x-0.5) + (y-0.5)*(y-0.5), C(1/4)) )
-//				.setBound(x, Cm1, C1)
-//				.setBound(y, Cm1, C1);
+
 		Domain omega = new Domain2D("\\Omega", x, y)
-		//.setConstraint( Le.apply((x-0.5)*(x-0.5) + (y-0.5)*(y-0.5), C(1/4)) )
-		.setBound(x, Cm1, C1) 
-		.setBound(y, Cm1, C1) //TODO How to deal with parameters? e.g. setBound(x, a, b); call f.apply(-1,1)
-		.setStepSize(0.001);
+			.setConstraint( Le.apply((x-0.5)*(x-0.5) + (y-0.5)*(y-0.5), 0.25) )
+			.setBound(x, 0, 1) 
+			.setBound(y, 0, 1);
 		
-		Expr ii = Integrate.apply(sin(x*x+y*y), omega);
+		Expr ii = Integrate.apply(sin(sqrt(log(x+y+1))), omega);
 		System.out.println(ii);
 		BytecodeFunc f = JIT.compile(ii);
 		System.out.println(f.apply());
 		test_2D_verifiy();
-		
-		
 	}
 	
 	public static void test_2D_verifiy() {
-		double xMin=-1, xMax=1, xStep=0.0001;
-		double yMin=-1, yMax=1, yStep=0.0001;
+		double xMin=-1, xMax=1, xStep=0.001;
+		double yMin=-1, yMax=1, yStep=0.001;
 		double sum = 0.0;
 		for(double x=xMin; x<=xMax; x+=xStep) {
 			for(double y=yMin; y<=yMax; y+=yStep) {
-				sum += Math.sin(x*x+y*y)*xStep*yStep;
+				if((x-0.5)*(x-0.5) + (y-0.5)*(y-0.5) < 0.5*0.5)
+					sum += Math.sin(Math.sqrt(Math.log(x+y+1)))*xStep*yStep;
 			}
 		}
 		System.out.println("verify="+sum);
+	}
+	
+	public static void test_ND() {
+		double r = 1.0;
+		Domain omega = new Domain3D("\\Omega", x, y, z)
+		.setConstraint( Le.apply(x*x + y*y + z*z, r*r) )
+		.setBound(x, -1, 1) 
+		.setBound(y, -1, 1)
+		.setBound(z, -1, 1);
+	
+		Expr ii = Integrate.apply(1, omega);
+		System.out.println(ii);
+		BytecodeFunc f = JIT.compile(ii);
+		System.out.println(f.apply());
+		System.out.println(4.0*Math.PI/3.0*Math.pow(r, 3));
+
+		Domain omega2 = new DomainND("\\Omega", x, y, z, t)
+		.setConstraint( Le.apply(x*x + y*y + z*z + t*t, r*r) )
+		.setBound(x, -1, 1) 
+		.setBound(y, -1, 1)
+		.setBound(z, -1, 1)
+		.setBound(t, -1, 1);
+	
+		Expr ii2 = Integrate.apply(1, omega2);
+		System.out.println(ii);
+		BytecodeFunc f2 = JIT.compile(ii2);
+		System.out.println(f2.apply());
+		System.out.println(0.5*Math.PI*Math.PI*Math.pow(r, 4));
+	
 	}
 
 }

@@ -31,4 +31,10 @@ public class Gt extends BinaryOp implements Relation {
 	public static Gt apply(Expr lhs, Expr rhs) {
 		return new Gt(lhs, rhs);
 	}
+	public static Gt apply(double lhs, Expr rhs) {
+		return new Gt(Expr.valueOf(lhs), rhs);
+	}
+	public static Gt apply(Expr lhs, double rhs) {
+		return new Gt(lhs, Expr.valueOf(rhs));
+	}
 }

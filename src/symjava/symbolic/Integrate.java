@@ -34,6 +34,10 @@ public class Integrate extends Expr {
 		return new Integrate(integrand, domain);
 	}
 	
+	public static Expr apply(double integrand, Domain domain) {
+		return new Integrate(Expr.valueOf(integrand), domain);
+	}
+	
 	@Override
 	public Expr subs(Expr from, Expr to) {
 		return new Integrate(this.integrand.subs(from, to), this.domain);

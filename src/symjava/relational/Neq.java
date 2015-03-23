@@ -29,4 +29,10 @@ public class Neq extends BinaryOp implements Relation {
 	public static Neq apply(Expr lhs, Expr rhs) {
 		return new Neq(lhs, rhs);
 	}
+	public static Neq apply(double lhs, Expr rhs) {
+		return new Neq(Expr.valueOf(lhs), rhs);
+	}
+	public static Neq apply(Expr lhs, double rhs) {
+		return new Neq(lhs, Expr.valueOf(rhs));
+	}
 }

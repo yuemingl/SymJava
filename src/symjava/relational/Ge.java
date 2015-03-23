@@ -31,4 +31,10 @@ public class Ge extends BinaryOp implements Relation {
 	public static Ge apply(Expr lhs, Expr rhs) {
 		return new Ge(lhs, rhs);
 	}
+	public static Ge apply(double lhs, Expr rhs) {
+		return new Ge(Expr.valueOf(lhs), rhs);
+	}
+	public static Ge apply(Expr lhs, double rhs) {
+		return new Ge(lhs, Expr.valueOf(rhs));
+	}
 }
