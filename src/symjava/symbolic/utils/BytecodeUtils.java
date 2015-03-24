@@ -349,8 +349,8 @@ public class BytecodeUtils {
 					Expr x = coord[0];
 					Expr y = coord[1];
 					Expr xMin = INT.domain.getMinBound(x);
-					Expr xMax = INT.domain.getMaxBound(y);
-					//Expr yMin = INT.domain.getMinBound(x);
+					Expr xMax = INT.domain.getMaxBound(x);
+					//Expr yMin = INT.domain.getMinBound(y);
 					//Expr yMax = INT.domain.getMaxBound(y);
 					Func fxMin = new Func("integrate_bound_"+x+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMin);
 					Func fxMax = new Func("integrate_bound_"+x+"Max_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMax);
@@ -364,6 +364,12 @@ public class BytecodeUtils {
 					//fyMin.toBytecodeFunc(true, true);
 					//fyMax.toBytecodeFunc(true, true);
 					//We have begin,end parameters on the top of the VM stack
+					if(INT.domain.getStepSize(x) == null) {
+						throw new RuntimeException("Please specify step size for "+x);
+					}
+					if(INT.domain.getStepSize(y) == null) {
+						throw new RuntimeException("Please specify step size for "+y);
+					}
 					il.append(new PUSH(cp, INT.domain.getStepSize(y)));
 					il.append(new PUSH(cp, fxMin.getName()));
 					il.append(new PUSH(cp, fxMax.getName()));

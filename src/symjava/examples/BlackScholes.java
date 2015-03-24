@@ -12,8 +12,9 @@ import static symjava.math.SymMath.*;
 public class BlackScholes {
 
 	public static void main(String[] args) {
-		test1(); //Example from QuantLib
-		test2(); //Example from UCLA Statistics C183/C283: Statistical Models in Finance
+		//test1(); //Example from QuantLib
+		//test2(); //Example from UCLA Statistics C183/C283: Statistical Models in Finance
+		peper_example();
 	}
 	
 	
@@ -58,7 +59,7 @@ public class BlackScholes {
 		BytecodeFunc blackScholesPrice = JIT.compile(new Expr[]{spot, strike, rd, rf, vol, tau, phi}, res);
 		double price = blackScholesPrice.apply(100.0, 110.0, 0.002, 0.01, 0.1423, 0.5, 1);
 		
-		System.out.println("Use Newtom method to recover the volatility by given the market data:");
+		System.out.println("Use Newtom method to recover the volatility by giving the market data:");
 		Expr[] freeVars = {vol};
 		Expr[] params = {spot, strike, rd, rf, tau, phi}; //Specify the params in the given order
 		Eq[] eq = new Eq[] {
@@ -142,6 +143,40 @@ public class BlackScholes {
 			};
 		double[] guess = new double[]{ 0.10 };
 		double[] constParams = new double[] {21, 20, 0.1, 0.25, 1.875};
+		Newton.solve(eq, guess, constParams, 100, 1e-5);
+	}
+	
+	
+	public static void peper_example() {
+		// Define symbols to construct the Black-Scholes formula
+		Symbol spot = new Symbol("spot"); //spot price
+		Symbol strike = new Symbol("strike"); //strike price
+		Symbol rd = new Symbol("rd");
+		Symbol rf = new Symbol("rf");
+		Symbol vol = new Symbol("\\sigma"); //volatility
+		Symbol tau = new Symbol("\\tau");
+		Symbol phi = new Symbol("\\phi");
+		
+		Expr domDf = exp(-rd*tau); 
+		Expr forDf = exp(-rf*tau);
+		Expr fwd=spot*forDf/domDf;
+		Expr stdDev=vol*sqrt(tau);
+		//We use -10 instead of -oo for numerical computation
+		double step = 1e-3;
+		Domain I1 = Interval.apply(-10, phi*(log(fwd/strike)+0.5*pow(stdDev,2))/stdDev, z)
+				.setStepSize(step); 
+		Domain I2 = Interval.apply(-10, phi*(log(fwd/strike)-0.5*pow(stdDev,2))/stdDev, z)
+				.setStepSize(step); 
+		Expr cdf1 = Integrate.apply(exp(-0.5*pow(z,2)), I1)/sqrt(PI2);
+		Expr cdf2 = Integrate.apply(exp(-0.5*pow(z,2)), I2)/sqrt(PI2);
+		Expr res = phi*domDf*(fwd*cdf1-strike*cdf2);
+		//Use Newtom method to recover the volatility by giving the market data
+		Expr[] freeVars = {vol};
+		Expr[] params = {spot, strike, rd, rf, tau, phi};
+		Eq[] eq = new Eq[] { new Eq(res-0.1423, C0, freeVars, params) };
+		// Use Newton's method to find the root
+		double[] guess = new double[]{ 0.10 };
+		double[] constParams = new double[] {100.0, 110.0, 0.002, 0.01, 0.5, 1};
 		Newton.solve(eq, guess, constParams, 100, 1e-5);
 	}
 }

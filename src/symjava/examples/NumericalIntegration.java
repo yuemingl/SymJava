@@ -1,12 +1,12 @@
 package symjava.examples;
 
+import symjava.relational.Ge;
 import symjava.relational.Le;
 import symjava.symbolic.*;
 import static symjava.math.SymMath.*;
 import static symjava.symbolic.Symbol.*;
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
-import symjava.domains.Domain1D;
 import symjava.domains.Domain2D;
 import symjava.domains.Domain3D;
 import symjava.domains.DomainND;
@@ -17,20 +17,16 @@ import symjava.symbolic.utils.JIT;
 public class NumericalIntegration {
 
 	public static void main(String[] args) {
-		//test_1D();
-		//test_2D();
-		//test_ND();
+//		test_1D();
+//		test_2D();
+//		test_ND();
 		
 		//Expr i = Integrate.apply(exp(pow(x,2)), Interval.apply(a, b).setStepSize(0.001));
 		//BytecodeFunc fi = JIT.compile(new Expr[]{a,b}, i);
 		//System.out.println(fi.apply(1,2));
 		
-		Domain2D d = new Domain2D("D");
-		d.setConstraint(
-				x <=y & x <=z
-				);
-		System.out.println(d.getConstraint());
-		
+		test_paper_example1();
+		test_paper_example2();
 	}
 	
 	public static void test_1D() {
@@ -90,16 +86,16 @@ public class NumericalIntegration {
 			.setBound(x, 0, 1) 
 			.setBound(y, 0, 1);
 		
-		Expr ii = Integrate.apply(sin(sqrt(log(x+y+1))), omega);
-		System.out.println(ii);
-		BytecodeFunc f = JIT.compile(ii);
-		System.out.println(f.apply());
+		Expr I = Integrate.apply(sin(sqrt(log(x+y+1))), omega);
+		System.out.println(I);
+		BytecodeFunc fI = JIT.compile(I);
+		System.out.println(fI.apply());
 		test_2D_verifiy();
 	}
 	
 	public static void test_2D_verifiy() {
-		double xMin=-1, xMax=1, xStep=0.001;
-		double yMin=-1, yMax=1, yStep=0.001;
+		double xMin=0, xMax=1, xStep=0.001;
+		double yMin=0, yMax=1, yStep=0.001;
 		double sum = 0.0;
 		for(double x=xMin; x<=xMax; x+=xStep) {
 			for(double y=yMin; y<=yMax; y+=yStep) {
@@ -138,8 +134,68 @@ public class NumericalIntegration {
 		System.out.println(0.5*Math.PI*Math.PI*Math.pow(r, 4));
 	
 	}
+	
+	/**
+	 * I = \int_{\Omega} sin(sqrt(log(x+y+1))) dxdy
+	 * where 
+	 * \Omega={ (x,y), where (x-1/2)^2 + (y-1/2)^2 <= 0.25 }
+	 */
+	public static void test_paper_example1() {
+Domain omega = new Domain2D("\\Omega", x, y)
+	.setBound(x, 0.5-sqrt(0.25-(y-0.5)*(y-0.5)), 0.5+sqrt(0.25-(y-0.5)*(y-0.5)))
+	.setBound(y, 0, 1)
+	.setStepSize(0.001);
 
+Expr I = Integrate.apply( sin(sqrt(log(x+y+1)) ), omega);
+System.out.println(I);
+
+BytecodeFunc fI = JIT.compile(I);
+System.out.println(fI.apply());
+	}
+	
+	/**
+	 * I = \int_{\Omega} sin(sqrt(log(x+y+1))) dxdy
+	 * where 
+	 * \Omega= { (x,y), where
+	 *             a^2 <= (x-1/2)^2 + (y-1/2)^2 <= b^2 or
+	 *             c^2 <= (x-1/2)^2 + (y-1/2)^2 <= d^2 
+	 *         }
+	 * we choose 
+	 * a=0.25, b=0.5, c=0.75, d=1.0
+	 */
+	public static void test_paper_example2() {
+		
+Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
+Domain omega = new Domain2D("\\Omega", x, y)
+	.setConstraint(
+			( Ge.apply(eq, a*a) & Le.apply(eq, b*b)) |
+			( Ge.apply(eq, c*c) & Le.apply(eq, d*d) )
+	).setBound(x, 0, 1).setBound(y, 0, 1);
+
+Expr I = Integrate.apply( sin(sqrt(log(x+y+1)) ), omega);
+System.out.println(I);
+
+BytecodeFunc fI = JIT.compile(new Expr[]{a, b, c, d}, I);
+System.out.println(fI.apply(0.25, 0.5, 0.75, 1.0));
+		
+		test_paper_example_verifiy();
+	}
+	
+	public static void test_paper_example_verifiy() {
+		double xMin=0, xMax=1, xStep=0.001;
+		double yMin=0, yMax=1, yStep=0.001;
+		double sum = 0.0;
+		double a=0.25, b=0.5, c=0.75, d=1.0;
+		for(double x=xMin; x<=xMax; x+=xStep) {
+			for(double y=yMin; y<=yMax; y+=yStep) {
+				double disk = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
+				if((a*a <= disk && disk <= b*b) || 
+				   (c*c <= disk && disk <= d*d )
+				  ) {
+					sum += Math.sin(Math.sqrt(Math.log(x+y+1)))*xStep*yStep;
+				}
+			}
+		}
+		System.out.println("verify="+sum);
+	}
 }
-
-
-

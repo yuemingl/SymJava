@@ -23,6 +23,9 @@ public abstract class Domain {
 		Double stepSize;
 		Expr minBound;
 		Expr maxBound;
+		public String toString() {
+			return minBound+" "+maxBound+" "+stepSize;
+		}
 	}
 	
 	protected Map<Expr, CoordVarInfo> infoMap = new HashMap<Expr, CoordVarInfo>();
@@ -181,13 +184,13 @@ public abstract class Domain {
 		return this;
 	}
 	
-	public Domain setConstraint(boolean dummy) {
-		if(Ge.stackTop != null) {
-			this.constraint = Ge.stackTop;
-			Ge.stackTop = null;
-		}
-		return this;
-	}
+//	public Domain setConstraint(boolean dummy) {
+//		if(Ge.stackTop != null) {
+//			this.constraint = Ge.stackTop;
+//			Ge.stackTop = null;
+//		}
+//		return this;
+//	}
 	
 	public Expr getConstraint() {
 		return this.constraint;
