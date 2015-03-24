@@ -6,18 +6,25 @@ import static symjava.math.SymMath.*;
 import static symjava.symbolic.Symbol.*;
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
+import symjava.domains.Domain1D;
 import symjava.domains.Domain2D;
 import symjava.domains.Domain3D;
 import symjava.domains.DomainND;
 import symjava.domains.Interval;
 import symjava.symbolic.utils.JIT;
 
+
 public class NumericalIntegration {
 
 	public static void main(String[] args) {
 		//test_1D();
 		//test_2D();
-		test_ND();
+		//test_ND();
+		
+		Expr i = Integrate.apply(exp(pow(x,2)), Interval.apply(a, b).setStepSize(0.001));
+		BytecodeFunc fi = JIT.compile(new Expr[]{a,b}, i);
+		System.out.println(fi.apply(1,2));
+		
 	}
 	
 	public static void test_1D() {

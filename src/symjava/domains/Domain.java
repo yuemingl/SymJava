@@ -19,7 +19,7 @@ public abstract class Domain {
 	protected Expr constraint;
 	
 	public static class CoordVarInfo {
-		double stepSize;
+		Double stepSize;
 		Expr minBound;
 		Expr maxBound;
 	}
