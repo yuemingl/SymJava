@@ -4,6 +4,7 @@ import symjava.symbolic.Expr;
 import symjava.symbolic.arity.BinaryOp;
 
 public class Ge extends BinaryOp implements Relation {
+	public static Expr stackTop = null;
 
 	public Ge(Expr arg1, Expr arg2) {
 		super(arg1, arg2);

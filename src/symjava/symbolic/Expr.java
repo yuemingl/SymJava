@@ -8,6 +8,7 @@ import symjava.logic.Not;
 import symjava.logic.Or;
 import symjava.logic.Xor;
 import symjava.relational.Ge;
+import symjava.relational.Relation;
 import symjava.symbolic.utils.Utils;
 
 abstract public class Expr implements Cloneable {
@@ -372,14 +373,18 @@ abstract public class Expr implements Cloneable {
 		return Xor.simplifiedIns(this, other);
 	}
 	
-//	/**
-//	 * TODO We cannot use the comparison operator overload in java-oo for our use case
-//	 * @param other
-//	 * @return
-//	 */
-//	public int compareTo(Expr other) {
-//		return 1;
-//	}
+	/**
+	 * TODO We cannot use the comparison operator overload in java-oo for our use case
+	 * @param other
+	 * @return
+	 */
+	public int compareTo(Expr other) {
+		if(Ge.stackTop == null)
+			Ge.stackTop = Ge.apply(this, other);
+		else
+			Ge.stackTop = Ge.apply(Ge.stackTop, other);
+		return -1;
+	}
 	
 	
 	/**
