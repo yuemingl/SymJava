@@ -7,6 +7,7 @@ import java.util.Map;
 
 import symjava.math.Transformation;
 import symjava.numeric.NumFunc;
+import symjava.relational.Ge;
 import symjava.symbolic.Expr;
 
 /**
@@ -177,6 +178,14 @@ public abstract class Domain {
 	 */
 	public Domain setConstraint(Expr logicalExpr) {
 		this.constraint = logicalExpr;
+		return this;
+	}
+	
+	public Domain setConstraint(boolean dummy) {
+		if(Ge.stackTop != null) {
+			this.constraint = Ge.stackTop;
+			Ge.stackTop = null;
+		}
 		return this;
 	}
 	

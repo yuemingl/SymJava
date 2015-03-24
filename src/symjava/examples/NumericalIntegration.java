@@ -21,9 +21,15 @@ public class NumericalIntegration {
 		//test_2D();
 		//test_ND();
 		
-		Expr i = Integrate.apply(exp(pow(x,2)), Interval.apply(a, b).setStepSize(0.001));
-		BytecodeFunc fi = JIT.compile(new Expr[]{a,b}, i);
-		System.out.println(fi.apply(1,2));
+		//Expr i = Integrate.apply(exp(pow(x,2)), Interval.apply(a, b).setStepSize(0.001));
+		//BytecodeFunc fi = JIT.compile(new Expr[]{a,b}, i);
+		//System.out.println(fi.apply(1,2));
+		
+		Domain2D d = new Domain2D("D");
+		d.setConstraint(
+				x <=y & x <=z
+				);
+		System.out.println(d.getConstraint());
 		
 	}
 	
