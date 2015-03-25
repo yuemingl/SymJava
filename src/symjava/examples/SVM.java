@@ -16,6 +16,7 @@ import symjava.matrix.SymVector;
 import symjava.relational.Eq;
 import symjava.symbolic.*;
 import symjava.symbolic.utils.AddList;
+import symjava.symbolic.utils.Utils;
 import static symjava.math.SymMath.*;
 import static symjava.symbolic.Symbol.*;
 
@@ -88,13 +89,12 @@ public class SVM extends JFrame {
 			double a = line[0];
 			double b = line[1];
 			double c = line[2];
-			double step = 2.0/N;
-			for(double p=-1.0; p<1.0; p+=step) {
-				int x = (int)(p*w);
-				double yy = (-c-a*p)/b;
-				int y = (int)(yy*h);
-				x += w/2;
-				y += h/2;
+			System.out.println("Distance to (0,0)="+c/Math.sqrt(a*a+b*b));
+			double step = 1.0/N;
+			for(double xx=0.0; xx<1.0; xx+=step) {
+				double yy = (-c-a*xx)/b;
+				int x = (int)(xx*w/2 + w/2);
+				int y = (int)(yy*h/2 + h/2);
 				y = h - y;
 				//System.out.println(x+", "+y);
 				g2d.drawLine(x, y, x, y);
@@ -117,17 +117,20 @@ public class SVM extends JFrame {
 //		 };
 //		 double[] sol  = solve(data, new double[]{0.0,0.0,0.0});
 
-		// double[][] data = {
-		// { 3.0, 1.0, 1},
-		// { 3.0, -1.0, 1},
-		// { 6.0, 1.0, 1},
-		// { 6.0, -1.0, 1},
-		// { 1.0, 0.0, -1},
-		// { 0.0, 1.0, -1},
-		// { 0.0, -1.0, -1},
-		// {-1.0, 0.0, -1}
-		// };
-		// solve(data, new double[]{0.1,0.0,-1});
+		//?
+		//http://axon.cs.byu.edu/Dan/478/misc/SVM.example.pdf
+//		 double[][] data = {
+//		 { 3.0, 1.0, 1},
+//		 { 3.0, -1.0, 1},
+//		 { 6.0, 1.0, 1},
+//		 { 6.0, -1.0, 1},
+//		 { 1.0, 0.0, -1},
+//		 { 0.0, 1.0, -1},
+//		 { 0.0, -1.0, -1},
+//		 {-1.0, 0.0, -1}
+//		 };
+//		 // w=(1,0) b=-2
+//		double[] sol = solve(data, new double[]{0.1,0.0,-1});
 
 		double[][] data = new double[10][3];
 		for (int i = 0; i < data.length/2; i++) {
@@ -140,7 +143,7 @@ public class SVM extends JFrame {
 			data[i][1] = 0.5+0.5*Math.random();
 			data[i][2] = -1.0;
 		}
-		double[] init = new double[] { -1.0, -1.0, 0.5 };
+		double[] init = new double[] { -1.0, -1.0, 0.1 };
 		double[] sol = solve(data, init);
 		
 		
@@ -160,6 +163,7 @@ public class SVM extends JFrame {
 	public static double[] solve(double[][] data, double[] init) {
 		int nFeatures = data[0].length - 1;
 		SymVector w = new SymVector("w", 1, nFeatures);
+		
 		Expr sumf = 0.5*dot(w, w);
 		System.out.println(sumf);
 
@@ -172,29 +176,23 @@ public class SVM extends JFrame {
 			addList.add(lmd.get(i) * (yi * (dot(xi, w) + b) - 1 - relax.get(i)*relax.get(i)));
 		}
 		Expr sumg = addList.toExpr();
-		// System.out.println(sumg);
+		System.out.println(sumg);
 
 		Expr L = sumf - sumg;
-		Expr[] freeVars = new Expr[w.dim() + 1 + lmd.dim() + relax.dim()];
-		int j = 0;
-		for (int i = 0; i < w.dim(); i++) {
-			freeVars[j++] = w.get(i);
-		}
-		freeVars[j++] = b;
-		for (int i = 0; i < lmd.dim(); i++) {
-			freeVars[j++] = lmd.get(i);
-		}
-		for (int i = 0; i < relax.dim(); i++) {
-			freeVars[j++] = relax.get(i);
-		}
+		Expr[] freeVars = Utils.joinArrays(
+				w.getData(), 
+				new Expr[]{b}, 
+				lmd.getData(), 
+				relax.getData()
+				);
+
 		Eq eq = new Eq(L, C0, freeVars);
 		System.out.println(eq);
 
 		double[] guess = new double[freeVars.length];
 		System.arraycopy(init, 0, guess, 0, init.length);
 
-		// ???GaussNewton.solve(eq, guess, 100, 1e-3);
-		NewtonOptimization.solve(eq, guess, 10000, 1e-8, false);
+		NewtonOptimization.solve(eq, guess, 10000, 1e-6, false);
 		return guess;
 	}
 
