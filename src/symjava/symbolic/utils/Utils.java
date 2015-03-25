@@ -334,4 +334,20 @@ public class Utils {
 	public static String joinLabels(List<Expr> list, String deliminator) {
 		return joinLabels(list.toArray(new Expr[0]), deliminator);
 	}
+	
+	public static Expr[] joinArrays(Expr[] ...arys) {
+		int len = 0;
+		for(int i=0; i<arys.length; i++) {
+			len += arys[i].length;
+		}
+		Expr[] rlt = new Expr[len];
+		int k = 0;
+		for(int i=0; i<arys.length; i++) {
+			for(Expr e : arys[i]) {
+				rlt[k++] = e;
+			}
+		}
+		return rlt;
+	}
+	
 }
