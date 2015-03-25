@@ -114,6 +114,44 @@ public class SymMath {
 		return Dot.apply(l, r);
 	}
 	
+	public static Expr dot(double[] l, SymVector r) {
+		SymVector v = new SymVector(l, 0, r.dim());
+		return Dot.apply(v, r);
+	}
+
+	public static Expr dot(SymVector l, double[] r) {
+		SymVector v = new SymVector(r, 0, l.dim());
+		return Dot.apply(l, v);
+	}
+	
+//	public static Expr dot(double[] l, double[] r) {
+//		double sum = 0.0;
+//		for(int i=0; i<l.length; i++)
+//			sum += l[i]*r[i];
+//		return sum;
+//	}
+//	???
+//	Exception in thread "main" java.lang.VerifyError: Bad type on operand stack
+//	Exception Details:
+//	  Location:
+//	    symjava/math/SymMath.dot([D[D)Lsymjava/symbolic/Expr; @34: dreturn
+//	  Reason:
+//	    Type 'symjava/symbolic/Expr' (current frame, stack[0]) is not assignable to double_2nd
+//	  Current Frame:
+//	    bci: @34
+//	    flags: { }
+//	    locals: { '[D', '[D', double, double_2nd, integer }
+//	    stack: { 'symjava/symbolic/Expr' }
+//	  Bytecode:
+//	    0000000: 0e49 0336 04a7 0012 282a 1504 312b 1504
+//	    0000010: 316b 6349 8404 0115 042a bea1 ffed 28b8
+//	    0000020: 002c af                                
+//	  Stackmap Table:
+//	    append_frame(@8,Double,Integer)
+//	    same_frame(@23)
+//
+//		at symjava.examples.SVM.main(SVM.java:11)
+		
 	public static SymVector grad(Expr f) {
 		return Grad.apply(f);
 	}

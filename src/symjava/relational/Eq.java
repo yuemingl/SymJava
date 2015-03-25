@@ -54,6 +54,8 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars) {
 		super(lhs, rhs);
+		this.label = arg1 + " = " + arg2;
+		this.sortKey = this.label;
 		this.freeVars = freeVars;
 		List<Expr> list = Utils.extractSymbols(lhs, rhs);
 		List<Expr> depList = new ArrayList<Expr>();
@@ -95,6 +97,8 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params) {
 		super(lhs, rhs);
+		this.label = arg1 + " = " + arg2;
+		this.sortKey = this.label;
 		this.freeVars = freeVars;
 		this.params = params;
 		//Find dependent variables
@@ -128,6 +132,8 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params, Expr[] dependentVars) {
 		super(lhs, rhs);
+		this.label = arg1 + " = " + arg2;
+		this.sortKey = this.label;
 		this.freeVars = freeVars;
 		this.params = params;
 		this.dependentVars = dependentVars;
@@ -273,6 +279,5 @@ public class Eq extends BinaryOp implements Relation {
 	public Expr diff(Expr expr) {
 		return new Eq(arg1.diff(expr), arg2.diff(expr), this.freeVars, this.params, this.dependentVars);
 	}
-	
 }
 
