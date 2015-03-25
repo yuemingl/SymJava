@@ -28,7 +28,7 @@ public class Symbols extends Expr {
 	public Symbols(String namePrefix) {
 		this.namePrefix = namePrefix;
 		this.indexSymbol = new Symbol("i");
-		this.label = namePrefix + indexSymbol;
+		this.label = namePrefix + "_" +indexSymbol;
 		sortKey = label;
 	}
 	
@@ -51,6 +51,20 @@ public class Symbols extends Expr {
 			cache.put(index, s);
 		}
 		return s;
+	}
+	
+	/**
+	 * Return an array of symbols: [startIdx, endIdx]
+	 * which include startIdx and endIdx
+	 * @param startIdx
+	 * @param endIdx
+	 * @return
+	 */
+	public Expr[] getRange(int startIdx, int endIdx) {
+		Expr[] rlt = new Expr[endIdx-startIdx+1];
+		for(int i=startIdx; i<=endIdx; i++)
+			rlt[i-startIdx] = get(i);
+		return rlt;
 	}
 
 	@Override

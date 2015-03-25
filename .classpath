@@ -3,5 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/Jama-1.0.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/mtj-1.0-snapshot.jar"/>
+	<classpathentry kind="lib" path="lib/colt-1.2.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

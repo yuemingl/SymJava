@@ -13,11 +13,11 @@ public class Sum extends Expr {
 	public int end;
 	HashMap<Integer, Expr> cache = new HashMap<Integer, Expr>();
 	
-	public Sum(Expr summandTemplate, Symbol indexSym, int start, int end) {
+	public Sum(Expr summandTemplate, Symbol indexSymbol, int start, int end) {
  		this.summand = summandTemplate;
- 		this.indexSym = indexSym;
+ 		this.indexSym = indexSymbol;
  		
-		label = "\\Sigma_{"+indexSym+"="+start+"}^" + end + "{" + SymPrinting.addParenthsesIfNeeded(summandTemplate, new Add(Symbol.x, Symbol.y)) + "}";
+		label = "\\Sigma_{"+indexSymbol+"="+start+"}^" + end + "{" + SymPrinting.addParenthsesIfNeeded(summandTemplate, new Add(Symbol.x, Symbol.y)) + "}";
 		this.start = start;
 		this.end = end;
 		sortKey = label;

@@ -1,19 +1,37 @@
 package symjava.symbolic.utils;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import symjava.symbolic.Expr;
 
-public class AddList {
-	int sign = 1;
-	List<Expr> list = new ArrayList<Expr>();
+public class AddList extends ArrayList<Expr>{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
+	int sign = 1;
+	
+	public AddList() {
+		
+	}
+	
+	/**
+	 * Flatten the expr to a summation list
+	 * @param expr
+	 */
 	public AddList(Expr expr) {
-		expr.flattenAdd(list);
+		expr.flattenAdd(this);
 	}
 	
 	boolean isNegative() {
 		return sign == -1;
+	}
+
+	/**
+	 * Convert the list back to an expr
+	 * @return
+	 */
+	public Expr toExpr() {
+		return Utils.addListToExpr(this);
 	}
 }

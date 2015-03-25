@@ -23,7 +23,7 @@ public class GaussNewton {
 		Expr[] params = eq.getParams();
 		for(int i=0; i<n; i++) {
 			Eq subEq = eq.subsUnknowns(data[i]);
-			res[i] = subEq.arg1 - subEq.arg2; //res[i] =y[i] - f(x[i]);
+			res[i] = subEq.lhs() - subEq.rhs(); //res[i] =y[i] - f(x[i]);
 			for(int j=0; j<eq.getParams().length; j++) {
 				Expr df = res[i].diff(params[j]);
 				J[i][j] = df;
