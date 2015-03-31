@@ -75,7 +75,7 @@ public class QPSlover {
 		Expr L = f + addList.toExpr();
 		System.out.println(L);
 		
-		Expr[] freeVars = Utils.joinArrays(new Expr[]{x, y}, lmd.getRange(1, 5), c.getRange(1, 5));
+		Expr[] freeVars = Utils.joinArrays(new Expr[]{x, y}, lmd.get(1, 5), c.get(1, 5));
 		Eq eq = new Eq(L, C0, freeVars);
 		System.out.println(eq);
 		
@@ -112,7 +112,7 @@ public class QPSlover {
 		Expr L = f + addList.toExpr();
 		System.out.println(L);
 		
-		Expr[] freeVars = Utils.joinArrays(new Expr[]{x, y}, lmd.getRange(1, 5), c.getRange(1, 5));
+		Expr[] freeVars = Utils.joinArrays(new Expr[]{x, y}, lmd.get(1, 5), c.get(1, 5));
 		Eq eq = new Eq(L, C0, freeVars);
 		System.out.println(eq);
 		
@@ -149,7 +149,7 @@ public class QPSlover {
 		Expr L = f + addList.toExpr();
 		System.out.println(L);
 		
-		Expr[] freeVars = Utils.joinArrays(new Expr[]{x, y}, lmd.getRange(1, 4), c.getRange(1, 4));
+		Expr[] freeVars = Utils.joinArrays(new Expr[]{x, y}, lmd.get(1, 4), c.get(1, 4));
 		Eq eq = new Eq(L, C0, freeVars);
 		System.out.println(eq);
 		

@@ -34,7 +34,7 @@ public class SymVector implements Iterable<Expr> {
 	
 	public SymVector(String prefix, int startIdx, int endIdx) {
 		Symbols v = new Symbols(prefix);
-		for(Expr e : v.getRange(startIdx, endIdx))
+		for(Expr e : v.get(startIdx, endIdx))
 			data.add(e);
 	}
 	
