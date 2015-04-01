@@ -60,6 +60,7 @@ import com.sun.org.apache.bcel.internal.generic.ClassGen;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.DADD;
 import com.sun.org.apache.bcel.internal.generic.DALOAD;
+import com.sun.org.apache.bcel.internal.generic.DASTORE;
 import com.sun.org.apache.bcel.internal.generic.DCMPL;
 import com.sun.org.apache.bcel.internal.generic.DDIV;
 import com.sun.org.apache.bcel.internal.generic.DLOAD;
@@ -177,7 +178,7 @@ public class BytecodeUtils {
 		return rlt;
 	}
 	
-	public static ClassGen genClass(Func fun, boolean writeClassFile, boolean staticMethod) {
+	public static ClassGen genClassBytecodeFunc(Func fun, boolean writeClassFile, boolean staticMethod) {
 		String packageName = "symjava.bytecode";
 		String clsName = fun.getName();
 		String fullClsName = packageName+"."+clsName;
@@ -226,11 +227,91 @@ public class BytecodeUtils {
 		for(int i=0; i<fExprArgs.length; i++) {
 			argsMap.put(fExprArgs[i], i);
 		}
+
+		addToInstructionList(mg, cp, factory, il, staticMethod, fun.getExpr(), fun.args, argsMap);
+
+		il.append(InstructionConstants.DRETURN);
+		
+		mg.setMaxStack();
+		cg.addMethod(mg.getMethod());
+		il.dispose(); // Allow instruction handles to be reused
+		
+		cg.addEmptyConstructor(ACC_PUBLIC);
+		if(writeClassFile) {
+			try {
+				cg.getJavaClass().dump("bin/symjava/bytecode/"+clsName+".class");
+			} catch (java.io.IOException e) {
+				System.err.println(e);
+			}
+		}
+		return cg;
+	}
+	
+	public static ClassGen genClassBytecodeVecFunc(String className, Expr[] exprs, Expr[] args, boolean writeClassFile, boolean staticMethod) {
+		String packageName = "symjava.bytecode";
+		String fullClsName = packageName+"."+className;
+		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",
+				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeVecFunc"});
+		ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
+		InstructionList il = new InstructionList();
+		InstructionFactory factory = new InstructionFactory(cg);
+		
+		short acc_flags = ACC_PUBLIC;
+		if(staticMethod)
+			acc_flags |= ACC_STATIC;
+		MethodGen mg = new MethodGen(acc_flags, // access flags
+				new ArrayType(Type.DOUBLE, 1), // return type
+				new Type[] { // argument types
+					new ArrayType(Type.DOUBLE, 1) 
+				},
+				new String[] { "args" }, // arg names
+				"apply", fullClsName, // method, class
+				il, cp);
+		
+		HashMap<Expr, Integer> argsMap = new HashMap<Expr, Integer>();
+		for(int i=0; i<args.length; i++) {
+			argsMap.put(args[i], i);
+		}
+
+		LocalVariableGen lg;
+		lg = mg.addLocalVariable("retArray",
+				new ArrayType(Type.DOUBLE, 1), null, null);
+		int retArray = lg.getIndex();
+		il.append(InstructionConstants.ACONST_NULL);
+		il.append(new PUSH(cp, exprs.length));
+		il.append(new NEWARRAY(Type.DOUBLE));
+		il.append(new ASTORE(retArray));
+		for(int i=0; i<exprs.length; i++) {
+			il.append(new ALOAD(retArray));
+			il.append(new PUSH(cp,i));
+			addToInstructionList(mg, cp, factory, il, staticMethod, exprs[i], args, argsMap);
+			il.append(new DASTORE());
+		}
+		il.append(new ALOAD(retArray));
+		il.append(InstructionConstants.ARETURN);
+		
+		mg.setMaxStack();
+		cg.addMethod(mg.getMethod());
+		il.dispose(); // Allow instruction handles to be reused
+		
+		cg.addEmptyConstructor(ACC_PUBLIC);
+		if(writeClassFile) {
+			try {
+				cg.getJavaClass().dump("bin/symjava/bytecode/"+className+".class");
+			} catch (java.io.IOException e) {
+				System.err.println(e);
+			}
+		}
+		return cg;
+	}
+	
+	public static void addToInstructionList(MethodGen mg, ConstantPoolGen cp, InstructionFactory factory, InstructionList il, 
+			boolean staticMethod, Expr expr, Expr[] args, HashMap<Expr, Integer> argsMap) {
+		//Traverse the expression tree
 		List<Expr> insList = new ArrayList<Expr>();
-		post_order(fun.getExpr(), insList);
+		post_order(expr, insList);
 		if(insList.size() == 0) {
-			throw new RuntimeException(String.format("Function %s is an empty function. Nothing to generate!",
-					fun.getName()));
+			throw new RuntimeException("Expressionis empty. Nothing to generate!");
 		}
 
 		for(int insIndex=0; insIndex<insList.size(); insIndex++) {
@@ -238,7 +319,7 @@ public class BytecodeUtils {
 			if(ins instanceof Symbol) {
 				Integer argIdx = argsMap.get(ins);
 				if(argIdx == null) {
-					throw new IllegalArgumentException(ins+" is not in the argument list of "+fun.getLabel());
+					throw new IllegalArgumentException(ins+" is not in the argument list of "+expr.getLabel());
 				}
 				if(staticMethod)
 					il.append(new ALOAD(0)); //for static method
@@ -318,11 +399,11 @@ public class BytecodeUtils {
 			} else if(ins instanceof Integrate) {
 				Integrate INT = (Integrate)ins;
 				//Reorder args for integrand
-				Expr[] integrandArgs = new Expr[fun.args().length + INT.domain.getDim()];
+				Expr[] integrandArgs = new Expr[args.length + INT.domain.getDim()];
 				int count = 0;
 				for(Expr ee : INT.domain.getCoordVars())
 					integrandArgs[count++] = ee;
-				for(Expr ee : fun.args()) 
+				for(Expr ee : args) 
 					integrandArgs[count++] = ee;
 				//Compile the integrand
 				Func integrand = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand, integrandArgs);
@@ -504,24 +585,8 @@ public class BytecodeUtils {
 				throw new RuntimeException(ins.getClass() + " is not supported in this version when generating bytecode function!");
 			}
 		}
-
-		if(fun.getExpr() instanceof Relation || fun.getExpr() instanceof Logic) {
+		if(expr instanceof Relation || expr instanceof Logic) {
 			il.append(new I2D());
 		}
-		il.append(InstructionConstants.DRETURN);
-		
-		mg.setMaxStack();
-		cg.addMethod(mg.getMethod());
-		il.dispose(); // Allow instruction handles to be reused
-		
-		cg.addEmptyConstructor(ACC_PUBLIC);
-		if(writeClassFile) {
-			try {
-				cg.getJavaClass().dump("bin/symjava/bytecode/"+clsName+".class");
-			} catch (java.io.IOException e) {
-				System.err.println(e);
-			}
-		}
-		return cg;
 	}
 }
