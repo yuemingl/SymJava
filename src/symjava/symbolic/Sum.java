@@ -74,6 +74,8 @@ public class Sum extends Expr {
 			if(!Utils.symCompare(Symbol.C0, summand))
 				addList.add(summand);
 		}
+		if(addList.size() == 0)
+			addList.add(Symbol.C0);
 		return addList.toExpr().simplify();
 	}
 
