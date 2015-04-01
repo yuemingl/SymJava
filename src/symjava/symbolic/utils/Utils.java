@@ -230,9 +230,11 @@ public class Utils {
 	}
 	
 	public static Expr addListToExpr(List<Expr> list) {
-		if(list.size() == 1)
+		if(list.size() <= 1) {
+			if(list.size() == 0)
+				throw new RuntimeException("Empty expression list!");
 			return list.get(0);
-		else {
+		} else {
 			Expr rlt = list.get(0);
 			for(int i=1; i<list.size(); i++) {
 				Expr e = list.get(i);
@@ -249,9 +251,11 @@ public class Utils {
 	}
 	
 	public static Expr multiplyListToExpr(List<Expr> list) {
-		if(list.size() == 1)
+		if(list.size() <= 1) {
+			if(list.size() == 0)
+				throw new RuntimeException("Empty expression list!");
 			return list.get(0);
-		else {
+		} else {
 			Expr rlt = list.get(0);
 			for(int i=1; i<list.size(); i++) {
 				Expr e = list.get(i);

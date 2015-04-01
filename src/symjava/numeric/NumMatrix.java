@@ -1,83 +1,63 @@
 package symjava.numeric;
 
-import java.util.Vector;
-
-import symjava.bytecode.BytecodeFunc;
+import symjava.bytecode.BytecodeVecFunc;
 import symjava.matrix.SymMatrix;
 import symjava.symbolic.Expr;
-import symjava.symbolic.Func;
-import symjava.symbolic.Expr;
+import symjava.symbolic.utils.JIT;
 
 public class NumMatrix {
-	Vector<Vector<BytecodeFunc>> data = new Vector<Vector<BytecodeFunc>>();
+	BytecodeVecFunc func;
+	int nRow;
+	int nCol;
+	double[][] lastEvalData;
 	
 	public NumMatrix() {
 	}
 	
+	/**
+	 * Create an empty matrix
+	 * @param m number of rows
+	 * @param n number of columns
+	 */
 	public NumMatrix(int m, int n) {
-		data.setSize(m);
-		for(int i=0; i<m; i++) {
-			data.set(i, new Vector<BytecodeFunc>(n));
-		}
+		this.nRow = m;
+		this.nCol = n;
 	}
 	
 	public NumMatrix(SymMatrix sm, Expr[] args) {
-		int m = sm.rowDim();
-		int n = sm.colDim();
-		data.setSize(m);
-		for(int i=0; i<m; i++) {
-			Vector<BytecodeFunc> row = new Vector<BytecodeFunc>();
-			row.setSize(n);
-			data.set(i, row);
-			for(int j=0; j<n; j++) {
-				Expr e = sm.get(i, j);
-				if(e == null)
-					continue;
-				Func func = null;
-				if(sm.get(i, j) instanceof Func) {
-					func = (Func)e; 
-				} else {
-					func = new Func(this.getClass().getSimpleName()+java.util.UUID.randomUUID().toString().replaceAll("-", "")+"_"+i+"_"+j,e);
-					func.args = args;
-					//System.out.println(func.getLabel());
-				}
-				row.set(j, func.toBytecodeFunc());
+		this.nRow = sm.rowDim();
+		this.nCol = sm.colDim();
+		Expr[] exprs = new Expr[nRow*nCol];
+		int idx = 0;
+		for(int i=0; i<nRow; i++) {
+			for(int j=0; j<nCol; j++) {
+				exprs[idx++] = sm.get(i, j);
 			}
 		}
-	}
-	
-	public BytecodeFunc get(int i, int j) {
-		return data.get(i).get(j);
-	}
-	
-	public void set(int i, int j, BytecodeFunc func) {
-		Vector<BytecodeFunc> row = data.get(i);
-		row.set(j, func);
-	}
-	
-	public void add(NumVector v) {
-		data.add(v.data);
+		this.func = JIT.compile(args, exprs);
 	}
 	
 	public int rowDim() {
-		return data.size();
+		return nRow;
 	}
 	
 	public int colDim() {
-		if(data.size() > 0)
-			return data.get(0).size();
-		return 0;
+		return nCol;
 	}
 	
+	/**
+	 * Return result: row by row
+	 * @param args
+	 * @return
+	 */
 	public double[][] eval(double ...args) {
 		int m = rowDim();
 		int n = colDim();
-		double[][] rlt = new double[m][n];
+		lastEvalData = new double[m][n];
+		double[] vecEval = func.apply(args);
 		for(int i=0; i<m; i++) {
-			for(int j=0; j<n; j++) {
-				rlt[i][j] = this.get(i, j).apply(args);
-			}
+			System.arraycopy(vecEval, i*n, lastEvalData[i], 0, nCol);
 		}
-		return rlt;
+		return lastEvalData;
 	}
 }
