@@ -12,8 +12,8 @@ import static symjava.math.SymMath.*;
 public class BlackScholes {
 
 	public static void main(String[] args) {
-		//test1(); //Example from QuantLib
-		//test2(); //Example from UCLA Statistics C183/C283: Statistical Models in Finance
+		test1(); //Example from QuantLib
+		test2(); //Example from UCLA Statistics C183/C283: Statistical Models in Finance
 		peper_example();
 	}
 	
@@ -58,6 +58,7 @@ public class BlackScholes {
 		// Calculate Black-Scholes price for a given volatility: \sigma=0.1423
 		BytecodeFunc blackScholesPrice = JIT.compile(new Expr[]{spot, strike, rd, rf, vol, tau, phi}, res);
 		double price = blackScholesPrice.apply(100.0, 110.0, 0.002, 0.01, 0.1423, 0.5, 1);
+		System.out.println(price);
 		
 		System.out.println("Use Newtom method to recover the volatility by giving the market data:");
 		Expr[] freeVars = {vol};
@@ -173,7 +174,7 @@ public class BlackScholes {
 		//Use Newtom method to recover the volatility by giving the market data
 		Expr[] freeVars = {vol};
 		Expr[] params = {spot, strike, rd, rf, tau, phi};
-		Eq[] eq = new Eq[] { new Eq(res-0.1423, C0, freeVars, params) };
+		Eq[] eq = new Eq[] { new Eq(res-0.897865, C0, freeVars, params) };
 		// Use Newton's method to find the root
 		double[] guess = new double[]{ 0.10 };
 		double[] constParams = new double[] {100.0, 110.0, 0.002, 0.01, 0.5, 1};
