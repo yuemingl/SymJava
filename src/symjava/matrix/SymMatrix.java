@@ -2,6 +2,7 @@ package symjava.matrix;
 
 import java.util.Vector;
 
+import symjava.numeric.NumMatrix;
 import symjava.symbolic.Expr;
 
 public class SymMatrix {
@@ -109,4 +110,9 @@ public class SymMatrix {
 ////			}
 ////		}
 //	}
+	
+	public NumMatrix toNumMatrix(Expr[] args) {
+		NumMatrix mat = new NumMatrix(this, args);
+		return mat;
+	}
 }

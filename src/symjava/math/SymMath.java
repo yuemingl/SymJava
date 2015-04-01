@@ -1,5 +1,6 @@
 package symjava.math;
 
+import symjava.matrix.SymMatrix;
 import symjava.matrix.SymVector;
 import symjava.symbolic.Cos;
 import symjava.symbolic.Exp;
@@ -12,6 +13,7 @@ import symjava.symbolic.Sin;
 import symjava.symbolic.Sqrt;
 import symjava.symbolic.SymConst;
 import symjava.symbolic.Tan;
+import symjava.symbolic.utils.Utils;
 
 public class SymMath {
 	/**
@@ -151,9 +153,29 @@ public class SymMath {
 //	    same_frame(@23)
 //
 //		at symjava.examples.SVM.main(SVM.java:11)
-		
+	
+	/**
+	 * Return Gradient of f
+	 * @param f
+	 * @return
+	 */
 	public static SymVector grad(Expr f) {
 		return Grad.apply(f);
+	}
+	
+	/**
+	 * Return Hessian Matrix of f
+	 * @param f
+	 * @return
+	 */
+	public static SymMatrix hess(Expr f) {
+		Expr[] args = Utils.extractSymbols(f).toArray(new Expr[0]);
+		SymVector grad = Grad.apply(f, args);
+		SymMatrix mat = new SymMatrix();
+		for(Expr e : grad) {
+			mat.add(Grad.apply(e, args));
+		}
+		return mat;
 	}
 	
 }

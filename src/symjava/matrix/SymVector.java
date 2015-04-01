@@ -3,6 +3,7 @@ package symjava.matrix;
 import java.util.Iterator;
 import java.util.Vector;
 
+import symjava.numeric.NumVector;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbols;
 
@@ -99,5 +100,10 @@ public class SymVector implements Iterable<Expr> {
 			rlt.add(e.diff(expr));
 		}
 		return rlt;
+	}
+	
+	public NumVector toNumVector(Expr[] args) {
+		NumVector ret = new NumVector(this, args);
+		return ret;
 	}
 }
