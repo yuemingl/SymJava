@@ -94,6 +94,10 @@ public class Grad extends SymVector {
 	public static SymVector apply(Expr f) {
 		return new Grad(f);
 	}
+
+	public static SymVector apply(Expr f, Expr[] args) {
+		return new Grad(f, args);
+	}
 	
 	public static SymVector apply(Expr F, Expr[] fs, Expr[] dfs) {
 		return new Grad(F, fs, dfs);
