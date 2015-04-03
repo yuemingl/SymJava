@@ -88,10 +88,10 @@ public class Symbol extends Expr {
 		return ss[0];
 	}
 	
-	public boolean containsSubIndex(int idx) {
+	public boolean containsSubIndex() {
 		String[] ss = this.toString().split("_");
 		if(ss.length == 2) {
-			return idx == Integer.valueOf(ss[1]);
+			return true;
 		}
 		return false;
 	}

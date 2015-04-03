@@ -45,7 +45,8 @@ public class Utils {
 					
 					int rlt = s1.getPrefix().compareTo(s2.getPrefix());
 					if(rlt == 0) {
-						return s1.getSubIndex()-s2.getSubIndex();
+						if(s1.containsSubIndex() && s2.containsSubIndex())
+							return s1.getSubIndex()-s2.getSubIndex();
 					}
 					return rlt;
 				}
@@ -65,7 +66,8 @@ public class Utils {
 					
 					int rlt = s1.getPrefix().compareTo(s2.getPrefix());
 					if(rlt == 0) {
-						return s1.getSubIndex()-s2.getSubIndex();
+						if(s1.containsSubIndex() && s2.containsSubIndex())
+							return s1.getSubIndex()-s2.getSubIndex();
 					}
 					return rlt;
 				}
