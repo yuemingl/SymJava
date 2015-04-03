@@ -282,10 +282,12 @@ public class BytecodeUtils {
 		il.append(new NEWARRAY(Type.DOUBLE));
 		il.append(new ASTORE(retArray));
 		for(int i=0; i<exprs.length; i++) {
-			il.append(new ALOAD(retArray));
-			il.append(new PUSH(cp,i));
-			addToInstructionList(mg, cp, factory, il, staticMethod, exprs[i], args, argsMap);
-			il.append(new DASTORE());
+			if(!Utils.symCompare(Symbol.C0, exprs[i])) {
+				il.append(new ALOAD(retArray));
+				il.append(new PUSH(cp,i));
+					addToInstructionList(mg, cp, factory, il, staticMethod, exprs[i], args, argsMap);
+				il.append(new DASTORE());
+			}
 		}
 		il.append(new ALOAD(retArray));
 		il.append(InstructionConstants.ARETURN);

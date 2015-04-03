@@ -14,22 +14,25 @@ import symjava.symbolic.Symbols;
 public class BenchmarkRosenbrock {
 
 	public static void test() {
-		//Another way for the definition of Rosenbrock function
 		int N = 10;
+		long begin, end;
 		Expr rosen = null;
 		Symbol i = new Symbol("i");
 		Symbols xi = new Symbols("x", i);
 		Symbols xim1 = new Symbols("x", i-1);
 		rosen  =  Sum.apply(100*pow(xi-xim1*xim1,2) + pow(1-xim1,2), i, 2, N);
-		System.out.println(rosen);
+		System.out.println("Rosenbrock function with N="+N+": "+rosen);
 		
 		Expr[] freeVars = xi.get(1, N);
-		double[] args = new double[freeVars.length];
+		begin = System.currentTimeMillis();
 		SymVector grad = SymMath.grad(rosen);
+		end = System.currentTimeMillis();
+		System.out.println("Hessian Time: "+((end-begin)/1000.0));
 		SymMatrix hess = SymMath.hess(rosen);
 		NumVector numGrad = grad.toNumVector(freeVars);
 		NumMatrix numHess = hess.toNumMatrix(freeVars);
 
+		double[] args = new double[freeVars.length];
 		System.out.println(grad);
 		double[] gradResult = numGrad.eval(args);
 		for(double d : gradResult)
@@ -44,12 +47,11 @@ public class BenchmarkRosenbrock {
 			System.out.println();
 		}
 		
-		
-		int NN = 10000000;
-		long begin = System.currentTimeMillis();
+		int NN = 100;
+		begin = System.currentTimeMillis();
 		for(int j=0; j<NN; j++)
 			numGrad.eval(args);
-		long end = System.currentTimeMillis();
+		end = System.currentTimeMillis();
 		System.out.println("Grad Time: "+((end-begin)/1000.0));
 		
 		begin = System.currentTimeMillis();
