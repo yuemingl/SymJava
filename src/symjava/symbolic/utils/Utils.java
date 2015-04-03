@@ -39,6 +39,16 @@ public class Utils {
 		Arrays.sort(exprs, new Comparator<Expr>() {
 			@Override
 			public int compare(Expr o1, Expr o2) {
+				if(o1 instanceof Symbol && o2 instanceof Symbol) {
+					Symbol s1 = (Symbol)o1;
+					Symbol s2 = (Symbol)o2;
+					
+					int rlt = s1.getPrefix().compareTo(s2.getPrefix());
+					if(rlt == 0) {
+						return s1.getSubIndex()-s2.getSubIndex();
+					}
+					return rlt;
+				}
 				return o1.getSortKey().compareTo(o2.getSortKey());
 			}
 		});
@@ -49,6 +59,16 @@ public class Utils {
 		Collections.sort(list, new Comparator<Expr>() {
 			@Override
 			public int compare(Expr o1, Expr o2) {
+				if(o1 instanceof Symbol && o2 instanceof Symbol) {
+					Symbol s1 = (Symbol)o1;
+					Symbol s2 = (Symbol)o2;
+					
+					int rlt = s1.getPrefix().compareTo(s2.getPrefix());
+					if(rlt == 0) {
+						return s1.getSubIndex()-s2.getSubIndex();
+					}
+					return rlt;
+				}
 				return o1.getSortKey().compareTo(o2.getSortKey());
 			}
 		});
@@ -294,12 +314,7 @@ public class Utils {
 		}
 		List<Expr> rlt = new ArrayList<Expr>();
 		rlt.addAll(set);
-		Collections.sort(rlt, new Comparator<Expr>() {
-			@Override
-			public int compare(Expr o1, Expr o2) {
-				return o1.toString().compareTo(o2.toString());
-			}
-		});
+		sortExprs(rlt);
 		return rlt;
 	}
 	
