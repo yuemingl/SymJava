@@ -9,7 +9,7 @@ public class NumMatrix {
 	BytecodeVecFunc func;
 	int nRow;
 	int nCol;
-	double[][] lastEvalData;
+	double[] lastEvalData;
 	
 	public NumMatrix() {
 	}
@@ -50,14 +50,18 @@ public class NumMatrix {
 	 * @param args
 	 * @return
 	 */
-	public double[][] eval(double ...args) {
+	public void eval(double[] outAry, double ...args) {
+		func.apply(outAry, args);
+		this.lastEvalData = outAry;
+	}
+	
+	public double[][] copyData() {
 		int m = rowDim();
 		int n = colDim();
-		lastEvalData = new double[m][n];
-		double[] vecEval = func.apply(args);
+		double [][] ret = new double[m][n];
 		for(int i=0; i<m; i++) {
-			System.arraycopy(vecEval, i*n, lastEvalData[i], 0, nCol);
+			System.arraycopy(this.lastEvalData, i*n, ret[i], 0, nCol);
 		}
-		return lastEvalData;
+		return ret;
 	}
 }

@@ -14,7 +14,7 @@ import symjava.symbolic.Symbols;
 public class BenchmarkRosenbrock {
 
 	public static void test() {
-		int N = 10;
+		int N = 300;
 		long begin, end;
 		Expr rosen = null;
 		Symbol i = new Symbol("i");
@@ -23,7 +23,7 @@ public class BenchmarkRosenbrock {
 		rosen  =  Sum.apply(100*pow(xi-xim1*xim1,2) + pow(1-xim1,2), i, 2, N);
 		System.out.println("Rosenbrock function with N="+N+": "+rosen);
 		
-		boolean debug = true;
+		boolean debug = false;
 		
 		Expr[] freeVars = xi.get(1, N);
 		begin = System.currentTimeMillis();
@@ -42,8 +42,11 @@ public class BenchmarkRosenbrock {
 		end = System.currentTimeMillis();
 		System.out.println("Hessian Compile Time: "+((end-begin)/1000.0));
 
+		double[] outAry = null;
+		
 		double[] args = new double[freeVars.length];
-		double[] gradResult = numGrad.eval(args);
+		outAry = new double[N];
+		double[] gradResult = numGrad.eval(outAry, args);
 		if(debug) {
 			System.out.println(grad);
 			for(double d : gradResult)
@@ -51,7 +54,9 @@ public class BenchmarkRosenbrock {
 			System.out.println();
 		}
 		
-		double[][] hessResult = numHess.eval(args);
+		outAry = new double[N*N];
+		numHess.eval(outAry, args);
+		double[][] hessResult = numHess.copyData();
 		if(debug) {
 			System.out.println(hess);
 			for(double[] row : hessResult) {
@@ -61,18 +66,18 @@ public class BenchmarkRosenbrock {
 			}
 		}
 		
-		int NN = 100;
+		int NN = 1000000;
 		begin = System.currentTimeMillis();
 		for(int j=0; j<NN; j++)
-			numGrad.eval(args);
+			numGrad.eval(outAry, args);
 		end = System.currentTimeMillis();
-		System.out.println("Grad Time: "+((end-begin)/1000.0));
+		System.out.println("Grad Evaluaton Time: "+((end-begin)/1000.0));
 		
 		begin = System.currentTimeMillis();
 		for(int j=0; j<NN; j++)
-			numHess.eval(args);
+			numHess.eval(outAry, args);
 		end = System.currentTimeMillis();
-		System.out.println("Hessian Time: "+((end-begin)/1000.0));
+		System.out.println("Hessian Evaluation Time: "+((end-begin)/1000.0));
 		
 	}
 	public static void main(String[] args) {

@@ -59,6 +59,7 @@ public class Example3 {
 		Eq L2 = lm.getEq();
 		System.out.println("L("+SymPrinting.join(L.getUnknowns(),",")+")=\n    "+L2.lhs());
 		NewtonOptimization.solve(L2, lm.getInitialGuess(), 100, 1e-4, false);
+		//\lambda_6=0.03343 a=0.36184 b=0.55624 
 	}
 	
 	public static void main(String[] args) {

@@ -71,6 +71,7 @@ public class Example2 {
 		double[] initialGuess = {1, 1, 1};
 		
 		GaussNewton.solve(eq, initialGuess, data, 100, 1e-4);
+		//a=7.99883 b=10.00184 c=16.32401 
 	}
 	
 	public static void main(String[] args) {

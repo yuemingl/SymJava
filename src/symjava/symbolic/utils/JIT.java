@@ -54,8 +54,9 @@ public class JIT {
 		exprs[1] = Symbol.x * Symbol.y;
 		exprs[2] = Symbol.y + 1;
 		BytecodeVecFunc vecFunc = compile(new Expr[]{Symbol.x, Symbol.y}, exprs);
-		double[] rlt = vecFunc.apply(10,20);
-		for(double d : rlt)
+		double[] outAry = new double[3];
+		vecFunc.apply(outAry, 10,20);
+		for(double d : outAry)
 			System.out.println(d);
 	}
 }
