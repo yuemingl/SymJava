@@ -40,10 +40,13 @@ public class GaussNewton {
 		NumMatrix NJ = new NumMatrix(J, eq.getParams());
 		
 		System.out.println("Iterativly sovle ... ");
+		double[] outJac = new double[NJ.rowDim()*NJ.colDim()];
+		double[] outRes = new double[Nres.dim()];
 		for(int i=0; i<maxIter; i++) {
 			//Use JAMA to solve the system
-			Matrix A = new Matrix(NJ.eval(init));
-			Matrix b = new Matrix(Nres.eval(init), Nres.dim());
+			NJ.eval(outJac, init);
+			Matrix A = new Matrix(NJ.copyData());
+			Matrix b = new Matrix(Nres.eval(outRes, init), Nres.dim());
 			Matrix x = A.solve(b); //Lease Square solution
 			if(x.norm2() < eps) 
 				break;

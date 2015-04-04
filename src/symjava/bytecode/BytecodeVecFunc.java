@@ -1,5 +1,5 @@
 package symjava.bytecode;
 
 public interface BytecodeVecFunc {
-	double[] apply(double ...args);
+	void apply(double[] outAry, double ...args);
 }

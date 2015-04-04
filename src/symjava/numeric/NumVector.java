@@ -27,8 +27,9 @@ public class NumVector {
 		return this.size;
 	}
 	
-	public double[] eval(double ...args) {
-		lastEvalData = func.apply(args);
+	public double[] eval(double[] outAry, double ...args) {
+		func.apply(outAry, args);
+		this.lastEvalData = outAry;
 		return lastEvalData;
 	}
 	
@@ -36,3 +37,4 @@ public class NumVector {
 		return lastEvalData;
 	}
 }
+

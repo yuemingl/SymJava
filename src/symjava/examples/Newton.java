@@ -64,9 +64,12 @@ public class Newton {
 		for(int j=init.length; j<funArgs.length; j++)
 			funArgs[j] = params[j-init.length];
 		
+		double[] outHess = new double[NH.rowDim()*NH.colDim()];
+		double[] outRes = new double[NG.dim()];
 		for(int i=0; i<maxIter; i++) {
 			//Use JAMA to solve the system
-			Matrix A = new Matrix(NH.eval(funArgs));
+			NH.eval(outHess, funArgs);
+			Matrix A = new Matrix(NH.copyData());
 //			System.out.println("Matrix:");
 //			for(int j=0;j<A.getRowDimension();j++) {
 //				for(int k=0; k<A.getColumnDimension(); k++) {
@@ -74,7 +77,7 @@ public class Newton {
 //				}
 //				System.out.println();
 //			}
-			Matrix b = new Matrix(NG.eval(funArgs), NG.dim());
+			Matrix b = new Matrix(NG.eval(outRes, funArgs), NG.dim());
 			Matrix x = A.solve(b); //Lease Square solution
 			for(int j=0; j<init.length; j++) {
 				System.out.print(String.format("%s=%.7f",unknowns[j], funArgs[j])+" ");

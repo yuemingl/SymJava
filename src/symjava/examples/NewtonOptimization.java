@@ -49,9 +49,12 @@ public class NewtonOptimization {
 		double[] x = initAndOut;
 		double[] dx = new double[initAndOut.length];
 		System.arraycopy(initAndOut, 0, dx, 0, initAndOut.length);
+		
+		double[] outHess = new double[NH.rowDim()*NH.colDim()];
+		double[] outRes = new double[NG.dim()];
 		for(int i=0; i<maxIter; i++) {
-			
-			Solver.solveCG2(NH.eval(x), NG.eval(x), dx);
+			NH.eval(outHess, x);
+			Solver.solveCG2(NH.copyData(), NG.eval(outRes, x), dx);
 			Matrix mdx = new Matrix(dx, NG.dim());
 			
 			//Use JAMA to solve the system

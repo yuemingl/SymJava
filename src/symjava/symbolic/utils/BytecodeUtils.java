@@ -227,8 +227,10 @@ public class BytecodeUtils {
 		for(int i=0; i<fExprArgs.length; i++) {
 			argsMap.put(fExprArgs[i], i);
 		}
-
-		addToInstructionList(mg, cp, factory, il, staticMethod, fun.getExpr(), fun.args, argsMap);
+		int argsIndex = 1;
+		if(staticMethod)
+			argsIndex = 0;
+		addToInstructionList(mg, cp, factory, il, argsIndex, fun.getExpr(), fun.args, argsMap);
 
 		il.append(InstructionConstants.DRETURN);
 		
@@ -260,11 +262,12 @@ public class BytecodeUtils {
 		if(staticMethod)
 			acc_flags |= ACC_STATIC;
 		MethodGen mg = new MethodGen(acc_flags, // access flags
-				new ArrayType(Type.DOUBLE, 1), // return type
+				Type.VOID, // return type
 				new Type[] { // argument types
+					new ArrayType(Type.DOUBLE, 1),
 					new ArrayType(Type.DOUBLE, 1) 
 				},
-				new String[] { "args" }, // arg names
+				new String[] { "outAry", "args" }, // arg names
 				"apply", fullClsName, // method, class
 				il, cp);
 		
@@ -273,24 +276,26 @@ public class BytecodeUtils {
 			argsMap.put(args[i], i);
 		}
 
-		LocalVariableGen lg;
-		lg = mg.addLocalVariable("retArray",
-				new ArrayType(Type.DOUBLE, 1), null, null);
-		int retArray = lg.getIndex();
-		il.append(InstructionConstants.ACONST_NULL);
-		il.append(new PUSH(cp, exprs.length));
-		il.append(new NEWARRAY(Type.DOUBLE));
-		il.append(new ASTORE(retArray));
+//		LocalVariableGen lg;
+//		lg = mg.addLocalVariable("retArray",
+//				new ArrayType(Type.DOUBLE, 1), null, null);
+//		int retArray = lg.getIndex();
+//		il.append(InstructionConstants.ACONST_NULL);
+//		il.append(new PUSH(cp, exprs.length));
+//		il.append(new NEWARRAY(Type.DOUBLE));
+//		il.append(new ASTORE(retArray));
 		for(int i=0; i<exprs.length; i++) {
 			if(!Utils.symCompare(Symbol.C0, exprs[i])) {
-				il.append(new ALOAD(retArray));
+				il.append(new ALOAD(1));
 				il.append(new PUSH(cp,i));
-					addToInstructionList(mg, cp, factory, il, staticMethod, exprs[i], args, argsMap);
+					addToInstructionList(mg, cp, factory, il, 2, exprs[i], args, argsMap);
 				il.append(new DASTORE());
 			}
 		}
-		il.append(new ALOAD(retArray));
-		il.append(InstructionConstants.ARETURN);
+//		il.append(new ALOAD(retArray));
+//		il.append(InstructionConstants.ARETURN);
+		il.append(InstructionConstants.RETURN);
+		
 		
 		mg.setMaxStack();
 		cg.addMethod(mg.getMethod());
@@ -308,7 +313,7 @@ public class BytecodeUtils {
 	}
 	
 	public static void addToInstructionList(MethodGen mg, ConstantPoolGen cp, InstructionFactory factory, InstructionList il, 
-			boolean staticMethod, Expr expr, Expr[] args, HashMap<Expr, Integer> argsMap) {
+			int argsIndex, Expr expr, Expr[] args, HashMap<Expr, Integer> argsMap) {
 		//Traverse the expression tree
 		List<Expr> insList = new ArrayList<Expr>();
 		post_order(expr, insList);
@@ -323,10 +328,10 @@ public class BytecodeUtils {
 				if(argIdx == null) {
 					throw new IllegalArgumentException(ins+" is not in the argument list of "+expr.getLabel());
 				}
-				if(staticMethod)
-					il.append(new ALOAD(0)); //for static method
-				else
-					il.append(new ALOAD(1));
+				//0 for static method
+				//1 for BytecodeFunc
+				//2 for BytecodeVecFunc
+				il.append(new ALOAD(argsIndex)); 
 				il.append(new PUSH(cp, argIdx));
 				il.append(new DALOAD());
 			} else if(ins instanceof SymReal<?>) {
