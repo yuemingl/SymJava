@@ -83,5 +83,12 @@ public class BenchmarkRosenbrock {
 	public static void main(String[] args) {
 		test();
 	}
-
+/*
+Rosenbrock function with N=500: \Sigma_{i=2}^500{(1 - x_{-1 + i})^2 + 100*(x_i - (x_{-1 + i})^2)^2}
+Symbolic Time: 4.837
+Gradient Compile Time: 0.203
+Hessian Compile Time: 0.11
+Grad Evaluaton Time: 48.44
+Hessian Evaluation Time: 45.009
+ */
 }

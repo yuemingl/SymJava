@@ -1,6 +1,7 @@
 package symjava.examples;
 
 import symjava.relational.Eq;
+import symjava.relational.Ge;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Sum;
 import symjava.symbolic.Symbol;
@@ -21,6 +22,7 @@ public class OptimizationExamples {
 		//test2();
 		test3_constrained();
 		test3_unconstrained();
+		test3_OptSolver();
 	}
 	
 	/**
@@ -71,6 +73,10 @@ public class OptimizationExamples {
 	
 	/**
 	 * Constrained minimization of multivariate scalar functions (minimize)
+	 *    min f(x,y)=2xy + 2x - x^2 - 2y^2
+	 *    subject to
+	 *      x^3 - y = 0
+	 *      y-1 >= 0
 	 */
 	public static void test3_constrained() {
 		Expr obj = 2*x*y + 2*x - x*x - 2*y*y;
@@ -88,7 +94,11 @@ public class OptimizationExamples {
 		NewtonOptimization.solve(eq, x0, 1000, 1e-6, false);
 		//[ 1.00000009  1.        ]
 	}
-	
+
+	/**
+	 * Unconstrained minimization of multivariate scalar functions (minimize)
+	 *    min f(x,y)=2xy + 2x - x^2 - 2y^2
+	 */
 	public static void test3_unconstrained() {
 		Expr obj = 2*x*y + 2*x - x*x - 2*y*y;
 		
@@ -100,5 +110,21 @@ public class OptimizationExamples {
 
 		NewtonOptimization.solve(eq, x0, 1000, 1e-6, false);
 		//[ 2.  1.]
+	}
+
+	/**
+	 * Constrained minimization of multivariate scalar functions (minimize)
+	 * with a wrapper class OptSolver
+	 *    min f(x,y)=2xy + 2x - x^2 - 2y^2
+	 *    subject to
+	 *      x^3 - y = 0
+	 *      y-1 >= 0
+	 */
+	public static void test3_OptSolver() {
+		OptSolver.min(2*x*y + 2*x - x*x - 2*y*y)
+			.subjectTo(
+				Eq.apply(pow(x,3), y), //x^3-y =  0
+				Ge.apply(y-1, 0)       //y-1   >= 0
+			).solve();
 	}
 }
