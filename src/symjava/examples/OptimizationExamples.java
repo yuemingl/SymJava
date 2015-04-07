@@ -18,8 +18,8 @@ import static symjava.symbolic.Symbol.*;
 public class OptimizationExamples {
 
 	public static void main(String[] args) {
-		//test1();
-		//test2();
+		test1();
+		test2();
 		test3_constrained();
 		test3_unconstrained();
 		test3_OptSolver();

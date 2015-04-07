@@ -38,16 +38,19 @@ public class BenchmarkSqrt {
 			funcs.add(bfunc);
 		}
 		
-		
 		int N=10000000;
+		double x = 0.1;
+		double out = 0.0;
 		for(int i=0; i<funcs.size(); i++) {
 			long begin = System.currentTimeMillis();
 			for(int j=0; j<N; j++) {
-				funcs.get(i).apply(0.1);
+				x += 1e-15;
+				out += funcs.get(i).apply(x);
 			}
 			long end = System.currentTimeMillis();
 			System.out.println("Time: "+((end-begin)/1000.0)+" expr="+exprs.get(i));
 		}
+		System.out.println("Test Value="+out);
 	}
 
 }
