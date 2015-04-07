@@ -1,9 +1,13 @@
 package symjava.symbolic.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
 
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
+import symjava.bytecode.VecFuncs;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 import symjava.symbolic.Symbol;
@@ -36,12 +40,50 @@ public class JIT {
 	public static BytecodeVecFunc compile(Expr[] args, Expr[] exprs) {
 		boolean isWriteFile = true;
 		boolean staticMethod = false;
-		String className = "JITVecFunc_"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		try {
+			int NMaxExpr = 36;
 			FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
-			ClassGen genClass = BytecodeUtils.genClassBytecodeVecFunc(className, exprs, args, isWriteFile, staticMethod);
-			return fcl.newInstance(genClass);
-			//return (BytecodeFunc)Class.forName("symjava.bytecode."+this.label).newInstance();
+			List<Expr> nonZeroList = new ArrayList<Expr>();
+			List<Integer> nonZeroIdx = new ArrayList<Integer>();
+			for(int i=0; i<exprs.length; i++) {
+				if(!Utils.symCompare(Symbol.C0, exprs[i])) {
+					nonZeroList.add(exprs[i]);
+					nonZeroIdx.add(i);
+				}
+			}
+			if(exprs.length > NMaxExpr) {
+				int N = exprs.length;
+				List<Expr> batchExprs = new ArrayList<Expr>();
+				List<Integer> batchOutPos = new ArrayList<Integer>();
+				VecFuncs ret = new VecFuncs();
+				for(int i = 0; i<nonZeroList.size(); i++) {
+					batchExprs.add(nonZeroList.get(i));
+					batchOutPos.add(nonZeroIdx.get(i));
+					if(i%NMaxExpr == NMaxExpr-1) {
+						String className = "JITVecFunc_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX__"+i+"___outof___"+exprs.length+"___XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+						ClassGen genClass = BytecodeUtils.genClassBytecodeVecFunc(className, batchExprs, batchOutPos, args, 
+								isWriteFile, staticMethod);
+						BytecodeVecFunc func = fcl.newInstance(genClass);
+						ret.addFunc(func, batchOutPos.get(0));
+						batchExprs.clear();
+						batchOutPos.clear();
+					}
+				}
+				int remain = N%NMaxExpr;
+				if(remain > 0) {
+					String className = "JITVecFunc_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX__"+(N-remain)+"___outof___"+exprs.length+"___XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+					ClassGen genClass = BytecodeUtils.genClassBytecodeVecFunc(className, batchExprs, batchOutPos, args, 
+							isWriteFile, staticMethod);
+					BytecodeVecFunc func = fcl.newInstance(genClass);
+					ret.addFunc(func, batchOutPos.get(0));
+				}
+				return ret;
+			} else {
+				String className = "JITVecFunc_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX__"+exprs.length+"___XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+				ClassGen genClass = BytecodeUtils.genClassBytecodeVecFunc(className, nonZeroList, nonZeroIdx, args, 
+						isWriteFile, staticMethod);
+				return fcl.newInstance(genClass);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -55,7 +97,7 @@ public class JIT {
 		exprs[2] = Symbol.y + 1;
 		BytecodeVecFunc vecFunc = compile(new Expr[]{Symbol.x, Symbol.y}, exprs);
 		double[] outAry = new double[3];
-		vecFunc.apply(outAry, 10,20);
+		vecFunc.apply(outAry, 0, 10.0,20.0);
 		for(double d : outAry)
 			System.out.println(d);
 	}

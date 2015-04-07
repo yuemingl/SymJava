@@ -249,7 +249,8 @@ public class BytecodeUtils {
 		return cg;
 	}
 	
-	public static ClassGen genClassBytecodeVecFunc(String className, Expr[] exprs, Expr[] args, boolean writeClassFile, boolean staticMethod) {
+	public static ClassGen genClassBytecodeVecFunc(String className, List<Expr> exprs, List<Integer> outPos, Expr[] args, 
+			boolean writeClassFile, boolean staticMethod) {
 		String packageName = "symjava.bytecode";
 		String fullClsName = packageName+"."+className;
 		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",
@@ -265,9 +266,10 @@ public class BytecodeUtils {
 				Type.VOID, // return type
 				new Type[] { // argument types
 					new ArrayType(Type.DOUBLE, 1),
+					Type.INT,
 					new ArrayType(Type.DOUBLE, 1) 
 				},
-				new String[] { "outAry", "args" }, // arg names
+				new String[] { "outAry", "outPos", "args" }, // arg names
 				"apply", fullClsName, // method, class
 				il, cp);
 		
@@ -284,11 +286,11 @@ public class BytecodeUtils {
 //		il.append(new PUSH(cp, exprs.length));
 //		il.append(new NEWARRAY(Type.DOUBLE));
 //		il.append(new ASTORE(retArray));
-		for(int i=0; i<exprs.length; i++) {
+		for(int i=0; i<exprs.size(); i++) {
 			if(!Utils.symCompare(Symbol.C0, exprs[i])) {
 				il.append(new ALOAD(1));
-				il.append(new PUSH(cp,i));
-					addToInstructionList(mg, cp, factory, il, 2, exprs[i], args, argsMap);
+				il.append(new PUSH(cp,outPos.get(i)));
+					addToInstructionList(mg, cp, factory, il, 3, exprs.get(i), args, argsMap);
 				il.append(new DASTORE());
 			}
 		}
@@ -330,7 +332,7 @@ public class BytecodeUtils {
 				}
 				//0 for static method
 				//1 for BytecodeFunc
-				//2 for BytecodeVecFunc
+				//3 for BytecodeVecFunc
 				il.append(new ALOAD(argsIndex)); 
 				il.append(new PUSH(cp, argIdx));
 				il.append(new DALOAD());
