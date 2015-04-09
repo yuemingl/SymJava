@@ -94,8 +94,8 @@ public class BenchmarkRosenbrock {
 		double timeCCompile = 0.0;
 		try {
 			begin = System.currentTimeMillis();
-			String execStr = "g++ -O3 /home/yliu/workspace_java/SymJava/"+genFileName+" -o run"+N;
-			//String execStr = "g++ /home/yliu/workspace_java/SymJava/"+genFileName+" -o run"+N;
+			String execStr = "g++ -O3 ./"+genFileName+" -o run"+N;
+			//String execStr = "g++ ./"+genFileName+" -o run"+N;
 			//System.out.println(execStr);
 			p = r.exec(execStr);
 			p.waitFor();
