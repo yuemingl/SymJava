@@ -3,11 +3,8 @@ package symjava.examples;
 import static symjava.math.SymMath.pow;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 
 import symjava.math.SymMath;
 import symjava.matrix.SymMatrix;
@@ -74,7 +71,7 @@ public class BenchmarkRosenbrock {
 			System.out.println();
 		}
 		print_c_code(pw, grad);
-		
+
 		outAry = new double[N*N];
 		numHess.eval(outAry, args);
 		double[][] hessResult = numHess.copyData();
@@ -86,6 +83,7 @@ public class BenchmarkRosenbrock {
 				System.out.println();
 			}
 		}
+
 		print_c_code(pw, hess);
 		print_main(pw, N);
 		pw.close();
@@ -94,8 +92,8 @@ public class BenchmarkRosenbrock {
 		double timeCCompile = 0.0;
 		try {
 			begin = System.currentTimeMillis();
-			String execStr = "g++ -O3 /home/yliu/workspace_java/SymJava/"+genFileName+" -o run"+N;
-			//String execStr = "g++ /home/yliu/workspace_java/SymJava/"+genFileName+" -o run"+N;
+			String execStr = "g++ -O3 ./"+genFileName+" -o run"+N;
+			//String execStr = "g++ ./"+genFileName+" -o run"+N;
 			//System.out.println(execStr);
 			p = r.exec(execStr);
 			p.waitFor();
