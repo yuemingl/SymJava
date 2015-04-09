@@ -13,6 +13,7 @@ import symjava.math.Div;
 import symjava.math.Dot;
 import symjava.math.Grad;
 import symjava.matrix.SymVector;
+import symjava.numeric.NumVector;
 import symjava.relational.Eq;
 import symjava.relational.Ge;
 import symjava.relational.Gt;
@@ -439,13 +440,26 @@ public class TestSymbolic {
 		System.out.println(ff1.apply(5,3));
 		
 	}
+	
+	public static void testJITVectorized() {
+		SymVector v = new SymVector();
+		for(int i=0; i<101; i++)
+			v[i] = x*x + 1;
+		NumVector nv = v.toNumVector(new Expr[]{x});
+		double[] outAry = new double[nv.dim()];
+		for(int j=0; j<100000; j++)
+			nv.eval(outAry, 2.0);
+		for(int i=0; i<outAry.length; i++) {
+			System.out.println(outAry[i]);
+		}
+	}
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
 //		testBasic();
 //		testPrint();
 //		testSimplify();
-		testSummation();
+//		testSummation();
 //		testToBytecodeFunc();
 //		testDiff();
 //		testAbstract();
@@ -454,5 +468,8 @@ public class TestSymbolic {
 //		testSymReal();
 //		testSinCosTan();
 //		testLogic();
+		
+		//set vm parameters: -XX:+PrintCompilation
+		testJITVectorized();
 	}
 }

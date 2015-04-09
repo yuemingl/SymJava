@@ -13,6 +13,10 @@ public class SymVector implements Iterable<Expr> {
 	public SymVector() {
 	}
 	
+	public SymVector(int size) {
+		data.setSize(size);
+	}
+	
 	public SymVector(Expr[] array) {
 		for(Expr e : array)
 			data.add(e);
@@ -39,15 +43,13 @@ public class SymVector implements Iterable<Expr> {
 			data.add(e);
 	}
 	
-	public SymVector(int size) {
-		data.setSize(size);
-	}
-	
 	public Expr get(int i) {
 		return data.get(i);
 	}
 	
 	public void set(int i, Expr expr) {
+		if(i >= data.size())
+			data.setSize(i+1);
 		data.set(i, expr);
 	}
 	

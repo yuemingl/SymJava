@@ -51,7 +51,7 @@ public class NumMatrix {
 	 * @return
 	 */
 	public void eval(double[] outAry, double ...args) {
-		func.apply(outAry, args);
+		func.apply(outAry, 0, args);
 		this.lastEvalData = outAry;
 	}
 	

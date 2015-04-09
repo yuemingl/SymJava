@@ -20,6 +20,7 @@ public class Pow extends BinaryOp {
 		}
 		if(base instanceof Symbol) {
 			label = base + "^" + displayExp + "";
+			//label = "pow(" + base + ","+displayExp+")";
 		} else {
 			label = "("+base + ")^" + displayExp;
 		}

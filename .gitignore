@@ -1,1 +1,6 @@
 /bin
+<<<<<<< HEAD
+=======
+benchmark-rosenbrock*-manual.cpp
+run[0-9]*
+>>>>>>> 8699a564dfb980fa1b089da9f32ba6c85704e879
