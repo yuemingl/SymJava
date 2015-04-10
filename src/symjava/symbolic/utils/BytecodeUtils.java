@@ -343,6 +343,7 @@ public class BytecodeUtils {
 		ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
 		InstructionList il = new InstructionList();
 		InstructionFactory factory = new InstructionFactory(cg);
+		LocalVariableGen lg;
 		
 		short acc_flags = ACC_PUBLIC;
 		MethodGen mg = new MethodGen(acc_flags, // access flags
@@ -361,14 +362,6 @@ public class BytecodeUtils {
 			argsMap.put(args[i], i);
 		}
 		
-		//double sum = 0;
-		LocalVariableGen lg;
-		lg = mg.addLocalVariable("sum",
-				Type.DOUBLE, null, null);
-		int idxSum = lg.getIndex();
-		il.append(InstructionConstants.DCONST_0);
-		lg.setStart(il.append(new DSTORE(idxSum))); // "sum" valid from here
-
 		//////////////////////////////////////////////////////////////
 		//	for(int i=0; i<args.length; i++) {
 		//		Compute the expression
@@ -422,8 +415,7 @@ public class BytecodeUtils {
 
 		//Compare: i < 10
 		InstructionHandle loopCmp = il.append(new ILOAD(idxI));
-		il.append(new ALOAD(3));
-		il.append(new ARRAYLENGTH());
+		il.append(new ILOAD(idxN));
 		il.append(new IF_ICMPLT(loopStart));
 		
 		il.insert(loopStart, new GOTO(loopCmp));

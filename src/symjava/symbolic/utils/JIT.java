@@ -109,7 +109,7 @@ public class JIT {
 //		for(double d : outAry)
 //			System.out.println(d);
 		
-		Expr expr = Symbol.x * Symbol.y;
+		Expr expr = Symbol.x + Symbol.y;
 		BytecodeBatchFunc vecFunc = compileBatchFunc(new Expr[]{Symbol.x, Symbol.y}, expr);
 		double[] outAry = new double[3];
 		double[][] params = {
