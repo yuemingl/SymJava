@@ -92,7 +92,7 @@ public class JIT {
 	}
 	
 	public static BytecodeBatchFunc compileBatchFunc(Expr[] args, Expr expr) {
-		String className = "JITVecFunc_YYYY"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		String className = "JITVecFunc_YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		ClassGen genClass = BytecodeUtils.genClassBytecodeBatchFunc(className,expr, args, true, false);
 		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
 		return fcl.newInstance(genClass);

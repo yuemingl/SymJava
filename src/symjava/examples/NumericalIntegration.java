@@ -17,9 +17,9 @@ import symjava.symbolic.utils.JIT;
 public class NumericalIntegration {
 
 	public static void main(String[] args) {
-//		test_1D();
-//		test_2D();
-//		test_ND();
+		test_1D();
+		test_2D();
+		test_ND();
 		
 		//Expr i = Integrate.apply(exp(pow(x,2)), Interval.apply(a, b).setStepSize(0.001));
 		//BytecodeFunc fi = JIT.compile(new Expr[]{a,b}, i);

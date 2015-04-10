@@ -113,33 +113,40 @@ public class BenchmarkRosenbrock {
 		
 		int NN = 100000;
 		outAry = new double[N];
+		double checkSumGrad = 0.0;
+		double xx = 1.0;
 		begin = System.currentTimeMillis();
-		double out = 0.0;
 		for(int j=0; j<NN; j++) {
-			for(int k=0; k<N; k++)
-				args[k] += 1e-15;
+			for(int k=0; k<N; k++) {
+				xx += 1e-15;
+				args[k] = xx;
+			}
 			numGrad.eval(outAry, args);
 			for(int k=0; k<N; k++)
-				out += outAry[k];
+				checkSumGrad += outAry[k];
 		}
 		end = System.currentTimeMillis();
 		double timeGradEval = (end-begin)/1000.0;
 		
 		outAry = new double[N*N];
+		double checkSumHess = 0.0;
+		xx = 1.0;
 		begin = System.currentTimeMillis();
 		for(int j=0; j<NN; j++) {
-			for(int k=0; k<N; k++)
-				args[k] += 1e-15;
+			for(int k=0; k<N; k++) {
+				xx += 1e-15;
+				args[k] = xx;
+			}
 			numHess.eval(outAry, args);
 			for(int k=0; k<N; k++) //Trace
-				out += outAry[k*N+k];
+				checkSumHess += outAry[k*N+k];
 		}
 		end = System.currentTimeMillis();
 		double timeHessEval = (end-begin)/1000.0;
 
-		System.out.println(N+"\t"+timeSym+"\t"+timeGrad+"\t"+timeGradEval+"\t"+timeHess+"\t"+timeHessEval+"\t"+timeCCompile);
+		System.out.println(N+"\t"+timeSym+"\t"+timeGrad+"\t"+timeGradEval+"\t"+timeHess+"\t"+timeHessEval+"\t"+checkSumGrad+"\t"+checkSumHess+"\t"+timeCCompile);
 
-		return out;
+		return checkSumGrad;
 	}
 	
 	public static void print_header(PrintWriter writer) {
@@ -176,42 +183,48 @@ public class BenchmarkRosenbrock {
 		writer.println("	double durationGrad, durationHess;");
 		writer.println("	int N = 100000;");
 		writer.println("	double *args, *outAry;");
-		writer.println("	double out = 0.0;");
+		writer.println("	double checkSumGrad = 0.0;");
+		writer.println("	double checkSumHess = 0.0;");
+		writer.println("	double xx = 1.0;");
 		writer.println();
-			writer.println("	args = new double["+N+"];");
-			writer.println("	for(int i=0; i<"+N+"; i++)");
-			writer.println("		args[i] = 1.0;");
-			writer.println("	outAry = new double["+(N*N)+"];");
-			writer.println("	start = std::clock();");
-			writer.println("	for(int i=0; i<N; i++) {");
-			writer.println("		for(int j=0; j<"+N+"; j++) {");
-			writer.println("			args[j] += 1e-15;");
-			writer.println("		}");
-			writer.println("		grad_"+N+"(args, outAry);");
-			writer.println("		for(int j=0; j<"+N+"; j++) {");
-			writer.println("			out += outAry[j];");
-			writer.println("		}");
-//			writer.println("		out += outAry["+(N-1)+"];");
-			writer.println("	}");
-			writer.println("	durationGrad = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;");
-			writer.println("	start = std::clock();");
-			writer.println("	for(int i=0; i<N; i++) {");
-			writer.println("		for(int j=0; j<"+N+"; j++) {");
-			writer.println("			args[j] += 1e-15;");
-			writer.println("		}");
-			writer.println("		hess_"+N+"(args, outAry);");
-//			writer.println("		for(int j=0; j<"+N+"*"+N+"; j++) {");
-			writer.println("		for(int j=0; j<"+N+"; j++) {");
-			writer.println("			out += outAry[j*"+N+"+j];");
-			writer.println("		}");
-//			writer.println("		out += outAry["+(N*N-1)+"];");
-			writer.println("	}");
-			writer.println("	durationHess = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;");
-			writer.println("	cout<<\"N="+N+": Grad=\"<< durationGrad << \" Hess=\" << durationHess << endl;");
-			writer.println("	delete args;");
-			writer.println("	delete outAry;");
-			writer.println();
-		writer.println("	cout<<\" Final Value=\" << out << endl;");
+		writer.println("	args = new double["+N+"];");
+		writer.println("	//for(int i=0; i<"+N+"; i++)");
+		writer.println("	//	args[i] = 1.0;");
+		writer.println("	outAry = new double["+(N*N)+"];");
+		writer.println("	xx = 1.0;");
+		writer.println("	start = std::clock();");
+		writer.println("	for(int i=0; i<N; i++) {");
+		writer.println("		for(int j=0; j<"+N+"; j++) {");
+		writer.println("			xx += 1e-15;");
+		writer.println("			args[j] = xx;");
+		writer.println("		}");
+		writer.println("		grad_"+N+"(args, outAry);");
+		writer.println("		for(int j=0; j<"+N+"; j++) {");
+		writer.println("			checkSumGrad += outAry[j];");
+		writer.println("		}");
+		writer.println("	}");
+		writer.println("	durationGrad = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;");
+		writer.println("	xx = 1.0;");
+		writer.println("	start = std::clock();");
+		writer.println("	for(int i=0; i<N; i++) {");
+		writer.println("		for(int j=0; j<"+N+"; j++) {");
+		writer.println("			xx += 1e-15;");
+		writer.println("			args[j] = xx;");
+		writer.println("		}");
+		writer.println("		hess_"+N+"(args, outAry);");
+//		writer.println("		for(int j=0; j<"+N+"*"+N+"; j++) {");
+		writer.println("		for(int j=0; j<"+N+"; j++) {");
+		writer.println("			checkSumHess += outAry[j*"+N+"+j];");
+		writer.println("		}");
+		writer.println("	}");
+		writer.println("	durationHess = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;");
+		writer.println("	cout.precision(6);");
+		writer.println("	cout<<\"N="+N+": Grad=\"<< durationGrad << \" Hess=\" << durationHess;");
+		writer.println("	cout.precision(17);");
+		writer.println("	cout<<  \" Grad CheckSum=\" << checkSumGrad <<  \" Hess CheckSum=\" << checkSumHess << endl;");
+		writer.println("	delete args;");
+		writer.println("	delete outAry;");
+		writer.println();
 		writer.println("}");
 		writer.println("//g++ -O3 benchmark-rosenbrock-manual.cpp -o run");
 	}
@@ -260,13 +273,9 @@ public class BenchmarkRosenbrock {
 	
 	public static void main(String[] args) {
 		System.out.println("============Benchmark for Rosenbrock==============");
-		System.out.println("N|Symbolic Manipulaton|Compile Gradient|Eval Gradient|Compile Hessian|Eval Hessian|C Code Compile");
-		double out = 0.0;
-		for(int N=5; N<850; N+=50) {
-			double tmp = test(N);
-			System.out.println("Final Value="+tmp);
-			out += tmp;
-		}
-		System.out.println("Final Value="+out);//6.881736000015767E11
+		System.out.println("N|Symbolic Manipulaton|Compile Gradient|Eval Gradient|Compile Hessian|Eval Hessian|Grad CheckSum|Hess CheckSum|C Code Compile");
+		for(int N=5; N<850; N+=50)
+			test(N);
+		//test(5000);//Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceeded
 	}
 }
