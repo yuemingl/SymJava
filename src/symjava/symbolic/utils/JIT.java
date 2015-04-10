@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
 
+import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
 import symjava.bytecode.VecFuncs;
@@ -90,15 +91,34 @@ public class JIT {
 		return null;
 	}
 	
+	public static BytecodeBatchFunc compileBatchFunc(Expr[] args, Expr expr) {
+		String className = "JITVecFunc_YYYY"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		ClassGen genClass = BytecodeUtils.genClassBytecodeBatchFunc(className,expr, args, true, false);
+		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
+		return fcl.newInstance(genClass);
+	}
+	
 	public static void main(String[] args) {
-		Expr[] exprs = new Expr[3];
-		exprs[0] = Symbol.x;
-		exprs[1] = Symbol.x * Symbol.y;
-		exprs[2] = Symbol.y + 1;
-		BytecodeVecFunc vecFunc = compile(new Expr[]{Symbol.x, Symbol.y}, exprs);
+//		Expr[] exprs = new Expr[3];
+//		exprs[0] = Symbol.x;
+//		exprs[1] = Symbol.x * Symbol.y;
+//		exprs[2] = Symbol.y + 1;
+//		BytecodeVecFunc vecFunc = compile(new Expr[]{Symbol.x, Symbol.y}, exprs);
+//		double[] outAry = new double[3];
+//		vecFunc.apply(outAry, 0, 10.0,20.0);
+//		for(double d : outAry)
+//			System.out.println(d);
+		
+		Expr expr = Symbol.x * Symbol.y;
+		BytecodeBatchFunc vecFunc = compileBatchFunc(new Expr[]{Symbol.x, Symbol.y}, expr);
 		double[] outAry = new double[3];
-		vecFunc.apply(outAry, 0, 10.0,20.0);
+		double[][] params = {
+				{1.0,  2.0, 3.0},
+				{10.0, 20.0, 30.0}
+		};
+		vecFunc.apply(outAry, 0, params);
 		for(double d : outAry)
 			System.out.println(d);
+		
 	}
 }

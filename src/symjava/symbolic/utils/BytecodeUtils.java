@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain2D;
 import symjava.domains.Interval;
 import symjava.logic.And;
@@ -51,9 +52,11 @@ import symjava.symbolic.arity.TernaryOp;
 import symjava.symbolic.arity.UnaryOp;
 
 import com.sun.org.apache.bcel.internal.Constants;
+import com.sun.org.apache.bcel.internal.generic.AALOAD;
 import com.sun.org.apache.bcel.internal.generic.AASTORE;
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import com.sun.org.apache.bcel.internal.generic.ANEWARRAY;
+import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
 import com.sun.org.apache.bcel.internal.generic.ASTORE;
 import com.sun.org.apache.bcel.internal.generic.ArrayType;
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
@@ -65,17 +68,23 @@ import com.sun.org.apache.bcel.internal.generic.DCMPL;
 import com.sun.org.apache.bcel.internal.generic.DDIV;
 import com.sun.org.apache.bcel.internal.generic.DLOAD;
 import com.sun.org.apache.bcel.internal.generic.DMUL;
+import com.sun.org.apache.bcel.internal.generic.DSTORE;
 import com.sun.org.apache.bcel.internal.generic.DSUB;
 import com.sun.org.apache.bcel.internal.generic.GOTO;
 import com.sun.org.apache.bcel.internal.generic.I2D;
 import com.sun.org.apache.bcel.internal.generic.IAND;
+import com.sun.org.apache.bcel.internal.generic.ICONST;
 import com.sun.org.apache.bcel.internal.generic.IFEQ;
 import com.sun.org.apache.bcel.internal.generic.IFGE;
 import com.sun.org.apache.bcel.internal.generic.IFGT;
 import com.sun.org.apache.bcel.internal.generic.IFLE;
 import com.sun.org.apache.bcel.internal.generic.IFLT;
 import com.sun.org.apache.bcel.internal.generic.IFNE;
+import com.sun.org.apache.bcel.internal.generic.IF_ICMPLT;
+import com.sun.org.apache.bcel.internal.generic.IINC;
+import com.sun.org.apache.bcel.internal.generic.ILOAD;
 import com.sun.org.apache.bcel.internal.generic.IOR;
+import com.sun.org.apache.bcel.internal.generic.ISTORE;
 import com.sun.org.apache.bcel.internal.generic.IXOR;
 import com.sun.org.apache.bcel.internal.generic.Instruction;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
@@ -290,7 +299,7 @@ public class BytecodeUtils {
 			if(!Utils.symCompare(Symbol.C0, exprs[i])) {
 				il.append(new ALOAD(1));
 				il.append(new PUSH(cp,outPos.get(i)));
-					addToInstructionList(mg, cp, factory, il, 3, exprs.get(i), args, argsMap);
+				addToInstructionList(mg, cp, factory, il, 3, exprs.get(i), args, argsMap);
 				il.append(new DASTORE());
 			}
 		}
@@ -314,6 +323,436 @@ public class BytecodeUtils {
 		return cg;
 	}
 	
+	
+	/**
+	 * 
+	 * @param className
+	 * @param expr
+	 * @param outPos
+	 * @param args
+	 * @param writeClassFile
+	 * @param staticMethod NOT supported
+	 * @return
+	 */
+	public static ClassGen genClassBytecodeBatchFunc(String className, Expr expr, Expr[] args,
+			boolean writeClassFile, boolean staticMethod) {
+		String packageName = "symjava.bytecode";
+		String fullClsName = packageName+"."+className;
+		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",
+				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeBatchFunc"});
+		ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
+		InstructionList il = new InstructionList();
+		InstructionFactory factory = new InstructionFactory(cg);
+		
+		short acc_flags = ACC_PUBLIC;
+		MethodGen mg = new MethodGen(acc_flags, // access flags
+				Type.VOID, // return type
+				new Type[] { // argument types
+					new ArrayType(Type.DOUBLE, 1),
+					Type.INT,
+					new ArrayType(Type.DOUBLE, 2) 
+				},
+				new String[] { "outAry", "outPos", "args" }, // arg names
+				"apply", fullClsName, // method, class
+				il, cp);
+		
+		HashMap<Expr, Integer> argsMap = new HashMap<Expr, Integer>();
+		for(int i=0; i<args.length; i++) {
+			argsMap.put(args[i], i);
+		}
+		
+		//double sum = 0;
+		LocalVariableGen lg;
+		lg = mg.addLocalVariable("sum",
+				Type.DOUBLE, null, null);
+		int idxSum = lg.getIndex();
+		il.append(InstructionConstants.DCONST_0);
+		lg.setStart(il.append(new DSTORE(idxSum))); // "sum" valid from here
+
+		//////////////////////////////////////////////////////////////
+		//	for(int i=0; i<args.length; i++) {
+		//		Compute the expression
+		//	}
+		/////////////////////////////////////////////////////////////
+		//int i = 0;
+		lg = mg.addLocalVariable("i",
+				Type.INT, null, null);
+		int idxI = lg.getIndex();
+		il.append(InstructionConstants.ICONST_0);
+		lg.setStart(il.append(new ISTORE(idxI))); // "i" valid from here
+		
+		lg = mg.addLocalVariable("N",
+				Type.INT, null, null);
+		int idxN = lg.getIndex();
+		il.append(new ALOAD(3));
+		il.append(new ICONST(0));
+		il.append(new AALOAD());
+		il.append(new ARRAYLENGTH());
+		lg.setStart(il.append(new ISTORE(idxN))); // "N" valid from here
+		
+		//Loop body:
+		InstructionHandle loopStart = il.append(new ALOAD(1)); 
+		il.append(new ILOAD(idxI)); //outAry[i]
+		
+		//Traverse the expression tree
+		List<Expr> insList = new ArrayList<Expr>();
+		post_order(expr, insList);
+		if(insList.size() == 0) {
+			throw new RuntimeException("Expressionis empty. Nothing to generate!");
+		}
+		for(int insIndex=0; insIndex<insList.size(); insIndex++) {
+			Expr ins = insList.get(insIndex);
+			if(ins instanceof Symbol) {
+				Integer argIdx = argsMap.get(ins);
+				if(argIdx == null) {
+					throw new IllegalArgumentException(ins+" is not in the argument list of "+expr.getLabel());
+				}
+				pushBatchSymbol(cp, il, 3, argIdx, idxI);
+			} else {
+				addOthers(mg, cp, factory, il, 3, ins, args, argsMap);
+			}
+		}
+		if(expr instanceof Relation || expr instanceof Logic) {
+			il.append(new I2D());
+		}
+		il.append(new DASTORE()); //outAry[i] = the value of the expression
+		
+		//i++
+		il.append(new IINC(idxI, 1));
+
+		//Compare: i < 10
+		InstructionHandle loopCmp = il.append(new ILOAD(idxI));
+		il.append(new ALOAD(3));
+		il.append(new ARRAYLENGTH());
+		il.append(new IF_ICMPLT(loopStart));
+		
+		il.insert(loopStart, new GOTO(loopCmp));
+		/////////////////////////////////////////////////////////////
+
+		il.append(InstructionConstants.RETURN);
+		
+		mg.setMaxStack();
+		cg.addMethod(mg.getMethod());
+		il.dispose(); // Allow instruction handles to be reused
+		cg.addEmptyConstructor(ACC_PUBLIC);
+		if(writeClassFile) {
+			try {
+				cg.getJavaClass().dump("bin/symjava/bytecode/"+className+".class");
+			} catch (java.io.IOException e) {
+				System.err.println(e);
+			}
+		}
+		return cg;
+	}
+
+	/**
+	 * public double apply(double[] args)
+	 * 	argIdx -> 1
+	 * 	idx -> args[idx]
+	 * 
+	 * public static double apply(double[] args)
+	 * 	argidx -> 0
+	 * 	idx -> args[idx]
+	 * 
+	 * @param argIdx
+	 */
+	public static void pushSymbol(ConstantPoolGen cp, InstructionList il, int argIdx, int idx) {
+		il.append(new ALOAD(argIdx));
+		il.append(new PUSH(cp, idx));
+		il.append(new DALOAD());
+	}
+	
+	/**
+	 * apply(double[] outAry, int outPos, double[][] args)
+	 * 
+	 * argIdx -> double[][]args
+	 * idx1,idx2 -> args[idx1][idx2]
+	 * 
+	 * @param cp
+	 * @param il
+	 * @param argIdx
+	 * @param idxSymbol
+	 * @param idxLocalVar
+	 */
+	public static void pushBatchSymbol(ConstantPoolGen cp, InstructionList il, int argIdx, int idxSymbol, int idxLocalVar) {
+		il.append(new ALOAD(argIdx));
+		il.append(new PUSH(cp, idxSymbol));
+		il.append(new AALOAD()); //args[idxSymbol]
+		il.append(new ILOAD(idxLocalVar));
+		il.append(new DALOAD()); //args[idxSymbol][idxLocalVar]
+	}
+	
+	public static void addOthers(MethodGen mg, ConstantPoolGen cp, InstructionFactory factory, InstructionList il, 
+			int argsIndex, Expr ins, Expr[] args, HashMap<Expr, Integer> argsMap) {
+		if(ins instanceof SymReal<?>) {
+			Number s = (Number)((SymReal<?>)ins).getValue();
+			il.append(new PUSH(cp, s.doubleValue()));
+		} else if(ins instanceof SymConst) {
+			il.append(new PUSH(cp, ((SymConst)ins).getValue()));
+		} else if(ins instanceof Add) {
+			il.append(new DADD());
+		} else if(ins instanceof Subtract) {
+			il.append(new DSUB());
+		} else if(ins instanceof Multiply) {
+			il.append(new DMUL());
+		} else if(ins instanceof Divide) {
+			il.append(new DDIV());
+		} else if(ins instanceof Pow) {
+			Pow p = (Pow)ins;
+			if(p.arg2 instanceof SymReal<?>) {
+				SymReal<?> realExp = (SymReal<?>)p.arg2;
+				if(realExp.isInteger()) {
+					il.append(new POP2()); //Replace double value to integer
+					il.append(new PUSH(cp, realExp.getIntValue()));
+					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "powi",
+							Type.DOUBLE, new Type[] { Type.DOUBLE, Type.INT }, Constants.INVOKESTATIC));
+					return;
+				}
+			}
+			il.append(factory.createInvoke("java.lang.Math", "pow",
+					Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+		} else if(ins instanceof Sqrt) {
+			Sqrt p = (Sqrt)ins;
+			if(p.arg2 instanceof SymReal<?>) {
+				SymReal<?> realRoot = (SymReal<?>)p.arg2;
+				if(realRoot.getIntValue() == 2) {
+					il.append(new POP2());
+					il.append(factory.createInvoke("java.lang.Math", "sqrt",
+							Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+					return;
+				}
+			}
+			il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "sqrt",
+					Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+		} else if(ins instanceof Sin) {
+			il.append(factory.createInvoke("java.lang.Math", "sin",
+					Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+		} else if(ins instanceof Cos) {
+			il.append(factory.createInvoke("java.lang.Math", "cos",
+					Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+		} else if(ins instanceof Tan) {
+			il.append(factory.createInvoke("java.lang.Math", "tan",
+					Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+//		} else if(ins instanceof Log10) {
+//			il.append(factory.createInvoke("java.lang.Math", "log10",
+//					Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+//			il.append(new POP2()); //this pop out the result of log10, not the base
+		} else if(ins instanceof Log) {
+//			if(Utils.symCompare(((Log) ins).arg1, Exp.E)) {
+//				il.append(factory.createInvoke("java.lang.Math", "log",
+//						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
+//				il.append(new POP2());
+//			} else {
+				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
+						Type.DOUBLE, new Type[] { Type.DOUBLE,  Type.DOUBLE }, Constants.INVOKESTATIC));
+//			}
+		} else if(ins instanceof Reciprocal) {
+			il.append(new DDIV());
+		} else if(ins instanceof Negate) {
+			il.append(new PUSH(cp, -1.0));
+			il.append(new DMUL());
+		} else if(ins instanceof Infinity) {
+			throw new RuntimeException(ins.getClass() + "Infinity cannot be used in numerical computation, use a proper number instead!");
+		} else if(ins instanceof Integrate) {
+			Integrate INT = (Integrate)ins;
+			//Reorder args for integrand
+			Expr[] integrandArgs = new Expr[args.length + INT.domain.getDim()];
+			int count = 0;
+			for(Expr ee : INT.domain.getCoordVars())
+				integrandArgs[count++] = ee;
+			for(Expr ee : args) 
+				integrandArgs[count++] = ee;
+			//Compile the integrand
+			Func integrand = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand, integrandArgs);
+			//System.out.println(f);
+			integrand.toBytecodeFunc(true, true); //Load class, could be better method to load a class
+
+			if(INT.domain instanceof Interval) {
+				//TODO read this: http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
+				if(INT.domain.getStepSize() == null) {
+					throw new RuntimeException("Please specifiy the step size for you integral: "+INT);
+				}
+				//We have begin,end parameters on the top of the VM stack
+				il.append(new PUSH(cp, INT.domain.getStepSize()));
+				il.append(new PUSH(cp, integrand.getName()));
+				il.append((new ALOAD(1))); //additional parameters from user's call
+				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate1D",
+						Type.DOUBLE, new Type[] { 
+						Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, 
+						Type.STRING, 
+						new ArrayType(Type.DOUBLE, 1) 
+						}, Constants.INVOKESTATIC));
+			} else if(INT.domain instanceof Domain2D && INT.isMultipleIntegral()) {
+				Expr[] coord = INT.domain.getCoordVars();
+				Expr x = coord[0];
+				Expr y = coord[1];
+				Expr xMin = INT.domain.getMinBound(x);
+				Expr xMax = INT.domain.getMaxBound(x);
+				//Expr yMin = INT.domain.getMinBound(y);
+				//Expr yMax = INT.domain.getMaxBound(y);
+				Func fxMin = new Func("integrate_bound_"+x+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMin);
+				Func fxMax = new Func("integrate_bound_"+x+"Max_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMax);
+				//Func fyMin = new Func("integrate_bound_"+y+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), yMin);
+				//Func fyMax = new Func("integrate_bound_"+y+"Maz_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), yMax);
+				//System.out.println("integrand="+f);
+				//System.out.println("fxMin="+fxMin);
+				//System.out.println("fxMax="+fxMax);
+				fxMin.toBytecodeFunc(true, true);
+				fxMax.toBytecodeFunc(true, true);
+				//fyMin.toBytecodeFunc(true, true);
+				//fyMax.toBytecodeFunc(true, true);
+				//We have begin,end parameters on the top of the VM stack
+				if(INT.domain.getStepSize(x) == null) {
+					throw new RuntimeException("Please specify step size for "+x);
+				}
+				if(INT.domain.getStepSize(y) == null) {
+					throw new RuntimeException("Please specify step size for "+y);
+				}
+				il.append(new PUSH(cp, INT.domain.getStepSize(y)));
+				il.append(new PUSH(cp, fxMin.getName()));
+				il.append(new PUSH(cp, fxMax.getName()));
+				il.append(new PUSH(cp, INT.domain.getStepSize(x)));
+				il.append(new PUSH(cp, integrand.getName()));
+				il.append((new ALOAD(1))); //additional parameters from user's call
+				//Now the paramters are ready, call the function
+				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate2D",
+						Type.DOUBLE, new Type[] { 
+						Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, 
+						Type.STRING, Type.STRING, Type.DOUBLE, 
+						Type.STRING,
+						new ArrayType(Type.DOUBLE, 1)
+				}, Constants.INVOKESTATIC));
+			} else if(!INT.isMultipleIntegral()) {
+				Expr[] coords = INT.domain.getCoordVars();
+				LocalVariableGen lg;
+				
+				lg = mg.addLocalVariable("minBound",
+					new ArrayType(Type.STRING, 1), null, null);
+				int idxMinBound = lg.getIndex();
+				il.append(InstructionConstants.ACONST_NULL);
+				lg.setStart(il.append(new ASTORE(idxMinBound))); // "minBound" valid from here
+				
+				lg = mg.addLocalVariable("maxBound",
+					new ArrayType(Type.STRING, 1), null, null);
+				int idxMaxBound = lg.getIndex();
+				il.append(InstructionConstants.ACONST_NULL);
+				lg.setStart(il.append(new ASTORE(idxMaxBound))); // "maxBound" valid from here
+				
+				il.append(new PUSH(cp, coords.length));
+				il.append(new ANEWARRAY(cp.addClass(Type.STRING)));
+				il.append(new ASTORE(idxMinBound));
+				
+				il.append(new PUSH(cp, coords.length));
+				il.append(new ANEWARRAY(cp.addClass(Type.STRING)));
+				il.append(new ASTORE(idxMaxBound));
+				
+				for(int i=0; i<coords.length; i++) {
+					Expr x = coords[i];
+					Expr xMin = INT.domain.getMinBound(x);
+					Expr xMax = INT.domain.getMaxBound(x);
+					Func fxMin = new Func("integrate_bound_"+x+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMin);
+					Func fxMax = new Func("integrate_bound_"+x+"Max_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMax);
+					System.out.println("min bound="+fxMin);
+					System.out.println("max bound="+fxMax);
+					il.append(new ALOAD(idxMinBound));
+					il.append(new PUSH(cp,i));
+					il.append(new PUSH(cp, fxMin.getName()));
+					il.append(new AASTORE());
+
+					il.append(new ALOAD(idxMaxBound));
+					il.append(new PUSH(cp,i));
+					il.append(new PUSH(cp, fxMax.getName()));
+					il.append(new AASTORE());
+
+					fxMin.toBytecodeFunc(true, true);
+					fxMax.toBytecodeFunc(true, true);
+				}
+				
+				Func constr = new Func("constr_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), INT.domain.getConstraint(), integrandArgs);
+				constr.toBytecodeFunc(true, true);
+				
+				il.append(new ALOAD(idxMinBound));
+				il.append(new ALOAD(idxMaxBound));
+				il.append(new PUSH(cp, integrand.getName()));
+				il.append(new PUSH(cp, constr.getName()));
+				il.append((new ALOAD(1))); //additional parameters from user's call
+				//Now the paramters are ready, call the function
+				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrateMonteCarloND",
+						Type.DOUBLE, new Type[] { 
+						new ArrayType(Type.STRING,1),new ArrayType(Type.STRING,1), 
+						Type.STRING,Type.STRING,
+						new ArrayType(Type.DOUBLE, 1)
+				}, Constants.INVOKESTATIC));
+			} else {
+				//TODO
+				throw new RuntimeException("Unsupported Integrate: "+INT);
+			}
+		} else if(ins instanceof Gt) {
+			il.append(new DCMPL());
+			InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+			InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+			InstructionHandle nop = il.append(new NOP());
+			il.insert(iconst1, new IFLE(iconst0));
+			il.insert(iconst0, new GOTO(nop));
+		} else if(ins instanceof Ge) {
+			il.append(new DCMPL());
+			InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+			InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+			InstructionHandle nop = il.append(new NOP());
+			il.insert(iconst1, new IFLT(iconst0));
+			il.insert(iconst0, new GOTO(nop));
+		} else if(ins instanceof Lt) {
+			il.append(new DCMPL());
+			InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+			InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+			InstructionHandle nop = il.append(new NOP());
+			il.insert(iconst1, new IFGE(iconst0));
+			il.insert(iconst0, new GOTO(nop));
+		} else if(ins instanceof Le) {
+			il.append(new DCMPL());
+			InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+			InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+			InstructionHandle nop = il.append(new NOP());
+			il.insert(iconst1, new IFGT(iconst0));
+			il.insert(iconst0, new GOTO(nop));
+		} else if(ins instanceof Eq) {
+			il.append(new DCMPL());
+			InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+			InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+			InstructionHandle nop = il.append(new NOP());
+			il.insert(iconst1, new IFNE(iconst0));
+			il.insert(iconst0, new GOTO(nop));
+		} else if(ins instanceof Neq) {
+			il.append(new DCMPL());
+			InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+			InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+			InstructionHandle nop = il.append(new NOP());
+			il.insert(iconst1, new IFEQ(iconst0));
+			il.insert(iconst0, new GOTO(nop));
+		} else if(ins instanceof And) {
+			il.append(new IAND());
+		} else if(ins instanceof Or) {
+			il.append(new IOR());
+		} else if(ins instanceof Xor) {
+			il.append(new IXOR());
+		} else if(ins instanceof Not) {
+			il.append(new PUSH(cp, 1));
+			il.append(new IXOR());
+		} else {
+			throw new RuntimeException(ins.getClass() + " is not supported in this version when generating bytecode function!");
+		}
+	}
+	/**
+	 * 
+	 * @param mg
+	 * @param cp
+	 * @param factory
+	 * @param il
+	 * @param argsIndex a number indicates the index of the arguments in the generated function 'apply()'
+	 * @param expr
+	 * @param args
+	 * @param argsMap
+	 */
 	public static void addToInstructionList(MethodGen mg, ConstantPoolGen cp, InstructionFactory factory, InstructionList il, 
 			int argsIndex, Expr expr, Expr[] args, HashMap<Expr, Integer> argsMap) {
 		//Traverse the expression tree
@@ -336,262 +775,8 @@ public class BytecodeUtils {
 				il.append(new ALOAD(argsIndex)); 
 				il.append(new PUSH(cp, argIdx));
 				il.append(new DALOAD());
-			} else if(ins instanceof SymReal<?>) {
-				Number s = (Number)((SymReal<?>)ins).getValue();
-				il.append(new PUSH(cp, s.doubleValue()));
-			} else if(ins instanceof SymConst) {
-				il.append(new PUSH(cp, ((SymConst)ins).getValue()));
-			} else if(ins instanceof Add) {
-				il.append(new DADD());
-			} else if(ins instanceof Subtract) {
-				il.append(new DSUB());
-			} else if(ins instanceof Multiply) {
-				il.append(new DMUL());
-			} else if(ins instanceof Divide) {
-				il.append(new DDIV());
-			} else if(ins instanceof Pow) {
-				Pow p = (Pow)ins;
-				if(p.arg2 instanceof SymReal<?>) {
-					SymReal<?> realExp = (SymReal<?>)p.arg2;
-					if(realExp.isInteger()) {
-						il.append(new POP2()); //Replace double value to integer
-						il.append(new PUSH(cp, realExp.getIntValue()));
-						il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "powi",
-								Type.DOUBLE, new Type[] { Type.DOUBLE, Type.INT }, Constants.INVOKESTATIC));
-						continue;
-					}
-				}
-				il.append(factory.createInvoke("java.lang.Math", "pow",
-						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
-			} else if(ins instanceof Sqrt) {
-				Sqrt p = (Sqrt)ins;
-				if(p.arg2 instanceof SymReal<?>) {
-					SymReal<?> realRoot = (SymReal<?>)p.arg2;
-					if(realRoot.getIntValue() == 2) {
-						il.append(new POP2());
-						il.append(factory.createInvoke("java.lang.Math", "sqrt",
-								Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
-						continue;
-					}
-				}
-				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "sqrt",
-						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
-			} else if(ins instanceof Sin) {
-				il.append(factory.createInvoke("java.lang.Math", "sin",
-						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
-			} else if(ins instanceof Cos) {
-				il.append(factory.createInvoke("java.lang.Math", "cos",
-						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
-			} else if(ins instanceof Tan) {
-				il.append(factory.createInvoke("java.lang.Math", "tan",
-						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
-//			} else if(ins instanceof Log10) {
-//				il.append(factory.createInvoke("java.lang.Math", "log10",
-//						Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
-//				il.append(new POP2()); //this pop out the result of log10, not the base
-			} else if(ins instanceof Log) {
-//				if(Utils.symCompare(((Log) ins).arg1, Exp.E)) {
-//					il.append(factory.createInvoke("java.lang.Math", "log",
-//							Type.DOUBLE, new Type[] { Type.DOUBLE }, Constants.INVOKESTATIC));
-//					il.append(new POP2());
-//				} else {
-					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
-							Type.DOUBLE, new Type[] { Type.DOUBLE,  Type.DOUBLE }, Constants.INVOKESTATIC));
-//				}
-			} else if(ins instanceof Reciprocal) {
-				il.append(new DDIV());
-			} else if(ins instanceof Negate) {
-				il.append(new PUSH(cp, -1.0));
-				il.append(new DMUL());
-			} else if(ins instanceof Infinity) {
-				throw new RuntimeException(ins.getClass() + "Infinity cannot be used in numerical computation, use a proper number instead!");
-			} else if(ins instanceof Integrate) {
-				Integrate INT = (Integrate)ins;
-				//Reorder args for integrand
-				Expr[] integrandArgs = new Expr[args.length + INT.domain.getDim()];
-				int count = 0;
-				for(Expr ee : INT.domain.getCoordVars())
-					integrandArgs[count++] = ee;
-				for(Expr ee : args) 
-					integrandArgs[count++] = ee;
-				//Compile the integrand
-				Func integrand = new Func("integrand_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""),INT.integrand, integrandArgs);
-				//System.out.println(f);
-				integrand.toBytecodeFunc(true, true); //Load class, could be better method to load a class
-
-				if(INT.domain instanceof Interval) {
-					//TODO read this: http://stackoverflow.com/questions/19119702/injecting-code-in-an-existing-method-using-bcel/19219759#19219759
-					if(INT.domain.getStepSize() == null) {
-						throw new RuntimeException("Please specifiy the step size for you integral: "+INT);
-					}
-					//We have begin,end parameters on the top of the VM stack
-					il.append(new PUSH(cp, INT.domain.getStepSize()));
-					il.append(new PUSH(cp, integrand.getName()));
-					il.append((new ALOAD(1))); //additional parameters from user's call
-					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate1D",
-							Type.DOUBLE, new Type[] { 
-							Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, 
-							Type.STRING, 
-							new ArrayType(Type.DOUBLE, 1) 
-							}, Constants.INVOKESTATIC));
-				} else if(INT.domain instanceof Domain2D && INT.isMultipleIntegral()) {
-					Expr[] coord = INT.domain.getCoordVars();
-					Expr x = coord[0];
-					Expr y = coord[1];
-					Expr xMin = INT.domain.getMinBound(x);
-					Expr xMax = INT.domain.getMaxBound(x);
-					//Expr yMin = INT.domain.getMinBound(y);
-					//Expr yMax = INT.domain.getMaxBound(y);
-					Func fxMin = new Func("integrate_bound_"+x+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMin);
-					Func fxMax = new Func("integrate_bound_"+x+"Max_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMax);
-					//Func fyMin = new Func("integrate_bound_"+y+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), yMin);
-					//Func fyMax = new Func("integrate_bound_"+y+"Maz_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), yMax);
-					//System.out.println("integrand="+f);
-					//System.out.println("fxMin="+fxMin);
-					//System.out.println("fxMax="+fxMax);
-					fxMin.toBytecodeFunc(true, true);
-					fxMax.toBytecodeFunc(true, true);
-					//fyMin.toBytecodeFunc(true, true);
-					//fyMax.toBytecodeFunc(true, true);
-					//We have begin,end parameters on the top of the VM stack
-					if(INT.domain.getStepSize(x) == null) {
-						throw new RuntimeException("Please specify step size for "+x);
-					}
-					if(INT.domain.getStepSize(y) == null) {
-						throw new RuntimeException("Please specify step size for "+y);
-					}
-					il.append(new PUSH(cp, INT.domain.getStepSize(y)));
-					il.append(new PUSH(cp, fxMin.getName()));
-					il.append(new PUSH(cp, fxMax.getName()));
-					il.append(new PUSH(cp, INT.domain.getStepSize(x)));
-					il.append(new PUSH(cp, integrand.getName()));
-					il.append((new ALOAD(1))); //additional parameters from user's call
-					//Now the paramters are ready, call the function
-					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrate2D",
-							Type.DOUBLE, new Type[] { 
-							Type.DOUBLE, Type.DOUBLE, Type.DOUBLE, 
-							Type.STRING, Type.STRING, Type.DOUBLE, 
-							Type.STRING,
-							new ArrayType(Type.DOUBLE, 1)
-					}, Constants.INVOKESTATIC));
-				} else if(!INT.isMultipleIntegral()) {
-					Expr[] coords = INT.domain.getCoordVars();
-					LocalVariableGen lg;
-					
-					lg = mg.addLocalVariable("minBound",
-						new ArrayType(Type.STRING, 1), null, null);
-					int idxMinBound = lg.getIndex();
-					il.append(InstructionConstants.ACONST_NULL);
-					lg.setStart(il.append(new ASTORE(idxMinBound))); // "minBound" valid from here
-					
-					lg = mg.addLocalVariable("maxBound",
-						new ArrayType(Type.STRING, 1), null, null);
-					int idxMaxBound = lg.getIndex();
-					il.append(InstructionConstants.ACONST_NULL);
-					lg.setStart(il.append(new ASTORE(idxMaxBound))); // "maxBound" valid from here
-					
-					il.append(new PUSH(cp, coords.length));
-					il.append(new ANEWARRAY(cp.addClass(Type.STRING)));
-					il.append(new ASTORE(idxMinBound));
-					
-					il.append(new PUSH(cp, coords.length));
-					il.append(new ANEWARRAY(cp.addClass(Type.STRING)));
-					il.append(new ASTORE(idxMaxBound));
-					
-					for(int i=0; i<coords.length; i++) {
-						Expr x = coords[i];
-						Expr xMin = INT.domain.getMinBound(x);
-						Expr xMax = INT.domain.getMaxBound(x);
-						Func fxMin = new Func("integrate_bound_"+x+"Min_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMin);
-						Func fxMax = new Func("integrate_bound_"+x+"Max_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), xMax);
-						System.out.println("min bound="+fxMin);
-						System.out.println("max bound="+fxMax);
-						il.append(new ALOAD(idxMinBound));
-						il.append(new PUSH(cp,i));
-						il.append(new PUSH(cp, fxMin.getName()));
-						il.append(new AASTORE());
-
-						il.append(new ALOAD(idxMaxBound));
-						il.append(new PUSH(cp,i));
-						il.append(new PUSH(cp, fxMax.getName()));
-						il.append(new AASTORE());
-
-						fxMin.toBytecodeFunc(true, true);
-						fxMax.toBytecodeFunc(true, true);
-					}
-					
-					Func constr = new Func("constr_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), INT.domain.getConstraint(), integrandArgs);
-					constr.toBytecodeFunc(true, true);
-					
-					il.append(new ALOAD(idxMinBound));
-					il.append(new ALOAD(idxMaxBound));
-					il.append(new PUSH(cp, integrand.getName()));
-					il.append(new PUSH(cp, constr.getName()));
-					il.append((new ALOAD(1))); //additional parameters from user's call
-					//Now the paramters are ready, call the function
-					il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "numIntegrateMonteCarloND",
-							Type.DOUBLE, new Type[] { 
-							new ArrayType(Type.STRING,1),new ArrayType(Type.STRING,1), 
-							Type.STRING,Type.STRING,
-							new ArrayType(Type.DOUBLE, 1)
-					}, Constants.INVOKESTATIC));
-				} else {
-					//TODO
-					throw new RuntimeException("Unsupported Integrate: "+INT);
-				}
-			} else if(ins instanceof Gt) {
-				il.append(new DCMPL());
-				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
-				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
-				InstructionHandle nop = il.append(new NOP());
-				il.insert(iconst1, new IFLE(iconst0));
-				il.insert(iconst0, new GOTO(nop));
-			} else if(ins instanceof Ge) {
-				il.append(new DCMPL());
-				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
-				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
-				InstructionHandle nop = il.append(new NOP());
-				il.insert(iconst1, new IFLT(iconst0));
-				il.insert(iconst0, new GOTO(nop));
-			} else if(ins instanceof Lt) {
-				il.append(new DCMPL());
-				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
-				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
-				InstructionHandle nop = il.append(new NOP());
-				il.insert(iconst1, new IFGE(iconst0));
-				il.insert(iconst0, new GOTO(nop));
-			} else if(ins instanceof Le) {
-				il.append(new DCMPL());
-				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
-				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
-				InstructionHandle nop = il.append(new NOP());
-				il.insert(iconst1, new IFGT(iconst0));
-				il.insert(iconst0, new GOTO(nop));
-			} else if(ins instanceof Eq) {
-				il.append(new DCMPL());
-				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
-				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
-				InstructionHandle nop = il.append(new NOP());
-				il.insert(iconst1, new IFNE(iconst0));
-				il.insert(iconst0, new GOTO(nop));
-			} else if(ins instanceof Neq) {
-				il.append(new DCMPL());
-				InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
-				InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
-				InstructionHandle nop = il.append(new NOP());
-				il.insert(iconst1, new IFEQ(iconst0));
-				il.insert(iconst0, new GOTO(nop));
-			} else if(ins instanceof And) {
-				il.append(new IAND());
-			} else if(ins instanceof Or) {
-				il.append(new IOR());
-			} else if(ins instanceof Xor) {
-				il.append(new IXOR());
-			} else if(ins instanceof Not) {
-				il.append(new PUSH(cp, 1));
-				il.append(new IXOR());
 			} else {
-				throw new RuntimeException(ins.getClass() + " is not supported in this version when generating bytecode function!");
+				addOthers(mg, cp, factory, il, argsIndex, ins, args, argsMap);
 			}
 		}
 		if(expr instanceof Relation || expr instanceof Logic) {

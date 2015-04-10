@@ -18,10 +18,15 @@ public class TestByteCode {
 //		double c = 3.0;
 //		Boolean r = (a == b) | (a != c);
 		
-		int a = 1;
-		int b = 0;
-		boolean c = true, d = false;
-		System.out.println(!c);
+//		int a = 1;
+//		int b = 0;
+//		boolean c = true, d = false;
+//		System.out.println(!c);
 		
+		String s = null;
+		for(int i=0; i<10; i++) {
+			s = args[i];
+		}
+		System.out.println(s);
 	}
 }
