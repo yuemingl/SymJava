@@ -63,6 +63,7 @@ public class QPSlover {
 			
 		Solution (x,y)=(2,3)
 */
+		JIT jit= new JIT("local");
 		Expr f = x*x + 4*(y-4)*(y-4);
 		Symbols lmd = new Symbols("\\lambda");
 		Symbols c = new Symbols("c");
@@ -83,7 +84,7 @@ public class QPSlover {
 		NewtonOptimization.solve(eq, guess, 10, 1e-3, false);
 		double xx = guess[0];
 		double yy = guess[1];
-		double objValue = JIT.compile(f).apply(xx,yy);
+		double objValue = jit.compile(f).apply(xx,yy);
 		System.out.println("Objective Value = "+objValue); //=8
 	}
 	
@@ -100,6 +101,7 @@ public class QPSlover {
 
 		Solution (x,y)=(10/3, 11/3)
 		*/
+		JIT jit= new JIT("local");
 		Expr f = -32*y+64;
 		Symbols lmd = new Symbols("\\lambda");
 		Symbols c = new Symbols("c");
@@ -120,7 +122,7 @@ public class QPSlover {
 		NewtonOptimization.solve(eq, guess, 10, 1e-3, false);
 		double xx = guess[0];
 		double yy = guess[1];
-		double objValue = JIT.compile(new Expr[]{x,y},f).apply(xx,yy);
+		double objValue = jit.compile(new Expr[]{x,y},f).apply(xx,yy);
 		System.out.println("Objective Value = "+objValue); //=-160/3
 	}
 	
@@ -137,6 +139,7 @@ public class QPSlover {
 					
 				Solution (x,y)=(2,3)
 		*/
+		JIT jit= new JIT("local");
 		Expr f = x*x + 4*(y-4)*(y-4);
 		Symbols lmd = new Symbols("\\lambda");
 		Symbols c = new Symbols("c");
@@ -157,7 +160,7 @@ public class QPSlover {
 		NewtonOptimization.solve(eq, guess, 10, 1e-3, false);
 		double xx = guess[0];
 		double yy = guess[1];
-		double objValue = JIT.compile(new Expr[]{x,y},f).apply(xx,yy);
+		double objValue = jit.compile(new Expr[]{x,y},f).apply(xx,yy);
 		System.out.println("Objective Value = "+objValue); //=8
 	}
 	

@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import symjava.numeric.NumMatrix;
 import symjava.symbolic.Expr;
+import symjava.symbolic.utils.JIT;
 
 public class SymMatrix {
 	/**
@@ -111,8 +112,8 @@ public class SymMatrix {
 ////		}
 //	}
 	
-	public NumMatrix toNumMatrix(Expr[] args) {
-		NumMatrix mat = new NumMatrix(this, args);
+	public NumMatrix toNumMatrix(JIT jit, Expr[] args) {
+		NumMatrix mat = new NumMatrix(jit, this, args);
 		return mat;
 	}
 }

@@ -18,9 +18,9 @@ public class NumVector {
 		this.size = size;
 	}
 	
-	public NumVector(SymVector sv, Expr[] args) {
+	public NumVector(JIT jit, SymVector sv, Expr[] args) {
 		this.size = sv.dim();
-		this.func = JIT.compile(args, sv.getData());
+		this.func = jit.compile(args, sv.getData());
 	}
 	
 	public int dim() {

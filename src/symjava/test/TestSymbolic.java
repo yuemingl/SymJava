@@ -354,38 +354,39 @@ public class TestSymbolic {
 		BytecodeFunc bfun2 = fun2.toBytecodeFunc();
 		checkResult("2.0",String.valueOf(bfun2.apply(4)));
 
-		checkResult(1.0,JIT.compile(sin(x)).apply(Math.PI/2), sin(x));
-		checkResult(0.0,JIT.compile(sin(x)).apply(0), sin(x));
+		JIT jit= new JIT("local");
+		checkResult(1.0,jit.compile(sin(x)).apply(Math.PI/2), sin(x));
+		checkResult(0.0,jit.compile(sin(x)).apply(0), sin(x));
 
-		checkResult(0.0,JIT.compile(cos(x)).apply(Math.PI/2), cos(x));
-		checkResult(1.0,JIT.compile(cos(x)).apply(0), cos(x));
+		checkResult(0.0,jit.compile(cos(x)).apply(Math.PI/2), cos(x));
+		checkResult(1.0,jit.compile(cos(x)).apply(0), cos(x));
 
-		checkResult(Math.tan(Math.PI/4),JIT.compile(tan(x)).apply(Math.PI/4), tan(x));
-		checkResult(0.0,JIT.compile(tan(x)).apply(0), tan(x));
+		checkResult(Math.tan(Math.PI/4),jit.compile(tan(x)).apply(Math.PI/4), tan(x));
+		checkResult(0.0,jit.compile(tan(x)).apply(0), tan(x));
 
-		checkResult(0.0,JIT.compile(log(x)).apply(1), log(x));
-		checkResult(0.0,JIT.compile(log10(x)).apply(1), log10(x));
-		checkResult(0.0,JIT.compile(log2(x)).apply(1), log2(x));
+		checkResult(0.0,jit.compile(log(x)).apply(1), log(x));
+		checkResult(0.0,jit.compile(log10(x)).apply(1), log10(x));
+		checkResult(0.0,jit.compile(log2(x)).apply(1), log2(x));
 
-		checkResult(1.0,JIT.compile(log(x)).apply(Math.E), log(x));
-		checkResult(1.0,JIT.compile(log10(x)).apply(10), log10(x));
-		checkResult(1.0,JIT.compile(log2(x)).apply(2), log2(x));
+		checkResult(1.0,jit.compile(log(x)).apply(Math.E), log(x));
+		checkResult(1.0,jit.compile(log10(x)).apply(10), log10(x));
+		checkResult(1.0,jit.compile(log2(x)).apply(2), log2(x));
 
-		checkResult(3.0,JIT.compile(log(x,y)).apply(3,27), log(x,y));
-		checkResult(3.0,JIT.compile(log10(x)).apply(1000), log10(x));
-		checkResult(3.0,JIT.compile(log2(x)).apply(8), log2(x));
+		checkResult(3.0,jit.compile(log(x,y)).apply(3,27), log(x,y));
+		checkResult(3.0,jit.compile(log10(x)).apply(1000), log10(x));
+		checkResult(3.0,jit.compile(log2(x)).apply(8), log2(x));
 		
-		checkResult(Math.E*Math.E,JIT.compile(exp(x)).apply(2), exp(x));
-		checkResult(1.0,JIT.compile(exp(x)).apply(0), exp(x));
+		checkResult(Math.E*Math.E,jit.compile(exp(x)).apply(2), exp(x));
+		checkResult(1.0,jit.compile(exp(x)).apply(0), exp(x));
 		
-		checkResult(1.0,JIT.compile(exp(-0.5*pow(z,2))).apply(2), exp(-0.5*pow(z,2)));
+		checkResult(1.0,jit.compile(exp(-0.5*pow(z,2))).apply(2), exp(-0.5*pow(z,2)));
 		
 		Domain I = Interval.apply(-oo, x, z);
 		Expr cdf = Integrate.apply(exp(-0.5*pow(z,2)), I)/sqrt(PI2);
 		checkResult("1/\\sqrt{2\\pi}*\\int_{-oo}^{x}{e^{-0.5*z^2}}dz",cdf);
 		Domain I2 = Interval.apply(-10, x, z).setStepSize(0.001);
 		Expr cdf2 = Integrate.apply(exp(-0.5*pow(z,2)), I2)/sqrt(PI2);
-		checkResult(1.0,JIT.compile(cdf2).apply(10), cdf);
+		checkResult(1.0,jit.compile(cdf2).apply(10), cdf);
 	}
 	
 	public static void testSinCosTan() {
@@ -442,10 +443,11 @@ public class TestSymbolic {
 	}
 	
 	public static void testJITVectorized() {
+		JIT jit= new JIT("local");
 		SymVector v = new SymVector();
 		for(int i=0; i<101; i++)
 			v[i] = x*x + 1;
-		NumVector nv = v.toNumVector(new Expr[]{x});
+		NumVector nv = v.toNumVector(jit, new Expr[]{x});
 		double[] outAry = new double[nv.dim()];
 		for(int j=0; j<100000; j++)
 			nv.eval(outAry, 2.0);

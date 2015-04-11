@@ -61,6 +61,7 @@ public class BenchmarkSqrt {
 	}
 	
 	public static void testBatchEval() {
+		JIT jit = new JIT("local");
 		int n = 9;
 		Expr expr = 0;
 		
@@ -81,7 +82,7 @@ public class BenchmarkSqrt {
 
 		for(int i=0; i<n; i++) {
 			Func func = new Func("func"+i, exprs.get(i));
-			BytecodeBatchFunc bfunc = JIT.compileBatchFunc(func.args(), func);
+			BytecodeBatchFunc bfunc = jit.compileBatchFunc(func.args(), func);
 			funcs.add(bfunc);
 		}
 		

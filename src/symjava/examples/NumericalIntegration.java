@@ -30,13 +30,14 @@ public class NumericalIntegration {
 	}
 	
 	public static void test_1D() {
+		JIT jit = new JIT("local");
 		//Define the interal
 		Domain I = Interval.apply(-10, 0).setStepSize(0.01);
 		//Define the integral: cumulative distribution function for standard normal distribution
 		Expr cdf = Integrate.apply(exp(-0.5*pow(x,2))/sqrt(2*PI), I);
 		System.out.println(cdf); //\int_{-10.0}^{10.0}{1/\sqrt{2*\pi}*e^{-0.5*x^2}}dx
 		//Compile cdf to perform numerical integration
-		BytecodeFunc f = JIT.compile(cdf);
+		BytecodeFunc f = jit.compile(cdf);
 		System.out.println(f.apply()); //0.5
 		
 		//Define the integral: cumulative distribution function for a general normal distribution
@@ -45,7 +46,7 @@ public class NumericalIntegration {
 		Expr cdf2 = Integrate.apply(exp(-pow(x-mu,2)/(2*sigma*sigma))/(sigma*sqrt(2*PI)), I);
 		System.out.println(cdf2); //\int_{-10.0}^{0.0}{1/(\sigma*\sqrt{2*\pi})*e^{-(-\mu + x)^2/(2*\sigma*\sigma)}}dx
 		//Compile cdf2 to perform numerical integration
-		BytecodeFunc f2 = JIT.compile(new Expr[]{mu, sigma}, cdf2);
+		BytecodeFunc f2 = jit.compile(new Expr[]{mu, sigma}, cdf2);
 		System.out.println(f2.apply(-5.0, 1.0)); //~1.0
 		
 	}
@@ -80,7 +81,7 @@ public class NumericalIntegration {
 		ans =
 		0.5679196
 		*/
-
+		JIT jit = new JIT("local");
 		Domain omega = new Domain2D("\\Omega", x, y)
 			.setConstraint( Le.apply((x-0.5)*(x-0.5) + (y-0.5)*(y-0.5), 0.25) )
 			.setBound(x, 0, 1) 
@@ -88,7 +89,7 @@ public class NumericalIntegration {
 		
 		Expr I = Integrate.apply(sin(sqrt(log(x+y+1))), omega);
 		System.out.println(I);
-		BytecodeFunc fI = JIT.compile(I);
+		BytecodeFunc fI = jit.compile(I);
 		System.out.println(fI.apply());
 		test_2D_verifiy();
 	}
@@ -107,6 +108,7 @@ public class NumericalIntegration {
 	}
 	
 	public static void test_ND() {
+		JIT jit  = new JIT("local");
 		double r = 1.0;
 		Domain omega = new Domain3D("\\Omega", x, y, z)
 		.setConstraint( Le.apply(x*x + y*y + z*z, r*r) )
@@ -116,7 +118,7 @@ public class NumericalIntegration {
 	
 		Expr ii = Integrate.apply(1, omega);
 		System.out.println(ii);
-		BytecodeFunc f = JIT.compile(ii);
+		BytecodeFunc f = jit.compile(ii);
 		System.out.println(f.apply());
 		System.out.println(4.0*Math.PI/3.0*Math.pow(r, 3));
 
@@ -129,7 +131,7 @@ public class NumericalIntegration {
 	
 		Expr ii2 = Integrate.apply(1, omega2);
 		System.out.println(ii);
-		BytecodeFunc f2 = JIT.compile(ii2);
+		BytecodeFunc f2 = jit.compile(ii2);
 		System.out.println(f2.apply());
 		System.out.println(0.5*Math.PI*Math.PI*Math.pow(r, 4));
 	
@@ -141,6 +143,7 @@ public class NumericalIntegration {
 	 * \Omega={ (x,y), where (x-1/2)^2 + (y-1/2)^2 <= 0.25 }
 	 */
 	public static void test_paper_example1() {
+		JIT jit= new JIT("local");
 Domain omega = new Domain2D("\\Omega", x, y)
 	.setBound(x, 0.5-sqrt(0.25-(y-0.5)*(y-0.5)), 0.5+sqrt(0.25-(y-0.5)*(y-0.5)))
 	.setBound(y, 0, 1)
@@ -149,7 +152,7 @@ Domain omega = new Domain2D("\\Omega", x, y)
 Expr I = Integrate.apply( sin(sqrt(log(x+y+1)) ), omega);
 System.out.println(I);
 
-BytecodeFunc fI = JIT.compile(I);
+BytecodeFunc fI = jit.compile(I);
 System.out.println(fI.apply());
 	}
 	
@@ -164,7 +167,7 @@ System.out.println(fI.apply());
 	 * a=0.25, b=0.5, c=0.75, d=1.0
 	 */
 	public static void test_paper_example2() {
-		
+		JIT jit= new JIT("local");
 Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
 Domain omega = new Domain2D("\\Omega", x, y)
 	.setConstraint(
@@ -175,7 +178,7 @@ Domain omega = new Domain2D("\\Omega", x, y)
 Expr I = Integrate.apply( sin(sqrt(log(x+y+1)) ), omega);
 System.out.println(I);
 
-BytecodeFunc fI = JIT.compile(new Expr[]{a, b, c, d}, I);
+BytecodeFunc fI = jit.compile(new Expr[]{a, b, c, d}, I);
 System.out.println(fI.apply(0.25, 0.5, 0.75, 1.0));
 		
 		test_paper_example_verifiy();

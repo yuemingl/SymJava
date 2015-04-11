@@ -6,6 +6,7 @@ import java.util.Vector;
 import symjava.numeric.NumVector;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbols;
+import symjava.symbolic.utils.JIT;
 
 public class SymVector implements Iterable<Expr> {
 	protected Vector<Expr> data = new Vector<Expr>();
@@ -104,8 +105,8 @@ public class SymVector implements Iterable<Expr> {
 		return rlt;
 	}
 	
-	public NumVector toNumVector(Expr[] args) {
-		NumVector ret = new NumVector(this, args);
+	public NumVector toNumVector(JIT jit, Expr[] args) {
+		NumVector ret = new NumVector(jit, this, args);
 		return ret;
 	}
 }
