@@ -30,7 +30,7 @@ public class BenchmarkRosenbrock {
 		rosen  =  Sum.apply(100*pow(xi-xim1*xim1,2) + pow(1-xim1,2), i, 2, N);
 		//System.out.println("Rosenbrock function with N="+N+": "+rosen);
 
-		boolean debug = false;
+		boolean debug = true;
 		PrintWriter pw = null;
 		String genFileName = "benchmark-rosenbrock"+N+"-manual.cpp";
 		try {
@@ -276,7 +276,7 @@ public class BenchmarkRosenbrock {
 	public static void main(String[] args) {
 		System.out.println("============Benchmark for Rosenbrock==============");
 		System.out.println("N|Symbolic Manipulaton|Compile Gradient|Eval Gradient|Compile Hessian|Eval Hessian|Grad CheckSum|Hess CheckSum|C Code Compile");
-		for(int N=5; N<850; N+=50)
+		for(int N=5; N<10; N+=50)
 			test(N);
 		//test(5000);//Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceeded
 	}

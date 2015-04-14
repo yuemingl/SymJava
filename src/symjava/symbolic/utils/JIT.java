@@ -14,28 +14,8 @@ import symjava.symbolic.Func;
 import symjava.symbolic.Symbol;
 
 public class JIT {
-	String target;
 	
-	/**
-	 * target can be
-	 * 1. "local": Locally compile and run
-	 * 2. "auth_key": Compile and run on www.lambdacloud.io
-	 * 
-	 * @param target
-	 */
-	public JIT(String target) {
-		this.target = target;
-	}
-	
-	/**
-	 * Print the configuration of target environment
-	 * @return
-	 */
-	public String printInfo() {
-		return "16 CPU, 64GB RAM";
-	}
-	
-	public BytecodeFunc compile(Expr[] args, Expr expr) {
+	public static BytecodeFunc compile(Expr[] args, Expr expr) {
 		if(expr instanceof Func) {
 			Func func = (Func)expr;
 			return func.toBytecodeFunc();
@@ -46,7 +26,7 @@ public class JIT {
 		}
 	}
 	
-	public BytecodeFunc compile(Expr expr) {
+	public static BytecodeFunc compile(Expr expr) {
 		if(expr instanceof Func) {
 			Func func = (Func)expr;
 			return func.toBytecodeFunc();
@@ -56,7 +36,7 @@ public class JIT {
 		}
 	}
 	
-	public BytecodeVecFunc compile(Expr[] args, Expr[] exprs) {
+	public static BytecodeVecFunc compile(Expr[] args, Expr[] exprs) {
 		boolean isWriteFile = true;
 		boolean staticMethod = false;
 		try {
@@ -109,7 +89,7 @@ public class JIT {
 		return null;
 	}
 	
-	public BytecodeBatchFunc compileBatchFunc(Expr[] args, Expr expr) {
+	public static BytecodeBatchFunc compileBatchFunc(Expr[] args, Expr expr) {
 		String className = "JITVecFunc_YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		ClassGen genClass = BytecodeUtils.genClassBytecodeBatchFunc(className,expr, args, true, false);
 		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
@@ -117,8 +97,6 @@ public class JIT {
 	}
 	
 	public static void main(String[] args) {
-		JIT jit = new JIT("local");
-		
 //		Expr[] exprs = new Expr[3];
 //		exprs[0] = Symbol.x;
 //		exprs[1] = Symbol.x * Symbol.y;
@@ -130,7 +108,7 @@ public class JIT {
 //			System.out.println(d);
 		
 		Expr expr = Symbol.x + Symbol.y;
-		BytecodeBatchFunc vecFunc = jit.compileBatchFunc(new Expr[]{Symbol.x, Symbol.y}, expr);
+		BytecodeBatchFunc vecFunc = JIT.compileBatchFunc(new Expr[]{Symbol.x, Symbol.y}, expr);
 		double[] outAry = new double[3];
 		double[][] params = {
 				{1.0,  2.0, 3.0},

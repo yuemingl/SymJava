@@ -5,6 +5,9 @@ import static symjava.math.SymMath.*;
 
 import java.util.ArrayList;
 
+import lambdacloud.core.CloudVar;
+import lambdacloud.core.CloudConfig;
+import lambdacloud.core.CloudFunc;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.Expr;
@@ -37,13 +40,17 @@ public class BenchmarkSqrt {
 			exprs.add(expr);
 		}
 		
-		ArrayList<BytecodeFunc> funcs = new ArrayList<BytecodeFunc>();
+		final ArrayList<BytecodeFunc> funcs = new ArrayList<BytecodeFunc>();
 		for(int i=0; i<n; i++) {
 			Func func = new Func("func"+i, exprs.get(i));
 			BytecodeFunc bfunc = func.toBytecodeFunc();
 			System.out.println(bfunc.apply(0.1));
 			funcs.add(bfunc);
 		}
+
+		CloudConfig config = new CloudConfig();
+		CloudVar output = new CloudVar(config);
+		CloudVar input = new CloudVar(config);
 		
 		int N=10000000;
 		double xx = 0.1;
@@ -52,7 +59,9 @@ public class BenchmarkSqrt {
 			long begin = System.currentTimeMillis();
 			for(int j=0; j<N; j++) {
 				xx += 1e-15;
-				out += funcs.get(i).apply(xx);
+				input.set(0, xx);
+				ff.apply(output, input);
+				//out += funcs.get(i).apply(xx);
 			}
 			long end = System.currentTimeMillis();
 			System.out.println("Time: "+((end-begin)/1000.0)+" expr="+exprs.get(i));
