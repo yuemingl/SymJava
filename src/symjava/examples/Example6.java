@@ -71,7 +71,8 @@ mesh.readGridGenMesh("triangle.grd");
 //Mark boundary nodes
 double eps = 0.01;
 for(Node n : mesh.nodes) {
-	if(Math.abs(3-Math.abs(n.coords[0]))<eps || Math.abs(3-Math.abs(n.coords[1]))<eps)
+	if(Math.abs(3-Math.abs(n.coords[0]))<eps || 
+			Math.abs(3-Math.abs(n.coords[1]))<eps)
 		n.setType(1);
 }
 Map<Integer, Double> diri = new HashMap<Integer, Double>();

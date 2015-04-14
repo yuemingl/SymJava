@@ -1,7 +1,11 @@
 package lambdacloud.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.symbolic.Expr;
+import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.JIT;
 
 public class CloudVar extends Expr {
@@ -73,5 +77,21 @@ public class CloudVar extends Expr {
 	public Expr diff(Expr expr) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public static CloudVar valueOf(Expr expr) {
+		List<Expr> outList = new ArrayList<Expr>();
+		BytecodeUtils.post_order(expr, outList);
+		CloudConfig config = null;
+		for(Expr e : outList) {
+			if(e instanceof CloudVar)
+				config = ((CloudVar)e).getConfig();
+		}
+		CloudVar v = new CloudVar(config, expr);
+		return v;
+	}
+	
+	public CloudConfig getConfig() {
+		return this.config;
 	}
 }

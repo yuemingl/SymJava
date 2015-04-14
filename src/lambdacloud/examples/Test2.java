@@ -34,6 +34,7 @@ public class Test2 {
 			System.out.println(d);
 		}
 		
-		f.apply(output, new CloudVar(config, input + output));
+		CloudVar update = CloudVar.valueOf(input + output);
+		f.apply(output, update);
 	}
 }
