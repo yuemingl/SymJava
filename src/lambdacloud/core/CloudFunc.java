@@ -7,19 +7,35 @@ import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
 public class CloudFunc {
-	CloudConfig config;
+	String name;
 	BytecodeFunc func;
 	BytecodeVecFunc vecFunc;
 	BytecodeBatchFunc batchFunc;
 	//1=BytecodeFunc,2=BytecodeVecFunc,3=BytecodeBatchFunc
 	int funcType = 0; 
 	
-	public CloudFunc(CloudConfig config) {
-		this.config = config;
+	public CloudFunc(String name) {
+		this.name = name;
+	}
+	public CloudFunc(String name, Expr[] args, Expr expr) {
+		this.name = name;
+		this.compile(name, args, expr);
+	}
+	public CloudFunc(String name, Expr[] args, Expr[] expr) {
+		this.name = name;
+		this.compile(name, args, expr);
+	}
+	public CloudFunc(Expr[] args, Expr expr) {
+		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		this.compile(name, args, expr);
+	}
+	public CloudFunc(Expr[] args, Expr[] expr) {
+		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		this.compile(name, args, expr);
 	}
 	
-	public CloudFunc compile(Expr[] args, Expr expr) {
-		if(config.isLocal()) {
+	public CloudFunc compile(String name, Expr[] args, Expr expr) {
+		if(CloudConfig.isLocal()) {
 			funcType = 1;
 			func = JIT.compile(args, expr);
 		} else {
@@ -28,8 +44,8 @@ public class CloudFunc {
 		return this;
 	}
 	
-	public CloudFunc compile(Expr[] args, Expr[] expr) {
-		if(config.isLocal()) {
+	public CloudFunc compile(String name, Expr[] args, Expr[] expr) {
+		if(CloudConfig.isLocal()) {
 			funcType = 2;
 			vecFunc = JIT.compile(args, expr);
 		} else {

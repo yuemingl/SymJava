@@ -1,37 +1,40 @@
 package lambdacloud.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.symbolic.Expr;
-import symjava.symbolic.SymDouble;
-import symjava.symbolic.SymFloat;
-import symjava.symbolic.SymInteger;
-import symjava.symbolic.SymLong;
-import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.JIT;
 
 public class CloudVar extends Expr {
-	CloudConfig config;
 	double[] data;
 	
-	public CloudVar(CloudConfig config, String name) {
+	public CloudVar(String name) {
 		this.label = name;
 		this.sortKey = this.label;
-		this.config = config;
 	}
 	
-	public CloudVar(CloudConfig config, Expr expr) {
-		if(config.isLocal()) {
+	public CloudVar(Expr expr) {
+		String name = "CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		this.label = name;
+		this.sortKey = this.label;
+		this.compile(name, expr);
+	}
+	
+	public CloudVar(String name, Expr expr) {
+		this.label = name;
+		this.sortKey = this.label;
+		this.compile(name, expr);
+	}
+	
+	public CloudVar compile(String name, Expr expr) {
+		if(CloudConfig.isLocal()) {
 			BytecodeBatchFunc fexpr = JIT.compileBatchFunc(new Expr[0], expr);
 			fexpr.apply(data, 0);
 		} else {
 			//expr contains server references
 		}
-			
+		return this;
 	}
-	
+
 	public CloudVar init(double ...array) {
 		this.data = array;
 		return this;
@@ -64,7 +67,6 @@ public class CloudVar extends Expr {
 		return data;
 	}
 	
-
 	@Override
 	public Expr simplify() {
 		// TODO Auto-generated method stub
@@ -83,39 +85,8 @@ public class CloudVar extends Expr {
 		return null;
 	}
 	
-	
-	public static CloudVar valueOf(String s) {
-		return null;
-	}
-	
 	public static CloudVar valueOf(Expr expr) {
-		List<Expr> outList = new ArrayList<Expr>();
-		BytecodeUtils.post_order(expr, outList);
-		CloudConfig config = null;
-		for(Expr e : outList) {
-			if(e instanceof CloudVar)
-				config = ((CloudVar)e).getConfig();
-		}
-		CloudVar v = new CloudVar(config, expr);
-		return v;
+		return new CloudVar(expr);
 	}
-	
-	public static CloudVar valueOf(int v) {
-		return new SymInteger(v);
-	}
-	
-	public static CloudVar valueOf(long v) {
-		return new SymLong(v);
-	}
-	
-	public static CloudVar valueOf(float v) {
-		return new SymFloat(v);
-	}
-	
-	public static CloudVar valueOf(double v) {
-		return new SymDouble(v);
-	}
-	public CloudConfig getConfig() {
-		return this.config;
-	}
+
 }

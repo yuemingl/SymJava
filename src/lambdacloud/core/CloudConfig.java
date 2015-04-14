@@ -1,21 +1,21 @@
 package lambdacloud.core;
 
 public class CloudConfig {
-	String config;
+	private static String target;
 
 	/**
-	 * Parameter config can be
+	 * Parameter target can be
 	 * 1. "local": Locally compile and run
 	 * 2. "<lambda_cloud_auth_file>.lca": Compile and run on www.lambdacloud.io
 	 * 
 	 * @param target
 	 */
-	public CloudConfig(String config) {
-		this.config = config;
+	public static void setTarget(String target) {
+		CloudConfig.target = target;
 	}
 	
-	public boolean isLocal() {
-		return config.equalsIgnoreCase("local");
+	public static boolean isLocal() {
+		return target.equalsIgnoreCase("local");
 	}
 
 	/**
