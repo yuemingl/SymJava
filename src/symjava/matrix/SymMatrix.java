@@ -112,8 +112,8 @@ public class SymMatrix {
 ////		}
 //	}
 	
-	public NumMatrix toNumMatrix(JIT jit, Expr[] args) {
-		NumMatrix mat = new NumMatrix(jit, this, args);
+	public NumMatrix toNumMatrix(Expr[] args) {
+		NumMatrix mat = new NumMatrix(this, args);
 		return mat;
 	}
 }

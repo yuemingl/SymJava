@@ -15,7 +15,6 @@ import symjava.symbolic.utils.JIT;
 public class GaussNewton {
 
 	public static void solve(Eq eq, double[] init, double[][] data, int maxIter, double eps) {
-		JIT jit= new JIT("local");
 		int n = data.length;
 		
 		//Construct Jacobian Matrix and Residuals
@@ -38,8 +37,8 @@ public class GaussNewton {
 		System.out.println(res);
 		
 		//Convert symbolic staff to Bytecode staff to speedup evaluation
-		NumVector Nres = new NumVector(jit, res, eq.getParams());
-		NumMatrix NJ = new NumMatrix(jit, J, eq.getParams());
+		NumVector Nres = new NumVector(res, eq.getParams());
+		NumMatrix NJ = new NumMatrix(J, eq.getParams());
 		
 		System.out.println("Iterativly sovle ... ");
 		double[] outJac = new double[NJ.rowDim()*NJ.colDim()];

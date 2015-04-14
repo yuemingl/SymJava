@@ -12,7 +12,7 @@ public class Example0 {
 		System.out.println(Rdy);
 		
 		//Just-In-Time compile the symbolic expression to native code
-		BytecodeFunc func = new JIT("local").compile(new Expr[]{x,y}, Rdy);
+		BytecodeFunc func = JIT.compile(new Expr[]{x,y}, Rdy);
 		System.out.println(func.apply(0.362, 0.556));
 	}
 }

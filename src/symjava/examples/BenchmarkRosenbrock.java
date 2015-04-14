@@ -21,7 +21,6 @@ import symjava.symbolic.utils.Utils;
 public class BenchmarkRosenbrock {
 
 	public static double test(int N) {
-		JIT jit= new JIT("local");
 		long begin, end;
 		Expr rosen = null;
 		Symbol i = new Symbol("i");
@@ -48,12 +47,12 @@ public class BenchmarkRosenbrock {
 		double timeSym = (end-begin)/1000.0;
 		
 		begin = System.currentTimeMillis();
-		NumVector numGrad = grad.toNumVector(jit, freeVars);
+		NumVector numGrad = grad.toNumVector(freeVars);
 		end = System.currentTimeMillis();
 		double timeGrad = (end-begin)/1000.0;
 
 		begin = System.currentTimeMillis();
-		NumMatrix numHess = hess.toNumMatrix(jit, freeVars);
+		NumMatrix numHess = hess.toNumMatrix(freeVars);
 		end = System.currentTimeMillis();
 		double timeHess = (end-begin)/1000.0;
 

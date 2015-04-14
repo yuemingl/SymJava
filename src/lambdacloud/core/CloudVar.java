@@ -5,6 +5,10 @@ import java.util.List;
 
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.symbolic.Expr;
+import symjava.symbolic.SymDouble;
+import symjava.symbolic.SymFloat;
+import symjava.symbolic.SymInteger;
+import symjava.symbolic.SymLong;
 import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.JIT;
 
@@ -79,6 +83,11 @@ public class CloudVar extends Expr {
 		return null;
 	}
 	
+	
+	public static CloudVar valueOf(String s) {
+		return null;
+	}
+	
 	public static CloudVar valueOf(Expr expr) {
 		List<Expr> outList = new ArrayList<Expr>();
 		BytecodeUtils.post_order(expr, outList);
@@ -91,6 +100,21 @@ public class CloudVar extends Expr {
 		return v;
 	}
 	
+	public static CloudVar valueOf(int v) {
+		return new SymInteger(v);
+	}
+	
+	public static CloudVar valueOf(long v) {
+		return new SymLong(v);
+	}
+	
+	public static CloudVar valueOf(float v) {
+		return new SymFloat(v);
+	}
+	
+	public static CloudVar valueOf(double v) {
+		return new SymDouble(v);
+	}
 	public CloudConfig getConfig() {
 		return this.config;
 	}

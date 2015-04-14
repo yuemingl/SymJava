@@ -105,8 +105,8 @@ public class SymVector implements Iterable<Expr> {
 		return rlt;
 	}
 	
-	public NumVector toNumVector(JIT jit, Expr[] args) {
-		NumVector ret = new NumVector(jit, this, args);
+	public NumVector toNumVector(Expr[] args) {
+		NumVector ret = new NumVector(this, args);
 		return ret;
 	}
 }

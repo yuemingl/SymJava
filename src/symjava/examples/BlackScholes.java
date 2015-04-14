@@ -56,8 +56,7 @@ public class BlackScholes {
 		System.out.println(res.diff(vol)+"\n"); //Let computer do it for us.
 		
 		// Calculate Black-Scholes price for a given volatility: \sigma=0.1423
-		JIT jit = new JIT("local");
-		BytecodeFunc blackScholesPrice = jit.compile(new Expr[]{spot, strike, rd, rf, vol, tau, phi}, res);
+		BytecodeFunc blackScholesPrice = JIT.compile(new Expr[]{spot, strike, rd, rf, vol, tau, phi}, res);
 		double price = blackScholesPrice.apply(100.0, 110.0, 0.002, 0.01, 0.1423, 0.5, 1);
 		System.out.println(price);
 		

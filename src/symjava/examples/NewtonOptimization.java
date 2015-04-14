@@ -16,7 +16,6 @@ import Jama.Matrix;
  */
 public class NewtonOptimization {
 	public static double[] solve(Eq eq, double[] initAndOut, int maxIter, double eps, boolean dislpayOnly) {
-		JIT jit= new JIT("local");
 //		if(!Symbol.C0.symEquals(eq.rhs())) {
 //			System.out.println("The right hand side of the equation must be 0.");
 //			return null;
@@ -44,8 +43,8 @@ public class NewtonOptimization {
 		if(dislpayOnly) return null;
 		
 		//Convert symbolic staff to Bytecode staff to speedup evaluation
-		NumMatrix NH = new NumMatrix(jit, hess, unknowns);
-		NumVector NG = new NumVector(jit, grad, unknowns);
+		NumMatrix NH = new NumMatrix(hess, unknowns);
+		NumVector NG = new NumVector(grad, unknowns);
 		
 		System.out.println("Iterativly sovle ... ");
 		double[] x = initAndOut;
