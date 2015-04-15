@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lambdacloud.core.CloudVar;
 import symjava.symbolic.Add;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Expr;
@@ -55,7 +56,7 @@ public class Utils {
 		});
 		return exprs;
 	}
-	
+
 	public static List<Expr> sortExprs(List<Expr> list) {
 		Collections.sort(list, new Comparator<Expr>() {
 			@Override
@@ -317,6 +318,35 @@ public class Utils {
 		List<Expr> rlt = new ArrayList<Expr>();
 		rlt.addAll(set);
 		sortExprs(rlt);
+		return rlt;
+	}
+	
+	public static List<CloudVar> extractCloudVars(Expr ...exprs) {
+		Set<Expr> set = new HashSet<Expr>();
+		List<Expr> list = new ArrayList<Expr>();
+		for(int i=0; i<exprs.length; i++) {
+			BytecodeUtils.post_order(exprs[i], list);
+			for(Expr e : list) {
+				if(e instanceof CloudVar) {
+					set.add((CloudVar)e);
+				}
+			}
+		}
+		List<Expr> rlt = new ArrayList<Expr>();
+		rlt.addAll(set);
+		sortExprs(rlt);
+		List<CloudVar> rlt2 = new ArrayList<CloudVar>();
+		for(Expr e : rlt) {
+			rlt2.add((CloudVar)e);
+		}
+		return rlt2;
+	}
+	
+	public static double[][] getDataFromCloudVars(CloudVar[] cloudVars) {
+		double[][] rlt = new double[cloudVars.length][];
+		for(int i=0; i<cloudVars.length; i++) {
+			rlt[i] = cloudVars[i].fetchToLocal();
+		}
 		return rlt;
 	}
 	

@@ -336,6 +336,9 @@ public class BytecodeUtils {
 	 */
 	public static ClassGen genClassBytecodeBatchFunc(String className, Expr expr, Expr[] args,
 			boolean writeClassFile, boolean staticMethod) {
+		
+		System.out.println(expr.getLabel());
+
 		String packageName = "symjava.bytecode";
 		String fullClsName = packageName+"."+className;
 		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",

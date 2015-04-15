@@ -22,15 +22,17 @@ public class Test2 {
 		};
 		CloudFunc f = new CloudFunc("a_vector_function", new Expr[]{x, y}, exprs);
 		
-		CloudVar input = new CloudVar("input").init(new double[]{1, 2});
+		CloudVar input = new CloudVar("input").init(new double[]{2, 1});
 		CloudVar output = new CloudVar("output").resize(2);
 		
 		long begin = System.currentTimeMillis();
 		//f.apply(output, input);
 		for(int i=0; i<10; i++) {
 			f.apply(output, input);
-			Expr update = input + 0.1*output;
+			Expr update = input + 1.0*output;
 			input = update; //Cast update to type CloudVar
+			for(double d : input.fetchToLocal())
+				System.out.println(d);
 		}
 		long end = System.currentTimeMillis();
 		System.out.println("Time: "+((end-begin)/1000.0));
@@ -38,5 +40,6 @@ public class Test2 {
 			System.out.println(d);
 		}
 	}
+	
 }
 

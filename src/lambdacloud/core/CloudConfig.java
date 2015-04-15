@@ -22,7 +22,16 @@ public class CloudConfig {
 	 * Print the configuration of target environment
 	 * @return
 	 */
-	public String printTargetInfo() {
+	public static String printTargetInfo() {
 		return "16 CPU, 64GB RAM";
+	}
+	
+	public static String getHost() {
+		return "127.0.0.1";
+	}
+	
+	public static int getPort() {
+		return 8322;
+		
 	}
 }

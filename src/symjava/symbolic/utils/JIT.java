@@ -8,6 +8,7 @@ import com.sun.org.apache.bcel.internal.generic.ClassGen;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
+import symjava.bytecode.IR;
 import symjava.bytecode.VecFuncs;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
@@ -94,6 +95,17 @@ public class JIT {
 		ClassGen genClass = BytecodeUtils.genClassBytecodeBatchFunc(className,expr, args, true, false);
 		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
 		return fcl.newInstance(genClass);
+	}
+	
+	public static IR getIR(Expr[] args, Expr expr) {
+		String className = "JITVecFunc_YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		ClassGen genClass = BytecodeUtils.genClassBytecodeBatchFunc(className,expr, args, true, false);
+		IR ir =  new IR();
+		ir.type = 1;
+		ir.name = genClass.getJavaClass().getClassName();
+		ir.bytes = genClass.getJavaClass().getBytes();
+		return ir;
+		
 	}
 	
 	public static void main(String[] args) {

@@ -2,33 +2,33 @@ package lambdacloud.core;
 
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Symbol;
 import symjava.symbolic.utils.JIT;
+import symjava.symbolic.utils.Utils;
 
-public class CloudVar extends Expr {
+public class CloudVar extends Symbol {
 	double[] data;
 	
 	public CloudVar(String name) {
-		this.label = name;
-		this.sortKey = this.label;
+		super(name);
 	}
 	
 	public CloudVar(Expr expr) {
-		String name = "CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
-		this.label = name;
-		this.sortKey = this.label;
-		this.compile(name, expr);
+		super("CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", ""));
+		this.compile(this.label, expr);
 	}
 	
 	public CloudVar(String name, Expr expr) {
-		this.label = name;
-		this.sortKey = this.label;
+		super(name);
 		this.compile(name, expr);
 	}
 	
 	public CloudVar compile(String name, Expr expr) {
 		if(CloudConfig.isLocal()) {
-			BytecodeBatchFunc fexpr = JIT.compileBatchFunc(new Expr[0], expr);
-			fexpr.apply(data, 0);
+			CloudVar[] args = Utils.extractCloudVars(expr).toArray(new CloudVar[0]);
+			BytecodeBatchFunc fexpr = JIT.compileBatchFunc(args, expr);
+			data = new double[args[0].size()];
+			fexpr.apply(data, 0, Utils.getDataFromCloudVars(args));
 		} else {
 			//expr contains server references
 		}
@@ -42,6 +42,10 @@ public class CloudVar extends Expr {
 
 	public void set(int index, double value) {
 		data[index] = value;
+	}
+	
+	public double[] getAll() {
+		return data;
 	}
 	
 	public CloudVar resize(int size) {
@@ -65,6 +69,10 @@ public class CloudVar extends Expr {
 	
 	public double[] fetchToLocal() {
 		return data;
+	}
+	
+	public int size() {
+		return data.length;
 	}
 	
 	@Override
