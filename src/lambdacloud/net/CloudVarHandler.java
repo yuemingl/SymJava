@@ -55,13 +55,14 @@ public class CloudVarHandler extends SimpleChannelInboundHandler<CloudVarResp> {
     @Override
     public void messageReceived(ChannelHandlerContext ctx, final CloudVarResp msg) {
     	System.out.println("CloudVarResp messageReceived");
-        ctx.channel().close().addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) {
-                boolean offered = answer.offer(msg);
-                assert offered;
-            }
-        });
+    	answer.offer(msg);
+//        ctx.channel().close().addListener(new ChannelFutureListener() {
+//            @Override
+//            public void operationComplete(ChannelFuture future) {
+//                boolean offered = answer.offer(msg);
+//                assert offered;
+//            }
+//        });
     }
 
     @Override

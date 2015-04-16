@@ -54,14 +54,15 @@ public class CloudFuncHandler extends SimpleChannelInboundHandler<CloudFuncResp>
     @Override
     public void messageReceived(ChannelHandlerContext ctx, final CloudFuncResp msg) {
     	System.out.println("CloudFuncResp messageReceived:");
+    	answer.offer(msg);
 //    	System.out.println(msg);
-        ctx.channel().close().addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) {
-                boolean offered = answer.offer(msg);
-                assert offered;
-            }
-        });
+//        ctx.channel().close().addListener(new ChannelFutureListener() {
+//            @Override
+//            public void operationComplete(ChannelFuture future) {
+//                boolean offered = answer.offer(msg);
+//                assert offered;
+//            }
+//        });
     }
 
     @Override
