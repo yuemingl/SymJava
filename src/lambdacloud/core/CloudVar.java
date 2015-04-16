@@ -1,5 +1,9 @@
 package lambdacloud.core;
 
+import lambdacloud.net.CloudResp;
+import lambdacloud.net.CloudVarHandler;
+import lambdacloud.net.CloudVarResp;
+import lambdacloud.net.LambdaClient;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
@@ -8,6 +12,7 @@ import symjava.symbolic.utils.Utils;
 
 public class CloudVar extends Symbol {
 	double[] data;
+	boolean isOnCloud = false;
 	
 	public CloudVar(String name) {
 		super(name);
@@ -64,11 +69,25 @@ public class CloudVar extends Symbol {
 	}
 	
 	public void storeToCloud() {
-		
+		LambdaClient client = CloudConfig.getClient();
+		//client.getCloudVarHandler().send(this);
+		CloudVarHandler handler = client.getCloudVarHandler();
+		try {
+			client.getChnnel().writeAndFlush(this).sync();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		CloudVarResp resp = handler.getCloudResp();
+		System.out.println(resp);
 	}
 	
 	public double[] fetchToLocal() {
 		return data;
+	}
+	
+	public boolean isOnCloud() {
+		return isOnCloud;
 	}
 	
 	public int size() {

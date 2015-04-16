@@ -16,12 +16,15 @@ public class CloudVarEncoder extends MessageToByteEncoder<CloudVar> {
 	@Override
 	protected void encode(ChannelHandlerContext ctx, CloudVar var, ByteBuf out) {
 		// Convert to a BigInteger first for easier implementation.
-		int nameLen = var.getLabel().length() * 2;
+		int nameLen = 0;
 		int dataLen = var.getAll().length * 8;
-		int packageLen = nameLen + dataLen;
-		byte[] allData = new byte[packageLen];
+		int packageLen = 0;
+		byte[] allData = null;
 		try {
 			byte[] nameBytes = var.getLabel().getBytes("UTF-8");
+			nameLen = nameBytes.length;
+			packageLen = nameLen + dataLen;
+			allData = new byte[packageLen];
 			System.arraycopy(nameBytes, 0, allData, 0, nameLen);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();

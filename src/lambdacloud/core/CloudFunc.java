@@ -1,8 +1,12 @@
 package lambdacloud.core;
 
+import io.netty.channel.Channel;
+import lambdacloud.net.CloudFuncHandler;
+import lambdacloud.net.CloudResp;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
+import symjava.bytecode.IR;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
@@ -11,8 +15,10 @@ public class CloudFunc {
 	BytecodeFunc func;
 	BytecodeVecFunc vecFunc;
 	BytecodeBatchFunc batchFunc;
+	
 	//1=BytecodeFunc,2=BytecodeVecFunc,3=BytecodeBatchFunc
 	int funcType = 0; 
+	IR funcIR = null;
 	
 	public CloudFunc(String name) {
 		this.name = name;
@@ -38,16 +44,34 @@ public class CloudFunc {
 		if(CloudConfig.isLocal()) {
 			funcType = 1;
 			func = JIT.compile(args, expr);
+			
 		} else {
 			//send the exprssion to the server
+			funcIR = JIT.getIR(args, expr);
+			CloudFuncHandler handler = CloudConfig.getClient().getCloudFuncHandler();
+//			handler.send(this);
+			
+			Channel ch = CloudConfig.getClient().getChnnel();
+			try {
+				ch.writeAndFlush(this).sync();
+				// Wait until the connection is closed.
+	            //ch.closeFuture().sync();
+	            
+				CloudResp resp = handler.getCloudResp();
+				System.out.println(resp);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 		return this;
 	}
 	
-	public CloudFunc compile(String name, Expr[] args, Expr[] expr) {
+	public CloudFunc compile(String name, Expr[] args, Expr[] exprs) {
 		if(CloudConfig.isLocal()) {
 			funcType = 2;
-			vecFunc = JIT.compile(args, expr);
+			vecFunc = JIT.compile(args, exprs);
 		} else {
 			//send the exprssion to the server
 		}
@@ -89,5 +113,35 @@ public class CloudFunc {
 		} else {
 			
 		}
+	}
+	public String getName() {
+		return this.name;
+	}
+	
+	public IR getFuncIR() {
+		return this.funcIR;
+	}
+	
+	public CloudFunc setBytecodeFunc(BytecodeFunc f) {
+		this.func = f;
+		return this;
+	}
+	public CloudFunc setBytecodeVecFunc(BytecodeVecFunc f) {
+		this.vecFunc = f;
+		return this;
+	}
+	public CloudFunc setBytecodeBatchFunc(BytecodeBatchFunc f) {
+		this.batchFunc = f;
+		return this;
+	}
+	
+	public BytecodeFunc getBytecodeFunc() {
+		return this.func;
+	}
+	public BytecodeVecFunc getBytecodeVecFunc() {
+		return this.vecFunc;
+	}
+	public BytecodeBatchFunc getBytecodeBatchFunc() {
+		return this.batchFunc;
 	}
 }

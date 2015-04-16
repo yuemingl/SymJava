@@ -99,7 +99,8 @@ public class JIT {
 	
 	public static IR getIR(Expr[] args, Expr expr) {
 		String className = "JITVecFunc_YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
-		ClassGen genClass = BytecodeUtils.genClassBytecodeBatchFunc(className,expr, args, true, false);
+		Func func = new Func(className, expr, args);
+		ClassGen genClass = BytecodeUtils.genClassBytecodeFunc(func, true, false);
 		IR ir =  new IR();
 		ir.type = 1;
 		ir.name = genClass.getJavaClass().getClassName();

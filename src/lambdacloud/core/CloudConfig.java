@@ -1,7 +1,10 @@
 package lambdacloud.core;
 
+import lambdacloud.net.LambdaClient;
+
 public class CloudConfig {
 	private static String target;
+	private static LambdaClient client;
 
 	/**
 	 * Parameter target can be
@@ -12,6 +15,12 @@ public class CloudConfig {
 	 */
 	public static void setTarget(String target) {
 		CloudConfig.target = target;
+		client = new LambdaClient();
+		try {
+			client.connect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static boolean isLocal() {
@@ -33,5 +42,13 @@ public class CloudConfig {
 	public static int getPort() {
 		return 8322;
 		
+	}
+	
+	public static LambdaClient getClient() {
+		return client;
+	}
+	
+	public static void shutDown() {
+		client.shutDown();
 	}
 }

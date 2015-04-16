@@ -33,8 +33,11 @@ public class LambdaClientInitializer extends ChannelInitializer<SocketChannel> {
 
         // Add the number codec first,
         pipeline.addLast(new CloudVarEncoder());
-
+        pipeline.addLast(new CloudFuncEncoder());
+        pipeline.addLast(new MessageDecoder());
+        
         // and then business logic.
-        pipeline.addLast(new LambdaClientHandler());
+        pipeline.addLast("CloudFuncHandler", new CloudFuncHandler());
+        pipeline.addLast("CloudVarHandler", new CloudVarHandler());
     }
 }
