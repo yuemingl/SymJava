@@ -23,7 +23,9 @@ public final class LambdaClient {
     
     ChannelFuture f;
     CloudVarHandler varHandler;
+    CloudVarRespHandler varRespHandler;
     CloudFuncHandler funcHandler;
+    
     Channel ch;
     EventLoopGroup group;
     
@@ -47,6 +49,7 @@ public final class LambdaClient {
             f = b.connect(CloudConfig.getHost(), CloudConfig.getPort()).sync();
             ch = f.channel();
             varHandler = (CloudVarHandler)f.channel().pipeline().get("CloudVarHandler");
+            varRespHandler = (CloudVarRespHandler)f.channel().pipeline().get("CloudVarRespHandler");
             funcHandler = (CloudFuncHandler)f.channel().pipeline().get("CloudFuncHandler");
             
             //ch.writeAndFlush(new CloudVar("xxxxxxx").init(1,2,3,4,5,6,7));
@@ -59,15 +62,20 @@ public final class LambdaClient {
     public CloudVarHandler getCloudVarHandler() {
         // Get the handler instance to retrieve the answer.
         return varHandler;
-    	
     }
+    
+    public CloudVarRespHandler getCloudVarRespHandler() {
+        // Get the handler instance to retrieve the answer.
+        return varRespHandler;
+    }
+    
     public CloudFuncHandler getCloudFuncHandler() {
         // Get the handler instance to retrieve the answer.
         return funcHandler;
     	
     }
     
-    public Channel getChnnel() {
+    public Channel getChannel() {
     	return ch;
     }
     

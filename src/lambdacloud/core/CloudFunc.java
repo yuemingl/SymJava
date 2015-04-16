@@ -2,7 +2,12 @@ package lambdacloud.core;
 
 import io.netty.channel.Channel;
 import lambdacloud.net.CloudFuncHandler;
+import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudResp;
+import lambdacloud.net.CloudVarHandler;
+import lambdacloud.net.CloudVarResp;
+import lambdacloud.net.CloudVarRespHandler;
+import lambdacloud.net.LambdaClient;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
@@ -47,11 +52,11 @@ public class CloudFunc {
 			
 		} else {
 			//send the exprssion to the server
-			funcIR = JIT.getIR(args, expr);
+			funcIR = JIT.getIR(name, args, expr);
 			CloudFuncHandler handler = CloudConfig.getClient().getCloudFuncHandler();
 //			handler.send(this);
 			
-			Channel ch = CloudConfig.getClient().getChnnel();
+			Channel ch = CloudConfig.getClient().getChannel();
 			try {
 				ch.writeAndFlush(this).sync();
 				// Wait until the connection is closed.
@@ -79,39 +84,64 @@ public class CloudFunc {
 	}
 
 	public void apply(CloudVar output, CloudVar ...inputs) {
-		if(inputs.length == 0) {
-			switch(funcType) {
-			case 1:
-				output.set(0, func.apply());
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			default:
-				throw new RuntimeException();
-			}
-		} else if(inputs.length == 1) {
-			double[] data = null;
-			double d;
-			switch(funcType) {
-			case 1:
-				data = inputs[0].fetchToLocal();
-				d = func.apply(data);
-				output.set(0, d);
-				break;
-			case 2:
-				data = inputs[0].fetchToLocal();
-				double[] out = output.fetchToLocal();
-				vecFunc.apply(out, 0, data);
-				break;
-			case 3:
-				break;
-			default:
-				throw new RuntimeException();
+		if(CloudConfig.isLocal()) {
+			if(inputs.length == 0) {
+				switch(funcType) {
+				case 1:
+					
+					output.set(0, func.apply());
+					break;
+				case 2:
+					break;
+				case 3:
+					break;
+				default:
+					throw new RuntimeException();
+				}
+			} else if(inputs.length == 1) {
+				double[] data = null;
+				double d;
+				switch(funcType) {
+				case 1:
+					data = inputs[0].fetchToLocal();
+					d = func.apply(data);
+					output.set(0, d);
+					break;
+				case 2:
+					data = inputs[0].fetchToLocal();
+					double[] out = output.fetchToLocal();
+					vecFunc.apply(out, 0, data);
+					break;
+				case 3:
+					break;
+				default:
+					throw new RuntimeException();
+				}
+			} else {
+				
 			}
 		} else {
-			
+			if(!inputs[0].isOnCloud()) {
+				inputs[0].storeToCloud();
+			}
+			LambdaClient client = CloudConfig.getClient();
+			//client.getCloudVarHandler().send(this);
+			CloudVarHandler handler = client.getCloudVarHandler();
+			try {
+				CloudQuery qry = new CloudQuery();
+				qry.qryType = CloudQuery.CLOUD_FUNC_EVAL;
+				qry.objName = this.getName();
+				qry.argNames.add(inputs[0].getLabel());
+				client.getChannel().writeAndFlush(qry).sync();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			CloudVar rlt = handler.getCloudVar();
+			output.setLabel(rlt.getLabel());
+			output.data = rlt.data;
+			output.isOnCloud = true;
+			//System.out.println(output);			
 		}
 	}
 	public String getName() {

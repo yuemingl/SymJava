@@ -97,8 +97,8 @@ public class JIT {
 		return fcl.newInstance(genClass);
 	}
 	
-	public static IR getIR(Expr[] args, Expr expr) {
-		String className = "JITVecFunc_YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+	public static IR getIR(String name, Expr[] args, Expr expr) {
+		String className = name;
 		Func func = new Func(className, expr, args);
 		ClassGen genClass = BytecodeUtils.genClassBytecodeFunc(func, true, false);
 		IR ir =  new IR();

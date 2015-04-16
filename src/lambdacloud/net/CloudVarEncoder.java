@@ -39,6 +39,7 @@ public class CloudVarEncoder extends MessageToByteEncoder<CloudVar> {
 		// Write a message.
 		out.writeByte((byte) 'V'); // magic number
 		out.writeInt(nameLen); // name length
+		out.writeInt(var.isOnCloud()?1:0);
 		out.writeInt(dataLen); // data length
 		out.writeBytes(allData); // data
 	}

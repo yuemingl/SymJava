@@ -1,7 +1,10 @@
 package lambdacloud.core;
 
+import io.netty.channel.Channel;
+import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudResp;
 import lambdacloud.net.CloudVarHandler;
+import lambdacloud.net.CloudVarRespHandler;
 import lambdacloud.net.CloudVarResp;
 import lambdacloud.net.LambdaClient;
 import symjava.bytecode.BytecodeBatchFunc;
@@ -71,23 +74,47 @@ public class CloudVar extends Symbol {
 	public void storeToCloud() {
 		LambdaClient client = CloudConfig.getClient();
 		//client.getCloudVarHandler().send(this);
-		CloudVarHandler handler = client.getCloudVarHandler();
+		CloudVarRespHandler handler = client.getCloudVarRespHandler();
 		try {
-			client.getChnnel().writeAndFlush(this).sync();
+			client.getChannel().writeAndFlush(this).sync();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		CloudVarResp resp = handler.getCloudResp();
+		if(resp.status == 0)
+			this.isOnCloud = true;
 		System.out.println(resp);
 	}
 	
 	public double[] fetchToLocal() {
-		return data;
+		if(CloudConfig.isLocal())
+			return data;
+		else {
+			Channel ch = CloudConfig.getClient().getChannel();
+			CloudQuery qry = new CloudQuery();
+			qry.objName = this.getLabel();
+			qry.qryType = CloudQuery.CLOUD_VAR;
+			try {
+				ch.writeAndFlush(qry).sync();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			CloudVarHandler h = CloudConfig.getClient().getCloudVarHandler();
+			CloudVar var = h.getCloudVar();
+			this.data = var.data;
+			this.isOnCloud = var.isOnCloud();
+			return this.data;
+		}
 	}
 	
 	public boolean isOnCloud() {
 		return isOnCloud;
+	}
+	
+	public void setOnCloudFlag(boolean flag) {
+		this.isOnCloud = true;
 	}
 	
 	public int size() {
