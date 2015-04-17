@@ -21,7 +21,7 @@ public class TestCloudFuncEval {
 		CloudFunc func = new CloudFunc("func123", 
 				new Expr[] { x, y }, sqrt(x*x + y*y));
 
-		CloudVar output = new CloudVar();
+		CloudVar output = new CloudVar("out123");
 		// Evaluate the function on the cloud and 
 		// return the reference of the result
 		func.apply(output, input); 

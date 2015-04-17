@@ -12,16 +12,24 @@ public class CloudQuery {
 
 	public int qryType;    // One of the static integer define in this class
 	public String objName; // Name of CloudVar or CloudFunc
+	
+	
 	public List<String> argNames = new ArrayList<String>(); // Parameters for function when evaluating
+	public String outputName = ""; // Output of a function evaluation
 	
 	public byte[] getBytes() {
 		byte[] bytes = null;
 		try {
 			int len = 0;
 			len += 4;
+			
 			byte[] nameBytes = objName.getBytes("UTF-8");
 			len += 4;
 			len += nameBytes.length;
+			
+			byte[] outputBytes = outputName.getBytes("UTF-8");
+			len += 4;
+			len += outputBytes.length;
 
 			len += 4;
 			List<byte[]> argNameBytes = new ArrayList<byte[]>();
@@ -38,7 +46,9 @@ public class CloudQuery {
 			ByteBuffer buf = ByteBuffer.wrap(bytes);
 			buf.putInt(qryType);
 			buf.putInt(nameBytes.length);
+			buf.putInt(outputBytes.length);
 			buf.put(nameBytes);
+			buf.put(outputBytes);
 			buf.putInt(argNameBytes.size());
 			for(byte[] bs : argNameBytes) {
 				buf.putInt(bs.length);

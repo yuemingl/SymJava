@@ -126,6 +126,7 @@ public class CloudFunc {
 				qry.qryType = CloudQuery.CLOUD_FUNC_EVAL;
 				qry.objName = this.getName();
 				qry.argNames.add(inputs[0].getLabel());
+				qry.outputName = output.getName();
 				client.getChannel().writeAndFlush(qry).sync();
 			} catch (InterruptedException e) {
 				e.printStackTrace();

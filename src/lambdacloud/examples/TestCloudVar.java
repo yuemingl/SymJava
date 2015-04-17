@@ -24,9 +24,13 @@ public class TestCloudVar {
 		}
 		
 		// This variable should not be on the cloud
-		CloudVar var3 = new CloudVar("var456");
-		System.out.println(var3.isOnCloud());
-
+		CloudVar var3 = new CloudVar("out123");
+		var3.fetchToLocal();
+		if(var3.isOnCloud()) {
+			for(double d : var3.getData()) {
+				System.out.println(d);
+			}
+		}
 	}
 
 }

@@ -121,7 +121,7 @@ public class CloudVar extends Symbol {
 	}
 	
 	public void setOnCloudFlag(boolean flag) {
-		this.isOnCloud = true;
+		this.isOnCloud = flag;
 	}
 	
 	public int size() {
