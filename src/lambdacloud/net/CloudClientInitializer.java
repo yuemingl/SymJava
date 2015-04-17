@@ -11,11 +11,11 @@ import io.netty.handler.ssl.SslContext;
 /**
  * Creates a newly configured {@link ChannelPipeline} for a client-side channel.
  */
-public class LambdaClientInitializer extends ChannelInitializer<SocketChannel> {
+public class CloudClientInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SslContext sslCtx;
 
-    public LambdaClientInitializer(SslContext sslCtx) {
+    public CloudClientInitializer(SslContext sslCtx) {
         this.sslCtx = sslCtx;
     }
 

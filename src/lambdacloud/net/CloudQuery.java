@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CloudQuery {
-	public static final int CLOUD_VAR        = 0;
-	public static final int CLOUD_FUNC_EVAL  = 1;
-	public static final int TARGET_INFO      = 2;
+	public static final int CLOUD_VAR        = 0; // Fetch a CloudVar from cloud
+	public static final int CLOUD_FUNC_EVAL  = 1; // Evaluate a function on the cloud
+	public static final int TARGET_INFO      = 2; // Query info of target machine on the cloud
 
-	public int qryType;
-	public String objName;
-	public List<String> argNames = new ArrayList<String>();
+	public int qryType;    // One of the static integer define in this class
+	public String objName; // Name of CloudVar or CloudFunc
+	public List<String> argNames = new ArrayList<String>(); // Parameters for function when evaluating
 	
 	public byte[] getBytes() {
 		byte[] bytes = null;
@@ -51,6 +51,6 @@ public class CloudQuery {
 	}
 	
 	public String toString() {
-		return "CloudReq:"+qryType+" "+objName;
+		return "CloudQuery: "+qryType+" "+objName;
 	}
 }

@@ -1,10 +1,10 @@
 package lambdacloud.core;
 
-import lambdacloud.net.LambdaClient;
+import lambdacloud.net.CloudClient;
 
 public class CloudConfig {
 	private static String target;
-	private static LambdaClient client;
+	private static CloudClient client;
 
 	/**
 	 * Parameter target can be
@@ -15,7 +15,7 @@ public class CloudConfig {
 	 */
 	public static void setTarget(String target) {
 		CloudConfig.target = target;
-		client = new LambdaClient();
+		client = new CloudClient();
 		try {
 			client.connect();
 		} catch (Exception e) {
@@ -44,7 +44,7 @@ public class CloudConfig {
 		
 	}
 	
-	public static LambdaClient getClient() {
+	public static CloudClient getClient() {
 		return client;
 	}
 	

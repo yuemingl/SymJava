@@ -5,9 +5,7 @@ import lambdacloud.net.CloudFuncHandler;
 import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudResp;
 import lambdacloud.net.CloudVarHandler;
-import lambdacloud.net.CloudVarResp;
-import lambdacloud.net.CloudVarRespHandler;
-import lambdacloud.net.LambdaClient;
+import lambdacloud.net.CloudClient;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
@@ -20,6 +18,7 @@ public class CloudFunc {
 	BytecodeFunc func;
 	BytecodeVecFunc vecFunc;
 	BytecodeBatchFunc batchFunc;
+	boolean isOnCloud = false;
 	
 	//1=BytecodeFunc,2=BytecodeVecFunc,3=BytecodeBatchFunc
 	int funcType = 0; 
@@ -54,21 +53,17 @@ public class CloudFunc {
 			//send the exprssion to the server
 			funcIR = JIT.getIR(name, args, expr);
 			CloudFuncHandler handler = CloudConfig.getClient().getCloudFuncHandler();
-//			handler.send(this);
-			
 			Channel ch = CloudConfig.getClient().getChannel();
 			try {
 				ch.writeAndFlush(this).sync();
-				// Wait until the connection is closed.
-	            //ch.closeFuture().sync();
-	            
-				CloudResp resp = handler.getCloudResp();
-				System.out.println(resp);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+			CloudResp resp = handler.getCloudResp();
+			if(resp.status == 0)
+				this.isOnCloud = true;
+			else
+				this.isOnCloud = false;
 		}
 		return this;
 	}
@@ -124,8 +119,7 @@ public class CloudFunc {
 			if(!inputs[0].isOnCloud()) {
 				inputs[0].storeToCloud();
 			}
-			LambdaClient client = CloudConfig.getClient();
-			//client.getCloudVarHandler().send(this);
+			CloudClient client = CloudConfig.getClient();
 			CloudVarHandler handler = client.getCloudVarHandler();
 			try {
 				CloudQuery qry = new CloudQuery();
@@ -134,16 +128,19 @@ public class CloudFunc {
 				qry.argNames.add(inputs[0].getLabel());
 				client.getChannel().writeAndFlush(qry).sync();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			CloudVar rlt = handler.getCloudVar();
 			output.setLabel(rlt.getLabel());
 			output.data = rlt.data;
-			output.isOnCloud = true;
-			//System.out.println(output);			
+			output.isOnCloud = rlt.isOnCloud;
 		}
 	}
+	
+	public boolean isOnCloud() {
+		return this.isOnCloud;
+	}
+	
 	public String getName() {
 		return this.name;
 	}

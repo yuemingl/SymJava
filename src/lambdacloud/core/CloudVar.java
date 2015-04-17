@@ -6,7 +6,7 @@ import lambdacloud.net.CloudResp;
 import lambdacloud.net.CloudVarHandler;
 import lambdacloud.net.CloudVarRespHandler;
 import lambdacloud.net.CloudVarResp;
-import lambdacloud.net.LambdaClient;
+import lambdacloud.net.CloudClient;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
@@ -80,36 +80,35 @@ public class CloudVar extends Symbol {
 	}
 	
 	public void storeToCloud() {
-		LambdaClient client = CloudConfig.getClient();
-		//client.getCloudVarHandler().send(this);
+		CloudClient client = CloudConfig.getClient();
 		CloudVarRespHandler handler = client.getCloudVarRespHandler();
 		try {
 			client.getChannel().writeAndFlush(this).sync();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		CloudVarResp resp = handler.getCloudResp();
 		if(resp.status == 0)
 			this.isOnCloud = true;
-		System.out.println(resp);
+		else
+			this.isOnCloud = false;
 	}
 	
 	public double[] fetchToLocal() {
 		if(CloudConfig.isLocal())
 			return data;
 		else {
-			Channel ch = CloudConfig.getClient().getChannel();
+			CloudClient client = CloudConfig.getClient();
+			Channel ch = client.getChannel();
 			CloudQuery qry = new CloudQuery();
 			qry.objName = this.getLabel();
 			qry.qryType = CloudQuery.CLOUD_VAR;
 			try {
 				ch.writeAndFlush(qry).sync();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			CloudVarHandler h = CloudConfig.getClient().getCloudVarHandler();
+			CloudVarHandler h = client.getCloudVarHandler();
 			CloudVar var = h.getCloudVar();
 			this.data = var.data;
 			this.isOnCloud = var.isOnCloud();

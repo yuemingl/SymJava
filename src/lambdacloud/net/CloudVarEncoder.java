@@ -9,10 +9,7 @@ import java.nio.ByteBuffer;
 
 import lambdacloud.core.CloudVar;
 
-/**
- */
 public class CloudVarEncoder extends MessageToByteEncoder<CloudVar> {
-
 	@Override
 	protected void encode(ChannelHandlerContext ctx, CloudVar var, ByteBuf out) {
 		// Convert to a BigInteger first for easier implementation.

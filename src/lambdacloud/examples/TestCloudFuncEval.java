@@ -16,8 +16,7 @@ public class TestCloudFuncEval {
 		CloudVar input = new CloudVar("var123").init(data);
 		input.storeToCloud();
 
-		CloudFunc func = new CloudFunc("func123", 
-				new Expr[] { x, y }, x + y);
+		CloudFunc func = new CloudFunc("func123", new Expr[] { x, y }, x + y);
 		CloudVar output = new CloudVar();
 		func.apply(output, input);
 

@@ -13,10 +13,16 @@ public class TestCloudVar {
 		var.storeToCloud();
 		
 		CloudVar var2 = new CloudVar("var123");
-		double[] dataVar2 = var2.fetchToLocal();
-		for(double d : dataVar2) {
-			System.out.println(d);
+		var2.fetchToLocal();
+		if(var2.isOnCloud()) {
+			for(double d : var2.getData()) {
+				System.out.println(d);
+			}
 		}
+		
+		CloudVar var3 = new CloudVar("var456");
+		System.out.println(var3.isOnCloud());
+
 	}
 
 }

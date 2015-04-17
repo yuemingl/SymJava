@@ -1,23 +1,21 @@
 package lambdacloud.net;
 
 
-import lambdacloud.core.CloudConfig;
-import lambdacloud.core.CloudVar;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import lambdacloud.core.CloudConfig;
 
 /**
  * Sends a sequence of integers to a {@link FactorialServer} to calculate
  * the factorial of the specified integer.
  */
-public final class LambdaClient {
+public final class CloudClient {
 
     static final boolean SSL = System.getProperty("ssl") != null;
     
@@ -43,7 +41,7 @@ public final class LambdaClient {
             Bootstrap b = new Bootstrap();
             b.group(group)
              .channel(NioSocketChannel.class)
-             .handler(new LambdaClientInitializer(sslCtx));
+             .handler(new CloudClientInitializer(sslCtx));
 
             // Make a new connection.
             f = b.connect(CloudConfig.getHost(), CloudConfig.getPort()).sync();
