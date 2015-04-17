@@ -11,20 +11,17 @@ public class TestCloudFuncEval {
 
 	public static void main(String[] args) {
 		CloudConfig.setTarget("server1");
+		
 		double[] data = { 1, 2 };
-		CloudVar var = new CloudVar("var123").init(data);
-		var.storeToCloud();
+		CloudVar input = new CloudVar("var123").init(data);
+		input.storeToCloud();
 
-		CloudVar output = new CloudVar("output");
-		output.resize(1);
+		CloudFunc func = new CloudFunc("func123", 
+				new Expr[] { x, y }, x + y);
+		CloudVar output = new CloudVar();
+		func.apply(output, input);
 
-		CloudFunc func = new CloudFunc("func123", new Expr[] { x, y }, x + y
-				+ 10);
-		func.apply(output, var);
-
-		output.fetchToLocal();
-		for (double d : output.getAll())
+		for (double d : output.fetchToLocal())
 			System.out.println(d);
 	}
-
 }

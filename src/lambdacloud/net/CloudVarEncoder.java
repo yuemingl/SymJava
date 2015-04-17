@@ -17,7 +17,7 @@ public class CloudVarEncoder extends MessageToByteEncoder<CloudVar> {
 	protected void encode(ChannelHandlerContext ctx, CloudVar var, ByteBuf out) {
 		// Convert to a BigInteger first for easier implementation.
 		int nameLen = 0;
-		int dataLen = var.getAll().length * 8;
+		int dataLen = var.getData().length * 8;
 		int packageLen = 0;
 		byte[] allData = null;
 		try {
@@ -31,7 +31,7 @@ public class CloudVarEncoder extends MessageToByteEncoder<CloudVar> {
 		}
 		byte[] data = new byte[dataLen];
 		ByteBuffer buf = ByteBuffer.wrap(data);
-		for (double d : var.getAll()) {
+		for (double d : var.getData()) {
 			buf.putDouble(d);
 		}
 		System.arraycopy(buf.array(), 0, allData, nameLen, dataLen);

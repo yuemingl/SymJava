@@ -14,9 +14,13 @@ import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
 public class CloudVar extends Symbol {
-	double[] data;
+	double[] data = new double[0];
 	boolean isOnCloud = false;
 	
+	public CloudVar() {
+		super("CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", ""));
+	}
+
 	public CloudVar(String name) {
 		super(name);
 	}
@@ -52,10 +56,6 @@ public class CloudVar extends Symbol {
 		data[index] = value;
 	}
 	
-	public double[] getAll() {
-		return data;
-	}
-	
 	public CloudVar resize(int size) {
 		if(this.data == null)
 			this.data = new double[size];
@@ -69,6 +69,14 @@ public class CloudVar extends Symbol {
 			this.data = newdata;
 		}
 		return this;
+	}
+	
+	public String getName() {
+		return this.label;
+	}
+	
+	public double[] getData() {
+		return data;
 	}
 	
 	public void storeToCloud() {
