@@ -229,7 +229,7 @@ public class BytecodeUtils {
 		} else {
 			fExprArgs = fun.args;
 		}
-		System.out.println(fun.getLabel()+": "+fun.getExpr());
+		System.out.println("Compiled: "+fun.getLabel()+": "+fun.getExpr());
 		//System.out.println(Utils.joinLabels(fExprArgs, ","));
 		
 		HashMap<Expr, Integer> argsMap = new HashMap<Expr, Integer>();
