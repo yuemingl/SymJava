@@ -70,5 +70,19 @@ public class Solver {
 		for(double i : x)
 			System.out.println(i);
 		//x=(0.3,0.4,0)
+		
+		int N = Integer.valueOf(args[0]);
+		long begin = System.currentTimeMillis();
+		double[][] AA = new double[N][N];
+		double[] xx = new double[N];
+		double[] bb = new double[N];
+		for(int i=0;i<N;i++)
+			for(int j=0;j<N;j++)
+				AA[i][j] = Math.random();
+		for(int i=0;i<N;i++)
+			bb[i] = Math.random();
+		solveCG2(AA, bb, xx);
+		long end = System.currentTimeMillis();
+		System.out.println("Time for solving "+N+"*"+N+" system:" + (end-begin) + "ms");
 	}
 }

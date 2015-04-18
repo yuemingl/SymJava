@@ -100,7 +100,7 @@ public class JIT {
 	public static IR getIR(String name, Expr[] args, Expr expr) {
 		String className = name;
 		Func func = new Func(className, expr, args);
-		ClassGen genClass = BytecodeUtils.genClassBytecodeFunc(func, true, false);
+		ClassGen genClass = BytecodeUtils.genClassBytecodeFunc(func, false, false);
 		IR ir =  new IR();
 		ir.type = 1;
 		ir.name = genClass.getJavaClass().getClassName();
