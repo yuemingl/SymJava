@@ -94,9 +94,14 @@ public class CloudVar extends Symbol {
 			this.isOnCloud = false;
 	}
 	
-	public double[] fetchToLocal() {
+	/**
+	 * Fetch a cloud variable to local. Return true if success. 
+	 * Call getData() to access the data in the cloud variable
+	 * @return
+	 */
+	public boolean fetchToLocal() {
 		if(CloudConfig.isLocal())
-			return data;
+			return true;
 		else {
 			CloudClient client = CloudConfig.getClient();
 			Channel ch = client.getChannel();
@@ -112,7 +117,7 @@ public class CloudVar extends Symbol {
 			CloudVar var = h.getCloudVar();
 			this.data = var.data;
 			this.isOnCloud = var.isOnCloud();
-			return this.data;
+			return this.isOnCloud;
 		}
 	}
 	

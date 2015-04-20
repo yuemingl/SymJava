@@ -98,13 +98,13 @@ public class CloudFunc {
 				double d;
 				switch(funcType) {
 				case 1:
-					data = inputs[0].fetchToLocal();
+					data = inputs[0].getData();
 					d = func.apply(data);
 					output.set(0, d);
 					break;
 				case 2:
-					data = inputs[0].fetchToLocal();
-					double[] out = output.fetchToLocal();
+					data = inputs[0].getData();
+					double[] out = output.getData();
 					vecFunc.apply(out, 0, data);
 					break;
 				case 3:

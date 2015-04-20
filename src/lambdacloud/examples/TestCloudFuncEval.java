@@ -27,7 +27,9 @@ public class TestCloudFuncEval {
 		func.apply(output, input); 
 
 		System.out.println(output.getName());
-		for (double d : output.fetchToLocal())
-			System.out.println(d);
+		if(output.fetchToLocal()) {
+			for (double d : output.getData())
+				System.out.println(d);
+		}
 	}
 }

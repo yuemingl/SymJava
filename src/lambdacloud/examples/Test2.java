@@ -31,13 +31,17 @@ public class Test2 {
 			f.apply(output, input);
 			Expr update = input + 1.0*output;
 			input = update; //Cast update to type CloudVar
-			for(double d : input.fetchToLocal())
-				System.out.println(d);
+			if(input.fetchToLocal()) {
+				for(double d : input.getData())
+					System.out.println(d);
+			}
 		}
 		long end = System.currentTimeMillis();
 		System.out.println("Time: "+((end-begin)/1000.0));
-		for(double d : output.fetchToLocal()) {
-			System.out.println(d);
+		if(output.fetchToLocal()) {
+			for(double d : output.getData()) {
+				System.out.println(d);
+			}
 		}
 	}
 	

@@ -345,7 +345,8 @@ public class Utils {
 	public static double[][] getDataFromCloudVars(CloudVar[] cloudVars) {
 		double[][] rlt = new double[cloudVars.length][];
 		for(int i=0; i<cloudVars.length; i++) {
-			rlt[i] = cloudVars[i].fetchToLocal();
+			if(cloudVars[i].fetchToLocal())
+				rlt[i] = cloudVars[i].getData();
 		}
 		return rlt;
 	}
