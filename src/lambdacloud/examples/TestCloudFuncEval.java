@@ -11,7 +11,7 @@ import symjava.symbolic.Expr;
 public class TestCloudFuncEval {
 
 	public static void main(String[] args) {
-		CloudConfig.setTarget("server1");
+		CloudConfig.setTarget("server");
 		
 		double[] data = { 3, 4 };
 		CloudVar input = new CloudVar("var123").init(data);
@@ -24,8 +24,13 @@ public class TestCloudFuncEval {
 		CloudVar output = new CloudVar("out123");
 		// Evaluate the function on the cloud and 
 		// return the reference of the result
-		func.apply(output, input); 
-
+		long begin = System.currentTimeMillis();
+		for(int i=0; i<100; i++) {
+			func.apply(output, input); 
+		}
+		long end = System.currentTimeMillis();
+		System.out.println("Time: "+(end-begin)+"ms");
+		
 		System.out.println(output.getName());
 		if(output.fetchToLocal()) {
 			for (double d : output.getData())

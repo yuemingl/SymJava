@@ -19,7 +19,7 @@ public class BenchmarkTaylor {
 		return rlt;
 	}
 	public static void main(String[] args) {
-		test();
+		//test();
 		testBatchEval();
 	}
 	

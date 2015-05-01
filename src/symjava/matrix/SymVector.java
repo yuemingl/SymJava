@@ -6,9 +6,13 @@ import java.util.Vector;
 import symjava.numeric.NumVector;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbols;
-import symjava.symbolic.utils.JIT;
 
-public class SymVector implements Iterable<Expr> {
+/**
+ * SymVector is a vector of symbolic expressions 
+ * 
+ *
+ */
+public class SymVector extends Expr implements Iterable<Expr> {
 	protected Vector<Expr> data = new Vector<Expr>();
 	
 	public SymVector() {
@@ -54,7 +58,7 @@ public class SymVector implements Iterable<Expr> {
 		data.set(i, expr);
 	}
 	
-	public void add(Expr e) {
+	public void append(Expr e) {
 		data.add(e);
 	}
 	
@@ -108,5 +112,17 @@ public class SymVector implements Iterable<Expr> {
 	public NumVector toNumVector(Expr[] args) {
 		NumVector ret = new NumVector(this, args);
 		return ret;
+	}
+
+	@Override
+	public Expr simplify() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

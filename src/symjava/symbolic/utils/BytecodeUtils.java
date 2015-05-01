@@ -229,7 +229,7 @@ public class BytecodeUtils {
 		} else {
 			fExprArgs = fun.args;
 		}
-		System.out.println("Compiled: "+fun.getLabel()+": "+fun.getExpr());
+		System.out.println("JIT Compiled: "+fun.getLabel()+": "+fun.getExpr());
 		//System.out.println(Utils.joinLabels(fExprArgs, ","));
 		
 		HashMap<Expr, Integer> argsMap = new HashMap<Expr, Integer>();
@@ -337,7 +337,7 @@ public class BytecodeUtils {
 	public static ClassGen genClassBytecodeBatchFunc(String className, Expr expr, Expr[] args,
 			boolean writeClassFile, boolean staticMethod) {
 		
-		System.out.println(expr.getLabel());
+		System.out.println("JIT Batch: "+expr);
 
 		String packageName = "symjava.bytecode";
 		String fullClsName = packageName+"."+className;

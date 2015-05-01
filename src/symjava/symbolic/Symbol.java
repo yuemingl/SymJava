@@ -3,9 +3,12 @@ package symjava.symbolic;
 import symjava.symbolic.utils.Utils;
 
 /**
- * An object of Symbol has a string name which is its unique id.
+ * An object of Symbol has a string name which is its unique id,
+ * just like the name of a variable in Java.
+ * 
  * Two objects of Symbol with the same name are the same thing in SymJava. 
- * see method symEquals()
+ * 
+ * @see symEquals()
  * 
  */
 public class Symbol extends Expr {

@@ -4,27 +4,39 @@ import java.util.Vector;
 
 import symjava.numeric.NumMatrix;
 import symjava.symbolic.Expr;
-import symjava.symbolic.utils.JIT;
 
-public class SymMatrix {
+/**
+ * SymMatrix is a matrix of symbolic expressions
+ *
+ */
+public class SymMatrix extends Expr {
 	/**
 	 * Row vectors
 	 */
-	Vector<SymVector> data = new Vector<SymVector>();
+	Vector<SymVector> data = null;
 	
 	public SymMatrix() {
 	}
 	
+	public SymMatrix(String name) {
+	}
+	
 	public SymMatrix(Expr[][] array) {
+		data = new Vector<SymVector>();
 		for(Expr[] row : array)
 			data.add(new SymVector(row));
 	}
 	
 	public SymMatrix(int m, int n) {
+		data = new Vector<SymVector>();
 		data.setSize(m);
 		for(int i=0; i<data.size(); i++) {
 			data.set(i, new SymVector(n));
 		}
+	}
+	
+	public boolean isAbstract() {
+		return data == null;
 	}
 	
 	public SymVector get(int i) {
@@ -115,5 +127,23 @@ public class SymMatrix {
 	public NumMatrix toNumMatrix(Expr[] args) {
 		NumMatrix mat = new NumMatrix(this, args);
 		return mat;
+	}
+
+	@Override
+	public Expr simplify() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean symEquals(Expr other) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Expr diff(Expr expr) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
