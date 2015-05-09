@@ -1,7 +1,7 @@
 # SymJava
-SymJava is a Java library for symbolic mathematics.
+SymJava is a Java library for symbolic-numeric computation.
 
-There are two interesting features:
+There are two useful features:
 
 1. Operator Overloading is implemented by using Java-OO (https://github.com/amelentev/java-oo)
 
