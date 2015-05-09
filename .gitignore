@@ -1,3 +1,8 @@
 /bin
+<<<<<<< Updated upstream
 benchmark-rosenbrock*-manual.cpp
 run[0-9]*
+=======
+run*
+benchmark-rosenbrock*-manual.cpp
+>>>>>>> Stashed changes
