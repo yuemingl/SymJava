@@ -1,11 +1,11 @@
 # SymJava
-SymJava is a Java library for symbolic mathematics.
+SymJava is a Java library for symbolic-numeric computation.
 
-There are two interesting features:
+There are two useful features:
 
-1. Operator Overloading is implemented by using https://github.com/amelentev/java-oo
+1. Operator Overloading is implemented by using Java-OO (https://github.com/amelentev/java-oo)
 
-2. Lambdify in sympy is implemented in SymJava by using BCEL library. The java Bytecode are generated in runtime for the math expressions.
+2. "Lambdify" in sympy is implemented in SymJava by using BCEL library. The java bytecode is generated at runtime for a symbolic expression. Fast numerical evaluation is achieved.
 
 SymJava is developed under Java 7 and Eclipse-Kepler (SR2 4.3.2, https://www.eclipse.org/downloads/packages/release/kepler/sr2)
 
