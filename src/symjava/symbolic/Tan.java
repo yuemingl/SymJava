@@ -13,6 +13,7 @@ public class Tan extends UnaryOp {
 
 	@Override
 	public Expr diff(Expr expr) {
+		//1 + tan^2(x) 
 		return arg.diff(expr).multiply(new Pow(this, Expr.valueOf(2)).add(1));
 	}
 

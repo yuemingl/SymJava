@@ -161,7 +161,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * Expr a = 5;
 	 * 
 	 * @param v
@@ -180,7 +180,7 @@ abstract public class Expr implements Cloneable {
 		return new SymDouble(v);
 	}
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * a+b
 	 * @param other
 	 * @return
@@ -214,7 +214,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * a-b
 	 * @param other
 	 * @return
@@ -248,7 +248,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * a*b
 	 * @param other
 	 * @return
@@ -282,7 +282,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * a/b
 	 * @param other
 	 * @return
@@ -316,7 +316,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * -a
 	 * 
 	 */
@@ -374,7 +374,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 //	/**
-//	 * TODO We cannot use the comparison operator overload in java-oo for our use case
+//	 * TODO We cannot use the comparison Operator overloading in java-oo for our use case
 //	 * @param other
 //	 * @return
 //	 */
