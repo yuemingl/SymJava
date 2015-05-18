@@ -16,6 +16,12 @@ import symjava.symbolic.Expr;
  * @param <T>
  */
 public abstract class NumFunc<T> extends Expr {
+	
+	/**
+	 * The derivative class should implement this method
+	 * @param args
+	 * @return
+	 */
 	public abstract T apply(double ...args);
 	
 	@Override

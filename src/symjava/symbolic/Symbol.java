@@ -83,10 +83,14 @@ public class Symbol extends Expr {
 		return false;
 	}
 	
+	public String getPrefix() {
+		String[] ss = this.toString().split("_");
+		return ss[0];
+	}
+	
 	public boolean containsSubIndex() {
 		String[] ss = this.toString().split("_");
 		if(ss.length == 2) {
-			Integer.valueOf(ss[1]);
 			return true;
 		}
 		return false;
@@ -97,6 +101,6 @@ public class Symbol extends Expr {
 		if(ss.length == 2) {
 			return Integer.valueOf(ss[1]);
 		}
-		throw new IllegalArgumentException(this+" contains no sub index, use containSubIndex() to check.");
+		throw new IllegalArgumentException(this.getLabel()+" contains no sub index.");
 	}
 }

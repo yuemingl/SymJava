@@ -23,7 +23,7 @@ public class GaussNewton {
 		Expr[] params = eq.getParams();
 		for(int i=0; i<n; i++) {
 			Eq subEq = eq.subsUnknowns(data[i]);
-			res[i] = subEq.lhs - subEq.rhs; //res[i] =y[i] - f(x[i]);
+			res[i] = subEq.lhs() - subEq.rhs(); //res[i] =y[i] - f(x[i]);
 			for(int j=0; j<eq.getParams().length; j++) {
 				Expr df = res[i].diff(params[j]);
 				J[i][j] = df;
@@ -40,10 +40,13 @@ public class GaussNewton {
 		NumMatrix NJ = new NumMatrix(J, eq.getParams());
 		
 		System.out.println("Iterativly sovle ... ");
+		double[] outJac = new double[NJ.rowDim()*NJ.colDim()];
+		double[] outRes = new double[Nres.dim()];
 		for(int i=0; i<maxIter; i++) {
 			//Use JAMA to solve the system
-			Matrix A = new Matrix(NJ.eval(init));
-			Matrix b = new Matrix(Nres.eval(init), Nres.dim());
+			NJ.eval(outJac, init);
+			Matrix A = new Matrix(NJ.copyData());
+			Matrix b = new Matrix(Nres.eval(outRes, init), Nres.dim());
 			Matrix x = A.solve(b); //Lease Square solution
 			if(x.norm2() < eps) 
 				break;

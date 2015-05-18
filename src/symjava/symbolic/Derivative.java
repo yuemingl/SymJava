@@ -150,5 +150,9 @@ public class Derivative extends Func {
 		}
 		return this;
 	}
+	
+	public Func getFunc() {
+		return func;
+	}
 
 }

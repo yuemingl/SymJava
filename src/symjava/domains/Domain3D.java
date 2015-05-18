@@ -1,9 +1,8 @@
 package symjava.domains;
 
-import java.util.List;
-
 import symjava.math.Transformation;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Symbol;
 
 public class Domain3D extends Domain {
 	/**
@@ -17,9 +16,15 @@ public class Domain3D extends Domain {
 		this.coordVars = coordVars;
 	}
 	
-	public Domain3D(String label, List<Expr> coordVars) {
+	/**
+	 * Construct a 3D domain with a given label(name) and with
+	 * default coordinate variables x,y and z
+	 * 
+	 * @param label
+	 */
+	public Domain3D(String label) {
 		this.label = label;
-		this.coordVars = coordVars.toArray(new Expr[0]);
+		this.coordVars = new Expr[]{Symbol.x, Symbol.y, Symbol.z};
 	}
 	
 	@Override

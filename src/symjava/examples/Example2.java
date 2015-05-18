@@ -65,12 +65,13 @@ public class Example2 {
 				{7 , 478.019226091914},
 				{8 , 608.140949270688},
 				{9 , 754.598868667148},
-				{10, 916.128818085883},		
+				{10, 916.128818085883},
 		};
 		
 		double[] initialGuess = {1, 1, 1};
 		
 		GaussNewton.solve(eq, initialGuess, data, 100, 1e-4);
+		//a=7.99883 b=10.00184 c=16.32401 
 	}
 	
 	public static void main(String[] args) {

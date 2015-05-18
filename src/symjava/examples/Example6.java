@@ -31,39 +31,55 @@ import symjava.symbolic.Symbol;
  */
 public class Example6 {
 	public static void main(String[] args) {
-		Func u = new Func("u", x, y);
-		Func v = new Func("v", x, y);
-
-//		//Our PDE equation
-//		Eq pde = new Eq(0.5*dot(grad(u), grad(v)) + 0.1*u*v, (x*x+y*y)*v);
-//		//Read the mesh
-//		Mesh2D mesh = new Mesh2D("mesh1", x, y);
-//		mesh.readTriangleMesh("double_hex3.1.node", "double_hex3.1.ele");
-//		solve(pde, mesh, null, "double_hex3.1.dat");
-
-		//Another PDE equation with Dirichlet condition
-		WeakForm wf = new WeakForm(dot(grad(u), grad(v)), (-2*(x*x+y*y)+36)*v, u, v);
-		//Eq pde2 = new Eq(u*v, (-2*(x*x+y*y)+36)*v);
-		Mesh2D mesh2 = new Mesh2D("mesh2");
-		//mesh2.readGridGenMesh("patch_triangle.grd");
-		mesh2.readGridGenMesh("triangle.grd");
-		//Mark boundary nodes
-		double eps = 0.01;
-		for(Node n : mesh2.nodes) {
-			//if(1-Math.abs(n.coords[0])<eps || 1-Math.abs(n.coords[1])<eps || Math.abs(n.coords[0])<eps || Math.abs(n.coords[1])<eps )
-			if(Math.abs(3-Math.abs(n.coords[0]))<eps || Math.abs(3-Math.abs(n.coords[1]))<eps)
-				n.setType(1);
-		}
-		Map<Integer, Double> diri = new HashMap<Integer, Double>();
-		diri.put(1, 0.0);
-		//solve(pde2, mesh2, diri, "patch_triangle.dat");
-		solve(wf, mesh2, diri, "triangle.dat");
-		solve2(mesh2, diri, "triangle_hardcode.dat");
-		
+//		Func u = new Func("u", x, y);
+//		Func v = new Func("v", x, y);
+//
+////		//Our PDE equation
+////		Eq pde = new Eq(0.5*dot(grad(u), grad(v)) + 0.1*u*v, (x*x+y*y)*v);
+////		//Read the mesh
+////		Mesh2D mesh = new Mesh2D("mesh1", x, y);
+////		mesh.readTriangleMesh("double_hex3.1.node", "double_hex3.1.ele");
+////		solve(pde, mesh, null, "double_hex3.1.dat");
+//
+//		//Another PDE equation with Dirichlet condition
+//		WeakForm wf = new WeakForm(dot(grad(u), grad(v)), (-2*(x*x+y*y)+36)*v, u, v);
+//		//Eq pde2 = new Eq(u*v, (-2*(x*x+y*y)+36)*v);
+//		Mesh2D mesh2 = new Mesh2D("mesh2");
+//		//mesh2.readGridGenMesh("patch_triangle.grd");
+//		mesh2.readGridGenMesh("triangle.grd");
+//		//Mark boundary nodes
+//		double eps = 0.01;
+//		for(Node n : mesh2.nodes) {
+//			//if(1-Math.abs(n.coords[0])<eps || 1-Math.abs(n.coords[1])<eps || Math.abs(n.coords[0])<eps || Math.abs(n.coords[1])<eps )
+//			if(Math.abs(3-Math.abs(n.coords[0]))<eps || Math.abs(3-Math.abs(n.coords[1]))<eps)
+//				n.setType(1);
+//		}
+//		Map<Integer, Double> diri = new HashMap<Integer, Double>();
+//		diri.put(1, 0.0);
+//		//solve(pde2, mesh2, diri, "patch_triangle.dat");
+//		solve(wf, mesh2, diri, "triangle.dat");
+//		solve2(mesh2, diri, "triangle_hardcode.dat");
+		peper_example();
 	}
 	
+	public static void peper_example() {
+Func u = new Func("u", x, y);
+Func v = new Func("v", x, y);
+WeakForm wf = new WeakForm(dot(grad(u), grad(v)), (-2*(x*x+y*y)+36)*v, u, v);
+Mesh2D mesh = new Mesh2D("Square");
+mesh.readGridGenMesh("triangle.grd");
+//Mark boundary nodes
+double eps = 0.01;
+for(Node n : mesh.nodes) {
+	if(Math.abs(3-Math.abs(n.coords[0]))<eps || Math.abs(3-Math.abs(n.coords[1]))<eps)
+		n.setType(1);
+}
+Map<Integer, Double> diri = new HashMap<Integer, Double>();
+diri.put(1, 0.0);
+solve(wf, mesh, diri, "triangle.dat");
+	}
 	public static void solve(WeakForm wf, Mesh2D mesh, Map<Integer, Double> dirichlet, String output) {
-		System.out.println(String.format("PDE Weak Form: %s = %s", wf.lhs, wf.rhs));
+		System.out.println(String.format("PDE Weak Form: %s = %s", wf.lhs(), wf.rhs()));
 		
 		//Create coordinate transformation
 		Symbol x1 = new Symbol("x1");
@@ -108,7 +124,7 @@ public class Example6 {
 				Func U = shapeFuns[j]; //trial
 				
 				//Weak form for the left hand side of the PDE
-				Expr lhs = wf.lhs.subs(wf.trial, U).subs(wf.test, V);
+				Expr lhs = wf.lhs().subs(wf.trial, U).subs(wf.test, V);
 				System.out.println(lhs);
 				System.out.println();
 				
@@ -118,8 +134,8 @@ public class Example6 {
 						.subs(N2.diff(x), sx)
 						.subs(N2.diff(y), sy)
 						.subs(N1, r).subs(N2, s)
-						.subs(x, trans.eqs[0].rhs)
-						.subs(y, trans.eqs[1].rhs);
+						.subs(x, trans.eqs[0].rhs())
+						.subs(y, trans.eqs[1].rhs());
 				System.out.println(lhs);
 				System.out.println();
 				
@@ -131,10 +147,10 @@ public class Example6 {
 				System.out.println();
 			}
 			//Weak form for the right hand side of the PDE
-			Expr rhs = wf.rhs.subs(wf.test, V)
+			Expr rhs = wf.rhs().subs(wf.test, V)
 							.subs(N1, r).subs(N2, s)
-							.subs(x, trans.eqs[0].rhs)
-							.subs(y, trans.eqs[1].rhs);
+							.subs(x, trans.eqs[0].rhs())
+							.subs(y, trans.eqs[1].rhs());
 			//System.out.println(rhs);
 			System.out.println();
 			rhsInt[i] = new Integrate(new Func(

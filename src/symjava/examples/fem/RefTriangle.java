@@ -34,7 +34,7 @@ public class RefTriangle extends Domain2D {
 	}
 	
 	public RefTriangle(String label, List<Expr> coordVars) {
-		super(label, coordVars);
+		super(label, coordVars.toArray(new Expr[0]));
 	}
 	
 	@Override

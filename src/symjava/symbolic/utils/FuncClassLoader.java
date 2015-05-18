@@ -4,18 +4,19 @@ import com.sun.org.apache.bcel.internal.generic.ClassGen;
 
 import symjava.bytecode.BytecodeFunc;
 
-public class FuncClassLoader extends ClassLoader {
+public class FuncClassLoader<T> extends ClassLoader {
 	
 	/**
 	 * Return an instance from a ClassGen object 
 	 *
 	 */
-	public BytecodeFunc newInstance(ClassGen cg) {
+	@SuppressWarnings("unchecked")
+	public T newInstance(ClassGen cg) {
         byte[] bytes  = cg.getJavaClass().getBytes();
-        Class<?> cl = null;
-        cl = defineClass(cg.getJavaClass().getClassName(), bytes, 0, bytes.length);
+        Class<T> cl = null;
+        cl = (Class<T>) defineClass(cg.getJavaClass().getClassName(), bytes, 0, bytes.length);
 		try {
-			return (BytecodeFunc)cl.newInstance();
+			return cl.newInstance();
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {

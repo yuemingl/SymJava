@@ -1,17 +1,23 @@
 package symjava.symbolic.utils;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import symjava.symbolic.Expr;
 import symjava.symbolic.Negate;
 
-public class MulList {
+public class MulList extends ArrayList<Expr>{
+	private static final long serialVersionUID = 1L;
 	int sign = 1;
-	List<Expr> list = new ArrayList<Expr>();
 	
+	public MulList() {
+		
+	}
+	
+	/**
+	 * Flatten the expr to a multiply list
+	 * @param expr
+	 */
 	public MulList(Expr expr) {
-		expr.flattenMultiply(list);
+		expr.flattenMultiply(this);
 		sign = getGlobalSign();
 	}
 	
@@ -21,7 +27,7 @@ public class MulList {
 	
 	public int getGlobalSign() {
 		int count = 0;
-		for(Expr e : list) {
+		for(Expr e : this) {
 			if(e instanceof Negate) {
 				count++;
 			}
@@ -29,5 +35,13 @@ public class MulList {
 		if(count%2==1)
 			return -1;
 		return 1;
+	}
+	
+	/**
+	 * Convert the list back to an expr
+	 * @return
+	 */
+	public Expr toExpr() {
+		return Utils.multiplyListToExpr(this);
 	}
 }

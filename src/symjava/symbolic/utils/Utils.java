@@ -39,6 +39,17 @@ public class Utils {
 		Arrays.sort(exprs, new Comparator<Expr>() {
 			@Override
 			public int compare(Expr o1, Expr o2) {
+				if(o1 instanceof Symbol && o2 instanceof Symbol) {
+					Symbol s1 = (Symbol)o1;
+					Symbol s2 = (Symbol)o2;
+					
+					int rlt = s1.getPrefix().compareTo(s2.getPrefix());
+					if(rlt == 0) {
+						if(s1.containsSubIndex() && s2.containsSubIndex())
+							return s1.getSubIndex()-s2.getSubIndex();
+					}
+					return rlt;
+				}
 				return o1.getSortKey().compareTo(o2.getSortKey());
 			}
 		});
@@ -49,6 +60,17 @@ public class Utils {
 		Collections.sort(list, new Comparator<Expr>() {
 			@Override
 			public int compare(Expr o1, Expr o2) {
+				if(o1 instanceof Symbol && o2 instanceof Symbol) {
+					Symbol s1 = (Symbol)o1;
+					Symbol s2 = (Symbol)o2;
+					
+					int rlt = s1.getPrefix().compareTo(s2.getPrefix());
+					if(rlt == 0) {
+						if(s1.containsSubIndex() && s2.containsSubIndex())
+							return s1.getSubIndex()-s2.getSubIndex();
+					}
+					return rlt;
+				}
 				return o1.getSortKey().compareTo(o2.getSortKey());
 			}
 		});
@@ -230,9 +252,11 @@ public class Utils {
 	}
 	
 	public static Expr addListToExpr(List<Expr> list) {
-		if(list.size() == 1)
+		if(list.size() <= 1) {
+			if(list.size() == 0)
+				throw new RuntimeException("Empty expression list!");
 			return list.get(0);
-		else {
+		} else {
 			Expr rlt = list.get(0);
 			for(int i=1; i<list.size(); i++) {
 				Expr e = list.get(i);
@@ -249,9 +273,11 @@ public class Utils {
 	}
 	
 	public static Expr multiplyListToExpr(List<Expr> list) {
-		if(list.size() == 1)
+		if(list.size() <= 1) {
+			if(list.size() == 0)
+				throw new RuntimeException("Empty expression list!");
 			return list.get(0);
-		else {
+		} else {
 			Expr rlt = list.get(0);
 			for(int i=1; i<list.size(); i++) {
 				Expr e = list.get(i);
@@ -290,12 +316,7 @@ public class Utils {
 		}
 		List<Expr> rlt = new ArrayList<Expr>();
 		rlt.addAll(set);
-		Collections.sort(rlt, new Comparator<Expr>() {
-			@Override
-			public int compare(Expr o1, Expr o2) {
-				return o1.toString().compareTo(o2.toString());
-			}
-		});
+		sortExprs(rlt);
 		return rlt;
 	}
 	
@@ -334,4 +355,20 @@ public class Utils {
 	public static String joinLabels(List<Expr> list, String deliminator) {
 		return joinLabels(list.toArray(new Expr[0]), deliminator);
 	}
+	
+	public static Expr[] joinArrays(Expr[] ...arys) {
+		int len = 0;
+		for(int i=0; i<arys.length; i++) {
+			len += arys[i].length;
+		}
+		Expr[] rlt = new Expr[len];
+		int k = 0;
+		for(int i=0; i<arys.length; i++) {
+			for(Expr e : arys[i]) {
+				rlt[k++] = e;
+			}
+		}
+		return rlt;
+	}
+	
 }

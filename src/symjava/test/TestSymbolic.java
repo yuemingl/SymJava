@@ -2,11 +2,24 @@ package symjava.test;
 
 import static symjava.symbolic.Symbol.*;
 import static symjava.math.SymMath.*;
+
+import java.math.BigInteger;
+
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
 import symjava.domains.Interval;
+import symjava.math.Div;
+import symjava.math.Dot;
+import symjava.math.Grad;
 import symjava.matrix.SymVector;
+import symjava.numeric.NumVector;
+import symjava.relational.Eq;
+import symjava.relational.Ge;
+import symjava.relational.Gt;
+import symjava.relational.Le;
+import symjava.relational.Lt;
+import symjava.relational.Neq;
 import symjava.symbolic.*;
 import symjava.symbolic.utils.JIT;
 
@@ -174,33 +187,50 @@ public class TestSymbolic {
 	
 	public static void testSummation() {
 		System.out.println("--------------testSummation-----------------");
-		Expr sum = new Sum( x*x, x, 1, 5);
-		checkResult("\\Sigma_{x=1}^5{x^2}", sum);
-		checkResult("55.0", sum.simplify());
-		checkResult("\\Sigma_{x=1}^5{4.0}", sum.subs(x, 2));
-		checkResult("20.0", sum.subs(x, 2).simplify());
-		checkResult("0", sum.diff(x));
-		checkResult("5*x^2", new Sum(x*x, y, 1, 5).simplify());
-		
+//		Expr sum = new Sum( x*x, x, 1, 5);
+//		checkResult("\\Sigma_{x=1}^5{x^2}", sum);
+//		checkResult("55.0", sum.simplify());
+//		checkResult("\\Sigma_{x=1}^5{4.0}", sum.subs(x, 2));
+//		checkResult("20.0", sum.subs(x, 2).simplify());
+//		checkResult("0", sum.diff(x));
+//		checkResult("5*x^2", new Sum(x*x, y, 1, 5).simplify());
+//		
 		Symbol i = new Symbol("i");
-		Symbols xi = new Symbols("x", i);
-		checkResult("x_i", xi);
-		checkResult("x_2", xi.get(2));
+//		Symbols xi = new Symbols("x", i);
+//		checkResult("x_i", xi);
+//		checkResult("x_2", xi.get(2));
+//		
+//		Sum sum2 = new Sum( xi*xi, i, 1, 5);
+//		checkResult("\\Sigma_{i=1}^5{(x_i)^2}",sum2);
+//		checkResult("2*x_1",sum2.diff(xi.get(1)));
+//		
+//		for(int j=sum2.start; j<sum2.end; j++) {
+//			checkResult("x_"+j+"^2", sum2.getSummand(j));
+//		}
+//		Expr summand2 = sum2.getSummand(2).subs(xi.get(2), y);
+//		checkResult("y^2",summand2);
+//		
+//		int n = 100;
+//		Expr sum3 = new Sum(new Reciprocal((x+3.5)*(x+8)), x, 1, n);
+//		checkResult("\\Sigma_{x=1}^100{1/(28.0 + 11.5*x + x^2)}", sum3);
+//		
+//		checkResult("\\Sigma_{y^2=1}^5{x}", Sum.apply(x, y*y, 1, 5));
 		
-		Sum sum2 = new Sum( xi*xi, i, 1, 5);
-		checkResult("\\Sigma_{i=1}^5{(x_i)^2}",sum2);
-		checkResult("2*x_1",sum2.diff(xi.get(1)));
+		Symbol j = new Symbol("j");
+		Symbols yj = new Symbols("y", j);
+		Symbols yjm1 = new Symbols("y", j-1);
+		Symbols yjmi = new Symbols("y", j-i);
+		checkResult("",yjmi);
 		
-		for(int j=sum2.start; j<sum2.end; j++) {
-			checkResult("x_"+j+"^2", sum2.getSummand(j));
-		}
-		Expr summand2 = sum2.getSummand(2).subs(xi.get(2), y);
-		checkResult("y^2",summand2);
+		checkResult("",yj.get(1));
+		checkResult("",yjm1.get(1));
+		checkResult("",yjmi.get(i,1));
+		checkResult("",yjmi.get(j,2));
 		
-		int n = 100;
-		Expr sum3 = new Sum(new Reciprocal((x+3.5)*(x+8)), x, 1, n);
-		checkResult("\\Sigma_{x=1}^100{1/(28.0 + 11.5*x + x^2)}", sum3);
-		
+		Sum sum4 = Sum.apply(yj+yjm1, j, 1, 5);
+		checkResult("\\Sigma_{y^2=1}^5{x}", sum4);
+		checkResult("\\Sigma_{y^2=1}^5{x}", sum4.getSummand(1));
+		checkResult("\\Sigma_{y^2=1}^5{x}", sum4.getSummand(2));
 	}
 	
 	public static void testToBytecodeFunc() {
@@ -353,7 +383,7 @@ public class TestSymbolic {
 		Domain I = Interval.apply(-oo, x, z);
 		Expr cdf = Integrate.apply(exp(-0.5*pow(z,2)), I)/sqrt(PI2);
 		checkResult("1/\\sqrt{2\\pi}*\\int_{-oo}^{x}{e^{-0.5*z^2}}dz",cdf);
-		Domain I2 = Interval.apply(-10, x, z).setStep(0.001);
+		Domain I2 = Interval.apply(-10, x, z).setStepSize(0.001);
 		Expr cdf2 = Integrate.apply(exp(-0.5*pow(z,2)), I2)/sqrt(PI2);
 		checkResult(1.0,JIT.compile(cdf2).apply(10), cdf);
 	}
@@ -381,7 +411,48 @@ public class TestSymbolic {
 		System.out.println(aa.symEquals(b));
 		System.out.println(a.symEquals(aa));
 	}
+
+	public static void testLogic() {
+		System.out.println(x & y);
+		System.out.println(x | y);
+		System.out.println(x ^ y);
+		System.out.println(~x);
+		//System.out.println(x < y);
+		
+		System.out.println(Gt.apply(x, y) | Gt.apply(x, z));
+		System.out.println(Ge.apply(x, y) | Ge.apply(x, z));
+		System.out.println(Le.apply(x, y) | Le.apply(x, z));
+		System.out.println(Lt.apply(x, y) | Lt.apply(x, z));
+		System.out.println(Neq.apply(x, y) | Neq.apply(x, z));
+		
+//		Func f1 = new Func("fun1", Gt.apply(x, y));
+//		Func f1 = new Func("fun1", Ge.apply(x, y));
+//		Func f1 = new Func("fun1", Lt.apply(x, y));
+//		Func f1 = new Func("fun1", Le.apply(x, y));
+//		Func f1 = new Func("fun1", Eq.apply(x, y));
+//		Func f1 = new Func("fun1", Neq.apply(x, y));
+//		Func f1 = new Func("fun1", Gt.apply(x, y) & Gt.apply(x, z));
+//		Func f1 = new Func("fun1", Gt.apply(x, y) | Gt.apply(x, z));
+//		Func f1 = new Func("fun1", Gt.apply(x, y) ^ Gt.apply(x, z));
+		Func f1 = new Func("fun1", ~Gt.apply(x, y));
+//		Func f1 = new Func("fun1", ~x); //NOT Supported
+		BytecodeFunc ff1 = f1.toBytecodeFunc();
+		System.out.println(ff1.apply(5,3));
+		
+	}
 	
+	public static void testJITVectorized() {
+		SymVector v = new SymVector();
+		for(int i=0; i<101; i++)
+			v[i] = x*x + 1;
+		NumVector nv = v.toNumVector(new Expr[]{x});
+		double[] outAry = new double[nv.dim()];
+		for(int j=0; j<100000; j++)
+			nv.eval(outAry, 2.0);
+		for(int i=0; i<outAry.length; i++) {
+			System.out.println(outAry[i]);
+		}
+	}
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
@@ -391,10 +462,14 @@ public class TestSymbolic {
 //		testSummation();
 //		testToBytecodeFunc();
 //		testDiff();
-		testAbstract();
+//		testAbstract();
 //		testIntegration();
 //		testPower();
 //		testSymReal();
 //		testSinCosTan();
+//		testLogic();
+		
+		//set vm parameters: -XX:+PrintCompilation
+		testJITVectorized();
 	}
 }

@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>main</name>
+			<type>2</type>
+			<location>/home/yliu/workspace_java/matrix-toolkits-java/src/main</location>
+		</link>
+	</linkedResources>
 </projectDescription>

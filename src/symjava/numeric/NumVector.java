@@ -1,71 +1,40 @@
 package symjava.numeric;
 
-import java.util.Iterator;
-import java.util.Vector;
-
-import symjava.bytecode.BytecodeFunc;
+import symjava.bytecode.BytecodeVecFunc;
 import symjava.matrix.SymVector;
 import symjava.symbolic.Expr;
-import symjava.symbolic.Func;
-import symjava.symbolic.Expr;
+import symjava.symbolic.utils.JIT;
 
-public class NumVector implements Iterable<BytecodeFunc> {
-	Vector<BytecodeFunc> data = new Vector<BytecodeFunc>();
+public class NumVector {
+	BytecodeVecFunc func;
+	int size;
+	double[] lastEvalData;
 	
 	public NumVector() {
 		
 	}
 	
 	public NumVector(int size) {
-		data.setSize(size);
+		this.size = size;
 	}
 	
 	public NumVector(SymVector sv, Expr[] args) {
-		int n = sv.dim();
-		data.setSize(n);
-		for(int j=0; j<n; j++) {
-			Expr e = sv.get(j);
-			if(e == null)
-				continue;
-			Func func = null;
-			if(sv.get(j) instanceof Func) {
-				func = (Func)e; 
-			} else {
-				func = new Func(this.getClass().getSimpleName()+java.util.UUID.randomUUID().toString().replaceAll("-", "")+"_"+j,e);
-				func.args = args;
-				//System.out.println(func.getLabel());
-			}
-			data.set(j, func.toBytecodeFunc());
-		}
-	}
-	
-	public BytecodeFunc get(int i) {
-		return data.get(i);
-	}
-	
-	public void set(int i, BytecodeFunc func) {
-		data.set(i, func);
-	}
-	
-	public void add(BytecodeFunc e) {
-		data.add(e);
+		this.size = sv.dim();
+		this.func = JIT.compile(args, sv.getData());
 	}
 	
 	public int dim() {
-		return data.size();
+		return this.size;
 	}
 	
-	public double[] eval(double ...args) {
-		int m = dim();
-		double[] rlt = new double[m];
-		for(int i=0; i<m; i++) {
-			rlt[i] = data.get(i).apply(args);
-		}
-		return rlt;
+	public double[] eval(double[] outAry, double ...args) {
+		func.apply(outAry, 0, args);
+		this.lastEvalData = outAry;
+		return lastEvalData;
 	}
-
-	@Override
-	public Iterator<BytecodeFunc> iterator() {
-		return data.iterator();
+	
+	public double[] getData() {
+		return lastEvalData;
 	}
 }
+

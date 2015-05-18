@@ -34,6 +34,10 @@ public class Integrate extends Expr {
 		return new Integrate(integrand, domain);
 	}
 	
+	public static Expr apply(double integrand, Domain domain) {
+		return new Integrate(Expr.valueOf(integrand), domain);
+	}
+	
 	@Override
 	public Expr subs(Expr from, Expr to) {
 		return new Integrate(this.integrand.subs(from, to), this.domain);
@@ -47,7 +51,7 @@ public class Integrate extends Expr {
 	public Integrate changeOfVars(Transformation trans) {
 		Expr tmp = this.integrand;
 		for(Eq e : trans.eqs) {
-			tmp = tmp.subs(e.lhs, e.rhs);
+			tmp = tmp.subs(e.arg1, e.arg2);
 		}
 		
 		//For test
@@ -89,6 +93,10 @@ public class Integrate extends Expr {
 	@Override
 	public boolean symEquals(Expr other) {
 		return false;
+	}
+	
+	public boolean isMultipleIntegral() {
+		return this.domain.getConstraint() == null;
 	}
 
 }
