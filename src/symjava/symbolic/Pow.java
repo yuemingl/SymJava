@@ -63,7 +63,7 @@ public class Pow extends BinaryOp {
 	public Expr diff(Expr expr) {
 		if(arg2 instanceof SymReal<?>) {
 			SymReal<?> realExp = (SymReal<?>)arg2;
-			return realExp.multiply(Pow.simplifiedIns(arg1, arg2 - 1)).multiply(arg1.diff(expr));
+			return realExp.multiply(Pow.simplifiedIns(arg1, arg2.subtract(1))).multiply(arg1.diff(expr));
 		} else {
 			Expr x = expr;
 			Expr b = arg1;
