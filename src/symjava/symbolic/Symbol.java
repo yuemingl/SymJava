@@ -49,6 +49,7 @@ public class Symbol extends Expr {
 	
 	public static Infinity oo = new Infinity();
 	
+	protected boolean isDeclaredAsLocal = false;
 	
 	public Symbol(String name) {
 		this.label = name;
@@ -105,5 +106,21 @@ public class Symbol extends Expr {
 			return Integer.valueOf(ss[1]);
 		}
 		throw new IllegalArgumentException(this.getLabel()+" contains no sub index.");
+	}
+	
+	/**
+	 * Declare the symbol as a local variable when compile an expression that
+	 * contains this symbol (A symbol is one of the arguments of an instance of
+	 * SymFunc by default).
+	 * 
+	 * If a symbol is declared as a local variable it will be defined as 
+	 * a local variable in the function when compiling. The result of evaluation of the 
+	 * associated expression is stored in this local variable.
+	 * 
+	 * @return
+	 */
+	public Expr declareAsLocal() {
+		this.isDeclaredAsLocal = true;
+		return this;
 	}
 }

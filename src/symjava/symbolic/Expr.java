@@ -13,12 +13,12 @@ import symjava.symbolic.utils.Utils;
 
 abstract public class Expr implements Cloneable {
 	/**
-	 * Label(or name) of an expression(Symbol, Func,...)
+	 * Label(or name) of an expression
 	 */
 	protected String label = null;
 	
 	/**
-	 * A string used to sort terms in an expression
+	 * A string used to sort the terms in an expression
 	 */
 	protected String sortKey = null;
 	
@@ -26,25 +26,37 @@ abstract public class Expr implements Cloneable {
 	 * Number of operations for simplifying an expression
 	 */
 	public int simplifyOpNum = 0;
-	
+
+	/**
+	 * Return true if simplify() is called
+	 */
 	public boolean isSimplified = false;
 	
+	/**
+	 * Simplify the expression
+	 * @return
+	 */
 	public abstract Expr simplify();
 	
+	/**
+	 * Return true if two expressions are equal in the sense of mathematics
+	 * @param other
+	 * @return
+	 */
 	public abstract boolean symEquals(Expr other);
 	
 	/**
-	 * Return the arguments of the expr
+	 * Return the arguments of the expression
 	 * @return
 	 */
 	public Expr[] args() { return new Expr[0]; }
 
 	/**
-	 * Derivative of expr
-	 * @param expr
+	 * Derivative of the expression with respect to x
+	 * @param x
 	 * @return
 	 */
-	public abstract Expr diff(Expr expr);
+	public abstract Expr diff(Expr x);
 	
 	/**
 	 * Functional derivative of f with respect to df
@@ -93,7 +105,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Return the string expression
+	 * Return the string representation of the expression
 	 */
 	public String toString() {
 		return label;
@@ -118,7 +130,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Set a string key for arranging terms in an expression
+	 * Set a string key for sorting the terms in the expression
 	 * @param sortKey
 	 * @return
 	 */
@@ -128,7 +140,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Get the string key used to arrange terms in an expression
+	 * Get the string key used to sort the terms in the expression
 	 * @param sortKey
 	 * @return
 	 */
@@ -436,4 +448,23 @@ abstract public class Expr implements Cloneable {
     public boolean equals(Object obj) {
        return this.label.equals(((Expr)obj).label);
     }
+    
+	/**
+	 * Declare a local variable with varName when compiling the expression and
+	 * the result of evaluation is stored in the declared local variable.
+	 * The returned value is an instance of Symbol and the evaluation of an expression
+	 * which refers the returned symbol will use the value in the local variable 
+	 * thus speedup the evaluation when the expression appears in multiple places. 
+	 * 
+	 * Note:
+	 * Since the name of a symbol is global, so the same thing can be achieved by calling
+	 * setLabel(varName) and create a instance of Symbol with the same varName.
+	 * 
+	 * @param varName
+	 * @return An instance of Symbol with name varName
+	 */
+	public Expr declareAsLocal(String varName) {
+		return new Symbol(varName).declareAsLocal();
+	}
 }
+
