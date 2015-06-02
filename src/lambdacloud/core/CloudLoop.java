@@ -46,11 +46,19 @@ public class CloudLoop extends CloudBase {
 	List<Expr> bodyList = new ArrayList<Expr>();
 	List<CloudVar[]> bodyArgs = new ArrayList<CloudVar[]>();
 	
-	public CloudLoop(Expr condition) {
+	public CloudLoop(Expr conditionExpr) {
 		
 	}
 	
-	public CloudLoop addBodyExpr(Expr expr) {
+	public CloudLoop(Expr initExpr, Expr conditionExpr) {
+		
+	}
+	
+	public CloudLoop(Expr initExpr, Expr conditionExpr, Expr incrementExpr) {
+		
+	}
+	
+	public CloudLoop appendBody(Expr expr) {
 		return this;
 	}
 	

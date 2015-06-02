@@ -1,6 +1,7 @@
 package lambdacloud.core;
 
 import io.netty.channel.Channel;
+import lambdacloud.core.operators.OPAsign;
 import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudVarHandler;
 import lambdacloud.net.CloudVarRespHandler;
@@ -227,6 +228,18 @@ public class CloudVar extends Symbol {
 	
 	public static CloudVar valueOf(Expr expr) {
 		return new CloudVar(expr);
+	}
+	
+	public Expr assign(Expr expr) {
+		return new OPAsign(this, expr);
+	}
+	
+	public Expr assign(double val) {
+		return new OPAsign(this, Expr.valueOf(val));
+	}
+
+	public Expr assign(int val) {
+		return new OPAsign(this, Expr.valueOf(val));
 	}
 
 }

@@ -14,24 +14,30 @@ import static symjava.symbolic.Symbol.*;
 
 public class TestCloudLoop {
 
+	/**
+	 * Test a simple loop 
+	*/
 	public static void testLoop1() {
-		/**
-		 * This test implements a loop to accumulate i from 0 to 99. 
-		 * This is equivalent to 
-			for(int i=0; i<100; i++);
-			or equivalent to
-			int i=0;
-			while(i<100) {
-			 i++;
-			}
-		 */
-		
 		CloudLocalVar i = new CloudLocalVar("i");
-		C0.assignTo(i); //i=0
-		CloudLoop loop = new CloudLoop( Lt.apply(i, 100) ); // while(i<100)
-		loop.addBodyExpr((i + 1).assignTo(i)); // i=i+1
+
+		//for(int i=0; i<100; i++);
+		CloudLoop loop = new CloudLoop(
+				i.assign(0),      //i = 0
+				Lt.apply(i, 100), //i < 100
+				i.assign(i + 1)   //i = i+1
+			);
 		loop.apply();
 		
+		//int i=0;
+		//while(i<100) {
+		// i++;
+		//}
+		CloudLoop loop2 = new CloudLoop(
+				i.assign(0),     //i = 0
+				Lt.apply(i, 100) //i < 100
+			);
+		loop2.appendBody(i.assign(i + 1)); // i=i+1
+		loop2.apply();
 	}
 	
 	/**
@@ -72,14 +78,14 @@ public class TestCloudLoop {
 		// Declare a temporary local variable dx on the cloud task server
 		CloudLocalVar dx = new CloudLocalVar("dx");
 		//dx = -f/df;
-		loop.addBodyExpr((-f/df).assignTo(dx));
+		loop.appendBody((-f/df).assignTo(dx));
 		
 		CloudIf stopCond = new CloudIf(Lt.apply(dx,1e-5)); //if(dx < 1e-5) break;
 		stopCond.addTrueBranch(new CloudBreak(), null);
-		loop.addBodyExpr(stopCond);
+		loop.appendBody(stopCond);
 		
 		// Update initial value x0 = x0 + dx
-		loop.addBodyExpr((x0+dx).assignTo(x0));
+		loop.appendBody((x0+dx).assignTo(x0));
 
 		// Now we have all our instructions, call apply() to run it on cloud
 		loop.apply(x0);
