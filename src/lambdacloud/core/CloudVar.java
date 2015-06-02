@@ -155,7 +155,7 @@ public class CloudVar extends Symbol {
 	/**
 	 * Store the local variable to the cloud. 
 	 */
-	public void storeToCloud() {
+	public boolean storeToCloud() {
 		CloudClient client = CloudConfig.getClient();
 		CloudVarRespHandler handler = client.getCloudVarRespHandler();
 		try {
@@ -168,6 +168,7 @@ public class CloudVar extends Symbol {
 			this.isOnCloud = true;
 		else
 			this.isOnCloud = false;
+		return this.isOnCloud;
 	}
 	
 	/**

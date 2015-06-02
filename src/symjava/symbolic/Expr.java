@@ -3,6 +3,7 @@ package symjava.symbolic;
 import java.math.BigInteger;
 import java.util.List;
 
+import lambdacloud.core.operators.OPAsign;
 import symjava.logic.And;
 import symjava.logic.Not;
 import symjava.logic.Or;
@@ -450,21 +451,24 @@ abstract public class Expr implements Cloneable {
     }
     
 	/**
-	 * Declare a local variable with varName when compiling the expression and
-	 * the result of evaluation is stored in the declared local variable.
-	 * The returned value is an instance of Symbol and the evaluation of an expression
-	 * which refers the returned symbol will use the value in the local variable 
-	 * thus speedup the evaluation when the expression appears in multiple places. 
+	 * Assign the result of evaluation of the expression to a local variable
+	 * when compiling. The local variable must be a symbol which is declared 
+	 * as a local variable.
+	 * <p>
+	 * The call of this function can be understand as
+	 * Symbol symLocal; //Declared somewhere
+	 * symLocal = this;
 	 * 
-	 * Note:
-	 * Since the name of a symbol is global, so the same thing can be achieved by calling
-	 * setLabel(varName) and create a instance of Symbol with the same varName.
+	 * <p>
+	 * Note: The name of a symbol is a global name. Make sure you don't have 
+	 * two symbols with the same name, otherwise they are treated as the same
+	 * symbol or local variable in compiled code.
 	 * 
-	 * @param varName
-	 * @return An instance of Symbol with name varName
+	 * @param symLocal A symbol declared as a local variable
+	 * @return An instance of operator OPAsign
 	 */
-	public Expr declareAsLocal(String varName) {
-		return new Symbol(varName).declareAsLocal();
+	public Expr assignTo(Symbol symLocal) {
+		return new OPAsign(symLocal, this);
 	}
 }
 

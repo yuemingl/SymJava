@@ -13,7 +13,7 @@ import symjava.bytecode.IR;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
-public class CloudFunc {
+public class CloudFunc extends CloudBase {
 	String name;
 	BytecodeFunc func;
 	BytecodeVecFunc vecFunc;
