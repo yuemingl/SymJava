@@ -7,6 +7,7 @@ public class Cos extends UnaryOp {
 	public Cos(Expr arg) {
 		super(arg);
 		label = "cos(" + arg + ")";
+		sortKey = label;
 	}
 
 	@Override
