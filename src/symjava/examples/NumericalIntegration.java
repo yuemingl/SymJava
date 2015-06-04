@@ -140,16 +140,16 @@ public class NumericalIntegration {
 	 * \Omega={ (x,y), where (x-1/2)^2 + (y-1/2)^2 <= 0.25 }
 	 */
 	public static void test_paper_example1() {
-Domain omega = new Domain2D("\\Omega", x, y)
-	.setBound(x, 0.5-sqrt(0.25-(y-0.5)*(y-0.5)), 0.5+sqrt(0.25-(y-0.5)*(y-0.5)))
-	.setBound(y, 0, 1)
-	.setStepSize(0.001);
-
-Expr I = Integrate.apply( sin(sqrt(log(x+y+1)) ), omega);
-System.out.println(I);
-
-BytecodeFunc fI = JIT.compile(I);
-System.out.println(fI.apply());
+		Domain omega = new Domain2D("\\Omega", x, y)
+			.setBound(x, 0.5-sqrt(0.25-(y-0.5)*(y-0.5)), 0.5+sqrt(0.25-(y-0.5)*(y-0.5)))
+			.setBound(y, 0, 1)
+			.setStepSize(0.001);
+		
+		Expr I = Integrate.apply( sin(sqrt(log(x+y+1)) ), omega);
+		System.out.println(I);
+		
+		BytecodeFunc fI = JIT.compile(I);
+		System.out.println(fI.apply());
 	}
 	
 	/**
@@ -163,18 +163,19 @@ System.out.println(fI.apply());
 	 * a=0.25, b=0.5, c=0.75, d=1.0
 	 */
 	public static void test_paper_example2() {
-Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
-Domain omega = new Domain2D("\\Omega", x, y)
-	.setConstraint(
-			( Ge.apply(eq, a*a) & Le.apply(eq, b*b)) |
-			( Ge.apply(eq, c*c) & Le.apply(eq, d*d) )
-	).setBound(x, 0, 1).setBound(y, 0, 1);
-
-Expr I = Integrate.apply( sin(sqrt(log(x+y+1)) ), omega);
-System.out.println(I);
-
-BytecodeFunc fI = JIT.compile(new Expr[]{a, b, c, d}, I);
-System.out.println(fI.apply(0.25, 0.5, 0.75, 1.0));
+		Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
+		Domain omega = new Domain2D("\\Omega", x, y)
+			.setConstraint(
+					( Ge.apply(eq, a*a) & Le.apply(eq, b*b)) |
+					( Ge.apply(eq, c*c) & Le.apply(eq, d*d) ))
+			.setBound(x, 0, 1)
+			.setBound(y, 0, 1);
+		
+		Expr I = Integrate.apply(sin(sqrt(log(x+y+1)) ), omega);
+		System.out.println(I);
+		
+		BytecodeFunc fI = JIT.compile(new Expr[]{a, b, c, d}, I);
+		System.out.println(fI.apply(0.25, 0.5, 0.75, 1.0));
 		
 		test_paper_example_verifiy();
 	}
