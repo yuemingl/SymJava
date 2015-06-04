@@ -457,6 +457,11 @@ public class TestSymbolic {
 		
 	}
 	
+	public static void testSymRandom() {
+		BytecodeFunc f = JIT.compile(new SymRandom());
+		System.out.println(f.apply());
+	}
+	
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
@@ -474,6 +479,7 @@ public class TestSymbolic {
 //		testLogic();
 		
 		//set vm parameters: -XX:+PrintCompilation
-		testJITVectorized();
+		//testJITVectorized();
+		testSymRandom();
 	}
 }
