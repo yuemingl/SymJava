@@ -28,6 +28,9 @@ public class LC {
 		return new CloudLoop(conditionExpr);
 	}
 	
+	public CloudIf If(Expr condition) {
+		return new CloudIf(condition);
+	}
 	public LC append(Expr expr) {
 		stmts.add(expr);
 		return this;
