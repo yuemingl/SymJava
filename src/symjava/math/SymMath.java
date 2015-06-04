@@ -12,6 +12,7 @@ import symjava.symbolic.Pow;
 import symjava.symbolic.Sin;
 import symjava.symbolic.Sqrt;
 import symjava.symbolic.SymConst;
+import symjava.symbolic.SymRandom;
 import symjava.symbolic.Tan;
 import symjava.symbolic.utils.Utils;
 
@@ -111,6 +112,10 @@ public class SymMath {
 	}
 	
 	//////////////////////////////////////////////////////////////
+	
+	public static Expr random() {
+		return new SymRandom();
+	}
 	
 	public static Expr dot(SymVector l, SymVector r) {
 		return Dot.apply(l, r);
