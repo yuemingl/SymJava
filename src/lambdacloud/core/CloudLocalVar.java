@@ -1,6 +1,7 @@
 package lambdacloud.core;
 
 import lambdacloud.core.operators.OPAsign;
+import lambdacloud.core.operators.OpIndex;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
 
@@ -21,6 +22,10 @@ public class CloudLocalVar extends Symbol {
 
 	public Expr assign(int val) {
 		return new OPAsign(this, Expr.valueOf(val));
+	}
+	
+	public Expr get(Expr index) {
+		return new OpIndex(this, index);
 	}
 
 }

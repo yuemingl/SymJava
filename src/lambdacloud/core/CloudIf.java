@@ -7,11 +7,11 @@ public class CloudIf extends CloudBase {
 		
 	}
 	
-	public CloudIf addTrueBranch(Expr expr, CloudVar output, CloudVar ...args) {
+	public CloudIf appendTrue(Expr expr) {
 		return this;
 	}
 
-	public CloudIf addFalseBranch(Expr expr, CloudVar output, CloudVar ...args) {
+	public CloudIf appendFalse(Expr expr) {
 		return this;
 	}
 	

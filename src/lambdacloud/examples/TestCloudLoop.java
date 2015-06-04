@@ -1,16 +1,16 @@
 package lambdacloud.examples;
 
-import symjava.relational.Lt;
-import symjava.symbolic.Expr;
-import symjava.symbolic.Symbol;
+import static symjava.math.SymMath.cos;
+import static symjava.symbolic.Symbol.C0;
+import static symjava.symbolic.Symbol.x;
 import lambdacloud.core.CloudBreak;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudIf;
 import lambdacloud.core.CloudLocalVar;
 import lambdacloud.core.CloudLoop;
 import lambdacloud.core.CloudVar;
-import static symjava.math.SymMath.*;
-import static symjava.symbolic.Symbol.*;
+import symjava.relational.Lt;
+import symjava.symbolic.Expr;
 
 public class TestCloudLoop {
 
@@ -81,7 +81,7 @@ public class TestCloudLoop {
 		loop.appendBody((-f/df).assignTo(dx));
 		
 		CloudIf stopCond = new CloudIf(Lt.apply(dx,1e-5)); //if(dx < 1e-5) break;
-		stopCond.addTrueBranch(new CloudBreak(), null);
+		stopCond.appendTrue(new CloudBreak());
 		loop.appendBody(stopCond);
 		
 		// Update initial value x0 = x0 + dx

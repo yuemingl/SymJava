@@ -21,8 +21,5 @@ public class CloudBase extends Expr {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	public void apply(CloudVar ...inputs) {
-		
-	}
+
 }
