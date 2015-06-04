@@ -42,6 +42,7 @@ import symjava.symbolic.Sin;
 import symjava.symbolic.Sqrt;
 import symjava.symbolic.Subtract;
 import symjava.symbolic.Sum;
+import symjava.symbolic.SymRandom;
 import symjava.symbolic.SymReal;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.SymConst;
@@ -541,6 +542,9 @@ public class BytecodeUtils {
 				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
 						Type.DOUBLE, new Type[] { Type.DOUBLE,  Type.DOUBLE }, Constants.INVOKESTATIC));
 //			}
+		} else if(ins instanceof SymRandom) {
+			il.append(factory.createInvoke("java.lang.Math", "random",
+					Type.DOUBLE, new Type[] { }, Constants.INVOKESTATIC));
 		} else if(ins instanceof Reciprocal) {
 			il.append(new DDIV());
 		} else if(ins instanceof Negate) {
