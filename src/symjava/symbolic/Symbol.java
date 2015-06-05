@@ -1,5 +1,17 @@
 package symjava.symbolic;
 
+import java.util.Map;
+
+import com.sun.org.apache.bcel.internal.generic.ALOAD;
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.DALOAD;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
+
 import symjava.symbolic.utils.Utils;
 
 /**
@@ -123,5 +135,15 @@ public class Symbol extends Expr {
 	public Expr declareAsLocal() {
 		this.isDeclaredAsLocal = true;
 		return this;
+	}
+	
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		il.append(new ALOAD(argsStartPos));
+		il.append(new PUSH(cp, argsMap.get(this.label)));
+		return il.append(InstructionConstants.DALOAD);
 	}
 }

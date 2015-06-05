@@ -1,16 +1,21 @@
 package symjava.symbolic;
 
-import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 import lambdacloud.core.operators.OPAsign;
 import symjava.logic.And;
 import symjava.logic.Not;
 import symjava.logic.Or;
 import symjava.logic.Xor;
-import symjava.relational.Ge;
-import symjava.relational.Relation;
 import symjava.symbolic.utils.Utils;
+
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 abstract public class Expr implements Cloneable {
 	/**
@@ -469,6 +474,13 @@ abstract public class Expr implements Cloneable {
 	 */
 	public Expr assignTo(Symbol symLocal) {
 		return new OPAsign(symLocal, this);
+	}
+	
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		return il.append(InstructionConstants.NOP);
 	}
 }
 

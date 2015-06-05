@@ -23,10 +23,45 @@ public class TestByteCode {
 //		boolean c = true, d = false;
 //		System.out.println(!c);
 		
-		String s = null;
-		for(int i=0; i<10; i++) {
-			s = args[i];
-		}
-		System.out.println(s);
-	}
+//		String s = null;
+//		for(int i=0; i<10; i++) {
+//			s = args[i];
+//		}
+//		System.out.println(s);
+		double s = 1;
+/*
+         6: dcmpl         
+         7: ifle          17
+		if(s > 0.5)
+			s++;
+		else
+			s--;
+
+         6: dcmpg         
+         7: ifge          17
+		if(0.5 < s)
+			s++;
+		else
+			s--;
+		
+//        6: dcmpl         
+//        7: iflt          17
+		if(0.5 >= s)
+			s++;
+		else
+			s--;
+
+//        6: dcmpg         
+//        7: ifgt          17
+		if(0.5 <= s)
+			s++;
+		else
+			s--;
+ */
+
+		if(s < 0.5)
+			s++;
+		else
+			s--;
+}
 }
