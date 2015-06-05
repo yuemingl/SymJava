@@ -31,31 +31,31 @@ import symjava.symbolic.utils.Utils;
  * </pre></blockquote>
  *
  */
-public class CloudVar extends Symbol {
+public class CloudSharedVar extends Symbol {
 	double[] data = new double[0];
 	boolean isOnCloud = false;
 	
-	public CloudVar() {
+	public CloudSharedVar() {
 		super("CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", ""));
 	}
 
-	public CloudVar(String name) {
+	public CloudSharedVar(String name) {
 		super(name);
 	}
 	
-	public CloudVar(Expr expr) {
+	public CloudSharedVar(Expr expr) {
 		super("CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", ""));
 		this.compile(this.label, expr);
 	}
 	
-	public CloudVar(String name, Expr expr) {
+	public CloudSharedVar(String name, Expr expr) {
 		super(name);
 		this.compile(name, expr);
 	}
 	
-	public CloudVar compile(String name, Expr expr) {
+	public CloudSharedVar compile(String name, Expr expr) {
 		if(CloudConfig.isLocal()) {
-			CloudVar[] args = Utils.extractCloudVars(expr).toArray(new CloudVar[0]);
+			CloudSharedVar[] args = Utils.extractCloudVars(expr).toArray(new CloudSharedVar[0]);
 			BytecodeBatchFunc fexpr = JIT.compileBatchFunc(args, expr);
 			data = new double[args[0].size()];
 			fexpr.apply(data, 0, Utils.getDataFromCloudVars(args));
@@ -73,7 +73,7 @@ public class CloudVar extends Symbol {
 	 * @param array
 	 * @return
 	 */
-	public CloudVar init(double ...array) {
+	public CloudSharedVar init(double ...array) {
 		this.data = array;
 		return this;
 	}
@@ -103,7 +103,7 @@ public class CloudVar extends Symbol {
 	 * @param size
 	 * @return
 	 */
-	public CloudVar resize(int size) {
+	public CloudSharedVar resize(int size) {
 		if(this.data == null)
 			this.data = new double[size];
 		else {
@@ -193,7 +193,7 @@ public class CloudVar extends Symbol {
 				e.printStackTrace();
 			}
 			CloudVarHandler h = client.getCloudVarHandler();
-			CloudVar var = h.getCloudVar();
+			CloudSharedVar var = h.getCloudVar();
 			this.data = var.data;
 			this.isOnCloud = var.isOnCloud();
 			return this.isOnCloud;
@@ -226,8 +226,8 @@ public class CloudVar extends Symbol {
 		return null;
 	}
 	
-	public static CloudVar valueOf(Expr expr) {
-		return new CloudVar(expr);
+	public static CloudSharedVar valueOf(Expr expr) {
+		return new CloudSharedVar(expr);
 	}
 	
 	public Expr assign(Expr expr) {

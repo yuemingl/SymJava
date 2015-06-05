@@ -6,13 +6,13 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import lambdacloud.core.CloudVar;
+import lambdacloud.core.CloudSharedVar;
 
-public class CloudVarHandler extends SimpleChannelInboundHandler<CloudVar> {
+public class CloudVarHandler extends SimpleChannelInboundHandler<CloudSharedVar> {
 
-	final BlockingQueue<CloudVar> queue = new LinkedBlockingQueue<CloudVar>();
+	final BlockingQueue<CloudSharedVar> queue = new LinkedBlockingQueue<CloudSharedVar>();
 
-	public CloudVar getCloudVar() {
+	public CloudSharedVar getCloudVar() {
 		boolean interrupted = false;
 		try {
 			for (;;) {
@@ -30,7 +30,7 @@ public class CloudVarHandler extends SimpleChannelInboundHandler<CloudVar> {
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, final CloudVar msg) {
+	public void messageReceived(ChannelHandlerContext ctx, final CloudSharedVar msg) {
 		System.err.println("messageReceived: CloudVar");
 		queue.offer(msg);
 	}

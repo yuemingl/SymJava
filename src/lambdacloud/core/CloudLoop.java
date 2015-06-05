@@ -4,7 +4,9 @@ import static com.sun.org.apache.bcel.internal.Constants.ACC_PUBLIC;
 import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
@@ -16,6 +18,8 @@ import com.sun.org.apache.bcel.internal.generic.DALOAD;
 import com.sun.org.apache.bcel.internal.generic.DLOAD;
 import com.sun.org.apache.bcel.internal.generic.DSTORE;
 import com.sun.org.apache.bcel.internal.generic.GOTO;
+import com.sun.org.apache.bcel.internal.generic.IFLE;
+import com.sun.org.apache.bcel.internal.generic.IFLT;
 import com.sun.org.apache.bcel.internal.generic.IF_ICMPLT;
 import com.sun.org.apache.bcel.internal.generic.IINC;
 import com.sun.org.apache.bcel.internal.generic.ILOAD;
@@ -34,35 +38,100 @@ import io.netty.channel.Channel;
 import lambdacloud.net.CloudFuncHandler;
 import lambdacloud.net.CloudResp;
 import symjava.bytecode.BytecodeFunc;
+import symjava.relational.Gt;
+import symjava.relational.Lt;
+import symjava.relational.Relation;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Symbol;
 import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.FuncClassLoader;
 import symjava.symbolic.utils.JIT;
+import symjava.symbolic.utils.Utils;
 
 public class CloudLoop extends CloudBase {
-	Expr condition;
-	CloudVar[] condArgs;
-	
+	Expr initExpr;
+	Expr conditionExpr;
+	Expr incrementExpr;
 	List<Expr> bodyList = new ArrayList<Expr>();
-	List<CloudVar[]> bodyArgs = new ArrayList<CloudVar[]>();
 	
 	public CloudLoop(Expr conditionExpr) {
-		
+		this.conditionExpr = conditionExpr;
 	}
 	
 	public CloudLoop(Expr initExpr, Expr conditionExpr) {
-		
+		this.initExpr = initExpr;
+		this.conditionExpr = conditionExpr;
 	}
 	
 	public CloudLoop(Expr initExpr, Expr conditionExpr, Expr incrementExpr) {
-		
+		this.initExpr = initExpr;
+		this.conditionExpr = conditionExpr;
+		this.incrementExpr = incrementExpr;
 	}
 	
 	public CloudLoop appendBody(Expr expr) {
 		return this;
 	}
 	
-	public CloudFunc compile() {
+	public int declareLocal(Symbol var, MethodGen mg, InstructionList il) {
+		//variable name
+		//initial value
+		//index in local table
+		LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+				Type.DOUBLE, null, null);
+		int idx = lg.getIndex();
+		il.append(InstructionConstants.DCONST_0);
+		lg.setStart(il.append(new DSTORE(idx)));
+		return idx;
+	}
+	
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		if(!(conditionExpr instanceof Relation))
+			throw new RuntimeException();
+		Relation cond = (Relation)conditionExpr;
+
+		// Declare local variables
+		List<Expr> allExprs = new ArrayList<Expr>();
+		allExprs.add(initExpr);
+		allExprs.add(conditionExpr);
+		allExprs.add(incrementExpr);
+		allExprs.addAll(bodyList);
+		List<Expr> vars = Utils.extractSymbols(allExprs.toArray(new Expr[0]));
+		for(Expr var : vars) {
+			if(var instanceof Symbol) {
+				Symbol s = (Symbol)var;
+				int indexLVT = declareLocal(s, mg, il);
+				s.setLVTIndex(indexLVT);
+			}
+		}
+		
+		if(this.initExpr != null)
+			this.initExpr.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		InstructionHandle loopStart = il.append(new NOP()); // Mark loop start position
+		for(int i=0; i<bodyList.size(); i++) {
+			Expr be = this.bodyList.get(i);
+			be.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		}
+		if(this.incrementExpr != null)
+			this.incrementExpr.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+
+		InstructionHandle cmpStart = il.append(new NOP()); // Mark comparison start position
+		if(cond instanceof Lt) { // l < r
+			cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			cond.rhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			il.append(InstructionConstants.DCMPG);
+			il.append(new IFLT(loopStart));
+		} //else if (...)
+		
+		
+		return il.insert(loopStart, new GOTO(cmpStart)); // goto comparison before the loop
+	}
+	
+	public BytecodeFunc compile(Expr[] args) {
 		String packageName = "symjava.bytecode";
 		String clsName = "CloudLoop" + java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		String fullClsName = packageName+"."+clsName;
@@ -82,61 +151,15 @@ public class CloudLoop extends CloudBase {
 				"apply", fullClsName, // method, class
 				il, cp);
 		
-		///////////////////////////////////
-		//>>>>define local variables in condition and bodyList
-		//double sum = 0;
-		LocalVariableGen lg;
-		lg = mg.addLocalVariable("sum",
-				Type.DOUBLE, null, null);
-		int idxSum = lg.getIndex();
-		il.append(InstructionConstants.DCONST_0);
-		lg.setStart(il.append(new DSTORE(idxSum))); // "sum" valid from here
-
-		//////////////////////////////////////////////////////////////
-		//	for(int i=0; i<10; i++) {
-		//		sum += args[i];
-		//	}
-		/////////////////////////////////////////////////////////////
-		//int i = 0;
-		lg = mg.addLocalVariable("i",
-				Type.INT, null, null);
-		int idxI = lg.getIndex();
-		il.append(InstructionConstants.ICONST_0);
-		lg.setStart(il.append(new ISTORE(idxI))); // "i" valid from here
-		
-		
-		InstructionHandle loopStart = il.append(new NOP()); // Mark loop start position
-		for(int i=0; i<bodyList.size(); i++) {
-			Expr be = bodyList.get(i);
-			Expr beArgs = bodyArgs.get(i);
-			BytecodeUtils.addToInstructionList(mg, cp, factory, il, argsIndex, be, beArgs, argsMap);
-			
+		HashMap<String, Integer> argsMap = new HashMap<String, Integer>();
+		if(args != null) {
+			for(int i=0; i<args.length; i++) {
+				argsMap.put(args[i].getLabel(), i);
+			}
 		}
-//		//Loop body: sum = sum + args[i]
-//		InstructionHandle loopStart = il.append(new ALOAD(1));
-//		il.append(new ILOAD(idxI));
-//		il.append(new DALOAD());
-//		il.append(new DLOAD(idxSum));
-//		il.append(new DADD());
-//		il.append(new DSTORE(idxSum));
-		
-//		//i++
-//		il.append(new IINC(idxI, 1));
+		this.bytecodeGen(fullClsName, mg, cp, factory, il, argsMap, 1, null);
 
-//		//Compare: i < 10
-//		InstructionHandle loopCmp = il.append(new ILOAD(idxI));
-//		il.append(new PUSH(cp, 10));
-//		il.append(new IF_ICMPLT(loopStart));
-		
-		//Mark loop compare
-		InstructionHandle loopCmp = il.append(new NOP());
-		//condition must be one of Lt,LE,Gt,Ge,Eq,Neq
-		BytecodeUtils.addOthers(mg, cp, factory, il, argsIndex, condition, args, argsMap);
-		
-		il.insert(loopStart, new GOTO(loopCmp));
-		/////////////////////////////////////////////////////////////
-
-		il.append(new DLOAD(idxSum));
+		il.append(InstructionConstants.DCONST_0);
 		il.append(InstructionConstants.DRETURN);
 		
 		mg.setMaxStack();
@@ -144,21 +167,18 @@ public class CloudLoop extends CloudBase {
 		il.dispose(); // Allow instruction handles to be reused
 		
 		cg.addEmptyConstructor(ACC_PUBLIC);
-		FuncClassLoader<BytecodeFunc> fcl = new FuncClassLoader<BytecodeFunc>();
-		BytecodeFunc fun = fcl.newInstance(cg);
-		double[] params = new double[10];
-		for(int i=0; i<params.length; i++)
-			params[i] = i;
-		System.out.println(fun.apply(params));
 		
 		try {
 			cg.getJavaClass().dump("bin/symjava/bytecode/"+clsName+".class");
 		} catch (java.io.IOException e) {
 			System.err.println(e);
 		}
+		FuncClassLoader<BytecodeFunc> fcl = new FuncClassLoader<BytecodeFunc>();
+		BytecodeFunc fun = fcl.newInstance(cg);
+		return fun;
 	}
 	
-	public void apply(CloudVar ...inputs) {
+	public void apply(CloudSharedVar ...inputs) {
 		
 	}
 }

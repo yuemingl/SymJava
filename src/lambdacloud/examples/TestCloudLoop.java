@@ -6,9 +6,9 @@ import static symjava.symbolic.Symbol.x;
 import lambdacloud.core.CloudBreak;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudIf;
-import lambdacloud.core.CloudLocalVar;
-import lambdacloud.core.CloudLoop;
 import lambdacloud.core.CloudVar;
+import lambdacloud.core.CloudLoop;
+import lambdacloud.core.CloudSharedVar;
 import symjava.relational.Lt;
 import symjava.symbolic.Expr;
 
@@ -18,7 +18,7 @@ public class TestCloudLoop {
 	 * Test a simple loop 
 	*/
 	public static void testLoop1() {
-		CloudLocalVar i = new CloudLocalVar("i");
+		CloudVar i = new CloudVar("i");
 
 		//for(int i=0; i<100; i++);
 		CloudLoop loop = new CloudLoop(
@@ -26,18 +26,20 @@ public class TestCloudLoop {
 				Lt.apply(i, 100), //i < 100
 				i.assign(i + 1)   //i = i+1
 			);
+		loop.compile(null).apply();
 		loop.apply();
 		
-		//int i=0;
-		//while(i<100) {
-		// i++;
-		//}
-		CloudLoop loop2 = new CloudLoop(
-				i.assign(0),     //i = 0
-				Lt.apply(i, 100) //i < 100
-			);
-		loop2.appendBody(i.assign(i + 1)); // i=i+1
-		loop2.apply();
+//		//int i=0;
+//		//while(i<100) {
+//		// i++;
+//		//}
+//		CloudLoop loop2 = new CloudLoop(
+//				i.assign(0),     //i = 0
+//				Lt.apply(i, 100) //i < 100
+//			);
+//		loop2.appendBody(i.assign(i + 1)); // i=i+1
+//		loop2.compile(null).apply();
+//		loop2.apply();
 	}
 	
 	/**
@@ -56,12 +58,12 @@ public class TestCloudLoop {
 		
 		// Define a cloud variable (global) to store 
 		//the initial value and solution after the iterations
-		CloudVar x0 = new CloudVar("x0");
+		CloudSharedVar x0 = new CloudSharedVar("x0");
 		x0.init(new double[] { 1.0 });
 		x0.storeToCloud();
 		
 		// Declare i as a local variable on the cloud task server
-		CloudLocalVar i = new CloudLocalVar("i");
+		CloudVar i = new CloudVar("i");
 		C0.assignTo(i); //i=0;
 
 		/**
@@ -76,7 +78,7 @@ public class TestCloudLoop {
 		CloudLoop loop = new CloudLoop( Lt.apply(i, maxIter) ); //while(i<maxIter)
 
 		// Declare a temporary local variable dx on the cloud task server
-		CloudLocalVar dx = new CloudLocalVar("dx");
+		CloudVar dx = new CloudVar("dx");
 		//dx = -f/df;
 		loop.appendBody((-f/df).assignTo(dx));
 		
@@ -97,7 +99,7 @@ public class TestCloudLoop {
 	
 	public static void main(String[] args) {
 		testLoop1();
-		testLoop2();
+		//testLoop2();
 	}
 }
 /**

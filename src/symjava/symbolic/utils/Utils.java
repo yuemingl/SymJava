@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import lambdacloud.core.CloudVar;
+import lambdacloud.core.CloudSharedVar;
 import symjava.symbolic.Add;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Expr;
@@ -321,28 +321,28 @@ public class Utils {
 		return rlt;
 	}
 	
-	public static List<CloudVar> extractCloudVars(Expr ...exprs) {
+	public static List<CloudSharedVar> extractCloudVars(Expr ...exprs) {
 		Set<Expr> set = new HashSet<Expr>();
 		List<Expr> list = new ArrayList<Expr>();
 		for(int i=0; i<exprs.length; i++) {
 			BytecodeUtils.post_order(exprs[i], list);
 			for(Expr e : list) {
-				if(e instanceof CloudVar) {
-					set.add((CloudVar)e);
+				if(e instanceof CloudSharedVar) {
+					set.add((CloudSharedVar)e);
 				}
 			}
 		}
 		List<Expr> rlt = new ArrayList<Expr>();
 		rlt.addAll(set);
 		sortExprs(rlt);
-		List<CloudVar> rlt2 = new ArrayList<CloudVar>();
+		List<CloudSharedVar> rlt2 = new ArrayList<CloudSharedVar>();
 		for(Expr e : rlt) {
-			rlt2.add((CloudVar)e);
+			rlt2.add((CloudSharedVar)e);
 		}
 		return rlt2;
 	}
 	
-	public static double[][] getDataFromCloudVars(CloudVar[] cloudVars) {
+	public static double[][] getDataFromCloudVars(CloudSharedVar[] cloudVars) {
 		double[][] rlt = new double[cloudVars.length][];
 		for(int i=0; i<cloudVars.length; i++) {
 			if(cloudVars[i].fetchToLocal())

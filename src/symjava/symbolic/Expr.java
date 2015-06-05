@@ -480,7 +480,7 @@ abstract public class Expr implements Cloneable {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		return il.append(InstructionConstants.NOP);
+		return null;//il.append(InstructionConstants.NOP);
 	}
 }
 

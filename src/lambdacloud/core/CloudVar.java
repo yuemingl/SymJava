@@ -5,9 +5,9 @@ import lambdacloud.core.operators.OpIndex;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
 
-public class CloudLocalVar extends Symbol {
+public class CloudVar extends Symbol {
 
-	public CloudLocalVar(String name) {
+	public CloudVar(String name) {
 		super(name);
 		this.isDeclaredAsLocal = true;
 	}

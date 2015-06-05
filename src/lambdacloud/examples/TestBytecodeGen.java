@@ -90,7 +90,25 @@ public class TestBytecodeGen {
 		System.out.println(func.apply(new double[]{10,2}));
 	}
 	
+	public static void test2() {
+		/**
+		 double apply(double[] args) {
+			 if(args[0] > args[1])
+			 	return args[0];
+			 else
+			 	return args[1];
+		 }
+		 */
+		CloudIf cif = new CloudIf(Gt.apply(x, y)); //x>y
+		cif.appendTrue(x+y*x-x/y);
+		cif.appendFalse(-x);
+		BytecodeFunc func = gen(new Expr[]{x, y}, cif);
+		System.out.println(func.apply(new double[]{1,2}));
+		System.out.println(func.apply(new double[]{10,2}));
+	}
+	
 	public static void main(String[] args) {
 		test1();
+		test2();
 	}
 }

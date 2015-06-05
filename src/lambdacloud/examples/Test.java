@@ -4,7 +4,7 @@ import static symjava.symbolic.Symbol.*;
 
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
-import lambdacloud.core.CloudVar;
+import lambdacloud.core.CloudSharedVar;
 import symjava.symbolic.Expr;
 
 public class Test {
@@ -18,8 +18,8 @@ public class Test {
 		Expr expr = x + y;
 		CloudFunc f = new CloudFunc(new Expr[]{x, y}, expr);
 		
-		CloudVar input = new CloudVar("input").init(new double[]{1, 2});
-		CloudVar output = new CloudVar("output").resize(1);
+		CloudSharedVar input = new CloudSharedVar("input").init(new double[]{1, 2});
+		CloudSharedVar output = new CloudSharedVar("output").resize(1);
 		
 		long begin = System.currentTimeMillis();
 		f.apply(output, input);

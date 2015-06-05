@@ -12,9 +12,9 @@ import static symjava.symbolic.Symbol.x;
 import static symjava.symbolic.Symbol.y;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudIf;
-import lambdacloud.core.CloudLocalVar;
-import lambdacloud.core.CloudLoop;
 import lambdacloud.core.CloudVar;
+import lambdacloud.core.CloudLoop;
+import lambdacloud.core.CloudSharedVar;
 import lambdacloud.core.LC;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
@@ -29,15 +29,15 @@ public class TestLC {
 	public static void main(String[] args) {
 		LC cloudTask = new LC("server");
 		
-		CloudLocalVar x = cloudTask.localVar("x"), y = cloudTask.localVar("y");
-		CloudVar output1 = cloudTask.globalVar("output1"), output2 = cloudTask.globalVar("output2");
+		CloudVar x = cloudTask.localVar("x"), y = cloudTask.localVar("y");
+		CloudSharedVar output1 = cloudTask.globalVar("output1"), output2 = cloudTask.globalVar("output2");
 		
 		cloudTask.append(x.assign(3));
 		cloudTask.append(y.assign(4));
 		cloudTask.append(output1.assign(sqrt(x*x+y*y)));
 
-		CloudLocalVar i = cloudTask.localVar("i");
-		CloudLocalVar sum = cloudTask.localVar("sum");
+		CloudVar i = cloudTask.localVar("i");
+		CloudVar sum = cloudTask.localVar("sum");
 		
 		//for(i=0; i<10; i++) {
 		CloudLoop loop = cloudTask.forLoop(i.assign(0), Lt.apply(i, 10), i.assign(i+1));
@@ -81,8 +81,8 @@ public class TestLC {
 		System.out.println(I);
 		
 		CloudFunc mc = new CloudFunc("MonteCarlo1", new Expr[]{a, b, c, d}, I);
-		CloudVar result = new CloudVar("result");
-		CloudVar inputParams = new CloudVar("params");
+		CloudSharedVar result = new CloudSharedVar("result");
+		CloudSharedVar inputParams = new CloudSharedVar("params");
 		inputParams.init(new double[]{0.25, 0.5, 0.75, 1.0});
 		mc.apply(result, inputParams);
 		
@@ -93,13 +93,13 @@ public class TestLC {
 	public static void MonteCarloImplement2() {
 		LC cloudTask = new LC("server");
 		
-		CloudLocalVar x = cloudTask.localVar("x"); 
-		CloudLocalVar y = cloudTask.localVar("y");
-		CloudVar result = cloudTask.globalVar("result");
+		CloudVar x = cloudTask.localVar("x"); 
+		CloudVar y = cloudTask.localVar("y");
+		CloudSharedVar result = cloudTask.globalVar("result");
 		
-		CloudLocalVar i = cloudTask.localVar("i");
-		CloudLocalVar sum = cloudTask.localVar("sum");
-		CloudLocalVar counter = cloudTask.localVar("counter");
+		CloudVar i = cloudTask.localVar("i");
+		CloudVar sum = cloudTask.localVar("sum");
+		CloudVar counter = cloudTask.localVar("counter");
 		
 		int N = 1000;
 		// for(i=0; i<N; i++) {

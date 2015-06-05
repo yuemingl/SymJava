@@ -5,7 +5,7 @@ import static symjava.math.SymMath.*;
 
 import java.util.ArrayList;
 
-import lambdacloud.core.CloudVar;
+import lambdacloud.core.CloudSharedVar;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import symjava.bytecode.BytecodeBatchFunc;

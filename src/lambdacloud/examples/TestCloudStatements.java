@@ -1,9 +1,9 @@
 package lambdacloud.examples;
 
 import lambdacloud.core.CloudConfig;
-import lambdacloud.core.CloudLocalVar;
-import lambdacloud.core.CloudStatements;
 import lambdacloud.core.CloudVar;
+import lambdacloud.core.CloudStatements;
+import lambdacloud.core.CloudSharedVar;
 import static symjava.symbolic.Symbol.*;
 
 public class TestCloudStatements {
@@ -15,10 +15,10 @@ public class TestCloudStatements {
 	public static void main(String[] args) {
 		CloudConfig.setTarget("server");
 		
-		CloudLocalVar i = new CloudLocalVar("i");
-		CloudLocalVar j = new CloudLocalVar("j");
-		CloudVar result = new CloudVar("TestCloudStatements.result");
-		CloudVar input = new CloudVar("TestCloudStatements.input");
+		CloudVar i = new CloudVar("i");
+		CloudVar j = new CloudVar("j");
+		CloudSharedVar result = new CloudSharedVar("TestCloudStatements.result");
+		CloudSharedVar input = new CloudSharedVar("TestCloudStatements.input");
 		input.init(new double[]{3.0,4.0});
 		input.storeToCloud();
 		

@@ -5,7 +5,7 @@ import static symjava.symbolic.Symbol.x;
 import static symjava.symbolic.Symbol.y;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
-import lambdacloud.core.CloudVar;
+import lambdacloud.core.CloudSharedVar;
 import symjava.symbolic.Expr;
 
 public class TestCloudFuncEval {
@@ -14,14 +14,14 @@ public class TestCloudFuncEval {
 		CloudConfig.setTarget("server");
 		
 		double[] data = { 3, 4 };
-		CloudVar input = new CloudVar("var123").init(data);
+		CloudSharedVar input = new CloudSharedVar("var123").init(data);
 		input.storeToCloud();
 
 		// This function will be sent to cloud
 		CloudFunc func = new CloudFunc("func123", 
 				new Expr[] { x, y }, sqrt(x*x + y*y));
 
-		CloudVar output = new CloudVar("out123");
+		CloudSharedVar output = new CloudSharedVar("out123");
 		// Evaluate the function on the cloud and 
 		// return the reference of the result
 		long begin = System.currentTimeMillis();

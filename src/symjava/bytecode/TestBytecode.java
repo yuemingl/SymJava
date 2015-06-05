@@ -2,7 +2,7 @@ package symjava.bytecode;
 
 import java.math.BigInteger;
 
-public class TestByteCode {
+public class TestBytecode {
 	public static double fun(double[] args) {
 //		return args[0] + args[1];
 		double s = Math.pow(2, 3);
@@ -23,13 +23,14 @@ public class TestByteCode {
 //		boolean c = true, d = false;
 //		System.out.println(!c);
 		
-//		String s = null;
-//		for(int i=0; i<10; i++) {
-//			s = args[i];
-//		}
-//		System.out.println(s);
-		double s = 1;
+		String s = null;
+		for(int i=0; i<10.2; i++) {
+			s = args[i];
+		}
+		System.out.println(s);
+
 /*
+		double s = 1;
          6: dcmpl         
          7: ifle          17
 		if(s > 0.5)
@@ -58,10 +59,5 @@ public class TestByteCode {
 		else
 			s--;
  */
-
-		if(s < 0.5)
-			s++;
-		else
-			s--;
-}
+	}
 }

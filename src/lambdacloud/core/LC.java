@@ -36,12 +36,12 @@ public class LC {
 		return this;
 	}
 	
-	public CloudVar globalVar(String name) {
-		return new CloudVar(name);
+	public CloudSharedVar globalVar(String name) {
+		return new CloudSharedVar(name);
 	}
 
-	public CloudLocalVar localVar(String name) {
-		return new CloudLocalVar(name);
+	public CloudVar localVar(String name) {
+		return new CloudVar(name);
 	}
 	
 	public void run() {

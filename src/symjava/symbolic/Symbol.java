@@ -5,6 +5,7 @@ import java.util.Map;
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.DALOAD;
+import com.sun.org.apache.bcel.internal.generic.DLOAD;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
@@ -62,6 +63,8 @@ public class Symbol extends Expr {
 	public static Infinity oo = new Infinity();
 	
 	protected boolean isDeclaredAsLocal = false;
+	protected int indexLVT; // index in local variable table
+	protected int varType; //0=int, 1=long, 2=float, 3=double
 	
 	public Symbol(String name) {
 		this.label = name;
@@ -132,9 +135,17 @@ public class Symbol extends Expr {
 	 * 
 	 * @return
 	 */
-	public Expr declareAsLocal() {
+	public Expr declareAsLocal(Class<?> clazz) {
 		this.isDeclaredAsLocal = true;
 		return this;
+	}
+	
+	public void setLVTIndex(int index) {
+		this.indexLVT = index;
+	}
+	
+	public int getLVTIndex() {
+		return this.indexLVT;
 	}
 	
 	@Override
@@ -142,8 +153,14 @@ public class Symbol extends Expr {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		il.append(new ALOAD(argsStartPos));
-		il.append(new PUSH(cp, argsMap.get(this.label)));
-		return il.append(InstructionConstants.DALOAD);
+		if(this.isDeclaredAsLocal) {
+			// Load from a local variable
+			return il.append(new DLOAD(indexLVT));
+		} else {
+			// Load from an array (argument or local array)
+			il.append(new ALOAD(argsStartPos));
+			il.append(new PUSH(cp, argsMap.get(this.label)));
+			return il.append(InstructionConstants.DALOAD);
+		}
 	}
 }
