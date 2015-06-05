@@ -44,4 +44,10 @@ public class SymComplex extends Expr {
 		return false;
 	}
 
+	@Override
+	public TYPE getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

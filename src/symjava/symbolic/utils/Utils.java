@@ -12,6 +12,7 @@ import lambdacloud.core.CloudSharedVar;
 import symjava.symbolic.Add;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.Func;
 import symjava.symbolic.Multiply;
 import symjava.symbolic.Negate;
@@ -402,4 +403,24 @@ public class Utils {
 		return rlt;
 	}
 	
+	public static TYPE getType(TYPE t1, TYPE t2) {
+		if(t1 == t2) return t1;
+		if(t1 == TYPE.BOOLEAN || t2 == TYPE.BOOLEAN) {
+			if(t1 != TYPE.BOOLEAN || t2 != TYPE.BOOLEAN)
+				throw new RuntimeException();
+		}
+		if(t1 == TYPE.VOID || t2 == TYPE.VOID) {
+			if(t1 != TYPE.VOID || t2 != TYPE.VOID)
+				throw new RuntimeException();
+		}
+		if(t1 == TYPE.DOUBLE || t2 == TYPE.DOUBLE) return TYPE.DOUBLE;
+		if(t1 == TYPE.FLOAT || t2 == TYPE.FLOAT) return TYPE.FLOAT;
+		if(t1 == TYPE.LONG || t2 == TYPE.LONG) return TYPE.LONG;
+		if(t1 == TYPE.INT || t2 == TYPE.INT) return TYPE.INT;
+		if(t1 == TYPE.SHORT || t2 == TYPE.SHORT) return TYPE.SHORT;
+		if(t1 == TYPE.CHAR || t2 == TYPE.CHAR) return TYPE.CHAR;
+		if(t1 != TYPE.BOOLEAN && t2 != TYPE.BYTE)
+			throw new RuntimeException();
+		return t1; //TYPE.BYTE
+	}
 }

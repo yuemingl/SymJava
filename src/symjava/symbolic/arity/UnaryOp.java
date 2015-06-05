@@ -1,6 +1,7 @@
 package symjava.symbolic.arity;
 
 import symjava.symbolic.Expr;
+import symjava.symbolic.Expr.TYPE;
 
 public abstract class UnaryOp extends Expr {
 	public Expr arg;
@@ -15,5 +16,10 @@ public abstract class UnaryOp extends Expr {
 	@Override
 	public Expr[] args() {
 		return new Expr[] { arg };
+	}
+	
+	@Override
+	public TYPE getType() {
+		return arg.getType();
 	}
 }

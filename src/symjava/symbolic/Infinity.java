@@ -20,4 +20,10 @@ public class Infinity extends Expr {
 	public boolean symEquals(Expr other) {
 		return false;
 	}
+
+	@Override
+	public TYPE getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

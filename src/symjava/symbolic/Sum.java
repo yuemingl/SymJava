@@ -120,4 +120,10 @@ public class Sum extends Expr {
 		outList.add(this);
 	}
 
+	@Override
+	public TYPE getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

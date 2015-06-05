@@ -178,4 +178,9 @@ public class Func extends NaryOp {
 			outList.add(this);
 	}
 
+	@Override
+	public TYPE getType() {
+		return expr.getType();
+	}
+
 }

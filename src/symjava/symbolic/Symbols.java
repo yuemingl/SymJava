@@ -152,4 +152,10 @@ public class Symbols extends Expr {
 		return false;
 	}
 
+	@Override
+	public TYPE getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

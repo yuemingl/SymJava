@@ -122,4 +122,19 @@ public class SymReal<T extends Number> extends Expr {
 			Map<Expr, Integer> funcRefsMap) {
 		return il.append(new PUSH(cp, value));
 	}
+
+	@Override
+	public TYPE getType() {
+		if(value instanceof Double)
+			return TYPE.DOUBLE;
+		else if(value instanceof Integer)
+			return TYPE.INT;
+		else if(value instanceof Long)
+			return TYPE.LONG;
+		else if(value instanceof Float)
+			return TYPE.FLOAT;
+		else 
+			throw new RuntimeException();
+		
+	}
 }

@@ -99,4 +99,9 @@ public class Integrate extends Expr {
 		return this.domain.getConstraint() == null;
 	}
 
+	@Override
+	public TYPE getType() {
+		return TYPE.DOUBLE;
+	}
+
 }

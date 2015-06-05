@@ -13,6 +13,7 @@ import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.utils.Utils;
 
 /**
@@ -61,10 +62,6 @@ public class Symbol extends Expr {
 	public static SymInteger C2 = new SymInteger(2);
 	
 	public static Infinity oo = new Infinity();
-	
-	protected boolean isDeclaredAsLocal = false;
-	protected int indexLVT; // index in local variable table
-	protected int varType; //0=int, 1=long, 2=float, 3=double
 	
 	public Symbol(String name) {
 		this.label = name;
@@ -123,44 +120,41 @@ public class Symbol extends Expr {
 		throw new IllegalArgumentException(this.getLabel()+" contains no sub index.");
 	}
 	
-	/**
-	 * Declare the symbol as a local variable when compiling an expression which
-	 * contains this symbol. By default, a symbol is one of the arguments of 
-	 * an instance of SymFunc. The declaration changes this default behavior of 
-	 * the symbol. 
-	 * 
-	 * If a symbol is declared as a local variable it will be defined as 
-	 * a local variable in the compiled function. The result of evaluation of the 
-	 * associated expression is stored in this local variable.
-	 * 
-	 * @return
-	 */
-	public Expr declareAsLocal(Class<?> clazz) {
-		this.isDeclaredAsLocal = true;
-		return this;
-	}
-	
-	public void setLVTIndex(int index) {
-		this.indexLVT = index;
-	}
-	
-	public int getLVTIndex() {
-		return this.indexLVT;
-	}
+//	/**
+//	 * Declare the symbol as a local variable when compiling an expression which
+//	 * contains this symbol. By default, a symbol is one of the arguments of 
+//	 * an instance of SymFunc. The declaration changes this default behavior of 
+//	 * the symbol. 
+//	 * 
+//	 * If a symbol is declared as a local variable it will be defined as 
+//	 * a local variable in the compiled function. The result of evaluation of the 
+//	 * associated expression is stored in this local variable.
+//	 * 
+//	 * @return
+//	 */
+//	public Expr declareAsLocal(Class<?> clazz) {
+//		this.isDeclaredAsLocal = true;
+//		return this;
+//	}
 	
 	@Override
 	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		if(this.isDeclaredAsLocal) {
-			// Load from a local variable
-			return il.append(new DLOAD(indexLVT));
-		} else {
+//		if(this.isDeclaredAsLocal) {
+//			// Load from a local variable
+//			return il.append(new DLOAD(indexLVT));
+//		} else {
 			// Load from an array (argument or local array)
 			il.append(new ALOAD(argsStartPos));
 			il.append(new PUSH(cp, argsMap.get(this.label)));
 			return il.append(InstructionConstants.DALOAD);
-		}
+//		}
 	}
+	
+	@Override
+	public TYPE getType() {
+		return TYPE.DOUBLE;
+	}	
 }

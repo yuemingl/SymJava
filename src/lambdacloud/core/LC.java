@@ -6,6 +6,10 @@ import java.util.List;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
 
+/**
+ * Lambda Cloud instruction builder
+ *
+ */
 public class LC {
 	CloudConfig config;
 	List<Expr> stmts = new ArrayList<Expr>();

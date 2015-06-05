@@ -455,26 +455,26 @@ abstract public class Expr implements Cloneable {
        return this.label.equals(((Expr)obj).label);
     }
     
-	/**
-	 * Assign the result of evaluation of the expression to a local variable
-	 * when compiling. The local variable must be a symbol which is declared 
-	 * as a local variable.
-	 * <p>
-	 * The call of this function can be understand as
-	 * Symbol symLocal; //Declared somewhere
-	 * symLocal = this;
-	 * 
-	 * <p>
-	 * Note: The name of a symbol is a global name. Make sure you don't have 
-	 * two symbols with the same name, otherwise they are treated as the same
-	 * symbol or local variable in compiled code.
-	 * 
-	 * @param symLocal A symbol declared as a local variable
-	 * @return An instance of operator OPAsign
-	 */
-	public Expr assignTo(Symbol symLocal) {
-		return new OPAsign(symLocal, this);
-	}
+//	/**
+//	 * Assign the result of evaluation of the expression to a local variable
+//	 * when compiling. The local variable must be a symbol which is declared 
+//	 * as a local variable.
+//	 * <p>
+//	 * The call of this function can be understand as
+//	 * Symbol symLocal; //Declared somewhere
+//	 * symLocal = this;
+//	 * 
+//	 * <p>
+//	 * Note: The name of a symbol is a global name. Make sure you don't have 
+//	 * two symbols with the same name, otherwise they are treated as the same
+//	 * symbol or local variable in compiled code.
+//	 * 
+//	 * @param symLocal A symbol declared as a local variable
+//	 * @return An instance of operator OPAsign
+//	 */
+//	public Expr assignTo(Symbol symLocal) {
+//		return new OPAsign(symLocal, this);
+//	}
 	
 	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
 			ConstantPoolGen cp, InstructionFactory factory,
@@ -482,5 +482,9 @@ abstract public class Expr implements Cloneable {
 			Map<Expr, Integer> funcRefsMap) {
 		return null;//il.append(InstructionConstants.NOP);
 	}
+	
+	public enum TYPE {INT, LONG, FLOAT, DOUBLE, BOOLEAN, BYTE, CHAR, SHORT, VOID};
+	
+	public abstract TYPE getType();
 }
 

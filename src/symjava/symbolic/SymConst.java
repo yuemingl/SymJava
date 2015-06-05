@@ -49,5 +49,10 @@ public class SymConst extends Expr {
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
 		return il.append(new PUSH(cp, value));
+	}
+
+	@Override
+	public TYPE getType() {
+		return TYPE.DOUBLE;
 	}	
 }

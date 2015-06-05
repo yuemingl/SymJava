@@ -20,4 +20,9 @@ public class SymRandom extends Expr {
 	public boolean symEquals(Expr other) {
 		return false;
 	}
+
+	@Override
+	public TYPE getType() {
+		return TYPE.DOUBLE;
+	}
 }

@@ -23,11 +23,31 @@ public class TestBytecode {
 //		boolean c = true, d = false;
 //		System.out.println(!c);
 		
-		String s = null;
-		for(int i=0; i<10.2; i++) {
-			s = args[i];
-		}
-		System.out.println(s);
+//		boolean i =false;
+//		i=true;
+//		System.out.println(i);
+		
+//		byte i =0;
+//		i=1;
+//		System.out.println(i);
+		
+//		char i =0;
+//		i=1;
+//		System.out.println(i);
+		
+//		short i =0;
+//		i=1;
+//		System.out.println(i);
+		
+		long l = 1;
+		float f = 2.0f;
+		System.out.println(l+f);
+		
+//		String s = null;
+//		for(int i=0; i<10.2; i++) {
+//			s = args[i];
+//		}
+//		System.out.println(s);
 
 /*
 		double s = 1;

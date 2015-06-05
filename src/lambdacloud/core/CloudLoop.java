@@ -73,16 +73,69 @@ public class CloudLoop extends CloudBase {
 		return this;
 	}
 	
-	public int declareLocal(Symbol var, MethodGen mg, InstructionList il) {
+	public int declareLocal(CloudVar var, MethodGen mg, InstructionList il) {
 		//variable name
 		//initial value
-		//index in local table
-		LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
-				Type.DOUBLE, null, null);
-		int idx = lg.getIndex();
-		il.append(InstructionConstants.DCONST_0);
-		lg.setStart(il.append(new DSTORE(idx)));
-		return idx;
+		//index in local variable table (LVT)
+		if(var instanceof CloudInt) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.INT, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudLong) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.LONG, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.LCONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+			
+		} else if(var instanceof CloudFloat) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.FLOAT, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.FCONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudDouble) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.DOUBLE, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.DCONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudBoolean) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.BOOLEAN, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudChar) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.CHAR, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudByte) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.BYTE, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudShort) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.SHORT, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		}
+		throw new RuntimeException();
 	}
 	
 	@Override
@@ -102,10 +155,10 @@ public class CloudLoop extends CloudBase {
 		allExprs.addAll(bodyList);
 		List<Expr> vars = Utils.extractSymbols(allExprs.toArray(new Expr[0]));
 		for(Expr var : vars) {
-			if(var instanceof Symbol) {
-				Symbol s = (Symbol)var;
-				int indexLVT = declareLocal(s, mg, il);
-				s.setLVTIndex(indexLVT);
+			if(var instanceof CloudVar) {
+				CloudVar cv = (CloudVar)var;
+				int indexLVT = declareLocal(cv, mg, il);
+				cv.setLVTIndex(indexLVT);
 			}
 		}
 		
