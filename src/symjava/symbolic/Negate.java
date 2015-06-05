@@ -2,6 +2,14 @@ package symjava.symbolic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 import symjava.symbolic.arity.UnaryOp;
 import symjava.symbolic.utils.Utils;
@@ -100,5 +108,13 @@ public class Negate extends UnaryOp {
 			}
 		}
 	}
-
+	
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		return il.append(InstructionConstants.DNEG);
+	}
 }

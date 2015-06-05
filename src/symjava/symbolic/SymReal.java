@@ -1,5 +1,14 @@
 package symjava.symbolic;
 
+import java.util.Map;
+
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
+
 import symjava.symbolic.utils.Utils;
 
 public class SymReal<T extends Number> extends Expr {
@@ -105,5 +114,12 @@ public class SymReal<T extends Number> extends Expr {
 		}
 		return false;
 	}
-
+	
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		return il.append(new PUSH(cp, value));
+	}
 }

@@ -1,5 +1,9 @@
 package symjava.symbolic;
 
+/**
+ * a*b*c*d...
+ *
+ */
 public class Prod extends Expr {
 
 	@Override

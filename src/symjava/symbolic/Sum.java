@@ -7,6 +7,9 @@ import java.util.List;
 import symjava.symbolic.utils.AddList;
 import symjava.symbolic.utils.Utils;
 
+/**
+ * a+b+c+d+...
+ */
 public class Sum extends Expr {
 	public Expr summandTemplate;
 	public Expr indexExpr;
