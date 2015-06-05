@@ -5,10 +5,17 @@ import java.util.Map;
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.DLOAD;
+import com.sun.org.apache.bcel.internal.generic.DSTORE;
+import com.sun.org.apache.bcel.internal.generic.FLOAD;
+import com.sun.org.apache.bcel.internal.generic.FSTORE;
+import com.sun.org.apache.bcel.internal.generic.ILOAD;
+import com.sun.org.apache.bcel.internal.generic.ISTORE;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.LLOAD;
+import com.sun.org.apache.bcel.internal.generic.LSTORE;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 
@@ -16,15 +23,15 @@ import lambdacloud.core.operators.OPAsign;
 import lambdacloud.core.operators.OpIndex;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
+import symjava.symbolic.Expr.TYPE;
 
-public class CloudVar extends Symbol {
-	protected boolean isDeclaredAsLocal = false;
+public abstract class CloudVar extends Symbol {
+//	protected boolean isDeclaredAsLocal = false;
 	protected int indexLVT; // index in local variable table
-	protected int varType; //0=int, 1=long, 2=float, 3=double
 	
 	public CloudVar(String name) {
 		super(name);
-		this.isDeclaredAsLocal = true;
+//		this.isDeclaredAsLocal = true;
 	}
 	
 	public Expr assign(Expr expr) {
@@ -55,14 +62,26 @@ public class CloudVar extends Symbol {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		if(this.isDeclaredAsLocal) {
+//		if(this.isDeclaredAsLocal) {
 			// Load from a local variable
-			return il.append(new DLOAD(indexLVT));
-		} else {
-			// Load from an array (argument or local array)
-			il.append(new ALOAD(argsStartPos));
-			il.append(new PUSH(cp, argsMap.get(this.label)));
-			return il.append(InstructionConstants.DALOAD);
-		}
+//			return il.append(new DLOAD(indexLVT));
+//		} else {
+//			// Load from an array (argument or local array)
+//			il.append(new ALOAD(argsStartPos));
+//			il.append(new PUSH(cp, argsMap.get(this.label)));
+//			return il.append(InstructionConstants.DALOAD);
+//		}
+			
+			TYPE ty = this.getType();
+			if(ty == TYPE.DOUBLE)
+				return il.append(new DLOAD(indexLVT));
+			if(ty == TYPE.INT)
+				return il.append(new ILOAD(indexLVT));
+			if(ty == TYPE.LONG)
+				return il.append(new LLOAD(indexLVT));
+			if(ty == TYPE.FLOAT)
+				return il.append(new FLOAD(indexLVT));
+			return il.append(new ILOAD(indexLVT));
+			
 	}
 }

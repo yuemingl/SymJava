@@ -20,6 +20,7 @@ import com.sun.org.apache.bcel.internal.generic.DSTORE;
 import com.sun.org.apache.bcel.internal.generic.GOTO;
 import com.sun.org.apache.bcel.internal.generic.IFLE;
 import com.sun.org.apache.bcel.internal.generic.IFLT;
+import com.sun.org.apache.bcel.internal.generic.IF_ICMPGT;
 import com.sun.org.apache.bcel.internal.generic.IF_ICMPLT;
 import com.sun.org.apache.bcel.internal.generic.IINC;
 import com.sun.org.apache.bcel.internal.generic.ILOAD;
@@ -81,8 +82,8 @@ public class CloudLoop extends CloudBase {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
 					Type.INT, null, null);
 			int idx = lg.getIndex();
-			il.append(InstructionConstants.ICONST_0);
-			lg.setStart(il.append(new DSTORE(idx)));
+			//il.append(InstructionConstants.ICONST_0);
+			//lg.setStart(il.append(new DSTORE(idx)));
 			return idx;
 		} else if(var instanceof CloudLong) {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
@@ -176,8 +177,7 @@ public class CloudLoop extends CloudBase {
 		if(cond instanceof Lt) { // l < r
 			cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			cond.rhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			il.append(InstructionConstants.DCMPG);
-			il.append(new IFLT(loopStart));
+			il.append(new IF_ICMPLT(loopStart));
 		} //else if (...)
 		
 		
@@ -212,7 +212,8 @@ public class CloudLoop extends CloudBase {
 		}
 		this.bytecodeGen(fullClsName, mg, cp, factory, il, argsMap, 1, null);
 
-		il.append(InstructionConstants.DCONST_0);
+		il.append(InstructionConstants.ILOAD_2);
+		il.append(InstructionConstants.I2D);
 		il.append(InstructionConstants.DRETURN);
 		
 		mg.setMaxStack();

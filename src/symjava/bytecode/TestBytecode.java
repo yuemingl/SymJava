@@ -39,15 +39,15 @@ public class TestBytecode {
 //		i=1;
 //		System.out.println(i);
 		
-		long l = 1;
-		float f = 2.0f;
-		System.out.println(l+f);
+//		long l = 1;
+//		float f = 2.0f;
+//		System.out.println(l+f);
 		
-//		String s = null;
-//		for(int i=0; i<10.2; i++) {
-//			s = args[i];
-//		}
-//		System.out.println(s);
+		String s = null;
+		for(int i=0; i<10; i++) {
+			s = args[i];
+		}
+		System.out.println(s);
 
 /*
 		double s = 1;

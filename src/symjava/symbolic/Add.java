@@ -141,6 +141,15 @@ public class Add extends BinaryOp {
 			Map<Expr, Integer> funcRefsMap) {
 		arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		return il.append(InstructionConstants.DADD);
+		TYPE ty = Utils.getType(arg1.getType(), arg2.getType());
+		if(ty == TYPE.DOUBLE)
+			return il.append(InstructionConstants.DADD);
+		if(ty == TYPE.INT)
+			return il.append(InstructionConstants.IADD);
+		if(ty == TYPE.LONG)
+			return il.append(InstructionConstants.LADD);
+		if(ty == TYPE.FLOAT)
+			return il.append(InstructionConstants.FADD);
+		return il.append(InstructionConstants.IADD);
 	}
 }
