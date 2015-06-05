@@ -25,6 +25,7 @@ public class OPAsign extends CloudBase {
 	public OPAsign(Expr lhs, Expr rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;
+		this.label = lhs + " = " + rhs;
 	}
 	
 	public void compile() {
@@ -39,16 +40,18 @@ public class OPAsign extends CloudBase {
 		if(!(lhs instanceof CloudVar))
 			throw new RuntimeException();
 		CloudVar var = (CloudVar)lhs;
-		rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		InstructionHandle startPos = rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		TYPE ty = lhs.getType();
 		if(ty == TYPE.DOUBLE)
-			return il.append(new DSTORE(var.getLVTIndex()));
-		if(ty == TYPE.INT)
-			return il.append(new ISTORE(var.getLVTIndex()));
-		if(ty == TYPE.LONG)
-			return il.append(new LSTORE(var.getLVTIndex()));
-		if(ty == TYPE.FLOAT)
-			return il.append(new FSTORE(var.getLVTIndex()));
-		return il.append(new ISTORE(var.getLVTIndex()));
+			il.append(new DSTORE(var.getLVTIndex()));
+		else if(ty == TYPE.INT)
+			il.append(new ISTORE(var.getLVTIndex()));
+		else if(ty == TYPE.LONG)
+			il.append(new LSTORE(var.getLVTIndex()));
+		else if(ty == TYPE.FLOAT)
+			il.append(new FSTORE(var.getLVTIndex()));
+		else
+			il.append(new ISTORE(var.getLVTIndex()));
+		return startPos;
 	}
 }

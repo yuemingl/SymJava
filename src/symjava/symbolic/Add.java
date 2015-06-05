@@ -139,17 +139,19 @@ public class Add extends BinaryOp {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		TYPE ty = Utils.getType(arg1.getType(), arg2.getType());
 		if(ty == TYPE.DOUBLE)
-			return il.append(InstructionConstants.DADD);
-		if(ty == TYPE.INT)
-			return il.append(InstructionConstants.IADD);
-		if(ty == TYPE.LONG)
-			return il.append(InstructionConstants.LADD);
-		if(ty == TYPE.FLOAT)
-			return il.append(InstructionConstants.FADD);
-		return il.append(InstructionConstants.IADD);
+			il.append(InstructionConstants.DADD);
+		else if(ty == TYPE.INT)
+			il.append(InstructionConstants.IADD);
+		else if(ty == TYPE.LONG)
+			il.append(InstructionConstants.LADD);
+		else if(ty == TYPE.FLOAT)
+			il.append(InstructionConstants.FADD);
+		else
+			il.append(InstructionConstants.IADD);
+		return startPos;
 	}
 }

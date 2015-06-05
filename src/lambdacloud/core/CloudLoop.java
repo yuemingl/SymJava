@@ -162,26 +162,34 @@ public class CloudLoop extends CloudBase {
 				cv.setLVTIndex(indexLVT);
 			}
 		}
-		
+		InstructionHandle loopStart = null;
 		if(this.initExpr != null)
-			this.initExpr.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		InstructionHandle loopStart = il.append(new NOP()); // Mark loop start position
+			loopStart = this.initExpr.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		
+		InstructionHandle bodyStart = null; //il.append(new NOP()); // Mark loop start position
 		for(int i=0; i<bodyList.size(); i++) {
 			Expr be = this.bodyList.get(i);
-			be.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			InstructionHandle pos = be.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			if(bodyStart == null) bodyStart = pos;
 		}
-		if(this.incrementExpr != null)
-			this.incrementExpr.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		if(this.incrementExpr != null) {
+			InstructionHandle pos = this.incrementExpr.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			if(bodyStart == null) bodyStart = pos;
+		}
 
-		InstructionHandle cmpStart = il.append(new NOP()); // Mark comparison start position
+		InstructionHandle cmpStart = null; //il.append(new NOP()); // Mark comparison start position
 		if(cond instanceof Lt) { // l < r
-			cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			cmpStart = cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			cond.rhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			il.append(new IF_ICMPLT(loopStart));
+			il.append(new IF_ICMPLT(bodyStart));
 		} //else if (...)
 		
+		if(bodyStart != null)
+			il.insert(bodyStart, new GOTO(cmpStart)); // goto comparison before the loop
 		
-		return il.insert(loopStart, new GOTO(cmpStart)); // goto comparison before the loop
+		if(loopStart == null) loopStart = bodyStart;
+		if(loopStart == null) loopStart = cmpStart;
+		return loopStart;
 	}
 	
 	public BytecodeFunc compile(Expr[] args) {
