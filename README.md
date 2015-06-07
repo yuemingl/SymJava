@@ -13,11 +13,11 @@ Install java-oo Eclipse plugin for Java Operator Overloading support (https://gi
 Click in menu: Help -> Install New Software. Enter in "Work with" field: 
 http://amelentev.github.io/eclipse.jdt-oo-site/
 
-Cite our paper:
+#Cite our paper
 Yueming Liu, Peng Zhang, Meikang Qiu "Fast Numerical Evaluation for Symbolic Expressions in Java
-", IEEE HPCC 2015 (offcially accepted)
+", IEEE HPCC 2015 (accepted)
 
-Examples:
+#Examples:
 
 ```Java
 package symjava.examples;
