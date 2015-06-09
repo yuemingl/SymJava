@@ -4,13 +4,32 @@ import java.util.List;
 import java.util.Map;
 
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
-import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
+
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.*;
+
+import com.sun.org.apache.bcel.internal.generic.ConversionInstruction;
+import com.sun.org.apache.bcel.internal.generic.D2F;
+import com.sun.org.apache.bcel.internal.generic.D2I;
+import com.sun.org.apache.bcel.internal.generic.D2L;
+import com.sun.org.apache.bcel.internal.generic.F2D;
+import com.sun.org.apache.bcel.internal.generic.F2I;
+import com.sun.org.apache.bcel.internal.generic.F2L;
+import com.sun.org.apache.bcel.internal.generic.I2B;
+import com.sun.org.apache.bcel.internal.generic.I2C;
+import com.sun.org.apache.bcel.internal.generic.I2D;
+import com.sun.org.apache.bcel.internal.generic.I2F;
+import com.sun.org.apache.bcel.internal.generic.I2L;
+import com.sun.org.apache.bcel.internal.generic.I2S;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.L2D;
+import com.sun.org.apache.bcel.internal.generic.L2F;
+import com.sun.org.apache.bcel.internal.generic.L2I;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
 
 public class Add extends BinaryOp {
@@ -139,19 +158,22 @@ public class Add extends BinaryOp {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		TYPE ty = Utils.getType(arg1.getType(), arg2.getType());
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		BytecodeUtils.typeCase(il, arg1.getType(), ty);
+		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		BytecodeUtils.typeCase(il, arg2.getType(), ty);
 		if(ty == TYPE.DOUBLE)
-			il.append(InstructionConstants.DADD);
+			il.append(DADD);
 		else if(ty == TYPE.INT)
-			il.append(InstructionConstants.IADD);
+			il.append(IADD);
 		else if(ty == TYPE.LONG)
-			il.append(InstructionConstants.LADD);
+			il.append(LADD);
 		else if(ty == TYPE.FLOAT)
-			il.append(InstructionConstants.FADD);
+			il.append(FADD);
 		else
-			il.append(InstructionConstants.IADD);
+			il.append(IADD);
 		return startPos;
 	}
+
 }
