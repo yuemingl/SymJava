@@ -16,7 +16,8 @@ http://amelentev.github.io/eclipse.jdt-oo-site/
 #Citing SymJava
 If you use SymJava for academic research, you are encouraged to cite the following paper:
 
-Yueming Liu, Peng Zhang, Meikang Qiu "Fast Numerical Evaluation for Symbolic Expressions in Java", IEEE HPCC 2015 (accepted)
+Yueming Liu, Peng Zhang, Meikang Qiu, "Fast Numerical Evaluation for Symbolic Expressions in Java", 17th IEEE International Conference on High Performance and Communications (HPCC 2015), New York, USA, August 24-26, 2015
+. (In Press)
 
 #Examples:
 
