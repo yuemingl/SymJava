@@ -1,6 +1,21 @@
 package symjava.symbolic.utils;
 
 import static com.sun.org.apache.bcel.internal.Constants.*;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.D2F;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.D2I;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.D2L;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.F2D;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.F2I;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.F2L;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2B;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2C;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2D;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2F;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2L;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2S;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.L2D;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.L2F;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.L2I;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +25,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lambdacloud.core.CloudBoolean;
+import lambdacloud.core.CloudByte;
+import lambdacloud.core.CloudChar;
+import lambdacloud.core.CloudDouble;
+import lambdacloud.core.CloudFloat;
+import lambdacloud.core.CloudInt;
+import lambdacloud.core.CloudLong;
+import lambdacloud.core.CloudShort;
+import lambdacloud.core.CloudVar;
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain2D;
 import symjava.domains.Interval;
@@ -47,6 +71,7 @@ import symjava.symbolic.SymReal;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.SymConst;
 import symjava.symbolic.Tan;
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.arity.NaryOp;
 import symjava.symbolic.arity.TernaryOp;
@@ -152,6 +177,10 @@ public class BytecodeUtils {
 				
 			}
 		} else if(e instanceof NaryOp || e instanceof TernaryOp) {
+			Expr[] args = e.args();
+			for(int i=0; i<args.length; i++)
+				post_order(args[i], outList);
+		} else {
 			Expr[] args = e.args();
 			for(int i=0; i<args.length; i++)
 				post_order(args[i], outList);
@@ -782,4 +811,144 @@ public class BytecodeUtils {
 			il.append(new I2D());
 		}
 	}
+	
+	public static int declareLocal(CloudVar var, MethodGen mg, InstructionList il) {
+		//variable name
+		//initial value
+		//index in local variable table (LVT)
+		if(var instanceof CloudInt) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.INT, null, null);
+			int idx = lg.getIndex();
+			//il.append(InstructionConstants.ICONST_0);
+			//lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudLong) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.LONG, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.LCONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+			
+		} else if(var instanceof CloudFloat) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.FLOAT, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.FCONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudDouble) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.DOUBLE, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.DCONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudBoolean) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.BOOLEAN, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudChar) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.CHAR, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudByte) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.BYTE, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof CloudShort) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.SHORT, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		}
+		throw new RuntimeException();
+	}
+
+	public static void typeCase(InstructionList il, TYPE fromType, TYPE toType) {
+		if(fromType != toType) {
+			switch(fromType) {
+			case INT: 
+				switch(toType) {
+					case LONG:
+						il.append(I2L);
+						return;
+					case FLOAT:
+						il.append(I2F);
+						return;
+					case DOUBLE:
+						il.append(I2D);
+						return;
+					case BYTE:
+						il.append(I2B);
+						return;
+					case CHAR:
+						il.append(I2C);
+						return;
+					case SHORT:
+						il.append(I2S);
+						return;
+					default:
+						return;
+				}
+			case LONG:
+				switch(toType) {
+					case INT:
+						il.append(L2I);
+						return;
+					case FLOAT:
+						il.append(L2F);
+						return;
+					case DOUBLE:
+						il.append(L2D);
+						return;
+					default:
+						return;
+				}
+			case FLOAT:
+				switch(toType) {
+					case INT:
+						il.append(F2I);
+						return;
+					case LONG:
+						il.append(F2L);
+						return;
+					case DOUBLE:
+						il.append(F2D);
+						return;
+					default:
+						return;
+				}
+			case DOUBLE:
+				switch(toType) {
+					case INT:
+						il.append(D2I);
+						return;
+					case LONG:
+						il.append(D2L);
+						return;
+					case FLOAT:
+						il.append(D2F);
+						return;
+					default:
+						return;
+				}
+			default:
+				return;
+			}
+		}
+	}	
+	
 }

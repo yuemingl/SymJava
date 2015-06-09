@@ -296,6 +296,12 @@ public class Utils {
 		}		
 	}
 	
+//	public static void extractSymbols(Expr expr, Set<Expr> set) {
+//		for(Expr e : expr.args())
+//			extractSymbols(e, set);
+//		set.add(expr);
+//	}
+	
 	public static List<Expr> extractSymbols(Expr ...exprs) {
 		Set<Expr> set = new HashSet<Expr>();
 		List<Expr> list = new ArrayList<Expr>();
