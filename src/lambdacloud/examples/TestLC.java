@@ -25,10 +25,6 @@ import symjava.symbolic.Expr;
 import symjava.symbolic.Integrate;
 
 public class TestLC {
-
-	public static void testReturnToCSD() {
-		
-	}
 	
 	public static void testOverWriteArgs() {
 		LC cloudTask = new LC("local");
@@ -40,8 +36,39 @@ public class TestLC {
 		System.out.println(args[0]); //5.0
 	}
 	
+	public static void testReturn() {
+		LC cloudTask = new LC("local");
+		
+		cloudTask.Return(sqrt(x*x+y*y)); //return sqrt(x*x+y*y)
+		
+		double[] args = new double[]{3,4};
+		double ret = cloudTask.compile(new Expr[]{x, y}).apply(args);
+		System.out.println(ret); //5.0
+		
+	}
+	
+	public static void testLoopAsignReturn() {
+		LC cloudTask = new LC("local");
+		
+		CloudVar i = cloudTask.declareInt("i"); //int i;
+		CloudVar sum = cloudTask.declareDouble("sum");//double sum;
+		
+		//for(i=0; i<10; i++) {
+		cloudTask.For(i.assign(0), Lt.apply(i, 10), i.assign(i+1))
+			.appendBody(sum.assign(sum+i)); //sum = sum + i
+		//} //end for
+		
+		//return sum;
+		cloudTask.Return(sum); 
+		
+		System.out.println(cloudTask.compile(null).apply()); //45.0
+	}
+
+	
 	public static void main(String[] args) {
-		testOverWriteArgs();
+		//testOverWriteArgs();
+		//testReturn();
+		testLoopAsignReturn();
 		
 //		CloudVar x = cloudTask.declareDouble("x");
 //		CloudVar y = cloudTask.declareDouble("y");
