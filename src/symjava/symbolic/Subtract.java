@@ -12,6 +12,7 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
 
 public class Subtract extends BinaryOp {
@@ -90,8 +91,10 @@ public class Subtract extends BinaryOp {
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
 		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		TYPE ty = Utils.getType(arg1.getType(), arg2.getType());
+		BytecodeUtils.typeCase(il, arg1.getType(), ty);
+		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		BytecodeUtils.typeCase(il, arg2.getType(), ty);
 		if(ty == TYPE.DOUBLE)
 			il.append(InstructionConstants.DSUB);
 		else if(ty == TYPE.INT)
