@@ -135,6 +135,11 @@ public class SymReal<T extends Number> extends Expr {
 			return TYPE.FLOAT;
 		else 
 			throw new RuntimeException();
-		
 	}
+
+	@Override
+	public Expr[] args() {
+		return new Expr[0];
+	}	
+
 }

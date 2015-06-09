@@ -25,4 +25,10 @@ public class SymRandom extends Expr {
 	public TYPE getType() {
 		return TYPE.DOUBLE;
 	}
+	
+	@Override
+	public Expr[] args() {
+		return new Expr[0];
+	}	
+	
 }

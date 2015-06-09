@@ -16,4 +16,9 @@ public class CloudStatements extends CloudBase {
 	public void apply(CSD ...inputs) {
 		
 	}
+
+	@Override
+	public Expr[] args() {
+		return this.exprList.toArray(new Expr[0]);
+	}
 }

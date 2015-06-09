@@ -125,4 +125,16 @@ public class SymVector extends Expr implements Iterable<Expr> {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public Expr[] args() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public TYPE getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

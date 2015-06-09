@@ -54,5 +54,10 @@ public class SymConst extends Expr {
 	@Override
 	public TYPE getType() {
 		return TYPE.DOUBLE;
+	}
+	
+	@Override
+	public Expr[] args() {
+		return new Expr[0];
 	}	
 }

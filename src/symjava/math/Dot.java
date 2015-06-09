@@ -140,4 +140,16 @@ public class Dot extends Expr {
 			return Utils.addListToExpr(list).simplify();
 		}
 	}
+
+	@Override
+	public Expr[] args() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public TYPE getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

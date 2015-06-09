@@ -55,7 +55,7 @@ abstract public class Expr implements Cloneable {
 	 * Return the arguments of the expression
 	 * @return
 	 */
-	public Expr[] args() { return new Expr[0]; }
+	public abstract Expr[] args();// { return new Expr[0]; }
 
 	/**
 	 * Derivative of the expression with respect to x

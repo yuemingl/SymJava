@@ -67,4 +67,13 @@ public class CloudIf extends CloudBase {
 		}
 		return endif;
 	}
+
+	@Override
+	public Expr[] args() {
+		List<Expr> ret = new ArrayList<Expr>();
+		ret.add(condition);
+		ret.addAll(this.trueStmts);
+		ret.addAll(this.falseStmts);
+		return ret.toArray(new Expr[0]);
+	}
 }

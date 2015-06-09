@@ -31,10 +31,6 @@ public class OPAsign extends CloudBase {
 		this.label = lhs + " = " + rhs;
 	}
 	
-	public void compile() {
-		
-	}
-	
 	@Override
 	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
 			ConstantPoolGen cp, InstructionFactory factory,
@@ -65,4 +61,9 @@ public class OPAsign extends CloudBase {
 		}
 		return startPos;
 	}
+	
+	@Override
+	public Expr[] args() {
+		return new Expr[]{lhs, rhs};
+	}	
 }

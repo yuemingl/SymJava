@@ -49,5 +49,9 @@ public class SymComplex extends Expr {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public Expr[] args() {
+		return new Expr[] {real, imaginary};
+	}	
 
 }

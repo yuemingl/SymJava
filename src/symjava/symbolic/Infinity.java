@@ -26,4 +26,10 @@ public class Infinity extends Expr {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Expr[] args() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

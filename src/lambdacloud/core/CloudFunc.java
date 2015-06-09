@@ -172,4 +172,9 @@ public class CloudFunc extends CloudBase {
 	public BytecodeBatchFunc getBytecodeBatchFunc() {
 		return this.batchFunc;
 	}
+	@Override
+	public Expr[] args() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

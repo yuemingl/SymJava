@@ -85,16 +85,11 @@ public class CloudLoop extends CloudBase {
 		Relation cond = (Relation)conditionExpr;
 
 		// Declare local variables
-		List<Expr> allExprs = new ArrayList<Expr>();
-		allExprs.add(initExpr);
-		allExprs.add(conditionExpr);
-		allExprs.add(incrementExpr);
-		allExprs.addAll(bodyList);
-		List<Expr> vars = Utils.extractSymbols(allExprs.toArray(new Expr[0]));
+		List<Expr> vars = Utils.extractSymbols(args());
 		for(Expr var : vars) {
 			if(var instanceof CloudVar) {
 				CloudVar cv = (CloudVar)var;
-				int indexLVT = declareLocal(cv, mg, il);
+				int indexLVT = BytecodeUtils.declareLocal(cv, mg, il);
 				cv.setLVTIndex(indexLVT);
 			}
 		}
@@ -178,5 +173,15 @@ public class CloudLoop extends CloudBase {
 	
 	public void apply(CSD ...inputs) {
 		
+	}
+
+	@Override
+	public Expr[] args() {
+		List<Expr> ret = new ArrayList<Expr>();
+		ret.add(this.initExpr);
+		ret.add(this.conditionExpr);
+		ret.add(this.incrementExpr);
+		ret.addAll(this.bodyList);
+		return ret.toArray(new Expr[0]);
 	}
 }

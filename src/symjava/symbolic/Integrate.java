@@ -104,4 +104,10 @@ public class Integrate extends Expr {
 		return TYPE.DOUBLE;
 	}
 
+	@Override
+	public Expr[] args() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

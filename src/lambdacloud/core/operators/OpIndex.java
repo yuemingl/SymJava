@@ -10,9 +10,10 @@ public class OpIndex extends CloudBase {
 		this.array = array;
 		this.index = index;
 	}
-	
-	public void compile() {
-		
+	@Override
+	public Expr[] args() {
+		return new Expr[]{array, index};
 	}
 	
+
 }

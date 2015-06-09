@@ -30,4 +30,10 @@ public class Prod extends Expr {
 		return null;
 	}
 
+	@Override
+	public Expr[] args() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

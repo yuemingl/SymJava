@@ -85,5 +85,11 @@ public class Div extends NaryOp {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public TYPE getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }
