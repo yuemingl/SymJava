@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import lambdacloud.core.operators.OPReturn;
+
 import com.sun.org.apache.bcel.internal.generic.ArrayType;
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
@@ -19,6 +21,7 @@ import com.sun.org.apache.bcel.internal.generic.Type;
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
+import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.FuncClassLoader;
 import symjava.symbolic.utils.Utils;
 
@@ -26,7 +29,7 @@ import symjava.symbolic.utils.Utils;
  * Lambda Cloud instruction builder
  *
  */
-public class LC extends CloudBase {
+public class LC{
 	CloudConfig config;
 	List<Expr> stmts = new ArrayList<Expr>();
 
@@ -39,19 +42,30 @@ public class LC extends CloudBase {
 		CloudConfig.setTarget(configFile);
 	}
 	
-	public CloudLoop forLoop(Expr initExpr, Expr conditionExpr, Expr incrementExpr) {
+	public CloudLoop For(Expr initExpr, Expr conditionExpr, Expr incrementExpr) {
 		CloudLoop cl = new CloudLoop(initExpr, conditionExpr, incrementExpr);
 		stmts.add(cl);
 		return cl;
 	}
 	
-	public CloudLoop whileLoop(Expr conditionExpr) {
-		return new CloudLoop(conditionExpr);
+	public CloudLoop While(Expr conditionExpr) {
+		CloudLoop stmt = new CloudLoop(conditionExpr);
+		stmts.add(stmt);
+		return stmt;
 	}
 	
 	public CloudIf If(Expr condition) {
-		return new CloudIf(condition);
+		CloudIf stmt = new CloudIf(condition);
+		stmts.add(stmt);
+		return stmt;
 	}
+	
+	public OPReturn Return(Expr expr) {
+		OPReturn stmt = new OPReturn(expr);
+		stmts.add(stmt);
+		return stmt;
+	}
+	
 	public LC append(Expr expr) {
 		stmts.add(expr);
 		return this;
@@ -113,14 +127,14 @@ public class LC extends CloudBase {
 				"apply", fullClsName, // method, class
 				il, cp);
 		
-		List<Expr> vars = Utils.extractSymbols(this.stmts.toArray(new Expr[0]));
-		for(Expr var : vars) {
-			if(var instanceof CloudVar) {
-				CloudVar cv = (CloudVar)var;
-				int indexLVT = declareLocal(cv, mg, il);
-				cv.setLVTIndex(indexLVT);
-			}
-		}
+//		List<Expr> vars = Utils.extractSymbols(this.stmts.toArray(new Expr[0]));
+//		for(Expr var : vars) {
+//			if(var instanceof CloudVar) {
+//				CloudVar cv = (CloudVar)var;
+//				int indexLVT = BytecodeUtils.declareLocal(cv, mg, il);
+//				cv.setLVTIndex(indexLVT);
+//			}
+//		}
 		
 		HashMap<String, Integer> argsMap = new HashMap<String, Integer>();
 		if(args != null) {
@@ -132,8 +146,11 @@ public class LC extends CloudBase {
 			expr.bytecodeGen(fullClsName, mg, cp, factory, il, argsMap, 1, null);
 		}
 		
-		il.append(InstructionConstants.DCONST_0);
-		il.append(InstructionConstants.DRETURN);
+		// Return 0 by default
+		if(!(this.stmts.get(this.stmts.size()-1) instanceof OPReturn)) {
+			il.append(InstructionConstants.DCONST_0);
+			il.append(InstructionConstants.DRETURN);
+		}
 		
 		mg.setMaxStack();
 		cg.addMethod(mg.getMethod());
