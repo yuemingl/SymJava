@@ -7,7 +7,7 @@ import io.netty.handler.codec.CorruptedFrameException;
 
 import java.util.List;
 
-import lambdacloud.core.CloudSharedVar;
+import lambdacloud.core.CSD;
 
 public class MessageDecoder extends ByteToMessageDecoder {
 
@@ -38,7 +38,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
 			}
 			byte[] decoded = new byte[nameLen + dataLen];
 			in.readBytes(decoded);
-			CloudSharedVar var = NetIOUtils.createCloudVar(decoded, nameLen, dataLen);
+			CSD var = NetIOUtils.createCloudVar(decoded, nameLen, dataLen);
 			var.setOnCloudFlag(onCloudFlag == 1 ? true : false);
 			out.add(var);
 			// System.out.println("decoded:"+var.getLabel());

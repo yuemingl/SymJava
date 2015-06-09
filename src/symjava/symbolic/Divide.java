@@ -11,6 +11,7 @@ import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
@@ -114,8 +115,19 @@ public class Divide extends BinaryOp {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		return il.append(InstructionConstants.DDIV);
+		TYPE ty = Utils.getType(arg1.getType(), arg2.getType());
+		if(ty == TYPE.DOUBLE)
+			il.append(InstructionConstants.DDIV);
+		else if(ty == TYPE.INT)
+			il.append(InstructionConstants.IDIV);
+		else if(ty == TYPE.LONG)
+			il.append(InstructionConstants.LDIV);
+		else if(ty == TYPE.FLOAT)
+			il.append(InstructionConstants.FDIV);
+		else
+			il.append(InstructionConstants.IDIV);
+		return startPos;
 	}
 }

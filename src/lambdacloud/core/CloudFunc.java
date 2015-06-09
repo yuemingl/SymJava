@@ -78,7 +78,7 @@ public class CloudFunc extends CloudBase {
 		return this;
 	}
 
-	public void apply(CloudSharedVar output, CloudSharedVar ...inputs) {
+	public void apply(CSD output, CSD ...inputs) {
 		if(CloudConfig.isLocal()) {
 			if(inputs.length == 0) {
 				switch(funcType) {
@@ -131,7 +131,7 @@ public class CloudFunc extends CloudBase {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			CloudSharedVar rlt = handler.getCloudVar();
+			CSD rlt = handler.getCloudVar();
 			output.setLabel(rlt.getLabel());
 			output.data = rlt.data;
 			output.isOnCloud = rlt.isOnCloud;

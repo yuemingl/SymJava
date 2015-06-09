@@ -3,7 +3,7 @@ package lambdacloud.examples;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudVar;
 import lambdacloud.core.CloudStatements;
-import lambdacloud.core.CloudSharedVar;
+import lambdacloud.core.CSD;
 import static symjava.symbolic.Symbol.*;
 
 public class TestCloudStatements {
@@ -17,8 +17,8 @@ public class TestCloudStatements {
 		
 		CloudVar i = new CloudVar("i");
 		CloudVar j = new CloudVar("j");
-		CloudSharedVar result = new CloudSharedVar("TestCloudStatements.result");
-		CloudSharedVar input = new CloudSharedVar("TestCloudStatements.input");
+		CSD result = new CSD("TestCloudStatements.result");
+		CSD input = new CSD("TestCloudStatements.input");
 		input.init(new double[]{3.0,4.0});
 		input.storeToCloud();
 		

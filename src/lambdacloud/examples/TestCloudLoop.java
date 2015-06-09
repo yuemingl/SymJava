@@ -9,7 +9,7 @@ import lambdacloud.core.CloudIf;
 import lambdacloud.core.CloudInt;
 import lambdacloud.core.CloudVar;
 import lambdacloud.core.CloudLoop;
-import lambdacloud.core.CloudSharedVar;
+import lambdacloud.core.CSD;
 import symjava.relational.Lt;
 import symjava.symbolic.Expr;
 
@@ -31,17 +31,17 @@ public class TestCloudLoop {
 		System.out.println(loop.compile(null).apply());
 		loop.apply();
 		
-//		//int i=0;
-//		//while(i<100) {
-//		// i++;
-//		//}
-//		CloudLoop loop2 = new CloudLoop(
-//				i.assign(0),     //i = 0
-//				Lt.apply(i, 100) //i < 100
-//			);
-//		loop2.appendBody(i.assign(i + 1)); // i=i+1
-//		loop2.compile(null).apply();
-//		loop2.apply();
+		//int i=0;
+		//while(i<100) {
+		// i++;
+		//}
+		CloudLoop loop2 = new CloudLoop(
+				i.assign(0),     //i = 0
+				Lt.apply(i, 100) //i < 100
+			);
+		loop2.appendBody(i.assign(i + 1)); // i=i+1
+		System.out.println(loop2.compile(null).apply());
+		loop2.apply();
 	}
 	
 //	/**

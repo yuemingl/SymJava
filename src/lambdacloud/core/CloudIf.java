@@ -21,7 +21,7 @@ public class CloudIf extends CloudBase {
 	Expr condition;
 	List<Expr> trueStmts = new ArrayList<Expr>();
 	List<Expr> falseStmts = new ArrayList<Expr>();
-	public CloudIf(Expr condition, CloudSharedVar ...args) {
+	public CloudIf(Expr condition, CSD ...args) {
 		this.condition = condition;
 	}
 	

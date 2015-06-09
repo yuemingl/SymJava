@@ -486,5 +486,17 @@ abstract public class Expr implements Cloneable {
 	public enum TYPE {INT, LONG, FLOAT, DOUBLE, BOOLEAN, BYTE, CHAR, SHORT, VOID};
 	
 	public abstract TYPE getType();
+	
+	public Expr assign(Expr expr) {
+		return new OPAsign(this, expr);
+	}
+	
+	public Expr assign(double val) {
+		return new OPAsign(this, Expr.valueOf(val));
+	}
+
+	public Expr assign(int val) {
+		return new OPAsign(this, Expr.valueOf(val));
+	}	
 }
 

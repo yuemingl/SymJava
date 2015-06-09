@@ -2,29 +2,30 @@ package lambdacloud.core;
 
 import java.util.Map;
 
-import com.sun.org.apache.bcel.internal.generic.ALOAD;
-import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
-import com.sun.org.apache.bcel.internal.generic.DLOAD;
-import com.sun.org.apache.bcel.internal.generic.DSTORE;
-import com.sun.org.apache.bcel.internal.generic.FLOAD;
-import com.sun.org.apache.bcel.internal.generic.FSTORE;
-import com.sun.org.apache.bcel.internal.generic.ILOAD;
-import com.sun.org.apache.bcel.internal.generic.ISTORE;
-import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
-import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
-import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
-import com.sun.org.apache.bcel.internal.generic.InstructionList;
-import com.sun.org.apache.bcel.internal.generic.LLOAD;
-import com.sun.org.apache.bcel.internal.generic.LSTORE;
-import com.sun.org.apache.bcel.internal.generic.MethodGen;
-import com.sun.org.apache.bcel.internal.generic.PUSH;
-
 import lambdacloud.core.operators.OPAsign;
 import lambdacloud.core.operators.OpIndex;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
-import symjava.symbolic.Expr.TYPE;
 
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.DLOAD;
+import com.sun.org.apache.bcel.internal.generic.FLOAD;
+import com.sun.org.apache.bcel.internal.generic.ILOAD;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.LLOAD;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+
+/**
+ * The base type of the local variables in a compiled function.
+ * Particular type of a local variable is defined in a sub-class of CloudVar.
+ * <br>
+ * 
+ * The local variables are exactly the same as the local variables in a Java function
+ * that is used to store temporary values.
+ *  
+ */
 public abstract class CloudVar extends Symbol {
 //	protected boolean isDeclaredAsLocal = false;
 	protected int indexLVT; // index in local variable table

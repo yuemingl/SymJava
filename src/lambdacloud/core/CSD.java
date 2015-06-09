@@ -14,48 +14,49 @@ import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
 /**
- * An instance of CloudVar represents a variable on the cloud server.
- * The variable can be created on local and stored to cloud side.
+ * CSD stands for Cloud Shared Data.
+ * <br>
+ * An instance of CSD represents a shared data set on the cloud server.
+ * The data set can be created on local machine and stored to the cloud side.
+ * <br>
  * For example:
  * <p><blockquote><pre>
- *     CloudVar var = new CloudVar("myvar").init(new double[]{1, 2, 3, 4, 5});
- *     var.sotoreToCloud();
- * </pre></blockquote>
- * <P>A variable on the cloud can be fetched to local by providing the correct name.
- * <p><blockquote><pre>
- *     if(var.fetchToLocal()) {
- *       for(double d : var.getData()) {
+ *     CSD data = new CSD("myvar").init(new double[]{1, 2, 3, 4, 5});
+ *     data.sotoreToCloud();
+ *     //A data set on the cloud server can be download to local machine by providing its name.
+ *     if(data.fetchToLocal()) {
+ *       for(double d : data.getData()) {
  *         System.out.println(d);
  *       }
  *     }
  * </pre></blockquote>
  *
  */
-public class CloudSharedVar extends Symbol {
+public class CSD extends Symbol {
 	double[] data = new double[0];
 	boolean isOnCloud = false;
 	
-	public CloudSharedVar() {
+	public CSD() {
 		super("CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", ""));
 	}
 
-	public CloudSharedVar(String name) {
+	public CSD(String name) {
 		super(name);
 	}
 	
-	public CloudSharedVar(Expr expr) {
+	public CSD(Expr expr) {
 		super("CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", ""));
 		this.compile(this.label, expr);
 	}
 	
-	public CloudSharedVar(String name, Expr expr) {
+	public CSD(String name, Expr expr) {
 		super(name);
 		this.compile(name, expr);
 	}
 	
-	public CloudSharedVar compile(String name, Expr expr) {
+	public CSD compile(String name, Expr expr) {
 		if(CloudConfig.isLocal()) {
-			CloudSharedVar[] args = Utils.extractCloudVars(expr).toArray(new CloudSharedVar[0]);
+			CSD[] args = Utils.extractCloudVars(expr).toArray(new CSD[0]);
 			BytecodeBatchFunc fexpr = JIT.compileBatchFunc(args, expr);
 			data = new double[args[0].size()];
 			fexpr.apply(data, 0, Utils.getDataFromCloudVars(args));
@@ -73,7 +74,7 @@ public class CloudSharedVar extends Symbol {
 	 * @param array
 	 * @return
 	 */
-	public CloudSharedVar init(double ...array) {
+	public CSD init(double ...array) {
 		this.data = array;
 		return this;
 	}
@@ -103,7 +104,7 @@ public class CloudSharedVar extends Symbol {
 	 * @param size
 	 * @return
 	 */
-	public CloudSharedVar resize(int size) {
+	public CSD resize(int size) {
 		if(this.data == null)
 			this.data = new double[size];
 		else {
@@ -193,7 +194,7 @@ public class CloudSharedVar extends Symbol {
 				e.printStackTrace();
 			}
 			CloudVarHandler h = client.getCloudVarHandler();
-			CloudSharedVar var = h.getCloudVar();
+			CSD var = h.getCloudVar();
 			this.data = var.data;
 			this.isOnCloud = var.isOnCloud();
 			return this.isOnCloud;
@@ -226,8 +227,8 @@ public class CloudSharedVar extends Symbol {
 		return null;
 	}
 	
-	public static CloudSharedVar valueOf(Expr expr) {
-		return new CloudSharedVar(expr);
+	public static CSD valueOf(Expr expr) {
+		return new CSD(expr);
 	}
 	
 	public Expr assign(Expr expr) {

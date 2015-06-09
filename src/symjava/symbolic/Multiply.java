@@ -11,6 +11,7 @@ import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
@@ -172,13 +173,25 @@ public class Multiply extends BinaryOp {
 		//return Utils.flattenSortAndCompare(this, other);
 		return Utils.flattenSortAndCompare(this.simplify(), other.simplify());
 	}
+	
 	@Override
 	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		return il.append(InstructionConstants.DMUL);
-	}
+		TYPE ty = Utils.getType(arg1.getType(), arg2.getType());
+		if(ty == TYPE.DOUBLE)
+			il.append(InstructionConstants.DMUL);
+		else if(ty == TYPE.INT)
+			il.append(InstructionConstants.IMUL);
+		else if(ty == TYPE.LONG)
+			il.append(InstructionConstants.LMUL);
+		else if(ty == TYPE.FLOAT)
+			il.append(InstructionConstants.FMUL);
+		else
+			il.append(InstructionConstants.IMUL);
+		return startPos;
+	}	
 }

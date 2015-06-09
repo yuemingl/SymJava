@@ -1,7 +1,18 @@
 package symjava.symbolic;
 
+import java.util.Map;
+
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
+
+import com.sun.org.apache.bcel.internal.Constants;
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class Sqrt extends BinaryOp {
 	public Sqrt(Expr expr) {
@@ -74,4 +85,26 @@ public class Sqrt extends BinaryOp {
 			return to;
 		return new Sqrt(arg1.subs(from, to), arg2.subs(from, to));
 	}
+	
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		il.append(InstructionConstants.DCONST_1);
+		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		if(arg2 instanceof SymReal<?>) {
+			SymReal<?> realExp = (SymReal<?>)arg2;
+			if(realExp.isInteger()) {
+				il.append(InstructionConstants.I2D);
+			}
+		}
+		il.append(InstructionConstants.DDIV);
+		il.append(factory.createInvoke("java.lang.Math", "pow",
+				Type.DOUBLE, 
+				new Type[] { Type.DOUBLE, Type.DOUBLE },
+		Constants.INVOKESTATIC));
+		return startPos;
+	}	
 }

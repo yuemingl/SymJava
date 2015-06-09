@@ -13,7 +13,7 @@ public class CloudStatements extends CloudBase {
 		return this;
 	}
 	
-	public void apply(CloudSharedVar ...inputs) {
+	public void apply(CSD ...inputs) {
 		
 	}
 }

@@ -1,7 +1,7 @@
 package lambdacloud.examples;
 
 import lambdacloud.core.CloudConfig;
-import lambdacloud.core.CloudSharedVar;
+import lambdacloud.core.CSD;
 
 public class TestCloudVar {
 
@@ -10,12 +10,12 @@ public class TestCloudVar {
 		
 		// Store var123 to the cloud
 		double[] data = {1,2,3,4,5,6};
-		CloudSharedVar var = new CloudSharedVar("var123").init(data);
+		CSD var = new CSD("var123").init(data);
 		var.storeToCloud();
 		
 		// The variable var123 should be on the cloud now. 
 		// We fetch it to local and print out the numbers
-		CloudSharedVar var2 = new CloudSharedVar("var123");
+		CSD var2 = new CSD("var123");
 		var2.fetchToLocal();
 		if(var2.isOnCloud()) {
 			for(double d : var2.getData()) {
@@ -24,7 +24,7 @@ public class TestCloudVar {
 		}
 		
 		// This variable should not be on the cloud
-		CloudSharedVar var3 = new CloudSharedVar("out123");
+		CSD var3 = new CSD("out123");
 		var3.fetchToLocal();
 		if(var3.isOnCloud()) {
 			for(double d : var3.getData()) {

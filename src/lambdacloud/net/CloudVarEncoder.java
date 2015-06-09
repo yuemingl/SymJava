@@ -7,11 +7,11 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
-import lambdacloud.core.CloudSharedVar;
+import lambdacloud.core.CSD;
 
-public class CloudVarEncoder extends MessageToByteEncoder<CloudSharedVar> {
+public class CloudVarEncoder extends MessageToByteEncoder<CSD> {
 	@Override
-	protected void encode(ChannelHandlerContext ctx, CloudSharedVar var, ByteBuf out) {
+	protected void encode(ChannelHandlerContext ctx, CSD var, ByteBuf out) {
 		// Convert to a BigInteger first for easier implementation.
 		int nameLen = 0;
 		int dataLen = var.getData().length * 8;
