@@ -4,26 +4,26 @@ import static symjava.math.SymMath.cos;
 import static symjava.symbolic.Symbol.C0;
 import static symjava.symbolic.Symbol.x;
 import lambdacloud.core.CloudConfig;
-import lambdacloud.core.CloudIf;
-import lambdacloud.core.CloudInt;
-import lambdacloud.core.CloudVar;
-import lambdacloud.core.CloudLoop;
 import lambdacloud.core.CSD;
-import lambdacloud.core.operators.OPBreak;
+import lambdacloud.core.lang.LCIf;
+import lambdacloud.core.lang.LCInt;
+import lambdacloud.core.lang.LCLoop;
+import lambdacloud.core.lang.LCVar;
+import lambdacloud.core.lang.LCBreak;
 import symjava.relational.Lt;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
-public class TestCloudLoop {
+public class TestLCLoop {
 
 	/**
 	 * Test a simple loop 
 	*/
 	public static void testLoop1() {
-		CloudInt i = new CloudInt("i");
+		LCInt i = new LCInt("i");
 
 		//for(int i=0; i<100; i++);
-		CloudLoop loop = new CloudLoop(
+		LCLoop loop = new LCLoop(
 				i.assign(0),      //i = 0
 				Lt.apply(i, 100), //i < 100
 				i.assign(i + 1)   //i = i+1
@@ -36,7 +36,7 @@ public class TestCloudLoop {
 		//while(i<100) {
 		// i++;
 		//}
-		CloudLoop loop2 = new CloudLoop(
+		LCLoop loop2 = new LCLoop(
 				i.assign(0),     //i = 0
 				Lt.apply(i, 100) //i < 100
 			);

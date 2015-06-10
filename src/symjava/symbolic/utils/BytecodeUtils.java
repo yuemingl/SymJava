@@ -25,15 +25,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import lambdacloud.core.CloudBoolean;
-import lambdacloud.core.CloudByte;
-import lambdacloud.core.CloudChar;
-import lambdacloud.core.CloudDouble;
-import lambdacloud.core.CloudFloat;
-import lambdacloud.core.CloudInt;
-import lambdacloud.core.CloudLong;
-import lambdacloud.core.CloudShort;
-import lambdacloud.core.CloudVar;
+import lambdacloud.core.lang.LCBoolean;
+import lambdacloud.core.lang.LCByte;
+import lambdacloud.core.lang.LCChar;
+import lambdacloud.core.lang.LCDouble;
+import lambdacloud.core.lang.LCFloat;
+import lambdacloud.core.lang.LCInt;
+import lambdacloud.core.lang.LCLong;
+import lambdacloud.core.lang.LCShort;
+import lambdacloud.core.lang.LCVar;
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain2D;
 import symjava.domains.Interval;
@@ -812,18 +812,18 @@ public class BytecodeUtils {
 		}
 	}
 	
-	public static int declareLocal(CloudVar var, MethodGen mg, InstructionList il) {
+	public static int declareLocal(LCVar var, MethodGen mg, InstructionList il) {
 		//variable name
 		//initial value
 		//index in local variable table (LVT)
-		if(var instanceof CloudInt) {
+		if(var instanceof LCInt) {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
 					Type.INT, null, null);
 			int idx = lg.getIndex();
 			//il.append(InstructionConstants.ICONST_0);
 			//lg.setStart(il.append(new DSTORE(idx)));
 			return idx;
-		} else if(var instanceof CloudLong) {
+		} else if(var instanceof LCLong) {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
 					Type.LONG, null, null);
 			int idx = lg.getIndex();
@@ -831,42 +831,42 @@ public class BytecodeUtils {
 			lg.setStart(il.append(new DSTORE(idx)));
 			return idx;
 			
-		} else if(var instanceof CloudFloat) {
+		} else if(var instanceof LCFloat) {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
 					Type.FLOAT, null, null);
 			int idx = lg.getIndex();
 			il.append(InstructionConstants.FCONST_0);
 			lg.setStart(il.append(new DSTORE(idx)));
 			return idx;
-		} else if(var instanceof CloudDouble) {
+		} else if(var instanceof LCDouble) {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
 					Type.DOUBLE, null, null);
 			int idx = lg.getIndex();
 			il.append(InstructionConstants.DCONST_0);
 			lg.setStart(il.append(new DSTORE(idx)));
 			return idx;
-		} else if(var instanceof CloudBoolean) {
+		} else if(var instanceof LCBoolean) {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
 					Type.BOOLEAN, null, null);
 			int idx = lg.getIndex();
 			il.append(InstructionConstants.ICONST_0);
 			lg.setStart(il.append(new DSTORE(idx)));
 			return idx;
-		} else if(var instanceof CloudChar) {
+		} else if(var instanceof LCChar) {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
 					Type.CHAR, null, null);
 			int idx = lg.getIndex();
 			il.append(InstructionConstants.ICONST_0);
 			lg.setStart(il.append(new DSTORE(idx)));
 			return idx;
-		} else if(var instanceof CloudByte) {
+		} else if(var instanceof LCByte) {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
 					Type.BYTE, null, null);
 			int idx = lg.getIndex();
 			il.append(InstructionConstants.ICONST_0);
 			lg.setStart(il.append(new DSTORE(idx)));
 			return idx;
-		} else if(var instanceof CloudShort) {
+		} else if(var instanceof LCShort) {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
 					Type.SHORT, null, null);
 			int idx = lg.getIndex();

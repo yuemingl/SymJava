@@ -1,4 +1,4 @@
-package lambdacloud.core;
+package lambdacloud.core.lang;
 
 import static com.sun.org.apache.bcel.internal.Constants.ACC_PUBLIC;
 import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import lambdacloud.core.operators.OPReturn;
+import lambdacloud.core.CSD;
+import lambdacloud.core.CloudConfig;
 
 import com.sun.org.apache.bcel.internal.generic.ArrayType;
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
@@ -29,44 +30,44 @@ import symjava.symbolic.utils.Utils;
  * Lambda Cloud instruction builder
  *
  */
-public class LC{
+public class LCBuilder{
 	CloudConfig config;
 	List<Expr> stmts = new ArrayList<Expr>();
 
-	public LC(CloudConfig config) {
+	public LCBuilder(CloudConfig config) {
 		this.config = config;
 	}
 	
-	public LC(String configFile) {
+	public LCBuilder(String configFile) {
 		//TODO change to not static
 		CloudConfig.setTarget(configFile);
 	}
 	
-	public CloudLoop For(Expr initExpr, Expr conditionExpr, Expr incrementExpr) {
-		CloudLoop cl = new CloudLoop(initExpr, conditionExpr, incrementExpr);
+	public LCLoop For(Expr initExpr, Expr conditionExpr, Expr incrementExpr) {
+		LCLoop cl = new LCLoop(initExpr, conditionExpr, incrementExpr);
 		stmts.add(cl);
 		return cl;
 	}
 	
-	public CloudLoop While(Expr conditionExpr) {
-		CloudLoop stmt = new CloudLoop(conditionExpr);
+	public LCLoop While(Expr conditionExpr) {
+		LCLoop stmt = new LCLoop(conditionExpr);
 		stmts.add(stmt);
 		return stmt;
 	}
 	
-	public CloudIf If(Expr condition) {
-		CloudIf stmt = new CloudIf(condition);
+	public LCIf If(Expr condition) {
+		LCIf stmt = new LCIf(condition);
 		stmts.add(stmt);
 		return stmt;
 	}
 	
-	public OPReturn Return(Expr expr) {
-		OPReturn stmt = new OPReturn(expr);
+	public LCReturn Return(Expr expr) {
+		LCReturn stmt = new LCReturn(expr);
 		stmts.add(stmt);
 		return stmt;
 	}
 	
-	public LC append(Expr expr) {
+	public LCBuilder append(Expr expr) {
 		stmts.add(expr);
 		return this;
 	}
@@ -75,32 +76,32 @@ public class LC{
 		return new CSD(name);
 	}
 
-	public CloudVar declareInt(String name) {
-		return new CloudInt(name);
+	public LCVar declareInt(String name) {
+		return new LCInt(name);
 	}
 	
-	public CloudVar declareLong(String name) {
-		return new CloudLong(name);
+	public LCVar declareLong(String name) {
+		return new LCLong(name);
 	}
 	
-	public CloudVar declareFloat(String name) {
-		return new CloudFloat(name);
+	public LCVar declareFloat(String name) {
+		return new LCFloat(name);
 	}
 	
-	public CloudVar declareDouble(String name) {
-		return new CloudDouble(name);
+	public LCVar declareDouble(String name) {
+		return new LCDouble(name);
 	}
 	
-	public CloudVar declareShort(String name) {
-		return new CloudShort(name);
+	public LCVar declareShort(String name) {
+		return new LCShort(name);
 	}
 	
-	public CloudVar declareChar(String name) {
-		return new CloudChar(name);
+	public LCVar declareChar(String name) {
+		return new LCChar(name);
 	}
 	
-	public CloudVar declareByte(String name) {
-		return new CloudByte(name);
+	public LCVar declareByte(String name) {
+		return new LCByte(name);
 	}
 	
 	public void apply(CSD ...args) {
@@ -129,8 +130,8 @@ public class LC{
 		
 		List<Expr> vars = Utils.extractSymbols(this.stmts.toArray(new Expr[0]));
 		for(Expr var : vars) {
-			if(var instanceof CloudVar) {
-				CloudVar cv = (CloudVar)var;
+			if(var instanceof LCVar) {
+				LCVar cv = (LCVar)var;
 				int indexLVT = BytecodeUtils.declareLocal(cv, mg, il);
 				cv.setLVTIndex(indexLVT);
 			}
@@ -147,7 +148,7 @@ public class LC{
 		}
 		
 		// Return 0 by default
-		if(!(this.stmts.get(this.stmts.size()-1) instanceof OPReturn)) {
+		if(!(this.stmts.get(this.stmts.size()-1) instanceof LCReturn)) {
 			il.append(InstructionConstants.DCONST_0);
 			il.append(InstructionConstants.DRETURN);
 		}

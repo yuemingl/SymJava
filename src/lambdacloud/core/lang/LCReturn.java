@@ -1,8 +1,7 @@
-package lambdacloud.core.operators;
+package lambdacloud.core.lang;
 
 import java.util.Map;
 
-import lambdacloud.core.CloudBase;
 import symjava.symbolic.Expr;
 
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
@@ -12,9 +11,9 @@ import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
-public class OPReturn extends CloudBase {
+public class LCReturn extends LCBase {
 	protected Expr arg;
-	public OPReturn(Expr expr) {
+	public LCReturn(Expr expr) {
 		this.arg = expr;
 		this.label = "return "+arg;
 	}

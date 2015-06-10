@@ -1,9 +1,10 @@
-package lambdacloud.core;
+package lambdacloud.core.lang;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lambdacloud.core.CSD;
 import symjava.relational.Gt;
 import symjava.relational.Relation;
 import symjava.symbolic.Expr;
@@ -17,12 +18,12 @@ import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
-public class CloudIf extends CloudBase {
+public class LCIf extends LCBase {
 	
 	Expr condition;
 	List<Expr> trueStmts = new ArrayList<Expr>();
 	List<Expr> falseStmts = new ArrayList<Expr>();
-	public CloudIf(Expr condition, CSD ...args) {
+	public LCIf(Expr condition, CSD ...args) {
 		this.condition = condition;
 		initLabel();
 	}
@@ -42,13 +43,13 @@ public class CloudIf extends CloudBase {
 		
 	}
 	
-	public CloudIf appendTrue(Expr expr) {
+	public LCIf appendTrue(Expr expr) {
 		trueStmts.add(expr);
 		initLabel();
 		return this;
 	}
 
-	public CloudIf appendFalse(Expr expr) {
+	public LCIf appendFalse(Expr expr) {
 		falseStmts.add(expr);
 		initLabel();
 		return this;

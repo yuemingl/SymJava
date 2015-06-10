@@ -1,9 +1,7 @@
-package lambdacloud.core;
+package lambdacloud.core.lang;
 
 import java.util.Map;
 
-import lambdacloud.core.operators.OPAsign;
-import lambdacloud.core.operators.OpIndex;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
 
@@ -26,29 +24,29 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
  * that is used to store temporary values.
  *  
  */
-public abstract class CloudVar extends Symbol {
+public abstract class LCVar extends Symbol {
 //	protected boolean isDeclaredAsLocal = false;
 	protected int indexLVT; // index in local variable table
 	
-	public CloudVar(String name) {
+	public LCVar(String name) {
 		super(name);
 //		this.isDeclaredAsLocal = true;
 	}
 	
 	public Expr assign(Expr expr) {
-		return new OPAsign(this, expr);
+		return new LCAsign(this, expr);
 	}
 	
 	public Expr assign(double val) {
-		return new OPAsign(this, Expr.valueOf(val));
+		return new LCAsign(this, Expr.valueOf(val));
 	}
 
 	public Expr assign(int val) {
-		return new OPAsign(this, Expr.valueOf(val));
+		return new LCAsign(this, Expr.valueOf(val));
 	}
 	
 	public Expr get(Expr index) {
-		return new OpIndex(this, index);
+		return new LCIndex(this, index);
 	}
 	
 	public void setLVTIndex(int index) {

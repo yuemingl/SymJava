@@ -1,9 +1,7 @@
-package lambdacloud.core.operators;
+package lambdacloud.core.lang;
 
 import java.util.Map;
 
-import lambdacloud.core.CloudBase;
-import lambdacloud.core.CloudVar;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.utils.BytecodeUtils;
@@ -21,10 +19,10 @@ import com.sun.org.apache.bcel.internal.generic.LSTORE;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 
-public class OPAsign extends CloudBase {
+public class LCAsign extends LCBase {
 	protected Expr lhs;
 	protected Expr rhs;
-	public OPAsign(Expr lhs, Expr rhs) {
+	public LCAsign(Expr lhs, Expr rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;
 		this.label = lhs + " = " + rhs;
@@ -38,9 +36,9 @@ public class OPAsign extends CloudBase {
 		if(!(lhs instanceof Symbol)) //allow symbol
 			throw new RuntimeException(lhs.toString());
 		InstructionHandle startPos = null;
-		if(lhs instanceof CloudVar) {
+		if(lhs instanceof LCVar) {
 			startPos = rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			CloudVar var = (CloudVar)lhs;
+			LCVar var = (LCVar)lhs;
 			TYPE ty = lhs.getType();
 			BytecodeUtils.typeCase(il, rhs.getType(), ty);
 			if(ty == TYPE.DOUBLE)

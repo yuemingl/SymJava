@@ -1,6 +1,7 @@
 package lambdacloud.core;
 
 import io.netty.channel.Channel;
+import lambdacloud.core.lang.LCBase;
 import lambdacloud.net.CloudFuncHandler;
 import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudResp;
@@ -13,7 +14,7 @@ import symjava.bytecode.IR;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
-public class CloudFunc extends CloudBase {
+public class CloudFunc extends LCBase {
 	String name;
 	BytecodeFunc func;
 	BytecodeVecFunc vecFunc;

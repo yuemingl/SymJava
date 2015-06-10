@@ -5,7 +5,7 @@ import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
 
 import java.util.HashMap;
 
-import lambdacloud.core.CloudIf;
+import lambdacloud.core.lang.LCIf;
 import symjava.bytecode.BytecodeFunc;
 import symjava.relational.Gt;
 import symjava.symbolic.Expr;
@@ -82,7 +82,7 @@ public class TestBytecodeGen {
 			 	return args[1];
 		 }
 		 */
-		CloudIf cif = new CloudIf(Gt.apply(x, y)); //x>y
+		LCIf cif = new LCIf(Gt.apply(x, y)); //x>y
 		cif.appendTrue(x);
 		cif.appendFalse(y);
 		BytecodeFunc func = gen(new Expr[]{x, y}, cif);
@@ -99,7 +99,7 @@ public class TestBytecodeGen {
 			 	return args[1];
 		 }
 		 */
-		CloudIf cif = new CloudIf(Gt.apply(x, y)); //x>y
+		LCIf cif = new LCIf(Gt.apply(x, y)); //x>y
 		cif.appendTrue(x+y*x-x/y);
 		cif.appendFalse(-x);
 		BytecodeFunc func = gen(new Expr[]{x, y}, cif);

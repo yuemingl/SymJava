@@ -6,7 +6,7 @@ import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
 import java.util.HashMap;
 import java.util.List;
 
-import lambdacloud.core.CloudVar;
+import lambdacloud.core.lang.LCVar;
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.BytecodeUtils;
@@ -61,8 +61,8 @@ public class CompileUtils {
 		// Declare local variables
 		List<Expr> vars = Utils.extractSymbols(expr);
 		for(Expr var : vars) {
-			if(var instanceof CloudVar) {
-				CloudVar cv = (CloudVar)var;
+			if(var instanceof LCVar) {
+				LCVar cv = (LCVar)var;
 				int indexLVT = BytecodeUtils.declareLocal(cv, mg, il);
 				cv.setLVTIndex(indexLVT);
 			}

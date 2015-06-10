@@ -3,13 +3,13 @@ package lambdacloud.test;
 import static symjava.symbolic.Symbol.x;
 import static symjava.symbolic.Symbol.y;
 import lambdacloud.core.CloudConfig;
-import lambdacloud.core.CloudDouble;
-import lambdacloud.core.CloudStatements;
-import lambdacloud.core.CloudVar;
-import lambdacloud.core.operators.OPReturn;
+import lambdacloud.core.lang.LCDouble;
+import lambdacloud.core.lang.LCStatements;
+import lambdacloud.core.lang.LCVar;
+import lambdacloud.core.lang.LCReturn;
 import symjava.symbolic.Expr;
 
-public class TestCloudStatements {
+public class TestLCStatements {
 
 	/**
 	 * 
@@ -18,15 +18,15 @@ public class TestCloudStatements {
 	public static void main(String[] args) {
 		CloudConfig.setTarget("server");
 		
-		CloudVar i = new CloudDouble("i");
-		CloudVar j = new CloudDouble("j");
-		CloudVar ret = new CloudDouble("ret");
+		LCVar i = new LCDouble("i");
+		LCVar j = new LCDouble("j");
+		LCVar ret = new LCDouble("ret");
 		
-		CloudStatements s = new CloudStatements();
+		LCStatements s = new LCStatements();
 		s.append(i.assign(1)); //i=1
 		s.append(j.assign(x*y)); //j=x*y
 		s.append(ret.assign(i+j)); //result=i+j
-		s.append(new OPReturn(ret));
+		s.append(new LCReturn(ret));
 		System.out.println(s);
 		
 		double t = CompileUtils.compile(s, new Expr[]{x, y}).apply(3,4);

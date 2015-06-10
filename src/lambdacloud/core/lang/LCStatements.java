@@ -1,4 +1,4 @@
-package lambdacloud.core;
+package lambdacloud.core.lang;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +16,10 @@ import symjava.relational.Lt;
 import symjava.relational.Relation;
 import symjava.symbolic.Expr;
 
-public class CloudStatements extends CloudBase {
+public class LCStatements extends LCBase {
 	List<Expr> exprList = new ArrayList<Expr>();
 	
-	public CloudStatements append(Expr expr) {
+	public LCStatements append(Expr expr) {
 		exprList.add(expr);
 		initLabel();
 		return this;

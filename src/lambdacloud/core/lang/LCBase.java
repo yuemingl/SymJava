@@ -1,8 +1,8 @@
-package lambdacloud.core;
+package lambdacloud.core.lang;
 
 import symjava.symbolic.Expr;
 
-public abstract class CloudBase extends Expr {
+public abstract class LCBase extends Expr {
 	@Override
 	public Expr simplify() {
 		throw new UnsupportedOperationException();

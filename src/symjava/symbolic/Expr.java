@@ -3,7 +3,7 @@ package symjava.symbolic;
 import java.util.List;
 import java.util.Map;
 
-import lambdacloud.core.operators.OPAsign;
+import lambdacloud.core.lang.LCAsign;
 import symjava.logic.And;
 import symjava.logic.Not;
 import symjava.logic.Or;
@@ -488,15 +488,15 @@ abstract public class Expr implements Cloneable {
 	public abstract TYPE getType();
 	
 	public Expr assign(Expr expr) {
-		return new OPAsign(this, expr);
+		return new LCAsign(this, expr);
 	}
 	
 	public Expr assign(double val) {
-		return new OPAsign(this, Expr.valueOf(val));
+		return new LCAsign(this, Expr.valueOf(val));
 	}
 
 	public Expr assign(int val) {
-		return new OPAsign(this, Expr.valueOf(val));
+		return new LCAsign(this, Expr.valueOf(val));
 	}	
 }
 

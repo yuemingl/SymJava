@@ -4,18 +4,13 @@ import static symjava.math.SymMath.log;
 import static symjava.math.SymMath.random;
 import static symjava.math.SymMath.sin;
 import static symjava.math.SymMath.sqrt;
-import static symjava.symbolic.Symbol.a;
-import static symjava.symbolic.Symbol.b;
-import static symjava.symbolic.Symbol.c;
-import static symjava.symbolic.Symbol.d;
-import static symjava.symbolic.Symbol.x;
 import static symjava.symbolic.Symbol.*;
 import lambdacloud.core.CloudFunc;
-import lambdacloud.core.CloudIf;
-import lambdacloud.core.CloudVar;
-import lambdacloud.core.CloudLoop;
 import lambdacloud.core.CSD;
-import lambdacloud.core.LC;
+import lambdacloud.core.lang.LCIf;
+import lambdacloud.core.lang.LCLoop;
+import lambdacloud.core.lang.LCVar;
+import lambdacloud.core.lang.LCBuilder;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
 import symjava.relational.Ge;
@@ -27,7 +22,7 @@ import symjava.symbolic.Integrate;
 public class TestLC {
 	
 	public static void testOverWriteArgs() {
-		LC cloudTask = new LC("local");
+		LCBuilder cloudTask = new LCBuilder("local");
 		
 		cloudTask.append(x.assign(sqrt(x*x+y*y))); //x=x+y
 		System.out.println(cloudTask);
@@ -40,7 +35,7 @@ public class TestLC {
 	}
 	
 	public static void testReturn() {
-		LC cloudTask = new LC("local");
+		LCBuilder cloudTask = new LCBuilder("local");
 		
 		cloudTask.Return(sqrt(x*x+y*y)); //return sqrt(x*x+y*y)
 		System.out.println(cloudTask);
@@ -52,10 +47,10 @@ public class TestLC {
 	}
 	
 	public static void testLoopAsignReturn() {
-		LC cloudTask = new LC("local");
+		LCBuilder cloudTask = new LCBuilder("local");
 		
-		CloudVar i = cloudTask.declareInt("i"); //int i;
-		CloudVar sum = cloudTask.declareDouble("sum");//double sum;
+		LCVar i = cloudTask.declareInt("i"); //int i;
+		LCVar sum = cloudTask.declareDouble("sum");//double sum;
 		
 		//for(i=0; i<10; i++) {
 		cloudTask.For(i.assign(0), Lt.apply(i, 10), i.assign(i+1))

@@ -1,4 +1,4 @@
-package lambdacloud.core;
+package lambdacloud.core.lang;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,31 +18,31 @@ import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
-public class CloudLoop extends CloudBase {
+public class LCLoop extends LCBase {
 	Expr initExpr;
 	Expr conditionExpr;
 	Expr incrementExpr;
 	List<Expr> bodyList = new ArrayList<Expr>();
 	
-	public CloudLoop(Expr conditionExpr) {
+	public LCLoop(Expr conditionExpr) {
 		this.conditionExpr = conditionExpr;
 		initLabel();
 	}
 	
-	public CloudLoop(Expr initExpr, Expr conditionExpr) {
+	public LCLoop(Expr initExpr, Expr conditionExpr) {
 		this.initExpr = initExpr;
 		this.conditionExpr = conditionExpr;
 		initLabel();
 	}
 	
-	public CloudLoop(Expr initExpr, Expr conditionExpr, Expr incrementExpr) {
+	public LCLoop(Expr initExpr, Expr conditionExpr, Expr incrementExpr) {
 		this.initExpr = initExpr;
 		this.conditionExpr = conditionExpr;
 		this.incrementExpr = incrementExpr;
 		initLabel();
 	}
 	
-	public CloudLoop appendBody(Expr expr) {
+	public LCLoop appendBody(Expr expr) {
 		bodyList.add(expr);
 		initLabel();
 		return this;
