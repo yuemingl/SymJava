@@ -5,9 +5,8 @@ import java.util.Map;
 import lambdacloud.core.CloudBase;
 import lambdacloud.core.CloudVar;
 import symjava.symbolic.Expr;
-import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.Symbol;
-import symjava.symbolic.utils.Utils;
+import symjava.symbolic.utils.BytecodeUtils;
 
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
@@ -43,6 +42,7 @@ public class OPAsign extends CloudBase {
 			startPos = rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			CloudVar var = (CloudVar)lhs;
 			TYPE ty = lhs.getType();
+			BytecodeUtils.typeCase(il, rhs.getType(), ty);
 			if(ty == TYPE.DOUBLE)
 				il.append(new DSTORE(var.getLVTIndex()));
 			else if(ty == TYPE.INT)
