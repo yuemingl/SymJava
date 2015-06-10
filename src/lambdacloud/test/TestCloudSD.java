@@ -3,7 +3,7 @@ package lambdacloud.test;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudSD;
 
-public class TestCSD {
+public class TestCloudSD {
 
 	public static void main(String[] args) {
 		CloudConfig.setTarget("server");
