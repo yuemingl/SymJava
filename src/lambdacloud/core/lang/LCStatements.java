@@ -4,20 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import symjava.symbolic.Expr;
+
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
-import com.sun.org.apache.bcel.internal.generic.GOTO;
-import com.sun.org.apache.bcel.internal.generic.IF_ICMPLT;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
-import symjava.relational.Lt;
-import symjava.relational.Relation;
-import symjava.symbolic.Expr;
-
 public class LCStatements extends LCBase {
 	List<Expr> exprList = new ArrayList<Expr>();
+	
+	public LCStatements() {
+		
+	}
+	
+	public LCStatements(List<Expr> exprList) {
+		this.exprList.addAll(exprList);
+		initLabel();
+	}
+	
+	public LCStatements append(List<Expr> exprList) {
+		this.exprList.addAll(exprList);
+		initLabel();
+		return this;
+	}
 	
 	public LCStatements append(Expr expr) {
 		exprList.add(expr);

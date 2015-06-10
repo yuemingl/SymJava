@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
 import lambdacloud.core.CloudConfig;
 
@@ -30,7 +31,7 @@ import symjava.symbolic.utils.Utils;
  * Lambda Cloud instruction builder
  *
  */
-public class LCBuilder{
+public class LCBuilder {
 	CloudConfig config;
 	List<Expr> stmts = new ArrayList<Expr>();
 
@@ -72,7 +73,7 @@ public class LCBuilder{
 		return this;
 	}
 	
-	public CloudSD declareCSD(String name) {
+	public CloudSD declareCloudSD(String name) {
 		return new CloudSD(name);
 	}
 
@@ -104,8 +105,9 @@ public class LCBuilder{
 		return new LCByte(name);
 	}
 	
-	public void apply(CloudSD ...args) {
-		//fun.apply(args);
+	public CloudFunc build(Expr ...args) {
+		CloudFunc func = new CloudFunc(args, new LCStatements(this.stmts));
+		return func;
 	}
 	
 	public BytecodeFunc compile(Expr ...args) {
