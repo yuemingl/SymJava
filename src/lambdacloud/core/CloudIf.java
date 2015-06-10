@@ -18,10 +18,22 @@ import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 public class CloudIf extends CloudBase {
+	
 	Expr condition;
 	List<Expr> trueStmts = new ArrayList<Expr>();
 	List<Expr> falseStmts = new ArrayList<Expr>();
 	public CloudIf(Expr condition, CSD ...args) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("if(").append(condition).append(") {\n");
+		for(Expr e : trueStmts) {
+			sb.append(e).append("\n");
+		}
+		sb.append("} else {\n");
+		for(Expr e : falseStmts) {
+			sb.append(e);
+		}
+		sb.append("}");
+		this.label = sb.toString();
 		this.condition = condition;
 	}
 	

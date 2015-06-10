@@ -16,6 +16,7 @@ public class OPReturn extends CloudBase {
 	protected Expr arg;
 	public OPReturn(Expr expr) {
 		this.arg = expr;
+		this.label = "return "+arg;
 	}
 	
 	@Override

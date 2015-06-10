@@ -13,6 +13,14 @@ public class CloudStatements extends CloudBase {
 		return this;
 	}
 	
+	protected void initLabel() {
+		StringBuilder sb = new StringBuilder();
+		for(Expr e : exprList) {
+			sb.append(e).append("\n");
+		}
+		this.label = sb.toString();		
+	}
+	
 	public void apply(CSD ...inputs) {
 		
 	}

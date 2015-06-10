@@ -30,9 +30,12 @@ public class TestLC {
 		LC cloudTask = new LC("local");
 		
 		cloudTask.append(x.assign(sqrt(x*x+y*y))); //x=x+y
+		System.out.println(cloudTask);
 		
 		double[] args = new double[]{3,4};
 		cloudTask.compile(new Expr[]{x, y}).apply(args);
+		
+		
 		System.out.println(args[0]); //5.0
 	}
 	
@@ -40,6 +43,7 @@ public class TestLC {
 		LC cloudTask = new LC("local");
 		
 		cloudTask.Return(sqrt(x*x+y*y)); //return sqrt(x*x+y*y)
+		System.out.println(cloudTask);
 		
 		double[] args = new double[]{3,4};
 		double ret = cloudTask.compile(new Expr[]{x, y}).apply(args);
@@ -58,18 +62,14 @@ public class TestLC {
 			.appendBody(sum.assign(sum+i)); //sum = sum + i
 		//} //end for
 		
-		//return sum;
-		cloudTask.Return(sum); 
+		cloudTask.Return(sum); //return sum;
+		System.out.println(cloudTask);
 		
-		System.out.println(cloudTask.compile(null).apply()); //45.0
+		System.out.println(cloudTask.compile().apply()); //45.0
 	}
 
-	
-	public static void main(String[] args) {
-		//testOverWriteArgs();
-		//testReturn();
-		testLoopAsignReturn();
-		
+	public static void test() {
+//		LC cloudTask = new LC("local");
 //		CloudVar x = cloudTask.declareDouble("x");
 //		CloudVar y = cloudTask.declareDouble("y");
 //		CSD output1 = cloudTask.declareCSD("output1");
@@ -77,6 +77,7 @@ public class TestLC {
 //		
 //		cloudTask.append(x.assign(3));
 //		cloudTask.append(y.assign(4));
+//		//assign is not supported for CSD?
 //		cloudTask.append(output1.assign(sqrt(x*x+y*y)));
 //
 //		CloudVar i = cloudTask.declareInt("i");
@@ -87,6 +88,7 @@ public class TestLC {
 //		loop.appendBody(sum.assign(sum+i)); //sum = sum + i
 //		//} end for
 //		
+//		//assign is not supported for CSD?
 //		cloudTask.append(output2.assign(sum)); //output = sum
 //		
 //		cloudTask.compile(null).apply();
@@ -96,6 +98,13 @@ public class TestLC {
 ////		
 ////		output2.fetchToLocal();
 ////		System.out.println(output2.get(0)); //=55
+	}
+	
+	public static void main(String[] args) {
+		testOverWriteArgs();
+		testReturn();
+		testLoopAsignReturn();
+
 	}
 	
 	

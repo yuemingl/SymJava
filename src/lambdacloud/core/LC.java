@@ -107,7 +107,7 @@ public class LC{
 		//fun.apply(args);
 	}
 	
-	public BytecodeFunc compile(Expr[] args) {
+	public BytecodeFunc compile(Expr ...args) {
 		String packageName = "symjava.bytecode";
 		String clsName = "LC" + java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		String fullClsName = packageName+"."+clsName;
@@ -166,5 +166,13 @@ public class LC{
 		FuncClassLoader<BytecodeFunc> fcl = new FuncClassLoader<BytecodeFunc>();
 		BytecodeFunc fun = fcl.newInstance(cg);
 		return fun;
-	}	
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for(Expr e : stmts) {
+			sb.append(e).append("\n");
+		}
+		return sb.toString();
+	}
 }

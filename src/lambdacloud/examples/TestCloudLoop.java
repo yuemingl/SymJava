@@ -12,6 +12,7 @@ import lambdacloud.core.CloudLoop;
 import lambdacloud.core.CSD;
 import symjava.relational.Lt;
 import symjava.symbolic.Expr;
+import symjava.symbolic.utils.JIT;
 
 public class TestCloudLoop {
 
@@ -28,6 +29,7 @@ public class TestCloudLoop {
 				i.assign(i + 1)   //i = i+1
 			);
 		
+		System.out.println(loop);
 		System.out.println(loop.compile(null).apply());
 		loop.apply();
 		
@@ -40,6 +42,7 @@ public class TestCloudLoop {
 				Lt.apply(i, 100) //i < 100
 			);
 		loop2.appendBody(i.assign(i + 1)); // i=i+1
+		System.out.println(loop2);
 		System.out.println(loop2.compile(null).apply());
 		loop2.apply();
 	}

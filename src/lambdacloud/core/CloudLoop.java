@@ -57,22 +57,42 @@ public class CloudLoop extends CloudBase {
 	
 	public CloudLoop(Expr conditionExpr) {
 		this.conditionExpr = conditionExpr;
+		initLabel();
 	}
 	
 	public CloudLoop(Expr initExpr, Expr conditionExpr) {
 		this.initExpr = initExpr;
 		this.conditionExpr = conditionExpr;
+		initLabel();
 	}
 	
 	public CloudLoop(Expr initExpr, Expr conditionExpr, Expr incrementExpr) {
 		this.initExpr = initExpr;
 		this.conditionExpr = conditionExpr;
 		this.incrementExpr = incrementExpr;
+		initLabel();
 	}
 	
 	public CloudLoop appendBody(Expr expr) {
 		bodyList.add(expr);
+		initLabel();
 		return this;
+	}
+	
+	protected void initLabel() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("for(");
+		if(initExpr != null) sb.append(initExpr);
+		sb.append("; ");
+		if(conditionExpr != null) sb.append(conditionExpr);
+		sb.append("; ");
+		if(incrementExpr != null) sb.append(incrementExpr);
+		sb.append(") {\n");
+		for(Expr e : bodyList) {
+			sb.append("\t").append(e).append("\n");
+		}
+		sb.append("}");
+		this.label = sb.toString();
 	}
 	
 	@Override
@@ -123,7 +143,7 @@ public class CloudLoop extends CloudBase {
 		return loopStart;
 	}
 	
-	public BytecodeFunc compile(Expr[] args) {
+	public BytecodeFunc compile(Expr ...args) {
 		String packageName = "symjava.bytecode";
 		String clsName = "CloudLoop" + java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		String fullClsName = packageName+"."+clsName;
