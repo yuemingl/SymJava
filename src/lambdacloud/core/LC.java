@@ -127,14 +127,14 @@ public class LC{
 				"apply", fullClsName, // method, class
 				il, cp);
 		
-//		List<Expr> vars = Utils.extractSymbols(this.stmts.toArray(new Expr[0]));
-//		for(Expr var : vars) {
-//			if(var instanceof CloudVar) {
-//				CloudVar cv = (CloudVar)var;
-//				int indexLVT = BytecodeUtils.declareLocal(cv, mg, il);
-//				cv.setLVTIndex(indexLVT);
-//			}
-//		}
+		List<Expr> vars = Utils.extractSymbols(this.stmts.toArray(new Expr[0]));
+		for(Expr var : vars) {
+			if(var instanceof CloudVar) {
+				CloudVar cv = (CloudVar)var;
+				int indexLVT = BytecodeUtils.declareLocal(cv, mg, il);
+				cv.setLVTIndex(indexLVT);
+			}
+		}
 		
 		HashMap<String, Integer> argsMap = new HashMap<String, Integer>();
 		if(args != null) {

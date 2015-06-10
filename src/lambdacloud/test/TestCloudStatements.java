@@ -1,14 +1,13 @@
 package lambdacloud.test;
 
-import symjava.symbolic.Expr;
+import static symjava.symbolic.Symbol.x;
+import static symjava.symbolic.Symbol.y;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudDouble;
-import lambdacloud.core.CloudInt;
-import lambdacloud.core.CloudVar;
 import lambdacloud.core.CloudStatements;
-import lambdacloud.core.CSD;
+import lambdacloud.core.CloudVar;
 import lambdacloud.core.operators.OPReturn;
-import static symjava.symbolic.Symbol.*;
+import symjava.symbolic.Expr;
 
 public class TestCloudStatements {
 
