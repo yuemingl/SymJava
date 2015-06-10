@@ -1,15 +1,15 @@
-package lambdacloud.examples;
+package lambdacloud.test;
 
 import static symjava.math.SymMath.cos;
 import static symjava.symbolic.Symbol.C0;
 import static symjava.symbolic.Symbol.x;
-import lambdacloud.core.CloudBreak;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudIf;
 import lambdacloud.core.CloudInt;
 import lambdacloud.core.CloudVar;
 import lambdacloud.core.CloudLoop;
 import lambdacloud.core.CSD;
+import lambdacloud.core.operators.OPBreak;
 import symjava.relational.Lt;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
@@ -30,8 +30,7 @@ public class TestCloudLoop {
 			);
 		
 		System.out.println(loop);
-		System.out.println(loop.compile(null).apply());
-		loop.apply();
+		System.out.println(CompileUtils.compile(loop).apply());
 		
 		//int i=0;
 		//while(i<100) {
@@ -43,8 +42,7 @@ public class TestCloudLoop {
 			);
 		loop2.appendBody(i.assign(i + 1)); // i=i+1
 		System.out.println(loop2);
-		System.out.println(loop2.compile(null).apply());
-		loop2.apply();
+		System.out.println(CompileUtils.compile(loop2).apply());
 	}
 	
 //	/**

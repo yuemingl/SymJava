@@ -1,4 +1,4 @@
-package lambdacloud.examples;
+package lambdacloud.test;
 
 import static symjava.math.SymMath.*;
 import static symjava.symbolic.Symbol.x;

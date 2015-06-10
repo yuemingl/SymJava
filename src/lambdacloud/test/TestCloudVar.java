@@ -1,4 +1,4 @@
-package lambdacloud.examples;
+package lambdacloud.test;
 
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CSD;

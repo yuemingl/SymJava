@@ -1,4 +1,4 @@
-package lambdacloud.examples;
+package lambdacloud.test;
 
 import symjava.symbolic.Expr;
 import lambdacloud.core.CloudConfig;

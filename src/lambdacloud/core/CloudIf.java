@@ -23,32 +23,35 @@ public class CloudIf extends CloudBase {
 	List<Expr> trueStmts = new ArrayList<Expr>();
 	List<Expr> falseStmts = new ArrayList<Expr>();
 	public CloudIf(Expr condition, CSD ...args) {
+		this.condition = condition;
+		initLabel();
+	}
+	
+	public void initLabel() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("if(").append(condition).append(") {\n");
+		sb.append("if( ").append(condition).append(" ) {\n");
 		for(Expr e : trueStmts) {
-			sb.append(e).append("\n");
+			sb.append("\t").append(e).append(";\n");
 		}
 		sb.append("} else {\n");
 		for(Expr e : falseStmts) {
-			sb.append(e);
+			sb.append("\t").append(e).append(";\n");
 		}
 		sb.append("}");
 		this.label = sb.toString();
-		this.condition = condition;
+		
 	}
 	
 	public CloudIf appendTrue(Expr expr) {
 		trueStmts.add(expr);
+		initLabel();
 		return this;
 	}
 
 	public CloudIf appendFalse(Expr expr) {
 		falseStmts.add(expr);
+		initLabel();
 		return this;
-	}
-	
-	public void apply() {
-		
 	}
 	
 	@Override

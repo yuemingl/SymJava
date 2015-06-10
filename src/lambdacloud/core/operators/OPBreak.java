@@ -1,7 +1,9 @@
-package lambdacloud.core;
+package lambdacloud.core.operators;
 
-public class CloudBreak extends CloudBase {
-	public CloudBreak() {
-		this.label = "break;";
+import lambdacloud.core.CloudBase;
+
+public class OPBreak extends CloudBase {
+	public OPBreak() {
+		this.label = "break";
 	}
 }

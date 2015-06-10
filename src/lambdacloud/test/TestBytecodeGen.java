@@ -1,4 +1,4 @@
-package lambdacloud.examples;
+package lambdacloud.test;
 
 import static com.sun.org.apache.bcel.internal.Constants.ACC_PUBLIC;
 import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;

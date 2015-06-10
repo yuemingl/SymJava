@@ -1,4 +1,4 @@
-package lambdacloud.examples;
+package lambdacloud.test;
 
 import static symjava.math.SymMath.log;
 import static symjava.math.SymMath.random;

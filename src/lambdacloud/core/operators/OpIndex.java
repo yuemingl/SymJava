@@ -9,11 +9,12 @@ public class OpIndex extends CloudBase {
 	public OpIndex(Expr array, Expr index) {
 		this.array = array;
 		this.index = index;
+		this.label = array + "["+index+"]";
 	}
+	
 	@Override
 	public Expr[] args() {
 		return new Expr[]{array, index};
 	}
-	
 
 }
