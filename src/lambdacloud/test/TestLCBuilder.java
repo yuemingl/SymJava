@@ -6,7 +6,7 @@ import static symjava.math.SymMath.sin;
 import static symjava.math.SymMath.sqrt;
 import static symjava.symbolic.Symbol.*;
 import lambdacloud.core.CloudFunc;
-import lambdacloud.core.CSD;
+import lambdacloud.core.CloudSD;
 import lambdacloud.core.lang.LCIf;
 import lambdacloud.core.lang.LCLoop;
 import lambdacloud.core.lang.LCVar;
@@ -19,16 +19,16 @@ import symjava.relational.Lt;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Integrate;
 
-public class TestLC {
+public class TestLCBuilder {
 	
 	public static void testOverWriteArgs() {
-		LCBuilder cloudTask = new LCBuilder("local");
+		LCBuilder task = new LCBuilder("local");
 		
-		cloudTask.append(x.assign(sqrt(x*x+y*y))); //x=x+y
-		System.out.println(cloudTask);
+		task.append(x.assign(sqrt(x*x+y*y))); //x=x+y
+		System.out.println(task);
 		
 		double[] args = new double[]{3,4};
-		cloudTask.compile(new Expr[]{x, y}).apply(args);
+		task.compile(new Expr[]{x, y}).apply(args);
 		
 		
 		System.out.println(args[0]); //5.0

@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import lambdacloud.core.CSD;
+import lambdacloud.core.CloudSD;
 import symjava.symbolic.Add;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Expr;
@@ -328,28 +328,28 @@ public class Utils {
 		return rlt;
 	}
 	
-	public static List<CSD> extractCloudVars(Expr ...exprs) {
+	public static List<CloudSD> extractCloudVars(Expr ...exprs) {
 		Set<Expr> set = new HashSet<Expr>();
 		List<Expr> list = new ArrayList<Expr>();
 		for(int i=0; i<exprs.length; i++) {
 			BytecodeUtils.post_order(exprs[i], list);
 			for(Expr e : list) {
-				if(e instanceof CSD) {
-					set.add((CSD)e);
+				if(e instanceof CloudSD) {
+					set.add((CloudSD)e);
 				}
 			}
 		}
 		List<Expr> rlt = new ArrayList<Expr>();
 		rlt.addAll(set);
 		sortExprs(rlt);
-		List<CSD> rlt2 = new ArrayList<CSD>();
+		List<CloudSD> rlt2 = new ArrayList<CloudSD>();
 		for(Expr e : rlt) {
-			rlt2.add((CSD)e);
+			rlt2.add((CloudSD)e);
 		}
 		return rlt2;
 	}
 	
-	public static double[][] getDataFromCloudVars(CSD[] cloudVars) {
+	public static double[][] getDataFromCloudVars(CloudSD[] cloudVars) {
 		double[][] rlt = new double[cloudVars.length][];
 		for(int i=0; i<cloudVars.length; i++) {
 			if(cloudVars[i].fetchToLocal())

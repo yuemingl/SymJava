@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import lambdacloud.core.CSD;
+import lambdacloud.core.CloudSD;
 import lambdacloud.core.CloudConfig;
 
 import com.sun.org.apache.bcel.internal.generic.ArrayType;
@@ -72,8 +72,8 @@ public class LCBuilder{
 		return this;
 	}
 	
-	public CSD declareCSD(String name) {
-		return new CSD(name);
+	public CloudSD declareCSD(String name) {
+		return new CloudSD(name);
 	}
 
 	public LCVar declareInt(String name) {
@@ -104,7 +104,7 @@ public class LCBuilder{
 		return new LCByte(name);
 	}
 	
-	public void apply(CSD ...args) {
+	public void apply(CloudSD ...args) {
 		//fun.apply(args);
 	}
 	

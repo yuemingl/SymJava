@@ -4,7 +4,7 @@ import static symjava.math.SymMath.cos;
 import static symjava.symbolic.Symbol.C0;
 import static symjava.symbolic.Symbol.x;
 import lambdacloud.core.CloudConfig;
-import lambdacloud.core.CSD;
+import lambdacloud.core.CloudSD;
 import lambdacloud.core.lang.LCIf;
 import lambdacloud.core.lang.LCInt;
 import lambdacloud.core.lang.LCLoop;

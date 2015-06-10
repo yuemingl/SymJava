@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import lambdacloud.core.CSD;
+import lambdacloud.core.CloudSD;
 import symjava.relational.Gt;
 import symjava.relational.Relation;
 import symjava.symbolic.Expr;
@@ -23,7 +23,7 @@ public class LCIf extends LCBase {
 	Expr condition;
 	List<Expr> trueStmts = new ArrayList<Expr>();
 	List<Expr> falseStmts = new ArrayList<Expr>();
-	public LCIf(Expr condition, CSD ...args) {
+	public LCIf(Expr condition, CloudSD ...args) {
 		this.condition = condition;
 		initLabel();
 	}

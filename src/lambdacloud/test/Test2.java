@@ -4,7 +4,7 @@ import static symjava.symbolic.Symbol.x;
 import static symjava.symbolic.Symbol.y;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
-import lambdacloud.core.CSD;
+import lambdacloud.core.CloudSD;
 import symjava.symbolic.Expr;
 
 public class Test2 {
@@ -22,8 +22,8 @@ public class Test2 {
 		};
 		CloudFunc f = new CloudFunc("a_vector_function", new Expr[]{x, y}, exprs);
 		
-		CSD input = new CSD("input").init(new double[]{2, 1});
-		CSD output = new CSD("output").resize(2);
+		CloudSD input = new CloudSD("input").init(new double[]{2, 1});
+		CloudSD output = new CloudSD("output").resize(2);
 		
 		long begin = System.currentTimeMillis();
 		//f.apply(output, input);

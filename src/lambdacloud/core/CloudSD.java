@@ -32,31 +32,31 @@ import symjava.symbolic.utils.Utils;
  * </pre></blockquote>
  *
  */
-public class CSD extends Symbol {
+public class CloudSD extends Symbol {
 	double[] data = new double[0];
 	boolean isOnCloud = false;
 	
-	public CSD() {
+	public CloudSD() {
 		super("CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", ""));
 	}
 
-	public CSD(String name) {
+	public CloudSD(String name) {
 		super(name);
 	}
 	
-	public CSD(Expr expr) {
+	public CloudSD(Expr expr) {
 		super("CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", ""));
 		this.compile(this.label, expr);
 	}
 	
-	public CSD(String name, Expr expr) {
+	public CloudSD(String name, Expr expr) {
 		super(name);
 		this.compile(name, expr);
 	}
 	
-	public CSD compile(String name, Expr expr) {
+	public CloudSD compile(String name, Expr expr) {
 		if(CloudConfig.isLocal()) {
-			CSD[] args = Utils.extractCloudVars(expr).toArray(new CSD[0]);
+			CloudSD[] args = Utils.extractCloudVars(expr).toArray(new CloudSD[0]);
 			BytecodeBatchFunc fexpr = JIT.compileBatchFunc(args, expr);
 			data = new double[args[0].size()];
 			fexpr.apply(data, 0, Utils.getDataFromCloudVars(args));
@@ -74,7 +74,7 @@ public class CSD extends Symbol {
 	 * @param array
 	 * @return
 	 */
-	public CSD init(double ...array) {
+	public CloudSD init(double ...array) {
 		this.data = array;
 		return this;
 	}
@@ -104,7 +104,7 @@ public class CSD extends Symbol {
 	 * @param size
 	 * @return
 	 */
-	public CSD resize(int size) {
+	public CloudSD resize(int size) {
 		if(this.data == null)
 			this.data = new double[size];
 		else {
@@ -194,7 +194,7 @@ public class CSD extends Symbol {
 				e.printStackTrace();
 			}
 			CloudVarHandler h = client.getCloudVarHandler();
-			CSD var = h.getCloudVar();
+			CloudSD var = h.getCloudVar();
 			this.data = var.data;
 			this.isOnCloud = var.isOnCloud();
 			return this.isOnCloud;
@@ -227,8 +227,8 @@ public class CSD extends Symbol {
 		return null;
 	}
 	
-	public static CSD valueOf(Expr expr) {
-		return new CSD(expr);
+	public static CloudSD valueOf(Expr expr) {
+		return new CloudSD(expr);
 	}
 	
 	public Expr assign(Expr expr) {

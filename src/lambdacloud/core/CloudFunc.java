@@ -79,7 +79,7 @@ public class CloudFunc extends LCBase {
 		return this;
 	}
 
-	public void apply(CSD output, CSD ...inputs) {
+	public void apply(CloudSD output, CloudSD ...inputs) {
 		if(CloudConfig.isLocal()) {
 			if(inputs.length == 0) {
 				switch(funcType) {
@@ -132,7 +132,7 @@ public class CloudFunc extends LCBase {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			CSD rlt = handler.getCloudVar();
+			CloudSD rlt = handler.getCloudVar();
 			output.setLabel(rlt.getLabel());
 			output.data = rlt.data;
 			output.isOnCloud = rlt.isOnCloud;

@@ -3,10 +3,10 @@ package lambdacloud.net;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
-import lambdacloud.core.CSD;
+import lambdacloud.core.CloudSD;
 
 public class NetIOUtils {
-	public static CSD createCloudVar(byte[] data, int nameLen, int dataLen) {
+	public static CloudSD createCloudVar(byte[] data, int nameLen, int dataLen) {
 		String name = null;
 		try {
 			name = new String(data, 0, nameLen, "UTF-8");
@@ -14,7 +14,7 @@ public class NetIOUtils {
 			e.printStackTrace();
 		}
 		double[] ddata = toDoubleArray(data, nameLen, dataLen);
-		return new CSD(name).init(ddata);
+		return new CloudSD(name).init(ddata);
 	}
 	
 	public static CloudVarResp createCloudVarResp(byte[] data, int status, int nameLen, int messageLen) {
