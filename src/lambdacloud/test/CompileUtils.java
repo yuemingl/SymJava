@@ -48,6 +48,15 @@ public class CompileUtils {
 				argsMap.put(args[i].getLabel(), i);
 			}
 		}
+		System.out.println(fullClsName);
+		StringBuilder sb = new StringBuilder();
+		sb.append("double apply(");
+		for(Expr a : args)
+			sb.append("double ").append(a).append(",");
+		if(args.length > 0)
+			sb.delete(sb.length()-1, sb.length());
+		sb.append(");");
+		System.out.println(sb.toString());
 		
 		// Declare local variables
 		List<Expr> vars = Utils.extractSymbols(expr);
