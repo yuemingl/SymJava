@@ -1,7 +1,7 @@
 # SymJava
 SymJava is a Java library for symbolic-numeric computation.
 
-There are two useful features:
+There are two interesting features:
 
 1. Operator Overloading is implemented by using Java-OO (https://github.com/amelentev/java-oo)
 
@@ -13,7 +13,13 @@ Install java-oo Eclipse plugin for Java Operator Overloading support (https://gi
 Click in menu: Help -> Install New Software. Enter in "Work with" field: 
 http://amelentev.github.io/eclipse.jdt-oo-site/
 
-Examples:
+#Citing SymJava
+If you use SymJava for academic research, you are encouraged to cite the following paper:
+
+Yueming Liu, Peng Zhang, Meikang Qiu, "Fast Numerical Evaluation for Symbolic Expressions in Java", 17th IEEE International Conference on High Performance and Communications (HPCC 2015), New York, USA, August 24-26, 2015
+. (In Press)
+
+#Examples:
 
 ```Java
 package symjava.examples;
