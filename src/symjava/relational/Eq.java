@@ -9,7 +9,7 @@ import symjava.symbolic.utils.Utils;
 
 /**
  * An object of Eq represents an equation like
- * y = a*x+b
+ * y == a*x+b
  * 
  */
 public class Eq extends BinaryOp implements Relation {
@@ -21,14 +21,14 @@ public class Eq extends BinaryOp implements Relation {
 	/**
 	 * Create an equation without any symbolic parameters except free variables
 	 * For example:
-	 * Eq eq = new Eq(y, 2*x+1); //y = 2*x+1
+	 * Eq eq = new Eq(y, 2*x+1); //y == 2*x+1
 	 * 
 	 * @param lhs
 	 * @param rhs
 	 */
 	public Eq(Expr lhs, Expr rhs) {
 		super(lhs, rhs);
-		this.label = arg1 + " = " + arg2;
+		this.label = arg1 + " == " + arg2;
 		this.sortKey = this.label;
 		this.freeVars = Utils.extractSymbols(rhs).toArray(new Expr[0]);
 		this.params = new Expr[0];
@@ -54,7 +54,7 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars) {
 		super(lhs, rhs);
-		this.label = arg1 + " = " + arg2;
+		this.label = arg1 + " == " + arg2;
 		this.sortKey = this.label;
 		this.freeVars = freeVars;
 		List<Expr> list = Utils.extractSymbols(lhs, rhs);
@@ -97,7 +97,7 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params) {
 		super(lhs, rhs);
-		this.label = arg1 + " = " + arg2;
+		this.label = arg1 + " == " + arg2;
 		this.sortKey = this.label;
 		this.freeVars = freeVars;
 		this.params = params;
@@ -132,7 +132,7 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params, Expr[] dependentVars) {
 		super(lhs, rhs);
-		this.label = arg1 + " = " + arg2;
+		this.label = arg1 + " == " + arg2;
 		this.sortKey = this.label;
 		this.freeVars = freeVars;
 		this.params = params;

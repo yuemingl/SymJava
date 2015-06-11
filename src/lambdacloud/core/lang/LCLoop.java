@@ -13,6 +13,7 @@ import symjava.symbolic.utils.Utils;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.GOTO;
 import com.sun.org.apache.bcel.internal.generic.IF_ICMPLT;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
@@ -23,32 +24,51 @@ public class LCLoop extends LCBase {
 	Expr conditionExpr;
 	Expr incrementExpr;
 	List<Expr> bodyList = new ArrayList<Expr>();
+	// Store position for 'break' instruction
+	List<InstructionHandle> breakPos = new ArrayList<InstructionHandle>();
 	
 	public LCLoop(Expr conditionExpr) {
 		this.conditionExpr = conditionExpr;
-		initLabel();
+		updateLabel();
 	}
 	
 	public LCLoop(Expr initExpr, Expr conditionExpr) {
 		this.initExpr = initExpr;
 		this.conditionExpr = conditionExpr;
-		initLabel();
+		updateLabel();
 	}
 	
 	public LCLoop(Expr initExpr, Expr conditionExpr, Expr incrementExpr) {
 		this.initExpr = initExpr;
 		this.conditionExpr = conditionExpr;
 		this.incrementExpr = incrementExpr;
-		initLabel();
+		updateLabel();
 	}
 	
 	public LCLoop appendBody(Expr expr) {
+		if(expr instanceof LCBase) {
+			((LCBase) expr).setParent(this);
+		}
 		bodyList.add(expr);
-		initLabel();
+		updateLabel();
 		return this;
 	}
 	
-	protected void initLabel() {
+	public LCLoop breakIf(Expr condition) {
+		LCIf ifa = new LCIf(condition);
+		ifa.setParent(this);
+		ifa.appendTrue(new LCBreak());
+		
+		bodyList.add(ifa);
+		updateLabel();
+		return this;
+	}
+	
+	public void addBreakPos(InstructionHandle pos) {
+		this.breakPos.add(pos);
+	}
+	
+	protected void updateLabel() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("for(");
 		if(initExpr != null) sb.append(initExpr);
@@ -74,17 +94,17 @@ public class LCLoop extends LCBase {
 		Relation cond = (Relation)conditionExpr;
 
 		InstructionHandle loopStart = null;
-		if(this.initExpr != null)
-			loopStart = this.initExpr.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		if(initExpr != null)
+			loopStart = initExpr.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		
 		InstructionHandle bodyStart = null; //il.append(new NOP()); // Mark loop start position
 		for(int i=0; i<bodyList.size(); i++) {
-			Expr be = this.bodyList.get(i);
+			Expr be = bodyList.get(i);
 			InstructionHandle pos = be.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			if(bodyStart == null) bodyStart = pos;
 		}
-		if(this.incrementExpr != null) {
-			InstructionHandle pos = this.incrementExpr.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		if(incrementExpr != null) {
+			InstructionHandle pos = incrementExpr.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			if(bodyStart == null) bodyStart = pos;
 		}
 
@@ -95,8 +115,14 @@ public class LCLoop extends LCBase {
 			il.append(new IF_ICMPLT(bodyStart));
 		} //else if (...)
 		
+		
 		if(bodyStart != null)
 			il.insert(bodyStart, new GOTO(cmpStart)); // goto comparison before the loop
+
+		InstructionHandle loopEnd = il.append(InstructionConstants.NOP);
+		for(int i=0; i<breakPos.size(); i++) {
+			il.insert(breakPos.get(i), new GOTO(loopEnd));
+		}
 		
 		if(loopStart == null) loopStart = bodyStart;
 		if(loopStart == null) loopStart = cmpStart;

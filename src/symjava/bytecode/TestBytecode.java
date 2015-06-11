@@ -46,6 +46,15 @@ public class TestBytecode {
 		String s = null;
 		for(int i=0; i<10; i++) {
 			s = args[i];
+			if(i == 3) {
+				s = "bbb";
+				//break;
+			}
+			else
+				s = "aaa";
+			//s += "";
+			StringBuilder ss = new StringBuilder();
+			//ss.append(1);
 		}
 		System.out.println(s);
 

@@ -3,6 +3,8 @@ package lambdacloud.core.lang;
 import symjava.symbolic.Expr;
 
 public abstract class LCBase extends Expr {
+	protected LCBase parent = null;
+	
 	@Override
 	public Expr simplify() {
 		throw new UnsupportedOperationException();
@@ -26,5 +28,10 @@ public abstract class LCBase extends Expr {
 	@Override
 	public Expr[] args() {
 		return new Expr[0];
+	}
+	
+	public LCBase setParent(LCBase p) {
+		this.parent = p;
+		return this;
 	}
 }

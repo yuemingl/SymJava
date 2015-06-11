@@ -21,22 +21,22 @@ public class LCStatements extends LCBase {
 	
 	public LCStatements(List<Expr> exprList) {
 		this.exprList.addAll(exprList);
-		initLabel();
+		updateLabel();
 	}
 	
 	public LCStatements append(List<Expr> exprList) {
 		this.exprList.addAll(exprList);
-		initLabel();
+		updateLabel();
 		return this;
 	}
 	
 	public LCStatements append(Expr expr) {
 		exprList.add(expr);
-		initLabel();
+		updateLabel();
 		return this;
 	}
 	
-	protected void initLabel() {
+	protected void updateLabel() {
 		StringBuilder sb = new StringBuilder();
 		for(Expr e : exprList) {
 			sb.append(e).append(";\n");

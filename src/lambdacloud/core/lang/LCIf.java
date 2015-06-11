@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import lambdacloud.core.CloudSD;
+import symjava.relational.Eq;
 import symjava.relational.Gt;
 import symjava.relational.Relation;
 import symjava.symbolic.Expr;
@@ -12,6 +13,7 @@ import symjava.symbolic.Expr;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.GOTO;
 import com.sun.org.apache.bcel.internal.generic.IFLE;
+import com.sun.org.apache.bcel.internal.generic.IF_ICMPNE;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
@@ -25,10 +27,10 @@ public class LCIf extends LCBase {
 	List<Expr> falseStmts = new ArrayList<Expr>();
 	public LCIf(Expr condition, CloudSD ...args) {
 		this.condition = condition;
-		initLabel();
+		updateLabel();
 	}
 	
-	public void initLabel() {
+	protected void updateLabel() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("if( ").append(condition).append(" ) {\n");
 		for(Expr e : trueStmts) {
@@ -44,14 +46,20 @@ public class LCIf extends LCBase {
 	}
 	
 	public LCIf appendTrue(Expr expr) {
+		if(expr instanceof LCBase) {
+			((LCBase) expr).setParent(this);
+		}
 		trueStmts.add(expr);
-		initLabel();
+		updateLabel();
 		return this;
 	}
 
 	public LCIf appendFalse(Expr expr) {
+		if(expr instanceof LCBase) {
+			((LCBase) expr).setParent(this);
+		}
 		falseStmts.add(expr);
-		initLabel();
+		updateLabel();
 		return this;
 	}
 	
@@ -63,25 +71,58 @@ public class LCIf extends LCBase {
 		if(!(condition instanceof Relation))
 			throw new RuntimeException();
 		Relation cond = (Relation)condition;
-		InstructionHandle endif = null;
+		InstructionHandle startPos = null;
+		InstructionHandle endPos = null;
 		if(cond instanceof Gt) { // l > r
 			cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			cond.rhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			il.append(InstructionConstants.DCMPL);
 			
-			InstructionHandle trueBranchStart = il.append(InstructionConstants.NOP);
-			trueStmts.get(0).bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			//for ...
+			InstructionHandle trueBranchStart = null;
+			for(Expr te : trueStmts) {
+				InstructionHandle pos = te.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+				if(trueBranchStart == null)
+					trueBranchStart = pos;
+			}
+			if(trueBranchStart == null) trueBranchStart = il.append(InstructionConstants.NOP);
 			
-			InstructionHandle falseBranchStart = il.append(InstructionConstants.NOP);
-			falseStmts.get(0).bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			//for ...
+			InstructionHandle falseBranchStart = null;
+			for(Expr fe : falseStmts) {
+				InstructionHandle pos = fe.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+				if(falseBranchStart == null)
+					falseBranchStart = pos;
+			}
+			if(falseBranchStart == null) falseBranchStart = il.append(InstructionConstants.NOP);
+
 			
-			endif = il.append(InstructionConstants.NOP);
+			endPos = il.append(InstructionConstants.NOP);
 			il.insert(trueBranchStart, new IFLE(falseBranchStart));
-			il.insert(falseBranchStart, new GOTO(endif));
+			il.insert(falseBranchStart, new GOTO(endPos));
+		} else if(cond instanceof Eq) { // l == r
+			startPos = cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			cond.rhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			
+			InstructionHandle trueBranchStart = null;
+			for(Expr te : trueStmts) {
+				InstructionHandle pos = te.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+				if(trueBranchStart == null)
+					trueBranchStart = pos;
+			}
+			if(trueBranchStart == null) trueBranchStart = il.append(InstructionConstants.NOP);
+			
+			InstructionHandle falseBranchStart = null;
+			for(Expr fe : falseStmts) {
+				InstructionHandle pos = fe.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+				if(falseBranchStart == null)
+					falseBranchStart = pos;
+			}
+			if(falseBranchStart == null) falseBranchStart = il.append(InstructionConstants.NOP);
+			
+			endPos = il.append(InstructionConstants.NOP);
+			il.insert(trueBranchStart, new IF_ICMPNE(falseBranchStart));
+			il.insert(falseBranchStart, new GOTO(endPos));
 		}
-		return endif;
+		return startPos;
 	}
 
 	@Override
