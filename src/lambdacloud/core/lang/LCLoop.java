@@ -47,7 +47,7 @@ public class LCLoop extends LCBase {
 	
 	public LCLoop appendBody(Expr expr) {
 		if(expr instanceof LCBase) {
-			((LCBase) expr).setParent(this);
+			((LCBase) expr).setParent(this).indent();
 		}
 		bodyList.add(expr);
 		updateLabel();
@@ -58,8 +58,7 @@ public class LCLoop extends LCBase {
 		LCIf ifa = new LCIf(condition);
 		ifa.setParent(this);
 		ifa.appendTrue(new LCBreak());
-		
-		bodyList.add(ifa);
+		appendBody(ifa);
 		updateLabel();
 		return this;
 	}
@@ -68,9 +67,9 @@ public class LCLoop extends LCBase {
 		this.breakPos.add(pos);
 	}
 	
-	protected void updateLabel() {
+	public void updateLabel() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("for(");
+		sb.append(indent).append("for(");
 		if(initExpr != null) sb.append(initExpr);
 		sb.append("; ");
 		if(conditionExpr != null) sb.append(conditionExpr);
@@ -78,7 +77,10 @@ public class LCLoop extends LCBase {
 		if(incrementExpr != null) sb.append(incrementExpr);
 		sb.append(") {\n");
 		for(Expr e : bodyList) {
-			sb.append("\t").append(e).append(";\n");
+			if(e instanceof LCBase) {
+				sb.append(indent).append(e).append("\n");
+			} else
+				sb.append(indent).append("\t").append(e).append(";\n");
 		}
 		sb.append("}");
 		this.label = sb.toString();

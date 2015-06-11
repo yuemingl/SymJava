@@ -25,7 +25,11 @@ public class LCAsign extends LCBase {
 	public LCAsign(Expr lhs, Expr rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;
-		this.label = lhs + " = " + rhs;
+		updateLabel();
+	}
+	
+	public void updateLabel() {
+		this.label = this.indent + lhs + " = " + rhs;
 	}
 	
 	@Override

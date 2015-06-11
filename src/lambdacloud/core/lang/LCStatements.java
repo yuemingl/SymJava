@@ -36,10 +36,13 @@ public class LCStatements extends LCBase {
 		return this;
 	}
 	
-	protected void updateLabel() {
+	public void updateLabel() {
 		StringBuilder sb = new StringBuilder();
 		for(Expr e : exprList) {
-			sb.append(e).append(";\n");
+			if(e instanceof LCBase) {
+				sb.append(e).append("\n");
+			} else
+				sb.append(indent).append(e).append(";\n");
 		}
 		this.label = sb.toString();
 	}

@@ -13,9 +13,18 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 public class LCReturn extends LCBase {
 	protected Expr arg;
+	public LCReturn() {
+		arg = null;
+	}
+	
 	public LCReturn(Expr expr) {
 		this.arg = expr;
-		this.label = "return "+arg;
+		updateLabel();
+	}
+	
+	public void updateLabel() {
+		this.label = this.indent + "return " + arg + ";";
+		
 	}
 	
 	@Override
@@ -23,6 +32,8 @@ public class LCReturn extends LCBase {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
+		if(arg == null)
+			il.append(InstructionConstants.RETURN);
 		InstructionHandle startPos = arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		TYPE ty = arg.getType();
 		if(ty == TYPE.DOUBLE)

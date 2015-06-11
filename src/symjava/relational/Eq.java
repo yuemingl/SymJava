@@ -157,7 +157,13 @@ public class Eq extends BinaryOp implements Relation {
 	public static Eq apply(double lhs, Expr rhs) {
 		return new Eq(Expr.valueOf(lhs), rhs);
 	}
+	public static Eq apply(int lhs, Expr rhs) {
+		return new Eq(Expr.valueOf(lhs), rhs);
+	}
 	public static Eq apply(Expr lhs, double rhs) {
+		return new Eq(lhs, Expr.valueOf(rhs));
+	}
+	public static Eq apply(Expr lhs, int rhs) {
 		return new Eq(lhs, Expr.valueOf(rhs));
 	}
 	

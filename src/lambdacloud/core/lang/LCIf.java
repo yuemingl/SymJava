@@ -30,24 +30,32 @@ public class LCIf extends LCBase {
 		updateLabel();
 	}
 	
-	protected void updateLabel() {
+	public void updateLabel() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("if( ").append(condition).append(" ) {\n");
+		sb.append(indent).append("if( ").append(condition).append(" ) {\n");
 		for(Expr e : trueStmts) {
-			sb.append("\t").append(e).append(";\n");
+			if(e instanceof LCBase) {
+				sb.append(indent).append(e).append("\n");
+			} else
+				sb.append(indent).append("\t").append(e).append(";\n");
 		}
+		if(falseStmts.size() > 0) {
 		sb.append("} else {\n");
 		for(Expr e : falseStmts) {
-			sb.append("\t").append(e).append(";\n");
+			if(e instanceof LCBase) {
+				sb.append(indent).append(e).append("\n");
+			} else
+				sb.append(indent).append("\t").append(e).append(";\n");
 		}
-		sb.append("}");
+		}
+		sb.append(indent).append("}");
 		this.label = sb.toString();
 		
 	}
 	
 	public LCIf appendTrue(Expr expr) {
 		if(expr instanceof LCBase) {
-			((LCBase) expr).setParent(this);
+			((LCBase) expr).setParent(this).indent();
 		}
 		trueStmts.add(expr);
 		updateLabel();
@@ -56,7 +64,7 @@ public class LCIf extends LCBase {
 
 	public LCIf appendFalse(Expr expr) {
 		if(expr instanceof LCBase) {
-			((LCBase) expr).setParent(this);
+			((LCBase) expr).setParent(this).indent();
 		}
 		falseStmts.add(expr);
 		updateLabel();

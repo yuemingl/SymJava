@@ -14,7 +14,11 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 public class LCBreak extends LCBase {
 	public LCBreak() {
-		this.label = "break";
+		updateLabel();
+	}
+	
+	public void updateLabel() {
+		this.label = this.indent + "break;";
 	}
 	
 	@Override

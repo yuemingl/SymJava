@@ -4,6 +4,7 @@ import symjava.symbolic.Expr;
 
 public abstract class LCBase extends Expr {
 	protected LCBase parent = null;
+	String indent = "";
 	
 	@Override
 	public Expr simplify() {
@@ -33,5 +34,18 @@ public abstract class LCBase extends Expr {
 	public LCBase setParent(LCBase p) {
 		this.parent = p;
 		return this;
+	}
+	
+	public LCBase indent() {
+		this.indent += "    ";
+		return this;
+	}
+	
+	public void updateLabel() {
+	}
+	
+	public String toString() {
+		updateLabel();
+		return label;
 	}
 }
