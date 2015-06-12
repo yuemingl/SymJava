@@ -26,10 +26,10 @@ public class Example1 {
 		// We fetch it to local machine and print out the numbers.
 		// In order to fetch a named shared data, you need define
 		// an instance of CloudSD with the name.
-		CloudSD var2 = new CloudSD("var123");
-		var2.fetchToLocal();
-		if(var2.isOnCloud()) {
-			for(double d : var2.getData()) {
+		CloudSD data2 = new CloudSD("myData");
+		data2.fetchToLocal();
+		if(data2.isOnCloud()) {
+			for(double d : data2.getData()) {
 				System.out.println(d);
 			}
 		}
