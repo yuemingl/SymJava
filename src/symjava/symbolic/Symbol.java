@@ -2,6 +2,8 @@ package symjava.symbolic;
 
 import java.util.Map;
 
+import lambdacloud.core.lang.LCIndex;
+
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.DALOAD;
@@ -161,5 +163,17 @@ public class Symbol extends Expr {
 	@Override
 	public Expr[] args() {
 		return new Expr[0];
-	}	
+	}
+	
+	public LCIndex get(int index) {
+		return new LCIndex(this, index);
+	}
+	
+	public LCIndex get(Expr index) {
+		return new LCIndex(this, index);
+	}
+//	
+//	public LCIndex set(int index) {
+//		return new LCIndex(this, index);
+//	}
 }
