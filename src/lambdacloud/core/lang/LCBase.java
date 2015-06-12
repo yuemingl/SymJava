@@ -8,17 +8,17 @@ public abstract class LCBase extends Expr {
 	
 	@Override
 	public Expr simplify() {
-		throw new UnsupportedOperationException();
+		return this;
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	@Override
 	public Expr diff(Expr expr) {
-		throw new UnsupportedOperationException();
+		return this;
 	}
 
 	@Override
