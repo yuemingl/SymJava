@@ -26,15 +26,16 @@ public class ExampleDotProduct {
 		
 		lcs.append(new LCLoop(i.assign(0), Lt.apply(i, new LCLength(x)), i.assign(i+1))
 			.appendBody(sum.assign(sum + x[i]*y[i])));
-		lcs.append(new LCAssign(output[0], sum));
+		lcs.append(new LCAssign(output[3], sum)); // Store the sum at index 3
 		
-		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, new Expr[]{x, y});
+		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, output, new Expr[]{x, y});
 		
-		double[] out = new double[10];
+		double[] out = new double[6];
 		double[] xx = new double[] {1,2,3,4,5,6};
 		double[] yy = new double[] {2,1,2,1,1,1};
 		f.apply(out, 0, xx, yy);
-		System.out.println(out[0]);
+		for(double d : out)
+			System.out.println(d);
 	}
 
 }

@@ -13,7 +13,7 @@ public class TestLCIndex {
 		LCStatements lcs = new LCStatements();
 		Symbol output = new Symbol("output");
 		lcs.append(new LCAssign(output[0], x[2]));
-		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, new Expr[]{x});
+		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, output, new Expr[]{x});
 		double[] out = new double[10];
 		double[] xx = new double[] {1,2,3};
 		f.apply(out, 0, xx);
@@ -24,7 +24,7 @@ public class TestLCIndex {
 		LCStatements lcs = new LCStatements();
 		Symbol output = new Symbol("output");
 		lcs.append(new LCAssign(output[0], x[2]*y[2]));
-		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, new Expr[]{x, y});
+		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, output, new Expr[]{x, y});
 		double[] out = new double[10];
 		double[] xx = new double[] {1,2,3};
 		double[] yy = new double[] {2,1,2};

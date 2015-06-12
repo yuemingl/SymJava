@@ -120,14 +120,22 @@ public class CompileUtils {
 		return cg;
 	}
 	
-	public static BytecodeBatchFunc compileVec(Expr expr, Expr ...args) {
-		ClassGen cg = _compileVec(expr, args);
+	/**
+	 * void apply(double[] output, int outPos, double[] x, double[] y, ...)
+	 * 
+	 * @param expr
+	 * @param output
+	 * @param args
+	 * @return
+	 */
+	public static BytecodeBatchFunc compileVec(Expr expr, Symbol output, Expr ...args) {
+		ClassGen cg = _compileVec(expr, output, args);
 		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
 		BytecodeBatchFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 	
-	public static ClassGen _compileVec(Expr expr, Expr[] args) {
+	public static ClassGen _compileVec(Expr expr, Symbol output, Expr[] args) {
 		String packageName = "symjava.bytecode";
 		String clsName = expr.getClass().getSimpleName() + System.currentTimeMillis();
 		String fullClsName = packageName+"."+clsName;
@@ -156,13 +164,13 @@ public class CompileUtils {
 			}
 		}
 		//special symbol for output
-		argsMap.put("output", 1);
+		argsMap.put(output.getLabel(), 1);
 		
 		System.out.println(fullClsName);
 		StringBuilder sb = new StringBuilder();
 		sb.append("void apply(double[] output, int outPos,");
 		for(Expr a : args)
-			sb.append("double[] ").append(a).append(",");
+			sb.append(" double[] ").append(a).append(",");
 		sb.delete(sb.length()-1, sb.length());
 		sb.append(");");
 		System.out.println(sb.toString());
