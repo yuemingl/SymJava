@@ -19,17 +19,17 @@ import com.sun.org.apache.bcel.internal.generic.LSTORE;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 
-public class LCAsign extends LCBase {
+public class LCAssign extends LCBase {
 	protected Expr lhs;
 	protected Expr rhs;
-	public LCAsign(Expr lhs, Expr rhs) {
+	public LCAssign(Expr lhs, Expr rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;
 		updateLabel();
 	}
 	
 	public void updateLabel() {
-		this.label = this.indent + lhs + " = " + rhs;
+		this.label = this.indent + lhs + " = " + rhs + ";";
 	}
 	
 	@Override
@@ -37,7 +37,7 @@ public class LCAsign extends LCBase {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		if(!(lhs instanceof Symbol)) //allow symbol
+		if(!(lhs instanceof Symbol) && !(lhs instanceof LCIndex)) //allow symbol
 			throw new RuntimeException(lhs.toString());
 		InstructionHandle startPos = null;
 		if(lhs instanceof LCVar) {
@@ -55,10 +55,17 @@ public class LCAsign extends LCBase {
 				il.append(new FSTORE(var.getLVTIndex()));
 			else
 				il.append(new ISTORE(var.getLVTIndex()));
+		} else if((lhs instanceof LCIndex) && (((LCIndex)lhs).getArrayRef().getLabel().equals("output"))) {
+			LCIndex idx = (LCIndex)lhs;
+			startPos = il.append(new ALOAD(argsMap.get(idx.getArrayRef().getLabel())));
+			idx.getIndex().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			BytecodeUtils.typeCase(il, rhs.getType(), TYPE.DOUBLE);
+			il.append(InstructionConstants.DASTORE);
 		} else {
-			il.append(new ALOAD(argsStartPos));
+			startPos = il.append(new ALOAD(argsStartPos));
 			il.append(new PUSH(cp, argsMap.get(lhs.getLabel())));
-			startPos = rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			il.append(InstructionConstants.DASTORE);
 		}
 		return startPos;
