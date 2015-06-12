@@ -2,11 +2,14 @@ package lambdacloud.core;
 
 import io.netty.channel.Channel;
 import lambdacloud.core.lang.LCBase;
+import lambdacloud.core.lang.LCReturn;
+import lambdacloud.core.lang.LCStatements;
 import lambdacloud.net.CloudFuncHandler;
 import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudResp;
 import lambdacloud.net.CloudVarHandler;
 import lambdacloud.net.CloudClient;
+import lambdacloud.test.CompileUtils;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
@@ -46,13 +49,19 @@ public class CloudFunc extends LCBase {
 	}
 	
 	public CloudFunc compile(String name, Expr[] args, Expr expr) {
+		Expr compileExpr = expr;
+		if(!(expr instanceof LCBase)) {
+			compileExpr = new LCReturn(expr);
+		}
 		if(CloudConfig.isLocal()) {
 			funcType = 1;
-			func = JIT.compile(args, expr);
+			func = CompileUtils.compile(compileExpr, args);
+			//func = JIT.compile(args, expr);
 			
 		} else {
 			//send the exprssion to the server
-			funcIR = JIT.getIR(name, args, expr);
+			funcIR = CompileUtils.getIR(compileExpr, args);
+			//funcIR = JIT.getIR(name, args, expr);
 			CloudFuncHandler handler = CloudConfig.getClient().getCloudFuncHandler();
 			Channel ch = CloudConfig.getClient().getChannel();
 			try {
