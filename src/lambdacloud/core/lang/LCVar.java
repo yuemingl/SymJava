@@ -34,15 +34,15 @@ public abstract class LCVar extends Symbol {
 	}
 	
 	public Expr assign(Expr expr) {
-		return new LCAsign(this, expr);
+		return new LCAssign(this, expr);
 	}
 	
 	public Expr assign(double val) {
-		return new LCAsign(this, Expr.valueOf(val));
+		return new LCAssign(this, Expr.valueOf(val));
 	}
 
 	public Expr assign(int val) {
-		return new LCAsign(this, Expr.valueOf(val));
+		return new LCAssign(this, Expr.valueOf(val));
 	}
 	
 	public Expr get(Expr index) {

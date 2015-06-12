@@ -13,7 +13,7 @@ import symjava.relational.Lt;
 public class Example3 {
 
 	public static void main(String[] args) {
-		LCBuilder lcb = new LCBuilder("server");
+		LCBuilder lcb = new LCBuilder("local");
 
 		double[] data = {1,2,3,4,5,6};
 		CloudSD myData = new CloudSD("myData").init(data);
@@ -27,7 +27,7 @@ public class Example3 {
 		 * 	sum = sum + i;
 		 * }
 		 */
-		lcb.For(i.assign(0), Lt.apply(i, 6), i.assign(i+1))
+		lcb.For(i.assign(0), Lt.apply(i, 11), i.assign(i+1))
 			.appendBody(sum.assign(sum+i));
 		
 		lcb.Return(sum); //return sum;

@@ -40,7 +40,7 @@ public class LCStatements extends LCBase {
 		StringBuilder sb = new StringBuilder();
 		for(Expr e : exprList) {
 			if(e instanceof LCBase) {
-				sb.append(e).append("\n");
+				sb.append(indent).append(e).append("\n");
 			} else
 				sb.append(indent).append(e).append(";\n");
 		}

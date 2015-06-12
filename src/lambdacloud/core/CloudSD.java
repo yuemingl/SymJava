@@ -1,7 +1,7 @@
 package lambdacloud.core;
 
 import io.netty.channel.Channel;
-import lambdacloud.core.lang.LCAsign;
+import lambdacloud.core.lang.LCAssign;
 import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudVarHandler;
 import lambdacloud.net.CloudVarRespHandler;
@@ -232,15 +232,15 @@ public class CloudSD extends Symbol {
 	}
 	
 	public Expr assign(Expr expr) {
-		return new LCAsign(this, expr);
+		return new LCAssign(this, expr);
 	}
 	
 	public Expr assign(double val) {
-		return new LCAsign(this, Expr.valueOf(val));
+		return new LCAssign(this, Expr.valueOf(val));
 	}
 
 	public Expr assign(int val) {
-		return new LCAsign(this, Expr.valueOf(val));
+		return new LCAssign(this, Expr.valueOf(val));
 	}
 
 }
