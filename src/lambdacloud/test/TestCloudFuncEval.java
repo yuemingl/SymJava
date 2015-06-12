@@ -21,7 +21,7 @@ public class TestCloudFuncEval {
 		CloudFunc func = new CloudFunc("func123", 
 				new Expr[] { x, y }, sqrt(x*x + y*y));
 
-		CloudSD output = new CloudSD("out123");
+		CloudSD output = new CloudSD("out123").resize(1);
 		// Evaluate the function on the cloud and 
 		// return the reference of the result
 		long begin = System.currentTimeMillis();
