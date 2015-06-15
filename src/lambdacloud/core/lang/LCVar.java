@@ -5,15 +5,18 @@ import java.util.Map;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
 
+import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.DLOAD;
 import com.sun.org.apache.bcel.internal.generic.FLOAD;
 import com.sun.org.apache.bcel.internal.generic.ILOAD;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.LLOAD;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
 
 /**
  * The base type of the local variables in a compiled function.
@@ -26,7 +29,7 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
  */
 public abstract class LCVar extends Symbol {
 //	protected boolean isDeclaredAsLocal = false;
-	protected int indexLVT; // index in local variable table
+	protected int indexLVT = -1; // index in local variable table
 	
 	public LCVar(String name) {
 		super(name);
@@ -57,21 +60,17 @@ public abstract class LCVar extends Symbol {
 		return this.getLabel();
 	}
 	
+	public boolean isLocalVar() {
+		return this.indexLVT >= 0;
+	}
+	
 	@Override
 	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-//		if(this.isDeclaredAsLocal) {
-			// Load from a local variable
-//			return il.append(new DLOAD(indexLVT));
-//		} else {
-//			// Load from an array (argument or local array)
-//			il.append(new ALOAD(argsStartPos));
-//			il.append(new PUSH(cp, argsMap.get(this.label)));
-//			return il.append(InstructionConstants.DALOAD);
-//		}
-			
+		if(this.isLocalVar()) {
+			// Load from local variable table
 			TYPE ty = this.getType();
 			if(ty == TYPE.DOUBLE)
 				return il.append(new DLOAD(indexLVT));
@@ -82,7 +81,12 @@ public abstract class LCVar extends Symbol {
 			if(ty == TYPE.FLOAT)
 				return il.append(new FLOAD(indexLVT));
 			return il.append(new ILOAD(indexLVT));
-			
+		} else {
+			// Load from a double array from arguments
+			il.append(new ALOAD(argsStartPos));
+			il.append(new PUSH(cp, argsMap.get(this.label)));
+			return il.append(InstructionConstants.DALOAD);
+		}
 	}
 	
 	public static LCInt getInt(String name) {

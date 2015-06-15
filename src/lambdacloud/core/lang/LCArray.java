@@ -3,7 +3,6 @@ package lambdacloud.core.lang;
 import java.util.Map;
 
 import symjava.symbolic.Expr;
-import symjava.symbolic.Symbol;
 
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
@@ -65,11 +64,35 @@ public abstract class LCArray extends LCVar {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		InstructionHandle startPos = il.append(new ALOAD(argsStartPos));
-		il.append(new PUSH(cp, argsMap.get(arrayRef.getLabel())));
-		il.append(InstructionConstants.AALOAD);
-		index.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		il.append(InstructionConstants.DALOAD);
+		InstructionHandle startPos = null;
+		if(this.isLocalVar()) {
+			startPos = il.append(new ALOAD(indexLVT));
+			index.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			LCArray tmp = this;
+			while(tmp.arrayRef.index != null) {
+				il.append(InstructionConstants.AALOAD);
+				il.append(new ALOAD(tmp.arrayRef.indexLVT));
+				tmp.arrayRef.index.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+				tmp = tmp.arrayRef;
+			}
+			TYPE ty = this.getType();
+			if(ty == TYPE.DOUBLE)
+				return il.append(InstructionConstants.DALOAD);
+			if(ty == TYPE.INT)
+				return il.append(InstructionConstants.IALOAD);
+			if(ty == TYPE.LONG)
+				return il.append(InstructionConstants.LALOAD);
+			if(ty == TYPE.FLOAT)
+				return il.append(InstructionConstants.FALOAD);
+			return il.append(InstructionConstants.IALOAD);
+		} else {
+			// Load from arguments
+			startPos = il.append(new ALOAD(argsStartPos));
+			il.append(new PUSH(cp, argsMap.get(arrayRef.getLabel())));
+			il.append(InstructionConstants.AALOAD);
+			index.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			il.append(InstructionConstants.DALOAD);
+		}
 		
 		return startPos;
 	}
