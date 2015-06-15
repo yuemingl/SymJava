@@ -172,6 +172,8 @@ public class CompileUtils {
 		for(Expr var : vars) {
 			if(var instanceof LCVar) {
 				LCVar cv = (LCVar)var;
+				if(argsMap.get(cv.getName()) != null)
+					continue; // Skip arguments (non local variables)
 				int indexLVT = BytecodeUtils.declareLocal(cv, mg, il);
 				cv.setLVTIndex(indexLVT);
 			}

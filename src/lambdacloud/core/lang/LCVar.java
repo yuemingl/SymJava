@@ -45,10 +45,6 @@ public abstract class LCVar extends Symbol {
 		return new LCAssign(this, Expr.valueOf(val));
 	}
 	
-	public Expr get(Expr index) {
-		return new LCIndex(this, index);
-	}
-	
 	public void setLVTIndex(int index) {
 		this.indexLVT = index;
 	}
@@ -56,6 +52,11 @@ public abstract class LCVar extends Symbol {
 	public int getLVTIndex() {
 		return this.indexLVT;
 	}
+	
+	public String getName() {
+		return this.getLabel();
+	}
+	
 	@Override
 	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
 			ConstantPoolGen cp, InstructionFactory factory,
@@ -82,5 +83,33 @@ public abstract class LCVar extends Symbol {
 				return il.append(new FLOAD(indexLVT));
 			return il.append(new ILOAD(indexLVT));
 			
+	}
+	
+	public static LCInt getInt(String name) {
+		return new LCInt(name);
+	}
+	
+	public static LCLong getLong(String name) {
+		return new LCLong(name);
+	}
+	
+	public static LCFloat getFloat(String name) {
+		return new LCFloat(name);
+	}
+	
+	public static LCDouble getDouble(String name) {
+		return new LCDouble(name);
+	}
+	
+	public static LCShort getShort(String name) {
+		return new LCShort(name);
+	}
+	
+	public static LCChar getChar(String name) {
+		return new LCChar(name);
+	}
+	
+	public static LCByte getByte(String name) {
+		return new LCByte(name);
 	}
 }

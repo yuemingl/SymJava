@@ -1,23 +1,36 @@
 package lambdacloud.test;
 
-import static symjava.symbolic.Symbol.x;
-import lambdacloud.core.lang.LCAssign;
+import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCLength;
 import lambdacloud.core.lang.LCStatements;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.symbolic.Expr;
-import symjava.symbolic.Symbol;
 
+/**
+ * 
+ * void apply(double[] outAry, int outPos, double[] ...args) {
+ * 	outAry[0] = args[0].length;
+ * }
+ *
+ */
 public class TestLCLength {
 	public static void test1() {
 		LCStatements lcs = new LCStatements();
-		Symbol output = new Symbol("output");
-		lcs.append(new LCAssign(output[0], new LCLength(x)));
+		
+		LCArray x = LCArray.getDoubleArray("x");
+		LCArray output = LCArray.getDoubleArray("output");
+		
+		lcs.append(output[0].assign(x.getLength()));
+		lcs.append(output[1].assign(x.size()));
+		lcs.append(output[2].assign(new LCLength(x)));
+		
 		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, new Expr[]{x});
+		
 		double[] out = new double[10];
 		double[] xx = new double[] {1,2,3};
 		f.apply(out, 0, xx);
-		System.out.println(out[0]);
+		for(double d : out)
+			System.out.println(d);
 	}
 	
 	public static void main(String[] args) {
