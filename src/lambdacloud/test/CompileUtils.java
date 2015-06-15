@@ -3,47 +3,31 @@ package lambdacloud.test;
 import static com.sun.org.apache.bcel.internal.Constants.ACC_PUBLIC;
 import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCVar;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.IR;
-import symjava.logic.Logic;
-import symjava.relational.Relation;
 import symjava.symbolic.Expr;
-import symjava.symbolic.Symbol;
 import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.FuncClassLoader;
 import symjava.symbolic.utils.Utils;
 
-import com.sun.org.apache.bcel.internal.generic.AALOAD;
-import com.sun.org.apache.bcel.internal.generic.ALOAD;
-import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
 import com.sun.org.apache.bcel.internal.generic.ArrayType;
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
-import com.sun.org.apache.bcel.internal.generic.DASTORE;
-import com.sun.org.apache.bcel.internal.generic.GOTO;
-import com.sun.org.apache.bcel.internal.generic.I2D;
-import com.sun.org.apache.bcel.internal.generic.ICONST;
-import com.sun.org.apache.bcel.internal.generic.IF_ICMPLT;
-import com.sun.org.apache.bcel.internal.generic.IINC;
-import com.sun.org.apache.bcel.internal.generic.ILOAD;
-import com.sun.org.apache.bcel.internal.generic.ISTORE;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
-import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
-import com.sun.org.apache.bcel.internal.generic.LocalVariableGen;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class CompileUtils {
 	
-	public static IR getIR(Expr expr, Expr ...args) {
+	public static IR getIR(Expr expr, LCVar ...args) {
 		ClassGen cg = _compile(expr, args);
 		IR ir =  new IR();
 		ir.type = 1;
@@ -52,14 +36,14 @@ public class CompileUtils {
 		return ir;
 	}
 	
-	public static BytecodeFunc compile(Expr expr, Expr ...args) {
+	public static BytecodeFunc compile(Expr expr, LCVar ...args) {
 		ClassGen cg = _compile(expr, args);
 		FuncClassLoader<BytecodeFunc> fcl = new FuncClassLoader<BytecodeFunc>();
 		BytecodeFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 	
-	public static ClassGen _compile(Expr expr, Expr ...args) {
+	public static ClassGen _compile(Expr expr, LCVar ...args) {
 		String packageName = "symjava.bytecode";
 		String clsName = expr.getClass().getSimpleName() + System.currentTimeMillis();
 		String fullClsName = packageName+"."+clsName;
@@ -128,14 +112,14 @@ public class CompileUtils {
 	 * @param args
 	 * @return
 	 */
-	public static BytecodeBatchFunc compileVec(Expr expr, Symbol output, Expr ...args) {
+	public static BytecodeBatchFunc compileVec(Expr expr, LCArray output, LCVar ...args) {
 		ClassGen cg = _compileVec(expr, output, args);
 		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
 		BytecodeBatchFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 	
-	public static ClassGen _compileVec(Expr expr, Symbol output, Expr[] args) {
+	public static ClassGen _compileVec(Expr expr, LCArray output, LCVar[] args) {
 		String packageName = "symjava.bytecode";
 		String clsName = expr.getClass().getSimpleName() + System.currentTimeMillis();
 		String fullClsName = packageName+"."+clsName;
@@ -180,6 +164,8 @@ public class CompileUtils {
 		for(Expr var : vars) {
 			if(var instanceof LCVar) {
 				LCVar cv = (LCVar)var;
+				if(argsMap.get(cv.getName()) != null)
+					continue; // Skip arguments (non local variables)
 				int indexLVT = BytecodeUtils.declareLocal(cv, mg, il);
 				cv.setLVTIndex(indexLVT);
 			}

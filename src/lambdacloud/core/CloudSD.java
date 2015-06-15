@@ -93,7 +93,7 @@ public class CloudSD extends Symbol {
 	 * @param index
 	 * @return
 	 */
-	public double get(int index) {
+	public double getData(int index) {
 		return data[index];
 	}
 	 

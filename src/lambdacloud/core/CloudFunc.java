@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 import lambdacloud.core.lang.LCBase;
 import lambdacloud.core.lang.LCReturn;
 import lambdacloud.core.lang.LCStatements;
+import lambdacloud.core.lang.LCVar;
 import lambdacloud.net.CloudFuncHandler;
 import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudResp;
@@ -31,24 +32,24 @@ public class CloudFunc extends LCBase {
 	public CloudFunc(String name) {
 		this.name = name;
 	}
-	public CloudFunc(String name, Expr[] args, Expr expr) {
+	public CloudFunc(String name, LCVar[] args, Expr expr) {
 		this.name = name;
 		this.compile(name, args, expr);
 	}
-	public CloudFunc(String name, Expr[] args, Expr[] expr) {
+	public CloudFunc(String name, LCVar[] args, Expr[] expr) {
 		this.name = name;
 		this.compile(name, args, expr);
 	}
-	public CloudFunc(Expr[] args, Expr expr) {
+	public CloudFunc(LCVar[] args, Expr expr) {
 		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		this.compile(name, args, expr);
 	}
-	public CloudFunc(Expr[] args, Expr[] expr) {
+	public CloudFunc(LCVar[] args, Expr[] expr) {
 		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		this.compile(name, args, expr);
 	}
 	
-	public CloudFunc compile(String name, Expr[] args, Expr expr) {
+	public CloudFunc compile(String name, LCVar[] args, Expr expr) {
 		Expr compileExpr = expr;
 		if(!(expr instanceof LCBase)) {
 			compileExpr = new LCReturn(expr);

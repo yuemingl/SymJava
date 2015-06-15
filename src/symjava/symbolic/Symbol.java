@@ -2,21 +2,16 @@ package symjava.symbolic;
 
 import java.util.Map;
 
-import lambdacloud.core.lang.LCIndex;
+import symjava.symbolic.utils.Utils;
 
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
-import com.sun.org.apache.bcel.internal.generic.DALOAD;
-import com.sun.org.apache.bcel.internal.generic.DLOAD;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
-
-import symjava.symbolic.Expr.TYPE;
-import symjava.symbolic.utils.Utils;
 
 /**
  * An object of Symbol has a string name which is its unique id,
@@ -164,16 +159,5 @@ public class Symbol extends Expr {
 	public Expr[] args() {
 		return new Expr[0];
 	}
-	
-	public LCIndex get(int index) {
-		return new LCIndex(this, index);
-	}
-	
-	public LCIndex get(Expr index) {
-		return new LCIndex(this, index);
-	}
-//	
-//	public LCIndex set(int index) {
-//		return new LCIndex(this, index);
-//	}
+
 }

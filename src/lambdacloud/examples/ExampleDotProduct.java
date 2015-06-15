@@ -1,34 +1,30 @@
 package lambdacloud.examples;
 
-import static symjava.symbolic.Symbol.x;
-import static symjava.symbolic.Symbol.y;
-import lambdacloud.core.lang.LCAssign;
-import lambdacloud.core.lang.LCDouble;
-import lambdacloud.core.lang.LCInt;
-import lambdacloud.core.lang.LCLength;
+import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCLoop;
 import lambdacloud.core.lang.LCStatements;
 import lambdacloud.core.lang.LCVar;
 import lambdacloud.test.CompileUtils;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.relational.Lt;
-import symjava.symbolic.Expr;
-import symjava.symbolic.Symbol;
 
 public class ExampleDotProduct {
 
 	public static void main(String[] args) {
 		LCStatements lcs = new LCStatements();
 		
-		Symbol output = new Symbol("output");
-		LCVar i = new LCInt("i");
-		LCVar sum = new LCDouble("sum");
+		LCArray x = LCArray.getDoubleArray("x");
+		LCArray y = LCArray.getDoubleArray("y");
+		LCArray output = LCArray.getDoubleArray("output");
+		LCVar i = LCVar.getInt("i");
+		LCVar sum = LCVar.getDouble("sum");
 		
-		lcs.append(new LCLoop(i.assign(0), Lt.apply(i, new LCLength(x)), i.assign(i+1))
+		lcs.append(new LCLoop(i.assign(0), Lt.apply(i, x.getLength()), i.assign(i+1))
 			.appendBody(sum.assign(sum + x[i]*y[i])));
-		lcs.append(new LCAssign(output[3], sum)); // Store the sum at index 3
+
+		lcs.append(output[0].assign(sum));
 		
-		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, output, new Expr[]{x, y});
+		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, output, x, y);
 		
 		double[] out = new double[6];
 		double[] xx = new double[] {1,2,3,4,5,6};

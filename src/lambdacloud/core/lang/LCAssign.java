@@ -37,10 +37,18 @@ public class LCAssign extends LCBase {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		if(!(lhs instanceof Symbol) && !(lhs instanceof LCIndex)) //allow symbol
+		if(!(lhs instanceof Symbol) && !(lhs instanceof LCArray)) //allow symbol
 			throw new RuntimeException(lhs.toString());
 		InstructionHandle startPos = null;
-		if(lhs instanceof LCVar) {
+		if(lhs instanceof LCArray) {
+			//TODO Support local array
+			LCArray aryRef = (LCArray)lhs;
+			startPos = il.append(new ALOAD(argsMap.get(aryRef.getArrayRef().getLabel())));
+			aryRef.getIndex().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			BytecodeUtils.typeCase(il, rhs.getType(), TYPE.DOUBLE);
+			il.append(InstructionConstants.DASTORE);
+		} else if(lhs instanceof LCVar) {
 			startPos = rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			LCVar var = (LCVar)lhs;
 			TYPE ty = lhs.getType();
@@ -55,16 +63,6 @@ public class LCAssign extends LCBase {
 				il.append(new FSTORE(var.getLVTIndex()));
 			else
 				il.append(new ISTORE(var.getLVTIndex()));
-		//} else if((lhs instanceof LCIndex) && (((LCIndex)lhs).getArrayRef().getLabel().equals("output"))) {
-		} else if(lhs instanceof LCIndex) {
-			LCIndex idx = (LCIndex)lhs;
-			startPos = il.append(new ALOAD(argsMap.get(idx.getArrayRef().getLabel())));
-			idx.getIndex().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			il.append(InstructionConstants.ILOAD_2); // int outPos in BytecodeBatchFunc
-			il.append(InstructionConstants.IADD);
-			rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			BytecodeUtils.typeCase(il, rhs.getType(), TYPE.DOUBLE);
-			il.append(InstructionConstants.DASTORE);
 		} else {
 			startPos = il.append(new ALOAD(argsStartPos));
 			il.append(new PUSH(cp, argsMap.get(lhs.getLabel())));

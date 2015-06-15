@@ -7,8 +7,6 @@ import java.util.Map;
 import symjava.relational.Lt;
 import symjava.relational.Relation;
 import symjava.symbolic.Expr;
-import symjava.symbolic.utils.BytecodeUtils;
-import symjava.symbolic.utils.Utils;
 
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.GOTO;
