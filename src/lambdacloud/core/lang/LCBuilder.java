@@ -7,9 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
-import lambdacloud.core.CloudConfig;
+import symjava.bytecode.BytecodeFunc;
+import symjava.symbolic.Expr;
+import symjava.symbolic.utils.BytecodeUtils;
+import symjava.symbolic.utils.FuncClassLoader;
+import symjava.symbolic.utils.Utils;
 
 import com.sun.org.apache.bcel.internal.generic.ArrayType;
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
@@ -19,13 +24,6 @@ import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.Type;
-
-import symjava.bytecode.BytecodeFunc;
-import symjava.symbolic.Expr;
-import symjava.symbolic.Symbol;
-import symjava.symbolic.utils.BytecodeUtils;
-import symjava.symbolic.utils.FuncClassLoader;
-import symjava.symbolic.utils.Utils;
 
 /**
  * Lambda Cloud instruction builder
