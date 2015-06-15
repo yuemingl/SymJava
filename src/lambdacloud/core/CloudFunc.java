@@ -19,49 +19,53 @@ import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
 public class CloudFunc extends LCBase {
-	String name;
-	BytecodeFunc func;
-	BytecodeVecFunc vecFunc;
-	BytecodeBatchFunc batchFunc;
-	boolean isOnCloud = false;
+	protected String name;
+	protected BytecodeFunc func;
+	protected BytecodeVecFunc vecFunc;
+	protected BytecodeBatchFunc batchFunc;
+	protected boolean isOnCloud = false;
 	
 	//1=BytecodeFunc,2=BytecodeVecFunc,3=BytecodeBatchFunc
-	int funcType = 0; 
-	IR funcIR = null;
+	protected int funcType = 0; 
+	protected IR funcIR = null;
 	
 	public CloudFunc(String name) {
 		this.name = name;
 	}
+	
 	public CloudFunc(String name, LCVar[] args, Expr expr) {
 		this.name = name;
-		this.compile(name, args, expr);
-	}
-	public CloudFunc(String name, LCVar[] args, Expr[] expr) {
-		this.name = name;
-		this.compile(name, args, expr);
-	}
-	public CloudFunc(LCVar[] args, Expr expr) {
-		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
-		this.compile(name, args, expr);
-	}
-	public CloudFunc(LCVar[] args, Expr[] expr) {
-		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
-		this.compile(name, args, expr);
+		this.compile(args, expr);
 	}
 	
-	public CloudFunc compile(String name, LCVar[] args, Expr expr) {
+	public CloudFunc(String name, LCVar[] args, Expr[] expr) {
+		this.name = name;
+		this.compile(args, expr);
+	}
+	
+	public CloudFunc(LCVar[] args, Expr expr) {
+		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		this.compile(args, expr);
+	}
+	
+	public CloudFunc(LCVar[] args, Expr[] expr) {
+		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		this.compile(args, expr);
+	}
+	
+	public CloudFunc compile(LCVar[] args, Expr expr) {
 		Expr compileExpr = expr;
 		if(!(expr instanceof LCBase)) {
 			compileExpr = new LCReturn(expr);
 		}
 		if(CloudConfig.isLocal()) {
 			funcType = 1;
-			func = CompileUtils.compile(compileExpr, args);
+			func = CompileUtils.compile(name, compileExpr, args);
 			//func = JIT.compile(args, expr);
 			
 		} else {
 			//send the exprssion to the server
-			funcIR = CompileUtils.getIR(compileExpr, args);
+			funcIR = CompileUtils.getIR(name, compileExpr, args);
 			//funcIR = JIT.getIR(name, args, expr);
 			CloudFuncHandler handler = CloudConfig.getClient().getCloudFuncHandler();
 			Channel ch = CloudConfig.getClient().getChannel();
@@ -79,7 +83,7 @@ public class CloudFunc extends LCBase {
 		return this;
 	}
 	
-	public CloudFunc compile(String name, Expr[] args, Expr[] exprs) {
+	public CloudFunc compile(Expr[] args, Expr[] exprs) {
 		if(CloudConfig.isLocal()) {
 			funcType = 2;
 			vecFunc = JIT.compile(args, exprs);
@@ -135,7 +139,7 @@ public class CloudFunc extends LCBase {
 			try {
 				CloudQuery qry = new CloudQuery();
 				qry.qryType = CloudQuery.CLOUD_FUNC_EVAL;
-				qry.objName = this.getName();
+				qry.objName = name;
 				qry.argNames.add(inputs[0].getLabel());
 				qry.outputName = output.getName();
 				client.getChannel().writeAndFlush(qry).sync();

@@ -1,10 +1,9 @@
 package lambdacloud.test;
 
-import static symjava.symbolic.Symbol.*;
-
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
+import lambdacloud.core.lang.LCVar;
 import symjava.symbolic.Expr;
 
 public class Test {
@@ -13,10 +12,13 @@ public class Test {
 	}
 	
 	public static void test() {
-		CloudConfig.setTarget("local");
+		CloudConfig.setTarget("server");
+		
+		LCVar x = LCVar.getDouble("x");
+		LCVar y = LCVar.getDouble("y");
 		
 		Expr expr = x + y;
-		CloudFunc f = new CloudFunc(new Expr[]{x, y}, expr);
+		CloudFunc f = new CloudFunc(new LCVar[]{x, y}, expr);
 		
 		CloudSD input = new CloudSD("input").init(new double[]{1, 2});
 		CloudSD output = new CloudSD("output").resize(1);

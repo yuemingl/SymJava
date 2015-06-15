@@ -27,8 +27,8 @@ import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class CompileUtils {
 	
-	public static IR getIR(Expr expr, LCVar ...args) {
-		ClassGen cg = _compile(expr, args);
+	public static IR getIR(String name, Expr expr, LCVar ...args) {
+		ClassGen cg = _compile(name, expr, args);
 		IR ir =  new IR();
 		ir.type = 1;
 		ir.name = cg.getJavaClass().getClassName();
@@ -37,15 +37,24 @@ public class CompileUtils {
 	}
 	
 	public static BytecodeFunc compile(Expr expr, LCVar ...args) {
-		ClassGen cg = _compile(expr, args);
+		ClassGen cg = _compile(null, expr, args);
 		FuncClassLoader<BytecodeFunc> fcl = new FuncClassLoader<BytecodeFunc>();
 		BytecodeFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 	
-	public static ClassGen _compile(Expr expr, LCVar ...args) {
+	public static BytecodeFunc compile(String name, Expr expr, LCVar ...args) {
+		ClassGen cg = _compile(name, expr, args);
+		FuncClassLoader<BytecodeFunc> fcl = new FuncClassLoader<BytecodeFunc>();
+		BytecodeFunc fun = fcl.newInstance(cg);
+		return fun;
+	}
+	
+	public static ClassGen _compile(String name, Expr expr, LCVar ...args) {
 		String packageName = "symjava.bytecode";
-		String clsName = expr.getClass().getSimpleName() + System.currentTimeMillis();
+		String clsName = name;
+		if(clsName == null)
+			clsName = expr.getClass().getSimpleName() + System.currentTimeMillis();
 		String fullClsName = packageName+"."+clsName;
 		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",
 				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeFunc"});
@@ -71,10 +80,11 @@ public class CompileUtils {
 		}
 		System.out.println(fullClsName);
 		StringBuilder sb = new StringBuilder();
-		sb.append("double apply(,");
+		sb.append("double apply(");
 		for(Expr a : args)
-			sb.append("double ").append(a).append(",");
-		sb.delete(sb.length()-1, sb.length());
+			sb.append("double ").append(a).append(", ");
+		if(args.length > 0)
+		sb.delete(sb.length()-2, sb.length());
 		sb.append(");");
 		System.out.println(sb.toString());
 		
@@ -83,6 +93,8 @@ public class CompileUtils {
 		for(Expr var : vars) {
 			if(var instanceof LCVar) {
 				LCVar cv = (LCVar)var;
+				if(argsMap.get(cv.getName()) != null)
+					continue; // Skip arguments (non local variables)
 				int indexLVT = BytecodeUtils.declareLocal(cv, mg, il);
 				cv.setLVTIndex(indexLVT);
 			}
@@ -113,15 +125,24 @@ public class CompileUtils {
 	 * @return
 	 */
 	public static BytecodeBatchFunc compileVec(Expr expr, LCArray output, LCVar ...args) {
-		ClassGen cg = _compileVec(expr, output, args);
+		ClassGen cg = _compileVec(null, expr, output, args);
+		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
+		BytecodeBatchFunc fun = fcl.newInstance(cg);
+		return fun;
+	}
+
+	public static BytecodeBatchFunc compileVec(String name, Expr expr, LCArray output, LCVar ...args) {
+		ClassGen cg = _compileVec(name, expr, output, args);
 		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
 		BytecodeBatchFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 	
-	public static ClassGen _compileVec(Expr expr, LCArray output, LCVar[] args) {
+	public static ClassGen _compileVec(String name, Expr expr, LCArray output, LCVar[] args) {
 		String packageName = "symjava.bytecode";
-		String clsName = expr.getClass().getSimpleName() + System.currentTimeMillis();
+		String clsName = name;
+		if(clsName == null)
+			clsName = expr.getClass().getSimpleName() + System.currentTimeMillis();
 		String fullClsName = packageName+"."+clsName;
 		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",
 				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeBatchFunc"});
