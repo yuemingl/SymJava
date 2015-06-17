@@ -1,18 +1,17 @@
 package lambdacloud.test;
 
 import static symjava.math.SymMath.cos;
-import static symjava.symbolic.Symbol.C0;
-import static symjava.symbolic.Symbol.x;
-import lambdacloud.core.CloudConfig;
+import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
-import lambdacloud.core.lang.LCIf;
+import lambdacloud.core.lang.LCBuilder;
 import lambdacloud.core.lang.LCInt;
 import lambdacloud.core.lang.LCLoop;
+import lambdacloud.core.lang.LCReturn;
+import lambdacloud.core.lang.LCStatements;
 import lambdacloud.core.lang.LCVar;
-import lambdacloud.core.lang.LCBreak;
+import symjava.math.SymMath;
 import symjava.relational.Lt;
 import symjava.symbolic.Expr;
-import symjava.symbolic.utils.JIT;
 
 public class TestLCLoop {
 
@@ -21,95 +20,115 @@ public class TestLCLoop {
 	*/
 	public static void testLoop1() {
 		LCInt i = new LCInt("i");
+		LCVar x = LCVar.getDouble("x");
 
+		LCStatements lcs1 = new LCStatements();
 		//for(int i=0; i<100; i++);
 		LCLoop loop = new LCLoop(
 				i.assign(0),      //i = 0
 				Lt.apply(i, 100), //i < 100
 				i.assign(i + 1)   //i = i+1
 			);
-		
-		System.out.println(loop);
-		System.out.println(CompileUtils.compile(loop).apply());
+		lcs1.append(loop);
+		lcs1.append(new LCReturn(x));
+		System.out.println(lcs1);
+		System.out.println(CompileUtils.compile(lcs1).apply());
 		
 		//int i=0;
 		//while(i<100) {
 		// i++;
 		//}
+		LCStatements lcs2 = new LCStatements();
 		LCLoop loop2 = new LCLoop(
 				i.assign(0),     //i = 0
 				Lt.apply(i, 100) //i < 100
 			);
 		loop2.appendBody(i.assign(i + 1)); // i=i+1
-		System.out.println(loop2);
-		System.out.println(CompileUtils.compile(loop2).apply());
+		lcs2.append(loop2);
+		lcs2.append(new LCReturn(x));
+		System.out.println(lcs2);
+		System.out.println(CompileUtils.compile(lcs2).apply());
 	}
 	
-//	/**
-//	 * Use Nnewton's method to solve x = cos(x) with
-//	 * initial value x0=1.0
-//	 * 
-//	 * @param args
-//	 */
-//	public static void testLoop2() {
-//		CloudConfig.setTarget("server");
-//		
-//		// Compute the derivative of f(x) locally
-//		Expr f = x - cos(x);
-//		Expr df = f.diff(x);
-//		System.out.println("f(x)="+f+"    f.diff(x)="+df);
-//		
-//		// Define a cloud variable (global) to store 
-//		//the initial value and solution after the iterations
-//		CloudSharedVar x0 = new CloudSharedVar("x0");
-//		x0.init(new double[] { 1.0 });
-//		x0.storeToCloud();
-//		
-//		// Declare i as a local variable on the cloud task server
-//		CloudVar i = new CloudVar("i");
-//		C0.assignTo(i); //i=0;
-//
-//		/**
-//		 *  Define a while loop on cloud:
-//		 *  while(i<maxIter) {
-//		 *    double dx = -f(x0)/df(x0);
-//		 *    if(dx < 1e-5) break;
-//		 *    x0 = x0 + dx;
-//		 *  }
-//		 */
-//		int maxIter = 100;
-//		CloudLoop loop = new CloudLoop( Lt.apply(i, maxIter) ); //while(i<maxIter)
-//
-//		// Declare a temporary local variable dx on the cloud task server
-//		CloudVar dx = new CloudVar("dx");
-//		//dx = -f/df;
-//		loop.appendBody((-f/df).assignTo(dx));
-//		
-//		CloudIf stopCond = new CloudIf(Lt.apply(dx,1e-5)); //if(dx < 1e-5) break;
-//		stopCond.appendTrue(new CloudBreak());
-//		loop.appendBody(stopCond);
-//		
-//		// Update initial value x0 = x0 + dx
-//		loop.appendBody((x0+dx).assignTo(x0));
-//
-//		// Now we have all our instructions, call apply() to run it on cloud
-//		loop.apply(x0);
-//		
-//		// Get the result
-//		x0.fetchToLocal();
-//		System.out.println(x0.get(0));
-//	}
+	/**
+	 * Use Newton's method to solve x = cos(x) with initial value x0=1.0
+	 * (http://www.sosmath.com/calculus/diff/der07/der07.html)
+	 * 
+	 * The following function is generated for the cloud task server.
+	 *  double apply(double x) {
+	 *    for(int i=0; i<100; i++) {
+	 *      double dx = -f(x)/df(x); //Symbolic expression
+	 *      if(abs(dx) < 1e-5) break;
+	 *      x = x + dx;
+	 *    }
+	 *    return x;
+	 *  }
+	 *  
+	 * Results:
+	 * x_1=1.
+	 * x_2=0.750363867840
+	 * ...
+	 * x_8=0.739085133215
+	 */
+	public static void testLoop2() {
+		LCBuilder lcb = new LCBuilder("server");
+		
+		// Compute the derivative of f(x) locally
+		LCVar x = LCVar.getDouble("x");
+		Expr f = x - cos(x);
+		Expr df = f.diff(x);
+		System.out.println("f(x)="+f+"    f.diff(x)="+df);
+		
+		int maxIter = 100;
+		LCInt i = new LCInt("i");                           //int i = 0;
+		LCVar dx = LCVar.getDouble("dx");                   //double dx = 0;
+		
+		lcb.For(i.assign(0), Lt.apply(i, maxIter), i.inc()) // for(int i=0; i<100; i++) {
+			.appendBody( dx.assign(-f/df) )                 //   dx = -f(x)/df(x);
+			.breakIf(Lt.apply(SymMath.abs(dx), 1e-5))       //   if(dx < 1e-5) break;
+			.appendBody(x.assign(x + dx))                   //   x = x + dx;
+			;                                               // }
+		lcb.Return(x);                                      // return x;
+		System.out.println(lcb);
+
+		// Build function: double apply(double x)
+		CloudFunc func = lcb.build(x);
+		
+		// Define the cloud shared variables to store the initial value and solution
+		CloudSD x0 = new CloudSD("x0");
+		x0.init(new double[] { 1.0 });
+		x0.storeToCloud();
+		CloudSD ans = new CloudSD("ans").resize(1);
+
+		func.apply(ans, x0); // Run the function on the cloud task server
+		
+		// Get the result. (=0.7390851)
+		ans.fetchToLocal();
+		System.out.println("Solution: "+ans.getData(0));
+		System.out.println("Verify: "+applyTest(1.0));
+	}
+	
+	/**
+	 * Verify the solution locally
+	 * @param x
+	 * @return
+	 */
+	public static double applyTest(double x) {
+		int i = 0;
+		for(; i < 100; i++) {
+		    double dx = -(-Math.cos(x) + x)/(1 + Math.sin(x));
+		    if( Math.abs(dx) < 1.0E-5 ) {
+		        break;
+		    }
+		    x = dx + x;
+		}
+		System.out.println("Max iter="+i);
+		return x;
+	}
 	
 	public static void main(String[] args) {
 		testLoop1();
-		//testLoop2();
+		testLoop2();
 	}
 }
-/**
- * \begin{displaymath}\begin{array}{cl} 
- * x_1=&1.\\ 
- * x_2=&0.7503638678402438930349423... ...7673873\\ 
- * x_8=&0.739085133215160641655312087673873 \end{array}
- * \end{displaymath}
- * 
- */
+

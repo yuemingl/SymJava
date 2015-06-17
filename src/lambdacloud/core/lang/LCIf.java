@@ -6,12 +6,17 @@ import java.util.Map;
 
 import lambdacloud.core.CloudSD;
 import symjava.relational.Eq;
+import symjava.relational.Ge;
 import symjava.relational.Gt;
+import symjava.relational.Lt;
 import symjava.relational.Relation;
 import symjava.symbolic.Expr;
+import symjava.symbolic.utils.BytecodeUtils;
+import symjava.symbolic.utils.Utils;
 
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.GOTO;
+import com.sun.org.apache.bcel.internal.generic.IFGE;
 import com.sun.org.apache.bcel.internal.generic.IFLE;
 import com.sun.org.apache.bcel.internal.generic.IF_ICMPNE;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
@@ -82,9 +87,11 @@ public class LCIf extends LCBase {
 		InstructionHandle startPos = null;
 		InstructionHandle endPos = null;
 		if(cond instanceof Gt) { // l > r
+			TYPE ty = Utils.getConvertedType(cond.lhs().getType(), cond.rhs().getType());
 			cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			BytecodeUtils.typeCase(il, cond.lhs().getType(), ty);
 			cond.rhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			il.append(InstructionConstants.DCMPL);
+			BytecodeUtils.typeCase(il, cond.lhs().getType(), ty);
 			
 			InstructionHandle trueBranchStart = null;
 			for(Expr te : trueStmts) {
@@ -102,14 +109,19 @@ public class LCIf extends LCBase {
 			}
 			if(falseBranchStart == null) falseBranchStart = il.append(InstructionConstants.NOP);
 
-			
 			endPos = il.append(InstructionConstants.NOP);
+			
+			il.insert(trueBranchStart, InstructionConstants.DCMPL);
 			il.insert(trueBranchStart, new IFLE(falseBranchStart));
 			il.insert(falseBranchStart, new GOTO(endPos));
-		} else if(cond instanceof Eq) { // l == r
+
+		} else if(cond instanceof Lt) { // l < r
+			TYPE ty = Utils.getConvertedType(cond.lhs().getType(), cond.rhs().getType());
 			startPos = cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			BytecodeUtils.typeCase(il, cond.lhs().getType(), ty);
 			cond.rhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			
+			BytecodeUtils.typeCase(il, cond.lhs().getType(), ty);
+
 			InstructionHandle trueBranchStart = null;
 			for(Expr te : trueStmts) {
 				InstructionHandle pos = te.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
@@ -125,11 +137,37 @@ public class LCIf extends LCBase {
 					falseBranchStart = pos;
 			}
 			if(falseBranchStart == null) falseBranchStart = il.append(InstructionConstants.NOP);
-			
+
 			endPos = il.append(InstructionConstants.NOP);
-			il.insert(trueBranchStart, new IF_ICMPNE(falseBranchStart));
+			
+			il.insert(trueBranchStart, InstructionConstants.DCMPG);
+			il.insert(trueBranchStart, new IFGE(falseBranchStart));
 			il.insert(falseBranchStart, new GOTO(endPos));
+
+		} else if(cond instanceof Eq) { // l == r
+		startPos = cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		cond.rhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		
+		InstructionHandle trueBranchStart = null;
+		for(Expr te : trueStmts) {
+			InstructionHandle pos = te.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			if(trueBranchStart == null)
+				trueBranchStart = pos;
 		}
+		if(trueBranchStart == null) trueBranchStart = il.append(InstructionConstants.NOP);
+		
+		InstructionHandle falseBranchStart = null;
+		for(Expr fe : falseStmts) {
+			InstructionHandle pos = fe.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			if(falseBranchStart == null)
+				falseBranchStart = pos;
+		}
+		if(falseBranchStart == null) falseBranchStart = il.append(InstructionConstants.NOP);
+		
+		endPos = il.append(InstructionConstants.NOP);
+		il.insert(trueBranchStart, new IF_ICMPNE(falseBranchStart));
+		il.insert(falseBranchStart, new GOTO(endPos));
+	}
 		return startPos;
 	}
 
