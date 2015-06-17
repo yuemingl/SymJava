@@ -114,7 +114,8 @@ public class Negate extends UnaryOp {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		return il.append(InstructionConstants.DNEG);
+		InstructionHandle startPos = arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		il.append(InstructionConstants.DNEG);
+		return startPos;
 	}
 }

@@ -38,6 +38,7 @@ public class Test2 {
 		
 		long begin = System.currentTimeMillis();
 		//f.apply(output, input);
+		// Call apply in every iteration
 		for(int i=0; i<10; i++) {
 			f.apply(output, input);
 			Expr update = input + 1.0*output;

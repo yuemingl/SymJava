@@ -409,7 +409,7 @@ public class Utils {
 		return rlt;
 	}
 	
-	public static TYPE getType(TYPE t1, TYPE t2) {
+	public static TYPE getConvertedType(TYPE t1, TYPE t2) {
 		if(t1 == t2) return t1;
 		if(t1 == TYPE.BOOLEAN || t2 == TYPE.BOOLEAN) {
 			if(t1 != TYPE.BOOLEAN || t2 != TYPE.BOOLEAN)

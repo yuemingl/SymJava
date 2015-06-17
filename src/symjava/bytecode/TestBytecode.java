@@ -88,12 +88,23 @@ public class TestBytecode {
 		else
 			s--;
  */
-		double[] data = new double[] {1,2,3,4};
-		double sum = 0;
-		for(int i=0; i<data.length; i++) {
-			sum = sum + i;
-			//sum = sum + data[i];
-		}
-		System.out.println(sum);
+//		double[] data = new double[] {1,2,3,4};
+//		double sum = 0;
+//		for(int i=0; i<data.length; i++) {
+//			sum = sum + i;
+//			//sum = sum + data[i];
+//		}
+//		System.out.println(sum);
+		
+		int i=0;
+		int j=1;
+		double d=1;
+		double e=1;
+		int s = 0;
+		if(i>j) s = 0;
+		else s = 1;
+		
+		if(d>e) s = 0;
+		else s = 1;
 	}
 }

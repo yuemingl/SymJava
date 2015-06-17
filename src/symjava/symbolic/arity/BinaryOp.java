@@ -32,7 +32,7 @@ public abstract class BinaryOp extends Expr {
 
 	@Override
 	public TYPE getType() {
-		return Utils.getType(arg1.getType(), arg2.getType());
+		return Utils.getConvertedType(arg1.getType(), arg2.getType());
 	}
 	
 }

@@ -45,7 +45,7 @@ public class Remainder extends BinaryOp {
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
 		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		TYPE ty = Utils.getType(arg1.getType(), arg2.getType());
+		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
 		BytecodeUtils.typeCase(il, arg1.getType(), ty);
 		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		BytecodeUtils.typeCase(il, arg2.getType(), ty);		

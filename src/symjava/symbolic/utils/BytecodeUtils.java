@@ -877,78 +877,76 @@ public class BytecodeUtils {
 		throw new RuntimeException();
 	}
 
-	public static void typeCase(InstructionList il, TYPE fromType, TYPE toType) {
+	public static InstructionHandle typeCase(InstructionList il, TYPE fromType, TYPE toType) {
 		if(fromType != toType) {
 			switch(fromType) {
 			case INT: 
 				switch(toType) {
 					case LONG:
-						il.append(I2L);
-						return;
+						return il.append(I2L);
 					case FLOAT:
-						il.append(I2F);
-						return;
+						return il.append(I2F);
 					case DOUBLE:
-						il.append(I2D);
-						return;
+						return il.append(I2D);
 					case BYTE:
-						il.append(I2B);
-						return;
+						return il.append(I2B);
 					case CHAR:
-						il.append(I2C);
-						return;
+						return il.append(I2C);
 					case SHORT:
-						il.append(I2S);
-						return;
+						return il.append(I2S);
 					default:
-						return;
+						return null;
 				}
 			case LONG:
 				switch(toType) {
 					case INT:
-						il.append(L2I);
-						return;
+						return il.append(L2I);
 					case FLOAT:
-						il.append(L2F);
-						return;
+						return il.append(L2F);
 					case DOUBLE:
-						il.append(L2D);
-						return;
+						return il.append(L2D);
 					default:
-						return;
+						return null;
 				}
 			case FLOAT:
 				switch(toType) {
 					case INT:
-						il.append(F2I);
-						return;
+						return il.append(F2I);
 					case LONG:
-						il.append(F2L);
-						return;
+						return il.append(F2L);
 					case DOUBLE:
-						il.append(F2D);
-						return;
+						return il.append(F2D);
 					default:
-						return;
+						return null;
 				}
 			case DOUBLE:
 				switch(toType) {
 					case INT:
-						il.append(D2I);
-						return;
+						return il.append(D2I);
 					case LONG:
-						il.append(D2L);
-						return;
+						return il.append(D2L);
 					case FLOAT:
-						il.append(D2F);
-						return;
+						return il.append(D2F);
 					default:
-						return;
+						return null;
 				}
 			default:
-				return;
+				return null;
 			}
 		}
-	}	
+		return null;
+	}
+	
+	public static InstructionHandle appendCMPL(InstructionList il, TYPE ty) {
+//		InstructionHandle startPos = null;
+//		switch(ty) {
+//			case INT: 
+//				startPos = il.append(new IF_ICMPLT());
+//				return startPos;
+//			default:
+				return null;
+//		}
+		
+	}
 	
 }
