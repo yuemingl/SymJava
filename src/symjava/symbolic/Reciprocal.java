@@ -1,5 +1,16 @@
 package symjava.symbolic;
 
+import java.util.Map;
+
+import com.sun.org.apache.bcel.internal.Constants;
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.Type;
+
 import symjava.symbolic.arity.UnaryOp;
 import symjava.symbolic.utils.Utils;
 
@@ -59,5 +70,15 @@ public class Reciprocal extends UnaryOp {
 			return this;
 		return Reciprocal.simplifiedIns(arg.subs(from, to));
 	}
-
+	
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		InstructionHandle startPos = il.append(InstructionConstants.DCONST_1);
+		arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		il.append(InstructionConstants.DDIV);
+		return startPos;
+	}
 }
