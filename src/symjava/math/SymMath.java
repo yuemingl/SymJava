@@ -2,6 +2,7 @@ package symjava.math;
 
 import symjava.matrix.SymMatrix;
 import symjava.matrix.SymVector;
+import symjava.symbolic.Abs;
 import symjava.symbolic.Cos;
 import symjava.symbolic.Exp;
 import symjava.symbolic.Expr;
@@ -130,6 +131,13 @@ public class SymMath {
 		SymVector v = new SymVector(r, 0, l.dim());
 		return Dot.apply(l, v);
 	}
+	
+	////////////////////////////////////////////////////////////////
+	public static Expr abs(Expr x) {
+		return Abs.simplifiedIns(x);
+	}
+	
+	
 	
 //	public static Expr dot(double[] l, double[] r) {
 //		double sum = 0.0;
