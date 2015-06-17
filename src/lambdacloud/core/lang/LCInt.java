@@ -9,5 +9,13 @@ public class LCInt extends LCVar {
 	@Override
 	public TYPE getType() {
 		return TYPE.INT;
-	}	
+	}
+	
+	public LCInc inc() {
+		return new LCInc(this);
+	}
+	
+	public LCInc inc(int increment) {
+		return new LCInc(this, increment);
+	}
 }

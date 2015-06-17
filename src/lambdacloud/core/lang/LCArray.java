@@ -17,6 +17,8 @@ public abstract class LCArray extends LCVar {
 	protected LCArray arrayRef;
 	protected Expr index;
 	
+	protected int argsDim = 2; // e.g. apply(..., double[][] args), argsDim = 2
+	
 	public LCArray(String name) {
 		super(name);
 		arrayRef = null;
@@ -59,6 +61,14 @@ public abstract class LCArray extends LCVar {
 		return tmp.getLabel();
 	}
 	
+	public void setArgsDim(int dim) {
+		this.argsDim = dim;
+	}
+	
+	public int getArgsDim() {
+		return this.argsDim;
+	}
+	
 	@Override
 	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
 			ConstantPoolGen cp, InstructionFactory factory,
@@ -86,10 +96,20 @@ public abstract class LCArray extends LCVar {
 				return il.append(InstructionConstants.FALOAD);
 			return il.append(InstructionConstants.IALOAD);
 		} else {
+			LCArray tmp = this;
+			while(tmp.arrayRef.index != null) {
+				tmp = tmp.arrayRef;
+			}
+			//TODO need refactor
+			this.argsDim = tmp.arrayRef.argsDim;
+			
 			// Load from arguments
 			startPos = il.append(new ALOAD(argsStartPos));
-			il.append(new PUSH(cp, argsMap.get(arrayRef.getLabel())));
-			il.append(InstructionConstants.AALOAD);
+			// Support both compile() and compileVec()
+			for(int i=0; i<argsDim-1; i++) {
+				il.append(new PUSH(cp, argsMap.get(arrayRef.getLabel())));
+				il.append(InstructionConstants.AALOAD);
+			}
 			index.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			il.append(InstructionConstants.DALOAD);
 		}

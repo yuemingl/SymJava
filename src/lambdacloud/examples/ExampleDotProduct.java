@@ -1,6 +1,7 @@
 package lambdacloud.examples;
 
 import lambdacloud.core.lang.LCArray;
+import lambdacloud.core.lang.LCInt;
 import lambdacloud.core.lang.LCLoop;
 import lambdacloud.core.lang.LCStatements;
 import lambdacloud.core.lang.LCVar;
@@ -16,13 +17,13 @@ public class ExampleDotProduct {
 		LCArray x = LCArray.getDoubleArray("x");
 		LCArray y = LCArray.getDoubleArray("y");
 		LCArray output = LCArray.getDoubleArray("output");
-		LCVar i = LCVar.getInt("i");
+		LCInt i = LCVar.getInt("i");
 		LCVar sum = LCVar.getDouble("sum");
 		
-		lcs.append(new LCLoop(i.assign(0), Lt.apply(i, x.getLength()), i.assign(i+1))
-			.appendBody(sum.assign(sum + x[i]*y[i])));
+		lcs.append(new LCLoop(i.assign(0), Lt.apply(i, x.getLength()), i.inc())
+			.appendBody(sum.assign( sum + x[i]*y[i] )));
 
-		lcs.append(output[0].assign(sum));
+		lcs.append(output[1].assign(sum));
 		
 		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, output, x, y);
 		

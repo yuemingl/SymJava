@@ -43,20 +43,20 @@ public class TestBytecode {
 //		float f = 2.0f;
 //		System.out.println(l+f);
 		
-		String s = null;
-		for(int i=0; i<10; i++) {
-			s = args[i];
-			if(i == 3) {
-				s = "bbb";
-				//break;
-			}
-			else
-				s = "aaa";
-			//s += "";
-			StringBuilder ss = new StringBuilder();
-			//ss.append(1);
-		}
-		System.out.println(s);
+//		String s = null;
+//		for(int i=0; i<10; i++) {
+//			s = args[i];
+//			if(i == 3) {
+//				s = "bbb";
+//				//break;
+//			}
+//			else
+//				s = "aaa";
+//			//s += "";
+//			StringBuilder ss = new StringBuilder();
+//			//ss.append(1);
+//		}
+//		System.out.println(s);
 
 /*
 		double s = 1;
@@ -88,5 +88,12 @@ public class TestBytecode {
 		else
 			s--;
  */
+		double[] data = new double[] {1,2,3,4};
+		double sum = 0;
+		for(int i=0; i<data.length; i++) {
+			sum = sum + i;
+			//sum = sum + data[i];
+		}
+		System.out.println(sum);
 	}
 }

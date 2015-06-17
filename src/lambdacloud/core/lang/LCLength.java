@@ -29,8 +29,10 @@ public class LCLength extends LCBase {
 			Map<Expr, Integer> funcRefsMap) {
 		
 		InstructionHandle startPos = il.append(new ALOAD(argsStartPos));
-		il.append(new PUSH(cp, argsMap.get(arrayRef.getLabel())));
-		il.append(InstructionConstants.AALOAD);
+		for(int i=0; i<arrayRef.getArgsDim()-1; i++) {
+			il.append(new PUSH(cp, argsMap.get(arrayRef.getLabel())));
+			il.append(InstructionConstants.AALOAD);
+		}
 		il.append(InstructionConstants.ARRAYLENGTH);
 		
 		return startPos;

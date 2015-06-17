@@ -29,7 +29,7 @@ public class LCAssign extends LCBase {
 	}
 	
 	public void updateLabel() {
-		this.label = this.indent + lhs + " = " + rhs + ";";
+		this.label = this.indent + lhs + " = " + rhs;
 	}
 	
 	@Override

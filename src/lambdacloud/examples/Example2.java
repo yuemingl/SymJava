@@ -27,7 +27,7 @@ import symjava.symbolic.Expr;
 public class Example2 {
 
 	public static void main(String[] args) {
-		CloudConfig.setTarget("server");
+		CloudConfig.setTarget("local");
 		
 		LCVar x = LCVar.getDouble("x");
 		LCVar y = LCVar.getDouble("y");

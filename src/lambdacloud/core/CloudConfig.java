@@ -16,10 +16,12 @@ public class CloudConfig {
 	public static void setTarget(String target) {
 		CloudConfig.target = target;
 		client = new CloudClient();
-		try {
-			client.connect();
-		} catch (Exception e) {
-			e.printStackTrace();
+		if(!target.equals("local")) {
+			try {
+				client.connect();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

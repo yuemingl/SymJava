@@ -23,7 +23,7 @@ public class LCReturn extends LCBase {
 	}
 	
 	public void updateLabel() {
-		this.label = this.indent + "return " + arg + ";";
+		this.label = this.indent + "return " + arg;
 		
 	}
 	

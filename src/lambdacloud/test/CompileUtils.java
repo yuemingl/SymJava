@@ -73,20 +73,30 @@ public class CompileUtils {
 				il, cp);
 		
 		HashMap<String, Integer> argsMap = new HashMap<String, Integer>();
-		if(args != null) {
+		if(args.length == 1 && args[0] instanceof LCArray) {
+			//double apply(double[] args)
+			((LCArray)args[0]).setArgsDim(1);
+			argsMap.put(args[0].getLabel(), 1); 
+			System.out.println(fullClsName);
+			StringBuilder sb = new StringBuilder();
+			sb.append("double apply(double[] ").append(args[0].getLabel());
+			sb.append(");");
+			System.out.println(sb.toString());
+		} else { 
+			//double apply(double x, double y, ...)
 			for(int i=0; i<args.length; i++) {
 				argsMap.put(args[i].getLabel(), i);
 			}
+			System.out.println(fullClsName);
+			StringBuilder sb = new StringBuilder();
+			sb.append("double apply(");
+			for(Expr a : args)
+				sb.append("double ").append(a).append(", ");
+			if(args.length > 0)
+			sb.delete(sb.length()-2, sb.length());
+			sb.append(");");
+			System.out.println(sb.toString());
 		}
-		System.out.println(fullClsName);
-		StringBuilder sb = new StringBuilder();
-		sb.append("double apply(");
-		for(Expr a : args)
-			sb.append("double ").append(a).append(", ");
-		if(args.length > 0)
-		sb.delete(sb.length()-2, sb.length());
-		sb.append(");");
-		System.out.println(sb.toString());
 		
 		// Declare local variables
 		List<Expr> vars = Utils.extractSymbols(expr);
@@ -138,7 +148,7 @@ public class CompileUtils {
 		return fun;
 	}
 	
-	public static ClassGen _compileVec(String name, Expr expr, LCArray output, LCVar[] args) {
+	public static ClassGen _compileVec(String name, Expr expr, LCArray output, LCVar ...args) {
 		String packageName = "symjava.bytecode";
 		String clsName = name;
 		if(clsName == null)

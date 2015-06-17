@@ -2,39 +2,49 @@ package lambdacloud.examples;
 
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
+import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCBuilder;
+import lambdacloud.core.lang.LCDouble;
+import lambdacloud.core.lang.LCDoubleArray;
+import lambdacloud.core.lang.LCInt;
 import lambdacloud.core.lang.LCVar;
 import symjava.relational.Lt;
 
 /**
- * This is a useful example 
+ * This example shows how to use LCBuilder to create a function
+ * that sums up the numbers in the argument 
  *
  */
 public class Example3 {
 
 	public static void main(String[] args) {
-		LCBuilder lcb = new LCBuilder("local");
+		LCBuilder lcb = new LCBuilder("server");
 
-		double[] data = {1,2,3,4,5,6};
-		CloudSD myData = new CloudSD("myData").init(data);
-		myData.storeToCloud();
-		
-		LCVar i = lcb.declareInt("i"); //int i=0;
-		LCVar sum = lcb.declareDouble("sum"); //double sum=0;
+		LCDoubleArray argData = new LCDoubleArray("argData"); //double[] argData;
+		LCInt i = new LCInt("i"); //int i=0;
+		LCDouble sum = new LCDouble("sum"); //double sum=0;
 		
 		/**
-		 * for(i=0; i<6; i=i+1) {
-		 * 	sum = sum + i;
+		 * double apply(double[] argData) {
+		 * 	for(i=0; i<argData.length; i++) {
+		 * 		sum = sum + argData[i];
+		 * 	}
+		 * 	return sum;
 		 * }
 		 */
-		lcb.For(i.assign(0), Lt.apply(i, 11), i.assign(i+1))
-			.appendBody(sum.assign(sum+i));
-		
-		lcb.Return(sum); //return sum;
-		
-		CloudFunc func = lcb.build();
+		lcb.For(i.assign(0), Lt.apply(i, argData.getLength()), i.inc())
+			.appendBody(sum.assign( sum + argData[i] ));
+		lcb.Return(sum);
+		CloudFunc func = lcb.build(argData);
+		System.out.println(lcb);
+
 		CloudSD myOutput = new CloudSD("myOutput").resize(1);
+		CloudSD myData = new CloudSD("myData").init(new double[] {2,2,3,3,4,4});
+		myData.storeToCloud();
+		
+		// Evaluating on the cloud server
 		func.apply(myOutput, myData);
+
 		if(myOutput.fetchToLocal()) {
 			for(double d : myOutput.getData()) {
 				System.out.println(d);

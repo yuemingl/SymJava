@@ -159,17 +159,21 @@ public class CloudSD extends Symbol {
 	 */
 	public boolean storeToCloud() {
 		CloudClient client = CloudConfig.getClient();
-		CloudVarRespHandler handler = client.getCloudVarRespHandler();
-		try {
-			client.getChannel().writeAndFlush(this).sync();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		CloudVarResp resp = handler.getCloudResp();
-		if(resp.status == 0)
-			this.isOnCloud = true;
-		else
+		if(!CloudConfig.isLocal()) {
+			CloudVarRespHandler handler = client.getCloudVarRespHandler();
+			try {
+				client.getChannel().writeAndFlush(this).sync();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			CloudVarResp resp = handler.getCloudResp();
+			if(resp.status == 0)
+				this.isOnCloud = true;
+			else
+				this.isOnCloud = false;
+		} else {
 			this.isOnCloud = false;
+		}
 		return this.isOnCloud;
 	}
 	
