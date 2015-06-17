@@ -83,9 +83,10 @@ public abstract class LCVar extends Symbol {
 			return il.append(new ILOAD(indexLVT));
 		} else {
 			// Load from a double array from arguments
-			il.append(new ALOAD(argsStartPos));
+			InstructionHandle startPos = il.append(new ALOAD(argsStartPos));
 			il.append(new PUSH(cp, argsMap.get(this.label)));
-			return il.append(InstructionConstants.DALOAD);
+			il.append(InstructionConstants.DALOAD);
+			return startPos;
 		}
 	}
 	
