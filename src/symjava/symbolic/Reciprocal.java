@@ -2,19 +2,16 @@ package symjava.symbolic;
 
 import java.util.Map;
 
-import com.sun.org.apache.bcel.internal.Constants;
+import symjava.symbolic.arity.UnaryOp;
+import symjava.symbolic.utils.BytecodeUtils;
+import symjava.symbolic.utils.Utils;
+
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
-import com.sun.org.apache.bcel.internal.generic.Type;
-
-import symjava.symbolic.Expr.TYPE;
-import symjava.symbolic.arity.UnaryOp;
-import symjava.symbolic.utils.BytecodeUtils;
-import symjava.symbolic.utils.Utils;
 
 public class Reciprocal extends UnaryOp {
 

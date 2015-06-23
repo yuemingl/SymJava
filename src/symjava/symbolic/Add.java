@@ -1,36 +1,22 @@
 package symjava.symbolic;
 
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.DADD;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.FADD;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.IADD;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.LADD;
+
 import java.util.List;
 import java.util.Map;
-
-import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
-
-import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.*;
-
-import com.sun.org.apache.bcel.internal.generic.ConversionInstruction;
-import com.sun.org.apache.bcel.internal.generic.D2F;
-import com.sun.org.apache.bcel.internal.generic.D2I;
-import com.sun.org.apache.bcel.internal.generic.D2L;
-import com.sun.org.apache.bcel.internal.generic.F2D;
-import com.sun.org.apache.bcel.internal.generic.F2I;
-import com.sun.org.apache.bcel.internal.generic.F2L;
-import com.sun.org.apache.bcel.internal.generic.I2B;
-import com.sun.org.apache.bcel.internal.generic.I2C;
-import com.sun.org.apache.bcel.internal.generic.I2D;
-import com.sun.org.apache.bcel.internal.generic.I2F;
-import com.sun.org.apache.bcel.internal.generic.I2L;
-import com.sun.org.apache.bcel.internal.generic.I2S;
-import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
-import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
-import com.sun.org.apache.bcel.internal.generic.InstructionList;
-import com.sun.org.apache.bcel.internal.generic.L2D;
-import com.sun.org.apache.bcel.internal.generic.L2F;
-import com.sun.org.apache.bcel.internal.generic.L2I;
-import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
+
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 public class Add extends BinaryOp {
 	public Add(Expr l, Expr r) {

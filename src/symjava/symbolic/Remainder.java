@@ -1,20 +1,21 @@
 package symjava.symbolic;
 
-import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.*;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.DREM;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.FREM;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.IREM;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.LREM;
 
 import java.util.Map;
 
+import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.utils.BytecodeUtils;
+import symjava.symbolic.utils.Utils;
+
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
-import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
-
-import symjava.symbolic.Expr.TYPE;
-import symjava.symbolic.arity.BinaryOp;
-import symjava.symbolic.utils.BytecodeUtils;
-import symjava.symbolic.utils.Utils;
 
 public class Remainder extends BinaryOp {
 	public Remainder(Expr arg1, Expr arg2) {

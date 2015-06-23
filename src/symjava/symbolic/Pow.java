@@ -3,19 +3,16 @@ package symjava.symbolic;
 import java.util.List;
 import java.util.Map;
 
+import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.utils.Utils;
+
 import com.sun.org.apache.bcel.internal.Constants;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
-import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
-import com.sun.org.apache.bcel.internal.generic.POP2;
-import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
-
-import symjava.symbolic.arity.BinaryOp;
-import symjava.symbolic.utils.Utils;
 
 public class Pow extends BinaryOp {
 	

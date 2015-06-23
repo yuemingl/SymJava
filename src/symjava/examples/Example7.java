@@ -45,6 +45,16 @@ public class Example7 {
 					return 2; //
 				return 0;
 			}
+			@Override
+			public Expr[] args() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public TYPE getType() {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		});
 		
 		WeakForm pde = new WeakForm(

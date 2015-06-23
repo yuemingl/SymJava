@@ -4,21 +4,19 @@ import static symjava.math.SymMath.log;
 import static symjava.math.SymMath.random;
 import static symjava.math.SymMath.sin;
 import static symjava.math.SymMath.sqrt;
-import static symjava.symbolic.Symbol.*;
+import static symjava.symbolic.Symbol.x;
+import static symjava.symbolic.Symbol.y;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
+import lambdacloud.core.lang.LCBuilder;
 import lambdacloud.core.lang.LCIf;
 import lambdacloud.core.lang.LCInt;
 import lambdacloud.core.lang.LCLoop;
 import lambdacloud.core.lang.LCVar;
-import lambdacloud.core.lang.LCBuilder;
-import symjava.domains.Domain;
-import symjava.domains.Domain2D;
 import symjava.relational.Ge;
 import symjava.relational.Le;
 import symjava.relational.Lt;
 import symjava.symbolic.Expr;
-import symjava.symbolic.Integrate;
 
 public class TestLCBuilder {
 	
@@ -186,6 +184,8 @@ public class TestLCBuilder {
 		CloudFunc func = task.build(new LCVar[]{x,y,a,b,c,d});
 	}	
 
+	
+	
 	public static void MonteCarloImplement2() {
 		LCBuilder task = new LCBuilder("local");
 		
@@ -199,32 +199,33 @@ public class TestLCBuilder {
 		LCInt i = task.declareInt("i");
 		LCVar sum = task.declareDouble("sum");
 		LCVar counter = task.declareInt("counter");
-		LCVar ret = task.declareDouble("ret");
 		
 		int N = 10000000;
 		
 		LCLoop loop = task.For(i.assign(0), 
 				Lt.apply(i, N), i.inc());    // for(i=0; i<N; i++) {
+		
 		loop.appendBody(x.assign(random())); // x = random(); //0.0~1.0
 		loop.appendBody(y.assign(random())); // y = random(); //0.0~1.0
+		
 		Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
-		// if( a^2 <= (x-1/2)^2 + (y-1/2)^2 <= b^2 or c^2 <= (x-1/2)^2 + (y-1/2)^2 <= d^2 ) {
-		Expr domain = ( Ge.apply(eq, a*a) & Le.apply(eq, b*b) ) | ( Ge.apply(eq, c*c) & Le.apply(eq, d*d) );
+		Expr domain = (                      // if( a^2 <= (x-1/2)^2 + (y-1/2)^2 <= b^2 or c^2 <= (x-1/2)^2 + (y-1/2)^2 <= d^2 ) {
+				Ge.apply(eq, a*a) & Le.apply(eq, b*b) ) | 
+				( Ge.apply(eq, c*c) & Le.apply(eq, d*d) 
+				);
 		LCIf ifBranch = new LCIf(domain);
-		// sum = sum + sin(sqrt(log(x+y+1))))
-		ifBranch.appendTrue( sum.assign(sum + sin(sqrt(log(x+y+1)))) );
-		// counter = counter + 1
-		ifBranch.appendTrue( counter.assign(counter+1) );
+		ifBranch.appendTrue(sum.assign(sum + sin(sqrt(log(x+y+1))))); // sum = sum + sin(sqrt(log(x+y+1))))
+		ifBranch.appendTrue(counter.assign(counter+1));               // counter = counter + 1
 		// } //end if
 		loop.appendBody(ifBranch);
 		//} end for
 
 		double squareArea = 1.0;
 		Expr area = (counter/N)*squareArea; // area of domain
-		task.append(ret.assign((sum/counter)*area)); 
-		task.Return(ret);
+		task.Return((sum/counter)*area); 
 		
 		CloudFunc func = task.build(new LCVar[]{a,b,c,d});
+		
 		CloudSD params = new CloudSD("result").init(new double[]{0.25,0.5,0.75,1.0});
 		CloudSD result = new CloudSD("result").resize(1);
 		func.apply(result, params);
