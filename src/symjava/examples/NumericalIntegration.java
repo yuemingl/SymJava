@@ -1,16 +1,30 @@
 package symjava.examples;
 
-import symjava.relational.Ge;
-import symjava.relational.Le;
-import symjava.symbolic.*;
-import static symjava.math.SymMath.*;
-import static symjava.symbolic.Symbol.*;
+import static symjava.math.SymMath.PI;
+import static symjava.math.SymMath.exp;
+import static symjava.math.SymMath.log;
+import static symjava.math.SymMath.pow;
+import static symjava.math.SymMath.sin;
+import static symjava.math.SymMath.sqrt;
+import static symjava.symbolic.Symbol.a;
+import static symjava.symbolic.Symbol.b;
+import static symjava.symbolic.Symbol.c;
+import static symjava.symbolic.Symbol.d;
+import static symjava.symbolic.Symbol.t;
+import static symjava.symbolic.Symbol.x;
+import static symjava.symbolic.Symbol.y;
+import static symjava.symbolic.Symbol.z;
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
 import symjava.domains.Domain3D;
 import symjava.domains.DomainND;
 import symjava.domains.Interval;
+import symjava.relational.Ge;
+import symjava.relational.Le;
+import symjava.symbolic.Expr;
+import symjava.symbolic.Integrate;
+import symjava.symbolic.Symbol;
 import symjava.symbolic.utils.JIT;
 
 
@@ -153,6 +167,7 @@ public class NumericalIntegration {
 	}
 	
 	/**
+	 * Monte Carlo integration on an annulus.
 	 * I = \int_{\Omega} sin(sqrt(log(x+y+1))) dxdy
 	 * where 
 	 * \Omega= { (x,y), where
