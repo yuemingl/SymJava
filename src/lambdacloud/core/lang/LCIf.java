@@ -120,9 +120,9 @@ public class LCIf extends LCBase {
 		if(cond instanceof Gt) { // l > r
 			TYPE ty = Utils.getConvertedType(cond.lhs().getType(), cond.rhs().getType());
 			cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			BytecodeUtils.typeCase(il, cond.lhs().getType(), ty);
+			BytecodeUtils.typeCast(il, cond.lhs().getType(), ty);
 			cond.rhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			BytecodeUtils.typeCase(il, cond.lhs().getType(), ty);
+			BytecodeUtils.typeCast(il, cond.lhs().getType(), ty);
 			
 			InstructionHandle trueBranchStart = null;
 			for(Expr te : trueStmts) {
@@ -149,9 +149,9 @@ public class LCIf extends LCBase {
 		} else if(cond instanceof Lt) { // l < r
 			TYPE ty = Utils.getConvertedType(cond.lhs().getType(), cond.rhs().getType());
 			startPos = cond.lhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			BytecodeUtils.typeCase(il, cond.lhs().getType(), ty);
+			BytecodeUtils.typeCast(il, cond.lhs().getType(), ty);
 			cond.rhs().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			BytecodeUtils.typeCase(il, cond.lhs().getType(), ty);
+			BytecodeUtils.typeCast(il, cond.lhs().getType(), ty);
 
 			InstructionHandle trueBranchStart = null;
 			for(Expr te : trueStmts) {

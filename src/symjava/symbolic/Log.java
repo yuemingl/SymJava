@@ -80,7 +80,10 @@ public class Log extends BinaryOp {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		return il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
 				Type.DOUBLE, new Type[] { Type.DOUBLE,  Type.DOUBLE }, Constants.INVOKESTATIC));
+		return startPos;
 	}
 }

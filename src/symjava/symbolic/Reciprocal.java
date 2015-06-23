@@ -11,7 +11,9 @@ import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.UnaryOp;
+import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
 
 public class Reciprocal extends UnaryOp {
@@ -78,7 +80,14 @@ public class Reciprocal extends UnaryOp {
 			Map<Expr, Integer> funcRefsMap) {
 		InstructionHandle startPos = il.append(InstructionConstants.DCONST_1);
 		arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		BytecodeUtils.typeCast(il, arg.getType(), TYPE.DOUBLE);
 		il.append(InstructionConstants.DDIV);
 		return startPos;
+	}
+	
+	
+	@Override
+	public TYPE getType() {
+		return TYPE.DOUBLE;
 	}
 }

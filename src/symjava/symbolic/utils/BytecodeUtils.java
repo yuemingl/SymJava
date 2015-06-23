@@ -820,8 +820,8 @@ public class BytecodeUtils {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
 					Type.INT, null, null);
 			int idx = lg.getIndex();
-			//il.append(InstructionConstants.ICONST_0);
-			//lg.setStart(il.append(new DSTORE(idx)));
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new ISTORE(idx)));
 			return idx;
 		} else if(var instanceof LCLong) {
 			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
@@ -877,7 +877,7 @@ public class BytecodeUtils {
 		throw new RuntimeException();
 	}
 
-	public static InstructionHandle typeCase(InstructionList il, TYPE fromType, TYPE toType) {
+	public static InstructionHandle typeCast(InstructionList il, TYPE fromType, TYPE toType) {
 		if(fromType != toType) {
 			switch(fromType) {
 			case INT: 

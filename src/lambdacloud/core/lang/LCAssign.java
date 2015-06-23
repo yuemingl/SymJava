@@ -46,13 +46,13 @@ public class LCAssign extends LCBase {
 			startPos = il.append(new ALOAD(argsMap.get(aryRef.getArrayRef().getLabel())));
 			aryRef.getIndex().bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-			BytecodeUtils.typeCase(il, rhs.getType(), TYPE.DOUBLE);
+			BytecodeUtils.typeCast(il, rhs.getType(), TYPE.DOUBLE);
 			il.append(InstructionConstants.DASTORE);
 		} else if(lhs instanceof LCVar && ((LCVar)lhs).isLocalVar()) {
 			startPos = rhs.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 			LCVar var = (LCVar)lhs;
 			TYPE ty = lhs.getType();
-			BytecodeUtils.typeCase(il, rhs.getType(), ty);
+			BytecodeUtils.typeCast(il, rhs.getType(), ty);
 			if(ty == TYPE.DOUBLE)
 				il.append(new DSTORE(var.getLVTIndex()));
 			else if(ty == TYPE.INT)

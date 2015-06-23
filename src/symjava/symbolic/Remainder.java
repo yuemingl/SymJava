@@ -46,9 +46,9 @@ public class Remainder extends BinaryOp {
 			Map<Expr, Integer> funcRefsMap) {
 		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
-		BytecodeUtils.typeCase(il, arg1.getType(), ty);
+		BytecodeUtils.typeCast(il, arg1.getType(), ty);
 		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		BytecodeUtils.typeCase(il, arg2.getType(), ty);		
+		BytecodeUtils.typeCast(il, arg2.getType(), ty);		
 		if(ty == TYPE.DOUBLE)
 			il.append(DREM);
 		else if(ty == TYPE.INT)

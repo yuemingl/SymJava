@@ -100,9 +100,10 @@ public class TestLCBuilder {
 		//testOverWriteArgs();
 		//testReturn();
 		//testLoopAsignReturn();
-		//MonteCarloImplement2();
+		MonteCarloImplement2();
 		//MTest1();
-		MTest2();
+		//MTest2();
+		MonteCarloImplementVerifiy();
 	}
 	
 	
@@ -167,18 +168,21 @@ public class TestLCBuilder {
 		LCVar d = task.declareDouble("d");
 		LCVar sum = task.declareDouble("sum");
 		LCVar counter = task.declareInt("counter");
-		LCVar ret = task.declareInt("ret");
+		LCVar ret = task.declareDouble("ret");
+		
+		task.append(counter.assign(0));
+		
 		Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
-		Expr domain = Ge.apply(1, a*a);
+		Expr domain = Ge.apply(1, a) & Ge.apply(1, b);
 		LCIf ifBranch = task.If(domain);
 		// sum = sum + sin(sqrt(log(x+y+1))))
-		//ifBranch.appendTrue( sum.assign(sum + sin(sqrt(log(x+y+1)))) );
-		ifBranch.appendTrue( sum.assign(sum + x) );
+		ifBranch.appendTrue( sum.assign(sum + sin(sqrt(log(x+y+1)))) );
+		//ifBranch.appendTrue( sum.assign(sum + x) );
 		// counter = counter + 1
 		ifBranch.appendTrue( counter.assign(counter+1) );
 		// } //end if
 		//CloudFunc func = new CloudFunc("MTest1",new LCVar[]{x,y,a,b,c,d}, domain);
-		task.Return(domain);
+		task.Return(ret);
 		CloudFunc func = task.build(new LCVar[]{x,y,a,b,c,d});
 	}	
 
@@ -195,23 +199,20 @@ public class TestLCBuilder {
 		LCInt i = task.declareInt("i");
 		LCVar sum = task.declareDouble("sum");
 		LCVar counter = task.declareInt("counter");
-		LCVar ret = task.declareInt("ret");
+		LCVar ret = task.declareDouble("ret");
 		
-		int N = 1000;
+		int N = 10000000;
 		
 		LCLoop loop = task.For(i.assign(0), 
 				Lt.apply(i, N), i.inc());    // for(i=0; i<N; i++) {
 		loop.appendBody(x.assign(random())); // x = random(); //0.0~1.0
 		loop.appendBody(y.assign(random())); // y = random(); //0.0~1.0
-
 		Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
 		// if( a^2 <= (x-1/2)^2 + (y-1/2)^2 <= b^2 or c^2 <= (x-1/2)^2 + (y-1/2)^2 <= d^2 ) {
-		//Expr domain = ( Ge.apply(eq, a*a) & Le.apply(eq, b*b) ) | ( Ge.apply(eq, c*c) & Le.apply(eq, d*d) );
-		Expr domain = Ge.apply(1, a*a);
-		LCIf ifBranch = task.If(domain);
+		Expr domain = ( Ge.apply(eq, a*a) & Le.apply(eq, b*b) ) | ( Ge.apply(eq, c*c) & Le.apply(eq, d*d) );
+		LCIf ifBranch = new LCIf(domain);
 		// sum = sum + sin(sqrt(log(x+y+1))))
-		//ifBranch.appendTrue( sum.assign(sum + sin(sqrt(log(x+y+1)))) );
-		ifBranch.appendTrue( sum.assign(sum + x) );
+		ifBranch.appendTrue( sum.assign(sum + sin(sqrt(log(x+y+1)))) );
 		// counter = counter + 1
 		ifBranch.appendTrue( counter.assign(counter+1) );
 		// } //end if
@@ -223,11 +224,30 @@ public class TestLCBuilder {
 		task.append(ret.assign((sum/counter)*area)); 
 		task.Return(ret);
 		
-		CloudFunc func = task.build(new LCVar[]{x,y,a,b,c,d});
+		CloudFunc func = task.build(new LCVar[]{a,b,c,d});
+		CloudSD params = new CloudSD("result").init(new double[]{0.25,0.5,0.75,1.0});
 		CloudSD result = new CloudSD("result").resize(1);
-		func.apply(result, result);
+		func.apply(result, params);
 		
 		result.fetchToLocal();
 		System.out.println(result.getData(0));
 	}
+	
+	public static void MonteCarloImplementVerifiy() {
+		double xMin=0, xMax=1, xStep=0.001;
+		double yMin=0, yMax=1, yStep=0.001;
+		double sum = 0.0;
+		double a=0.25, b=0.5, c=0.75, d=1.0;
+		for(double x=xMin; x<=xMax; x+=xStep) {
+			for(double y=yMin; y<=yMax; y+=yStep) {
+				double disk = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
+				if((a*a <= disk && disk <= b*b) || 
+				   (c*c <= disk && disk <= d*d )
+				  ) {
+					sum += Math.sin(Math.sqrt(Math.log(x+y+1)))*xStep*yStep;
+				}
+			}
+		}
+		System.out.println("verify="+sum);
+	}	
 }
