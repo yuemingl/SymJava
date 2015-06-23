@@ -2,8 +2,22 @@ package symjava.relational;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.DCMPL;
+import com.sun.org.apache.bcel.internal.generic.GOTO;
+import com.sun.org.apache.bcel.internal.generic.IFLE;
+import com.sun.org.apache.bcel.internal.generic.IFNE;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.NOP;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
 
 import symjava.symbolic.Expr;
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
@@ -285,5 +299,26 @@ public class Eq extends BinaryOp implements Relation {
 	public Expr diff(Expr expr) {
 		return new Eq(arg1.diff(expr), arg2.diff(expr), this.freeVars, this.params, this.dependentVars);
 	}
+
+	
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		il.append(new DCMPL());
+		InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+		InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+		InstructionHandle nop = il.append(new NOP());
+		il.insert(iconst1, new IFNE(iconst0));
+		il.insert(iconst0, new GOTO(nop));
+		return startPos;
+	}
+	
+	@Override
+	public TYPE getType() {
+		return TYPE.INT;
+	}	
 }
 

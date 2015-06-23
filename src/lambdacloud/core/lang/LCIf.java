@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import lambdacloud.core.CloudSD;
+import symjava.logic.Logic;
 import symjava.relational.Eq;
 import symjava.relational.Ge;
 import symjava.relational.Gt;
@@ -18,6 +19,8 @@ import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.GOTO;
 import com.sun.org.apache.bcel.internal.generic.IFGE;
 import com.sun.org.apache.bcel.internal.generic.IFLE;
+import com.sun.org.apache.bcel.internal.generic.IF_ICMPGT;
+import com.sun.org.apache.bcel.internal.generic.IF_ICMPLE;
 import com.sun.org.apache.bcel.internal.generic.IF_ICMPNE;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
@@ -81,8 +84,36 @@ public class LCIf extends LCBase {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
+		if(condition instanceof Logic) {
+			il.append(InstructionConstants.ICONST_1);
+			InstructionHandle startPos = condition.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			
+			InstructionHandle trueBranchStart = null;
+			for(Expr te : trueStmts) {
+				InstructionHandle pos = te.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+				if(trueBranchStart == null)
+					trueBranchStart = pos;
+			}
+			if(trueBranchStart == null) trueBranchStart = il.append(InstructionConstants.NOP);
+			
+			InstructionHandle falseBranchStart = null;
+			for(Expr fe : falseStmts) {
+				InstructionHandle pos = fe.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+				if(falseBranchStart == null)
+					falseBranchStart = pos;
+			}
+			if(falseBranchStart == null) falseBranchStart = il.append(InstructionConstants.NOP);
+
+			InstructionHandle endPos = il.append(InstructionConstants.NOP);
+			
+			il.insert(trueBranchStart, new IF_ICMPGT(falseBranchStart));
+			il.insert(falseBranchStart, new GOTO(endPos));
+			return startPos;
+		}
+		
 		if(!(condition instanceof Relation))
 			throw new RuntimeException();
+		
 		Relation cond = (Relation)condition;
 		InstructionHandle startPos = null;
 		InstructionHandle endPos = null;

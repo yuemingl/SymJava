@@ -75,23 +75,23 @@ public class LCBuilder {
 		return new CloudSD(name);
 	}
 
-	public LCVar declareInt(String name) {
+	public LCInt declareInt(String name) {
 		return new LCInt(name);
 	}
 	
-	public LCVar declareLong(String name) {
+	public LCLong declareLong(String name) {
 		return new LCLong(name);
 	}
 	
-	public LCVar declareFloat(String name) {
+	public LCFloat declareFloat(String name) {
 		return new LCFloat(name);
 	}
 	
-	public LCVar declareDouble(String name) {
+	public LCDouble declareDouble(String name) {
 		return new LCDouble(name);
 	}
 	
-	public LCVar declareShort(String name) {
+	public LCShort declareShort(String name) {
 		return new LCShort(name);
 	}
 	
@@ -99,7 +99,7 @@ public class LCBuilder {
 		return new LCChar(name);
 	}
 	
-	public LCVar declareByte(String name) {
+	public LCByte declareByte(String name) {
 		return new LCByte(name);
 	}
 	

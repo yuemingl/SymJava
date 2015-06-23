@@ -480,7 +480,7 @@ abstract public class Expr implements Cloneable {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		return null;//il.append(InstructionConstants.NOP);
+		throw new UnsupportedOperationException();//il.append(InstructionConstants.NOP);
 	}
 	
 	public enum TYPE {INT, LONG, FLOAT, DOUBLE, BOOLEAN, BYTE, CHAR, SHORT, VOID};

@@ -1,6 +1,21 @@
 package symjava.logic;
 
+import java.util.Map;
+
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.DCMPL;
+import com.sun.org.apache.bcel.internal.generic.GOTO;
+import com.sun.org.apache.bcel.internal.generic.IFLE;
+import com.sun.org.apache.bcel.internal.generic.IOR;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.NOP;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
+
 import symjava.symbolic.Expr;
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.BinaryOp;
 
 public class Or extends BinaryOp implements Logic {
@@ -28,4 +43,20 @@ public class Or extends BinaryOp implements Logic {
 	public static Expr simplifiedIns(Expr lhs, Expr rhs) {
 		return new Or(lhs, rhs);
 	}
+	
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		il.append(new IOR());
+		return startPos;
+	}
+	
+	@Override
+	public TYPE getType() {
+		return TYPE.INT;
+	}	
+	
 }

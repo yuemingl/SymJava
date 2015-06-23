@@ -8,6 +8,7 @@ import static symjava.symbolic.Symbol.*;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
 import lambdacloud.core.lang.LCIf;
+import lambdacloud.core.lang.LCInt;
 import lambdacloud.core.lang.LCLoop;
 import lambdacloud.core.lang.LCVar;
 import lambdacloud.core.lang.LCBuilder;
@@ -96,10 +97,12 @@ public class TestLCBuilder {
 	}
 	
 	public static void main(String[] args) {
-		testOverWriteArgs();
-		testReturn();
-		testLoopAsignReturn();
-
+		//testOverWriteArgs();
+		//testReturn();
+		//testLoopAsignReturn();
+		//MonteCarloImplement2();
+		//MTest1();
+		MTest2();
 	}
 	
 	
@@ -137,44 +140,94 @@ public class TestLCBuilder {
 //		System.out.println(result.get(0));
 //	}
 //	
-//	public static void MonteCarloImplement2() {
-//		LC cloudTask = new LC("server");
-//		
-//		CloudVar x = cloudTask.localVar("x"); 
-//		CloudVar y = cloudTask.localVar("y");
-//		CSD result = cloudTask.globalVar("result");
-//		
-//		CloudVar i = cloudTask.localVar("i");
-//		CloudVar sum = cloudTask.localVar("sum");
-//		CloudVar counter = cloudTask.localVar("counter");
-//		
-//		int N = 1000;
-//		// for(i=0; i<N; i++) {
-//		CloudLoop loop = cloudTask.forLoop(i.assign(0), Lt.apply(i, N), i.assign(i+1));
-//		// x = random(); //0.0~1.0
-//		// y = random(); //0.0~1.0
-//		loop.appendBody(x.assign(random())); 
-//		loop.appendBody(y.assign(random()));
-//
-//		Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
-//		// if( a^2 <= (x-1/2)^2 + (y-1/2)^2 <= b^2 or c^2 <= (x-1/2)^2 + (y-1/2)^2 <= d^2 ) {
-//		Expr domain = ( Ge.apply(eq, a*a) & Le.apply(eq, b*b) ) | ( Ge.apply(eq, c*c) & Le.apply(eq, d*d) );
-//		CloudIf ifBranch = cloudTask.If(domain);
-//		// sum = sum + sin(sqrt(log(x+y+1))))
-//		ifBranch.appendTrue( sum.assign(sum + sin(sqrt(log(x+y+1)))) );
-//		// counter = counter + 1
-//		ifBranch.appendTrue( counter.assign(counter+1) );
-//		// } //end fi
-//		loop.appendBody(ifBranch);
-//		//} end for
-//
-//		double squareArea = 1.0;
-//		Expr area = (counter/N)*squareArea; // area of domain
-//		cloudTask.append(result.assign((sum/counter)*area)); 
-//		
-//		cloudTask.run();
-//		
-//		result.fetchToLocal();
-//		System.out.println(result.get(0));
-//	}
+	
+	public static void MTest1() {
+		LCBuilder task = new LCBuilder("local");
+		LCVar x = task.declareDouble("x"); 
+		LCVar y = task.declareDouble("y");
+		LCVar a = task.declareDouble("a");
+		LCVar b = task.declareDouble("b");
+		LCVar c = task.declareDouble("c");
+		LCVar d = task.declareDouble("d");
+		Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
+		Expr domain = ( Ge.apply(eq, a*a) & Le.apply(eq, b*b) ) | ( Ge.apply(eq, c*c) & Le.apply(eq, d*d) );
+		//Expr domain = Ge.apply(eq, a*a) & Le.apply(eq, b*b);
+		//CloudFunc func = new CloudFunc("MTest1",new LCVar[]{x,y,a,b,c,d}, domain);
+		task.Return(domain);
+		CloudFunc func = task.build(new LCVar[]{x,y,a,b,c,d});
+	}
+	
+	public static void MTest2() {
+		LCBuilder task = new LCBuilder("local");
+		LCVar x = task.declareDouble("x"); 
+		LCVar y = task.declareDouble("y");
+		LCVar a = task.declareDouble("a");
+		LCVar b = task.declareDouble("b");
+		LCVar c = task.declareDouble("c");
+		LCVar d = task.declareDouble("d");
+		LCVar sum = task.declareDouble("sum");
+		LCVar counter = task.declareInt("counter");
+		LCVar ret = task.declareInt("ret");
+		Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
+		Expr domain = Ge.apply(1, a*a);
+		LCIf ifBranch = task.If(domain);
+		// sum = sum + sin(sqrt(log(x+y+1))))
+		//ifBranch.appendTrue( sum.assign(sum + sin(sqrt(log(x+y+1)))) );
+		ifBranch.appendTrue( sum.assign(sum + x) );
+		// counter = counter + 1
+		ifBranch.appendTrue( counter.assign(counter+1) );
+		// } //end if
+		//CloudFunc func = new CloudFunc("MTest1",new LCVar[]{x,y,a,b,c,d}, domain);
+		task.Return(domain);
+		CloudFunc func = task.build(new LCVar[]{x,y,a,b,c,d});
+	}	
+
+	public static void MonteCarloImplement2() {
+		LCBuilder task = new LCBuilder("local");
+		
+		LCVar x = task.declareDouble("x"); 
+		LCVar y = task.declareDouble("y");
+		LCVar a = task.declareDouble("a");
+		LCVar b = task.declareDouble("b");
+		LCVar c = task.declareDouble("c");
+		LCVar d = task.declareDouble("d");
+		
+		LCInt i = task.declareInt("i");
+		LCVar sum = task.declareDouble("sum");
+		LCVar counter = task.declareInt("counter");
+		LCVar ret = task.declareInt("ret");
+		
+		int N = 1000;
+		
+		LCLoop loop = task.For(i.assign(0), 
+				Lt.apply(i, N), i.inc());    // for(i=0; i<N; i++) {
+		loop.appendBody(x.assign(random())); // x = random(); //0.0~1.0
+		loop.appendBody(y.assign(random())); // y = random(); //0.0~1.0
+
+		Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
+		// if( a^2 <= (x-1/2)^2 + (y-1/2)^2 <= b^2 or c^2 <= (x-1/2)^2 + (y-1/2)^2 <= d^2 ) {
+		//Expr domain = ( Ge.apply(eq, a*a) & Le.apply(eq, b*b) ) | ( Ge.apply(eq, c*c) & Le.apply(eq, d*d) );
+		Expr domain = Ge.apply(1, a*a);
+		LCIf ifBranch = task.If(domain);
+		// sum = sum + sin(sqrt(log(x+y+1))))
+		//ifBranch.appendTrue( sum.assign(sum + sin(sqrt(log(x+y+1)))) );
+		ifBranch.appendTrue( sum.assign(sum + x) );
+		// counter = counter + 1
+		ifBranch.appendTrue( counter.assign(counter+1) );
+		// } //end if
+		loop.appendBody(ifBranch);
+		//} end for
+
+		double squareArea = 1.0;
+		Expr area = (counter/N)*squareArea; // area of domain
+		task.append(ret.assign((sum/counter)*area)); 
+		task.Return(ret);
+		
+		CloudFunc func = task.build(new LCVar[]{x,y,a,b,c,d});
+		CloudSD result = new CloudSD("result").resize(1);
+		func.apply(result, result);
+		
+		result.fetchToLocal();
+		System.out.println(result.getData(0));
+	}
 }

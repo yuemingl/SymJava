@@ -101,7 +101,7 @@ public class TestBytecode {
 		double d=1;
 		double e=1;
 		int s = 0;
-		if(i>j) s = 0;
+		if(i>j && d>e) s = 0;
 		else s = 1;
 		
 		if(d>e) s = 0;

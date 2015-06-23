@@ -1,5 +1,15 @@
 package symjava.symbolic;
 
+import java.util.Map;
+
+import com.sun.org.apache.bcel.internal.Constants;
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.Type;
+
 import symjava.math.SymMath;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
@@ -65,5 +75,12 @@ public class Log extends BinaryOp {
 	public boolean symEquals(Expr other) {
 		return false;
 	}
-
+	
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		return il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
+				Type.DOUBLE, new Type[] { Type.DOUBLE,  Type.DOUBLE }, Constants.INVOKESTATIC));
+	}
 }
