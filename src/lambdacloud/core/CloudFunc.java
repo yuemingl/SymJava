@@ -66,6 +66,7 @@ public class CloudFunc extends LCBase {
 	}
 	
 	public CloudFunc(Class<?> clazz) {
+		this.name = clazz.getSimpleName();
 		this.clazz = clazz;
 		if(CloudConfig.isLocal()) {
 			try {
@@ -74,13 +75,14 @@ public class CloudFunc extends LCBase {
 				e.printStackTrace();
 			}
 		} else {
-			Path path = Paths.get(clazz.getProtectionDomain().getCodeSource().getLocation().getPath());
+			Path path = Paths.get(clazz.getProtectionDomain().getCodeSource().getLocation().getPath()+clazz.getName().replace(".", "/")+".class");
 			try {
 				byte[] data = Files.readAllBytes(path);
 				IR ir =  new IR();
 				ir.type = 1;
 				ir.name = clazz.getName();
 				ir.bytes = data;
+				this.funcIR = ir;
 				CloudFuncHandler handler = CloudConfig.getClient().getCloudFuncHandler();
 				Channel ch = CloudConfig.getClient().getChannel();
 				try {

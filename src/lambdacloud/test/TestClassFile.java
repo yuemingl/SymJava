@@ -3,16 +3,15 @@ package lambdacloud.test;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
-import symjava.bytecode.BytecodeFunc;
+import symjava.bytecode.BytecodeFuncImp1;
 
-public class TestClassFile implements BytecodeFunc {
+public class TestClassFile {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		CloudConfig.setTarget("local");
+		CloudConfig.setTarget("server");
 		
-		
-		CloudFunc f = new CloudFunc(TestClassFile.class);
+		CloudFunc f = new CloudFunc(BytecodeFuncImp1.class);
 		
 		CloudSD input = new CloudSD("input").init(new double[]{3, 4});
 		
@@ -25,10 +24,4 @@ public class TestClassFile implements BytecodeFunc {
 			}
 		}
 	}
-
-	@Override
-	public double apply(double... args) {
-		return args[0]+args[1];
-	}
-
 }
