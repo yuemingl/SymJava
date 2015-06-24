@@ -29,8 +29,8 @@ public class ExampleMonteCarlo {
 	 * where a,b,c,d=0.25,0.5,0.75,1.0
 	 * 
 	 */
-	public static void MonteCarloTwoAnnulusImp1() {
-		LCBuilder task = new LCBuilder("server");
+	public static void MonteCarloTwoAnnulusImp1(int N) {
+		LCBuilder task = new LCBuilder("local");
 		
 		LCVar x = task.declareDouble("x"); 
 		LCVar y = task.declareDouble("y");
@@ -42,8 +42,6 @@ public class ExampleMonteCarlo {
 		LCInt i = task.declareInt("i");
 		LCVar sum = task.declareDouble("sum");
 		LCVar counter = task.declareInt("counter");
-		
-		int N = 10000000;
 		
 		LCLoop loop = task.For(i.assign(0), 
 				Lt.apply(i, N), i.inc());    // for(i=0; i<N; i++) {
@@ -71,15 +69,18 @@ public class ExampleMonteCarlo {
 		
 		CloudSD params = new CloudSD("result").init(new double[]{0.25,0.5,0.75,1.0});
 		CloudSD result = new CloudSD("result").resize(1);
+		long start = System.currentTimeMillis();
 		func.apply(result, params);
+		System.out.println(System.currentTimeMillis()-start);
+		
 		
 		result.fetchToLocal();
 		System.out.println(result.getData(0));
 	}
 	
 	public static void MonteCarloTowAnnulusVerifiy() {
-		double xMin=0, xMax=1, xStep=0.001;
-		double yMin=0, yMax=1, yStep=0.001;
+		double xMin=0, xMax=1, xStep=0.0001;
+		double yMin=0, yMax=1, yStep=0.0001;
 		double sum = 0.0;
 		double a=0.25, b=0.5, c=0.75, d=1.0;
 		for(double x=xMin; x<=xMax; x+=xStep) {
@@ -140,7 +141,9 @@ public class ExampleMonteCarlo {
 	}
 	
 	public static void main(String[] args) {
-		MonteCarloTwoAnnulusImp1();
+		for(int N=10000; N<1000000000; N*=10) {
+			MonteCarloTwoAnnulusImp1(N);
+		}
 		//MonteCarloTwoAnnulusImp2();
 		MonteCarloTowAnnulusVerifiy();
 	}

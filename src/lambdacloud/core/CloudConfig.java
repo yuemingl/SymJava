@@ -39,7 +39,8 @@ public class CloudConfig {
 	
 	public static String getHost() {
 		return "localhost";
-		//return "ec2-54-200-107-134.us-west-2.compute.amazonaws.com";
+		//return "ec2-54-200-107-134.us-west-2.compute.amazonaws.com"; //
+		//return "ec2-52-27-4-226.us-west-2.compute.amazonaws.com"; //c4.large
 	}
 	
 	public static int getPort() {

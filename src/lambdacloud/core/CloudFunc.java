@@ -1,5 +1,12 @@
 package lambdacloud.core;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import io.netty.channel.Channel;
 import lambdacloud.core.lang.LCBase;
 import lambdacloud.core.lang.LCReturn;
@@ -24,6 +31,8 @@ public class CloudFunc extends LCBase {
 	protected BytecodeVecFunc vecFunc;
 	protected BytecodeBatchFunc batchFunc;
 	protected boolean isOnCloud = false;
+	protected Class<?> clazz;
+	protected Method method;
 	
 	//1=BytecodeFunc,2=BytecodeVecFunc,3=BytecodeBatchFunc
 	protected int funcType = 0; 
@@ -51,6 +60,43 @@ public class CloudFunc extends LCBase {
 	public CloudFunc(LCVar[] args, Expr[] expr) {
 		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		this.compile(args, expr);
+	}
+	
+	public CloudFunc(Class<?> clazz) {
+		this.name = clazz.getSimpleName();
+		if(CloudConfig.isLocal()) {
+			this.clazz = clazz;
+			try {
+				this.method = clazz.getMethod("apply", new Class[]{double[].class});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			Path path = Paths.get(clazz.getProtectionDomain().getCodeSource().getLocation().getPath()+
+					clazz.getName().replace(".", "/")+".class");
+			try {
+				byte[] data = Files.readAllBytes(path);
+				IR ir =  new IR();
+				ir.type = 1;
+				ir.name = clazz.getName();
+				ir.bytes = data;
+				this.funcIR = ir;
+				CloudFuncHandler handler = CloudConfig.getClient().getCloudFuncHandler();
+				Channel ch = CloudConfig.getClient().getChannel();
+				try {
+					ch.writeAndFlush(this).sync();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				CloudResp resp = handler.getCloudResp();
+				if(resp.status == 0)
+					this.isOnCloud = true;
+				else
+					this.isOnCloud = false;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public CloudFunc compile(LCVar[] args, Expr expr) {
@@ -94,6 +140,16 @@ public class CloudFunc extends LCBase {
 	}
 
 	public void apply(CloudSD output, CloudSD ...inputs) {
+		if(this.clazz != null) {
+			if(CloudConfig.isLocal()) {
+				try {
+					method.invoke(this.clazz.newInstance(), inputs[0].getData());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			return;
+		}
 		if(CloudConfig.isLocal()) {
 			if(inputs.length == 0) {
 				switch(funcType) {
