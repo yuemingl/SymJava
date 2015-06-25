@@ -1,31 +1,27 @@
 package lambdacloud.core;
 
+import io.netty.channel.Channel;
+
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.sun.org.apache.bcel.internal.generic.ClassGen;
-
-import io.netty.channel.Channel;
 import lambdacloud.core.lang.LCBase;
 import lambdacloud.core.lang.LCReturn;
-import lambdacloud.core.lang.LCStatements;
 import lambdacloud.core.lang.LCVar;
+import lambdacloud.net.CloudClient;
 import lambdacloud.net.CloudFuncHandler;
 import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudResp;
 import lambdacloud.net.CloudVarHandler;
-import lambdacloud.net.CloudClient;
 import lambdacloud.test.CompileUtils;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
 import symjava.bytecode.IR;
 import symjava.symbolic.Expr;
-import symjava.symbolic.utils.BytecodeSupport;
 import symjava.symbolic.utils.JIT;
 
 public class CloudFunc extends LCBase {
@@ -75,7 +71,8 @@ public class CloudFunc extends LCBase {
 				e.printStackTrace();
 			}
 		} else {
-			Path path = Paths.get(clazz.getProtectionDomain().getCodeSource().getLocation().getPath()+clazz.getName().replace(".", "/")+".class");
+			Path path = Paths.get(clazz.getProtectionDomain().getCodeSource().getLocation().getPath()+
+					clazz.getName().replace(".", "/")+".class");
 			try {
 				byte[] data = Files.readAllBytes(path);
 				IR ir =  new IR();
@@ -142,6 +139,16 @@ public class CloudFunc extends LCBase {
 	}
 
 	public void apply(CloudSD output, CloudSD ...inputs) {
+		if(this.clazz != null) {
+			if(CloudConfig.isLocal()) {
+				try {
+					method.invoke(this.clazz.newInstance(), inputs[0].getData());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			return;
+		}
 		if(CloudConfig.isLocal()) {
 			if(this.clazz != null) {
 				Double val1;
