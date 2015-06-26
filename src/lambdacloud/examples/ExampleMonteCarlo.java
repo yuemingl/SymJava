@@ -30,7 +30,7 @@ public class ExampleMonteCarlo {
 	 * 
 	 */
 	public static void MonteCarloTwoAnnulusImp1(int N) {
-		LCBuilder task = new LCBuilder("local");
+		LCBuilder task = new LCBuilder("server");
 		
 		LCVar x = task.declareDouble("x"); 
 		LCVar y = task.declareDouble("y");
@@ -141,7 +141,7 @@ public class ExampleMonteCarlo {
 	}
 	
 	public static void main(String[] args) {
-		for(int N=10000; N<1000000; N*=10) {
+		for(int N=10000; N<1000000000; N*=10) {
 			MonteCarloTwoAnnulusImp1(N);
 		}
 		//MonteCarloTwoAnnulusImp2();
