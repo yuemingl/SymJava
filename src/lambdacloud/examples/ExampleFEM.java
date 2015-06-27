@@ -7,7 +7,7 @@ import symjava.bytecode.BytecodeFuncImpFEM;
 
 public class ExampleFEM {
 	public static void main(String[] args) {
-		CloudConfig.setTarget("server");
+		CloudConfig.setGlobalTarget("job1.conf");
 		
 		CloudFunc f = new CloudFunc(BytecodeFuncImpFEM.class);
 		

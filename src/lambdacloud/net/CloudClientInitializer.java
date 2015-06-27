@@ -1,6 +1,5 @@
 package lambdacloud.net;
 
-import lambdacloud.core.CloudConfig;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -14,9 +13,13 @@ import io.netty.handler.ssl.SslContext;
 public class CloudClientInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SslContext sslCtx;
-
-    public CloudClientInitializer(SslContext sslCtx) {
+    private final String host;
+    private final int port;
+    
+    public CloudClientInitializer(SslContext sslCtx, String host, int port) {
         this.sslCtx = sslCtx;
+        this.host = host;
+        this.port = port;
     }
 
     @Override
@@ -24,7 +27,7 @@ public class CloudClientInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline pipeline = ch.pipeline();
 
         if (sslCtx != null) {
-            pipeline.addLast(sslCtx.newHandler(ch.alloc(), CloudConfig.getHost(), CloudConfig.getPort()));
+            pipeline.addLast(sslCtx.newHandler(ch.alloc(), host, port));
         }
 
         // Enable stream compression (you can remove these two if unnecessary)

@@ -14,7 +14,7 @@ public class Example1 {
 		// Set your secure configure file. 
 		// You can register an account and download it from 
 		// http://lambdacloud.io
-		CloudConfig.setTarget("server");
+		CloudConfig.setGlobalTarget("job1.conf");
 		
 		// Store myData to the cloud, which is initialized by 
 		// an array of double numbers.

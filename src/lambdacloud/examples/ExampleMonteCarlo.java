@@ -4,6 +4,7 @@ import static symjava.math.SymMath.log;
 import static symjava.math.SymMath.random;
 import static symjava.math.SymMath.sin;
 import static symjava.math.SymMath.sqrt;
+import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
 import lambdacloud.core.lang.LCBuilder;
@@ -30,7 +31,8 @@ public class ExampleMonteCarlo {
 	 * 
 	 */
 	public static void MonteCarloTwoAnnulusImp1(int N) {
-		LCBuilder task = new LCBuilder("server");
+		CloudConfig config = CloudConfig.instance("job1.conf");
+		LCBuilder task = new LCBuilder(config);
 		
 		LCVar x = task.declareDouble("x"); 
 		LCVar y = task.declareDouble("y");
@@ -67,12 +69,11 @@ public class ExampleMonteCarlo {
 		
 		CloudFunc func = task.build(new LCVar[]{a,b,c,d});
 		
-		CloudSD params = new CloudSD("result").init(new double[]{0.25,0.5,0.75,1.0});
-		CloudSD result = new CloudSD("result").resize(1);
+		CloudSD params = new CloudSD(config,"params").init(new double[]{0.25,0.5,0.75,1.0});
+		CloudSD result = new CloudSD(config, "result").resize(1);
 		long start = System.currentTimeMillis();
 		func.apply(result, params);
 		System.out.println(System.currentTimeMillis()-start);
-		
 		
 		result.fetchToLocal();
 		System.out.println(result.getData(0));

@@ -35,9 +35,10 @@ import symjava.symbolic.utils.Utils;
 public class CloudSD extends Symbol {
 	double[] data = new double[0];
 	boolean isOnCloud = false;
+	protected CloudConfig localConfig = null;
 	
 	public CloudSD() {
-		super("CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", ""));
+		super(generateName());
 	}
 
 	public CloudSD(String name) {
@@ -45,7 +46,7 @@ public class CloudSD extends Symbol {
 	}
 	
 	public CloudSD(Expr expr) {
-		super("CloudVar"+java.util.UUID.randomUUID().toString().replaceAll("-", ""));
+		super(generateName());
 		this.compile(this.label, expr);
 	}
 	
@@ -53,9 +54,31 @@ public class CloudSD extends Symbol {
 		super(name);
 		this.compile(name, expr);
 	}
+
+	public CloudSD(CloudConfig config) {
+		super(generateName());
+		this.localConfig = config;
+	}
+
+	public CloudSD(CloudConfig config, String name) {
+		super(name);
+		this.localConfig = config;
+	}
 	
+	public CloudSD(CloudConfig config, Expr expr) {
+		super(generateName());
+		this.localConfig = config;
+		this.compile(this.label, expr);
+	}
+	
+	public CloudSD(CloudConfig config, String name, Expr expr) {
+		super(name);
+		this.localConfig = config;
+		this.compile(name, expr);
+	}
+
 	public CloudSD compile(String name, Expr expr) {
-		if(CloudConfig.isLocal()) {
+		if(currentCloudConfig().isLocal()) {
 			CloudSD[] args = Utils.extractCloudVars(expr).toArray(new CloudSD[0]);
 			BytecodeBatchFunc fexpr = JIT.compileBatchFunc(args, expr);
 			data = new double[args[0].size()];
@@ -78,7 +101,33 @@ public class CloudSD extends Symbol {
 		this.data = array;
 		return this;
 	}
-
+	
+	private static String generateName() {
+		return "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+	}
+	
+	/**
+	 * Use the given cloud configuration other than the global one
+	 * @param conf
+	 */
+	public void useCloudConfig(CloudConfig conf) {
+		this.localConfig = conf;
+	}
+	
+	/**
+	 * Return current cloud configuration. Default is the global configuration.
+	 * @return
+	 */
+	public CloudConfig currentCloudConfig() {
+		if(this.localConfig != null)
+			return this.localConfig;
+		CloudConfig config = CloudConfig.getGlobalConfig();
+		if(config == null) {
+			throw new RuntimeException("CloudConfig is not specified!");
+		}
+		return config;
+	}
+	
 	/**
 	 * Set the value of the backed array at index
 	 * @param index
@@ -158,8 +207,8 @@ public class CloudSD extends Symbol {
 	 * Store the local variable to the cloud. 
 	 */
 	public boolean storeToCloud() {
-		CloudClient client = CloudConfig.getClient();
-		if(!CloudConfig.isLocal()) {
+		CloudClient client = currentCloudConfig().currentClient();
+		if(!currentCloudConfig().isLocal()) {
 			CloudVarRespHandler handler = client.getCloudVarRespHandler();
 			try {
 				client.getChannel().writeAndFlush(this).sync();
@@ -184,10 +233,10 @@ public class CloudSD extends Symbol {
 	 * @return
 	 */
 	public boolean fetchToLocal() {
-		if(CloudConfig.isLocal())
+		if(currentCloudConfig().isLocal())
 			return true;
 		else {
-			CloudClient client = CloudConfig.getClient();
+			CloudClient client = currentCloudConfig().currentClient();
 			Channel ch = client.getChannel();
 			CloudQuery qry = new CloudQuery();
 			qry.objName = this.getLabel();

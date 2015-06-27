@@ -1,5 +1,6 @@
 package lambdacloud.examples;
 
+import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
 import lambdacloud.core.lang.LCArray;
@@ -12,13 +13,16 @@ import symjava.relational.Lt;
 
 /**
  * This example shows how to use LCBuilder to create a function
- * that sums up the numbers in the argument 
+ * that sums up the numbers in the argument. We also use local
+ * configuration for cloud shared data (CloudSD) and cloud function
+ * (CloudFunc)
  *
  */
 public class Example3 {
 
 	public static void main(String[] args) {
-		LCBuilder lcb = new LCBuilder("server");
+		CloudConfig config = CloudConfig.instance("job1.conf");
+		LCBuilder task = new LCBuilder(config);
 
 		LCDoubleArray argData = new LCDoubleArray("argData"); //double[] argData;
 		LCInt i = new LCInt("i"); //int i=0;
@@ -32,14 +36,14 @@ public class Example3 {
 		 * 	return sum;
 		 * }
 		 */
-		lcb.For(i.assign(0), Lt.apply(i, argData.getLength()), i.inc())
+		task.For(i.assign(0), Lt.apply(i, argData.getLength()), i.inc())
 			.appendBody(sum.assign( sum + argData[i] ));
-		lcb.Return(sum);
-		CloudFunc func = lcb.build(argData);
-		System.out.println(lcb);
+		task.Return(sum);
+		CloudFunc func = task.build(argData);
+		System.out.println(task);
 
-		CloudSD myOutput = new CloudSD("myOutput").resize(1);
-		CloudSD myData = new CloudSD("myData").init(new double[] {2,2,3,3,4,4});
+		CloudSD myOutput = new CloudSD(config, "myOutput").resize(1);
+		CloudSD myData = new CloudSD(config, "myData").init(new double[] {2,2,3,3,4,4});
 		myData.storeToCloud();
 		
 		// Evaluating on the cloud server

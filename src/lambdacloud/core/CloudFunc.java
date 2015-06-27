@@ -32,8 +32,9 @@ public class CloudFunc extends LCBase {
 	protected boolean isOnCloud = false;
 	protected Class<?> clazz;
 	protected Method method;
+	protected CloudConfig localConfig = null;
 	
-	//1=BytecodeFunc,2=BytecodeVecFunc,3=BytecodeBatchFunc
+	//1=BytecodeFunc, 2=BytecodeVecFunc, 3=BytecodeBatchFunc
 	protected int funcType = 0; 
 	protected IR funcIR = null;
 	
@@ -52,19 +53,77 @@ public class CloudFunc extends LCBase {
 	}
 	
 	public CloudFunc(LCVar[] args, Expr expr) {
-		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		this.name = generateName();
 		this.compile(args, expr);
 	}
 	
 	public CloudFunc(LCVar[] args, Expr[] expr) {
-		this.name = "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		this.name = generateName();
 		this.compile(args, expr);
+	}
+	
+	public CloudFunc(CloudConfig config, String name) {
+		this.name = name;
+		this.localConfig = config;
+	}
+	
+	public CloudFunc(CloudConfig config, String name, LCVar[] args, Expr expr) {
+		this.name = name;
+		this.localConfig = config;
+
+		this.compile(args, expr);
+	}
+	
+	public CloudFunc(CloudConfig config, String name, LCVar[] args, Expr[] expr) {
+		this.name = name;
+		this.localConfig = config;
+
+		this.compile(args, expr);
+	}
+	
+	public CloudFunc(CloudConfig config, LCVar[] args, Expr expr) {
+		this.name = generateName();
+		this.localConfig = config;
+		this.compile(args, expr);
+	}
+	
+	public CloudFunc(CloudConfig config, LCVar[] args, Expr[] expr) {
+		this.name = generateName();
+		this.localConfig = config;
+		this.compile(args, expr);
+	}
+	
+	private static String generateName() {
+		return "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+	}
+	
+	/**
+	 * Use the given cloud configuration other than the global one
+	 * @param conf
+	 */
+	public void useCloudConfig(CloudConfig conf) {
+		this.localConfig = conf;
+	}
+	
+	/**
+	 * Return current cloud configuration. Default is the global configuration.
+	 * @return
+	 */
+	public CloudConfig currentCloudConfig() {
+		if(this.localConfig != null)
+			return this.localConfig;
+		CloudConfig config = CloudConfig.getGlobalConfig();
+		if(config == null) {
+			throw new RuntimeException("CloudConfig is not specified!");
+		}
+		return config;
 	}
 	
 	public CloudFunc(Class<?> clazz) {
 		this.name = clazz.getSimpleName();
 		this.clazz = clazz;
-		if(CloudConfig.isLocal()) {
+
+		if(currentCloudConfig().isLocal()) {
 			try {
 				method = clazz.getMethod("apply", new Class[] {double[].class});
 			} catch (Exception e) {
@@ -80,8 +139,8 @@ public class CloudFunc extends LCBase {
 				ir.name = clazz.getName();
 				ir.bytes = data;
 				this.funcIR = ir;
-				CloudFuncHandler handler = CloudConfig.getClient().getCloudFuncHandler();
-				Channel ch = CloudConfig.getClient().getChannel();
+				CloudFuncHandler handler =currentCloudConfig().currentClient().getCloudFuncHandler();
+				Channel ch = currentCloudConfig().currentClient().getChannel();
 				try {
 					ch.writeAndFlush(this).sync();
 				} catch (InterruptedException e) {
@@ -97,13 +156,14 @@ public class CloudFunc extends LCBase {
 			}
 		}
 	}
+
 	
 	public CloudFunc compile(LCVar[] args, Expr expr) {
 		Expr compileExpr = expr;
 		if(!(expr instanceof LCBase)) {
 			compileExpr = new LCReturn(expr);
 		}
-		if(CloudConfig.isLocal()) {
+		if(currentCloudConfig().isLocal()) {
 			funcType = 1;
 			func = CompileUtils.compile(name, compileExpr, args);
 			//func = JIT.compile(args, expr);
@@ -112,8 +172,8 @@ public class CloudFunc extends LCBase {
 			//send the exprssion to the server
 			funcIR = CompileUtils.getIR(name, compileExpr, args);
 			//funcIR = JIT.getIR(name, args, expr);
-			CloudFuncHandler handler = CloudConfig.getClient().getCloudFuncHandler();
-			Channel ch = CloudConfig.getClient().getChannel();
+			CloudFuncHandler handler = currentCloudConfig().currentClient().getCloudFuncHandler();
+			Channel ch = currentCloudConfig().currentClient().getChannel();
 			try {
 				ch.writeAndFlush(this).sync();
 			} catch (InterruptedException e) {
@@ -129,7 +189,7 @@ public class CloudFunc extends LCBase {
 	}
 	
 	public CloudFunc compile(Expr[] args, Expr[] exprs) {
-		if(CloudConfig.isLocal()) {
+		if(currentCloudConfig().isLocal()) {
 			funcType = 2;
 			vecFunc = JIT.compile(args, exprs);
 		} else {
@@ -140,7 +200,7 @@ public class CloudFunc extends LCBase {
 
 	public void apply(CloudSD output, CloudSD ...inputs) {
 		if(this.clazz != null) {
-			if(CloudConfig.isLocal()) {
+			if(currentCloudConfig().isLocal()) {
 				try {
 					method.invoke(this.clazz.newInstance(), inputs[0].getData());
 				} catch (Exception e) {
@@ -149,7 +209,7 @@ public class CloudFunc extends LCBase {
 			}
 			return;
 		}
-		if(CloudConfig.isLocal()) {
+		if(currentCloudConfig().isLocal()) {
 			if(this.clazz != null) {
 				Double val1;
 				try {
@@ -199,7 +259,7 @@ public class CloudFunc extends LCBase {
 			if(!inputs[0].isOnCloud()) {
 				inputs[0].storeToCloud();
 			}
-			CloudClient client = CloudConfig.getClient();
+			CloudClient client = currentCloudConfig().currentClient();
 			CloudVarHandler handler = client.getCloudVarHandler();
 			try {
 				CloudQuery qry = new CloudQuery();

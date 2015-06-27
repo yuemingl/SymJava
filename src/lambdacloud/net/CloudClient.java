@@ -9,24 +9,32 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import lambdacloud.core.CloudConfig;
 
 /**
- * Sends a sequence of integers to a {@link FactorialServer} to calculate
- * the factorial of the specified integer.
+ * 
+ * A cloud client represents a connection to a server 
+ * with host and port passed to the constructor
+ * 
  */
 public final class CloudClient {
+	public String host;
+	public int port;
+	
+	ChannelFuture f;
+	Channel ch;
+	EventLoopGroup group;
+	
+	CloudVarHandler varHandler;
+	CloudVarRespHandler varRespHandler;
+	CloudFuncHandler funcHandler;
+	
+	static final boolean SSL = System.getProperty("ssl") != null;
 
-    static final boolean SSL = System.getProperty("ssl") != null;
-    
-    ChannelFuture f;
-    CloudVarHandler varHandler;
-    CloudVarRespHandler varRespHandler;
-    CloudFuncHandler funcHandler;
-    
-    Channel ch;
-    EventLoopGroup group;
-    
+	public CloudClient(String host, int port) {
+		this.host = host;
+		this.port = port;
+	}
+
     public void connect() throws Exception {
         // Configure SSL.
         final SslContext sslCtx;
@@ -41,10 +49,10 @@ public final class CloudClient {
             Bootstrap b = new Bootstrap();
             b.group(group)
              .channel(NioSocketChannel.class)
-             .handler(new CloudClientInitializer(sslCtx));
+             .handler(new CloudClientInitializer(sslCtx, host, port));
 
             // Make a new connection.
-            f = b.connect(CloudConfig.getHost(), CloudConfig.getPort()).sync();
+            f = b.connect(host, port).sync();
             ch = f.channel();
             varHandler = (CloudVarHandler)f.channel().pipeline().get("CloudVarHandler");
             varRespHandler = (CloudVarRespHandler)f.channel().pipeline().get("CloudVarRespHandler");
