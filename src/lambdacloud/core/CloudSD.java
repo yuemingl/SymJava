@@ -247,10 +247,15 @@ public class CloudSD extends Symbol {
 				e.printStackTrace();
 			}
 			CloudVarHandler h = client.getCloudVarHandler();
-			CloudSD var = h.getCloudVar();
-			this.data = var.data;
-			this.isOnCloud = var.isOnCloud();
-			return this.isOnCloud;
+			
+			while(true) {
+				CloudSD var = h.getCloudVar();
+				this.data = var.data;
+				this.isOnCloud = var.isOnCloud();
+				if(this.data.length > 0)
+					return this.isOnCloud;
+			}
+			//return this.isOnCloud;
 		}
 	}
 	
@@ -294,6 +299,10 @@ public class CloudSD extends Symbol {
 
 	public Expr assign(int val) {
 		return new LCAssign(this, Expr.valueOf(val));
+	}
+	
+	public String toString() {
+		return this.getName()+" data.length="+this.data.length;
 	}
 
 }

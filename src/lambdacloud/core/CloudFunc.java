@@ -33,6 +33,7 @@ public class CloudFunc extends LCBase {
 	protected Class<?> clazz;
 	protected Method method;
 	protected CloudConfig localConfig = null;
+	protected boolean isAsync = false;
 	
 	//1=BytecodeFunc, 2=BytecodeVecFunc, 3=BytecodeBatchFunc
 	protected int funcType = 0; 
@@ -198,6 +199,16 @@ public class CloudFunc extends LCBase {
 		return this;
 	}
 
+	/**
+	 * flag=true: run apply() method asynchronously
+	 * flag=false: run apply() method synchronously
+	 * 
+	 * @param flag
+	 */
+	public void isAsyncApply(boolean flag) {
+		this.isAsync = flag;
+	}
+	
 	public void apply(CloudSD output, CloudSD ...inputs) {
 		if(this.clazz != null) {
 			if(currentCloudConfig().isLocal()) {
@@ -267,14 +278,19 @@ public class CloudFunc extends LCBase {
 				qry.objName = name;
 				qry.argNames.add(inputs[0].getLabel());
 				qry.outputName = output.getName();
-				client.getChannel().writeAndFlush(qry).sync();
+				if(this.isAsync)
+					client.getChannel().writeAndFlush(qry);
+				else
+					client.getChannel().writeAndFlush(qry).sync();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			CloudSD rlt = handler.getCloudVar();
-			output.setLabel(rlt.getLabel());
-			output.data = rlt.data;
-			output.isOnCloud = rlt.isOnCloud;
+			if(!this.isAsync) {
+				CloudSD rlt = handler.getCloudVar(); //blockqueue
+				output.setLabel(rlt.getLabel());
+				output.data = rlt.data;
+				output.isOnCloud = rlt.isOnCloud;
+			}
 		}
 	}
 	

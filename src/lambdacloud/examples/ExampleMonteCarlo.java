@@ -67,16 +67,31 @@ public class ExampleMonteCarlo {
 		Expr area = (counter/N)*squareArea; // area of domain
 		task.Return((sum/counter)*area); 
 		
-		CloudFunc func = task.build(new LCVar[]{a,b,c,d});
-		
 		CloudSD params = new CloudSD(config,"params").init(new double[]{0.25,0.5,0.75,1.0});
-		CloudSD result = new CloudSD(config, "result").resize(1);
-		long start = System.currentTimeMillis();
-		func.apply(result, params);
-		System.out.println(System.currentTimeMillis()-start);
+		CloudSD[] result = new CloudSD[3];
+		for(int j=0; j<3; j++) {
+			config.useClient(config.getClientByIndex(j));
+			
+			CloudFunc func = task.build(new LCVar[]{a,b,c,d});
+			func.isAsyncApply(true);
+			result[j] = new CloudSD(config, "result"+j).resize(1);
+			
+			long start = System.currentTimeMillis();
+			func.apply(result[j], params);
+			System.out.println("apply time="+(System.currentTimeMillis()-start));
+		}
 		
-		result.fetchToLocal();
-		System.out.println(result.getData(0));
+//		try {
+//			Thread.sleep(10000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		for(int j=0; j<3; j++) {
+			config.useClient(config.getClientByIndex(j));
+			result[j].fetchToLocal();
+			System.out.println(result[j].getData(0));
+		}
 	}
 	
 	public static void MonteCarloTowAnnulusVerifiy() {
@@ -142,11 +157,11 @@ public class ExampleMonteCarlo {
 	}
 	
 	public static void main(String[] args) {
-		for(int N=10000; N<1000000000; N*=10) {
+		for(int N=10000000; N<100000000; N*=10) {
 			MonteCarloTwoAnnulusImp1(N);
 		}
 		//MonteCarloTwoAnnulusImp2();
-		MonteCarloTowAnnulusVerifiy();
+		//MonteCarloTowAnnulusVerifiy();
 	}
 
 }

@@ -31,7 +31,7 @@ public class CloudVarHandler extends SimpleChannelInboundHandler<CloudSD> {
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, final CloudSD msg) {
-		System.err.println("messageReceived: CloudVar");
+		System.err.println("messageReceived: CloudVar="+msg);
 		queue.offer(msg);
 	}
 
