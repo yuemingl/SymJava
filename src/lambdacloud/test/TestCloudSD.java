@@ -6,7 +6,7 @@ import lambdacloud.core.CloudSD;
 public class TestCloudSD {
 
 	public static void main(String[] args) {
-		CloudConfig.setTarget("server");
+		CloudConfig.setGlobalTarget("job_aws.conf");
 		
 		// Store var123 to the cloud
 		double[] data = {1,2,3,4,5,6};

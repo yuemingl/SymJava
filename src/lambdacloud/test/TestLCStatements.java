@@ -13,7 +13,7 @@ public class TestLCStatements {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		CloudConfig.setTarget("server");
+		CloudConfig.setGlobalTarget("job_aws.conf");
 		
 		LCVar x = new LCDouble("x");
 		LCVar y = new LCDouble("y");

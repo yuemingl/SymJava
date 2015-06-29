@@ -48,6 +48,12 @@ public class LCBuilder {
 		return stmt;
 	}
 	
+	public LCReturn Return(double expr) {
+		LCReturn stmt = new LCReturn(expr);
+		stmts.add(stmt);
+		return stmt;
+	}
+	
 	public LCBuilder append(Expr expr) {
 		stmts.add(expr);
 		return this;

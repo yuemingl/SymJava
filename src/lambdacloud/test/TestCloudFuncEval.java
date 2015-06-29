@@ -12,7 +12,7 @@ import symjava.symbolic.Expr;
 public class TestCloudFuncEval {
 
 	public static void main(String[] args) {
-		CloudConfig.setTarget("server");
+		CloudConfig.setGlobalTarget("job_aws.conf");
 		
 		double[] data = { 3, 4 };
 		CloudSD input = new CloudSD("var123").init(data);

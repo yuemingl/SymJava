@@ -3,11 +3,9 @@ package lambdacloud.examples;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
-import lambdacloud.core.lang.LCVar;
 import symjava.bytecode.BytecodeFuncImpFEM;
 
 public class ExampleFEM {
-	
 	
 	public static void main(String[] args) {
 		System.out.println("Current working dir="+System.getProperty("user.dir"));
@@ -29,7 +27,7 @@ public class ExampleFEM {
 			}
 		}
 		
-		CloudConfig.setGlobalTarget(configFile);
+		CloudConfig config = CloudConfig.setGlobalTarget(configFile);
 		
 		double[] data = new double[nData];
 		for(int i=0; i<data.length; i++)
@@ -44,7 +42,10 @@ public class ExampleFEM {
 		start = System.currentTimeMillis();
 		start2 = System.currentTimeMillis();
 		for(int i=0; i<CloudConfig.getGlobalConfig().getTotalNumClients(); i++) {
+			config.useClient(config.getClientByIndex(i));
 			CloudFunc f = new CloudFunc(BytecodeFuncImpFEM.class);
+			//f.useCloudConfig(config); //No need to set config. We use global configuration here
+			
 			f.isAsyncApply(isAsync);
 			f.apply(output, input);
 		}

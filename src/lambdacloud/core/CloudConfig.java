@@ -26,7 +26,9 @@ public class CloudConfig {
 	public CloudConfig(String target) {
 		if(target == null) return;
 		this.target = target;
-		if(!target.equals("local")) {
+		if(target.equals("local")) {
+			System.out.println("Using 'local' config.");
+		} else {
 			try {
 				Path path = Paths.get(System.getProperty("user.dir")+"/conf/"+target);
 				System.out.println("Using config file: "+path);

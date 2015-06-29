@@ -22,31 +22,47 @@ public class TestLCBuilder {
 	
 	public static void testOverWriteArgs() {
 		LCBuilder task = new LCBuilder("local");
-		
+
+		LCVar x = task.declareDouble("x"); 
+		LCVar y = task.declareDouble("y");
+
 		task.append(x.assign(sqrt(x*x+y*y))); //x=x+y
+		task.Return(-1);                       //return 0
 		System.out.println(task);
 		
-		double[] args = new double[]{3,4};
-		task.compile(new Expr[]{x, y}).apply(args);
+		CloudSD input = new CloudSD("input").init(new double[]{3, 4});
+		CloudSD output = new CloudSD("output").resize(1);
+		task.build(new LCVar[]{x, y}).apply(output, input);
 		
+		if( output.fetchToLocal() ) 
+			System.out.println("output="+output.getData(0)); //-1
 		
-		System.out.println(args[0]); //5.0
+		if( input.fetchToLocal() ) {
+			System.out.println("input=");
+			for(double d: input.getData())
+				System.out.println(d); //5.0
+		}
 	}
 	
 	public static void testReturn() {
-		LCBuilder cloudTask = new LCBuilder("local");
+		LCBuilder task = new LCBuilder("job_aws.conf");
 		
-		cloudTask.Return(sqrt(x*x+y*y)); //return sqrt(x*x+y*y)
-		System.out.println(cloudTask);
+		LCVar x = task.declareDouble("x"); 
+		LCVar y = task.declareDouble("y");
+
+		task.Return(sqrt(x*x+y*y)); //return sqrt(x*x+y*y)
+		System.out.println(task);
 		
-		double[] args = new double[]{3,4};
-		double ret = cloudTask.compile(new Expr[]{x, y}).apply(args);
-		System.out.println(ret); //5.0
-		
+		CloudSD input = new CloudSD("input").init(new double[]{3, 4});
+		CloudSD output = new CloudSD("output").resize(1);
+
+		task.build(new LCVar[]{x, y}).apply(output, input);
+		if( output.fetchToLocal() ) 
+			System.out.println(output.getData(0)); //5.0
 	}
 	
 	public static void testLoopAsignReturn() {
-		LCBuilder cloudTask = new LCBuilder("local");
+		LCBuilder cloudTask = new LCBuilder("job_aws.conf");
 		
 		LCVar i = cloudTask.declareInt("i"); //int i;
 		LCVar sum = cloudTask.declareDouble("sum");//double sum;
@@ -59,7 +75,12 @@ public class TestLCBuilder {
 		cloudTask.Return(sum); //return sum;
 		System.out.println(cloudTask);
 		
-		System.out.println(cloudTask.compile().apply()); //45.0
+		//input is not needed here
+		CloudSD input = new CloudSD("input").init(new double[]{1});
+		CloudSD output = new CloudSD("output").resize(1);
+		cloudTask.build().apply(output, input);
+		if( output.fetchToLocal() ) 
+			System.out.println(output.getData(0)); //45.0
 	}
 
 	public static void test() {
@@ -95,15 +116,16 @@ public class TestLCBuilder {
 	}
 	
 	public static void main(String[] args) {
-		//testOverWriteArgs();
-		//testReturn();
-		//testLoopAsignReturn();
-		//MTest1();
-		MTest2();
+		testOverWriteArgs();
+		testReturn();
+		testLoopAsignReturn();
+		
+		//MonteCarloTest1();
+		//MonteCarloTest2();
 	}
 	
 	
-	public static void MTest1() {
+	public static void MonteCarloTest1() {
 		LCBuilder task = new LCBuilder("local");
 		LCVar x = task.declareDouble("x"); 
 		LCVar y = task.declareDouble("y");
@@ -122,7 +144,7 @@ public class TestLCBuilder {
 		task.build(new LCVar[]{x,y,a,b,c,d});
 	}
 	
-	public static void MTest2() {
+	public static void MonteCarloTest2() {
 		LCBuilder task = new LCBuilder("local");
 		
 		LCVar x = task.declareDouble("x"); 

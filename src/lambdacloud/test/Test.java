@@ -12,7 +12,7 @@ public class Test {
 	}
 	
 	public static void test() {
-		CloudConfig.setTarget("server");
+		CloudConfig.setGlobalTarget("job_aws.conf");
 		
 		LCVar x = LCVar.getDouble("x");
 		LCVar y = LCVar.getDouble("y");

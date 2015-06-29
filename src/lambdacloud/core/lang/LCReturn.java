@@ -22,6 +22,11 @@ public class LCReturn extends LCBase {
 		updateLabel();
 	}
 	
+	public LCReturn(double expr) {
+		this.arg = expr;
+		updateLabel();
+	}
+	
 	public void updateLabel() {
 		this.label = this.indent + "return " + arg;
 		

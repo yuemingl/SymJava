@@ -6,7 +6,7 @@ import lambdacloud.core.lang.LCVar;
 
 public class TestCloudFunc {
 	public static void main(String[] args) {
-		CloudConfig.setTarget("server1");
+		CloudConfig.setGlobalTarget("job_aws.conf");
 
 		LCVar x = LCVar.getDouble("x");
 		LCVar y = LCVar.getDouble("y");

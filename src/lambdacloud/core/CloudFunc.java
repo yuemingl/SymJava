@@ -210,6 +210,10 @@ public class CloudFunc extends LCBase {
 	}
 	
 	public void apply(CloudSD output, CloudSD ...inputs) {
+		output.useCloudConfig(currentCloudConfig());
+		for(int i=0; i<inputs.length; i++) 
+			inputs[i].useCloudConfig(currentCloudConfig());
+		
 		if(this.clazz != null) {
 			if(currentCloudConfig().isLocal()) {
 				try {
@@ -268,16 +272,18 @@ public class CloudFunc extends LCBase {
 				
 			}
 		} else {
-			if(!inputs[0].isOnCloud()) {
-				inputs[0].storeToCloud();
-			}
+			for(int i=0; i<inputs.length; i++) 
+				if(!inputs[i].isOnCloud()) {
+					inputs[i].storeToCloud();
+				}
 			CloudClient client = currentCloudConfig().currentClient();
 			CloudVarHandler handler = client.getCloudVarHandler();
 			try {
 				CloudQuery qry = new CloudQuery();
 				qry.qryType = CloudQuery.CLOUD_FUNC_EVAL;
 				qry.objName = name;
-				qry.argNames.add(inputs[0].getLabel());
+				for(int i=0; i<inputs.length; i++) 
+					qry.argNames.add(inputs[i].getLabel());
 				qry.outputName = output.getName();
 				if(this.isAsync)
 					client.getChannel().writeAndFlush(qry);

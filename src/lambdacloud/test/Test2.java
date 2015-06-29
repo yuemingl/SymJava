@@ -22,7 +22,7 @@ public class Test2 {
 	}
 	
 	public static void test() {
-		CloudConfig.setTarget("local");
+		CloudConfig.setGlobalTarget("job_aws.conf");
 		
 		LCVar x = LCVar.getDouble("x");
 		LCVar y = LCVar.getDouble("y");
