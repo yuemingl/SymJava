@@ -28,7 +28,8 @@ public class CloudConfig {
 		this.target = target;
 		if(!target.equals("local")) {
 			try {
-				Path path = Paths.get(System.getProperty("user.dir")+"/"+target);
+				Path path = Paths.get(System.getProperty("user.dir")+"/conf/"+target);
+				System.out.println("Using config file: "+path);
 				List<String> hosts = Files.readAllLines(path, Charset.forName("UTF-8"));
 				for(String host : hosts) {
 					if(host.trim().length() == 0) 

@@ -166,7 +166,7 @@ public class ExampleMonteCarlo {
 	public static void main(String[] args) {
 		System.out.println("Current working dir="+System.getProperty("user.dir"));
 		int N = 1000000;
-		String configFile = "local";
+		String configFile = "job1.conf";
 		boolean isAsync = false;
 		if(args.length == 3) {
 			N = Integer.valueOf(args[0]);
