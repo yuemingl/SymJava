@@ -213,12 +213,13 @@ public class CloudFunc extends LCBase {
 		if(this.clazz != null) {
 			if(currentCloudConfig().isLocal()) {
 				try {
-					method.invoke(this.clazz.newInstance(), inputs[0].getData());
+					Object ret = method.invoke(this.clazz.newInstance(), inputs[0].getData());
+					output.data[0] = ((Double)ret).doubleValue();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				return;
 			}
-			return;
 		}
 		if(currentCloudConfig().isLocal()) {
 			if(this.clazz != null) {

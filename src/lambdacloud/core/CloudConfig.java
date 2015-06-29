@@ -28,7 +28,7 @@ public class CloudConfig {
 		this.target = target;
 		if(!target.equals("local")) {
 			try {
-				Path path = Paths.get(CloudConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"../"+target);
+				Path path = Paths.get(System.getProperty("user.dir")+"/"+target);
 				List<String> hosts = Files.readAllLines(path, Charset.forName("UTF-8"));
 				for(String host : hosts) {
 					if(host.trim().length() == 0) 
@@ -102,10 +102,14 @@ public class CloudConfig {
 	*/
 	
 	public CloudClient getClientByIndex(int index) {
+		if(this.isLocal())
+			return null;
 		return clients.get(index);
 	}
 	
 	public int getTotalNumClients() {
+		if(this.isLocal())
+			return 1;
 		return clients.size();
 	}
 	
@@ -114,6 +118,8 @@ public class CloudConfig {
 	}
 	
 	public void useClient(CloudClient client) {
+		if(this.isLocal()) 
+			return;
 		this.currentClient = client;
 	}
 	

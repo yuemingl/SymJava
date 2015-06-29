@@ -98,8 +98,7 @@ public class BytecodeFuncImpFEM implements BytecodeFunc {
 		}
 
 		public static void solveLaplace(double[] nodesData) {
-			int nNodes = nodesData.length/3;
-			Element[]
+			int nEle = (int)nodesData[0];
 			NodeList nodes = new NodeList();
 			/**
 			 * |\
@@ -173,7 +172,7 @@ public class BytecodeFuncImpFEM implements BytecodeFunc {
 			System.arraycopy(coords, 0, params, 0, coords.length);
 
 			long start = System.currentTimeMillis();
-			for(int k=0; k<1000000; k++) {
+			for(int k=0; k<nEle; k++) {
 				for(int j=0; j<3; j++) {
 					for(int i=0; i<3; i++) {
 						A[j][i] += intOnTriangleRefElement(clhs[j][i], params, coords.length, 3);
@@ -206,17 +205,17 @@ public class BytecodeFuncImpFEM implements BytecodeFunc {
 				-0.45833333333333287 0.04166666666666662 0.5833333333333327 
 				0.24999999999999972
 				0.31249999999999967
-				0.31249999999999967			
+				0.31249999999999967
 			 */
 		}
 
 		public static void main(String[] args) {
-			testLaplace();
+			solveLaplace(new double[]{100});
 		}
 		
 		@Override
 		public double apply(double... args) {
-			testLaplace();
-			return 0;
+			solveLaplace(args);
+			return args[0];
 		}	
 }

@@ -30,8 +30,8 @@ public class ExampleMonteCarlo {
 	 * where a,b,c,d=0.25,0.5,0.75,1.0
 	 * 
 	 */
-	public static void MonteCarloTwoAnnulusImp1(int N) {
-		CloudConfig config = CloudConfig.instance("job1.conf");
+	public static void MonteCarloTwoAnnulusImp1(int N, String configFile, boolean isAsync) {
+		CloudConfig config = CloudConfig.instance(configFile);
 		LCBuilder task = new LCBuilder(config);
 		
 		LCVar x = task.declareDouble("x"); 
@@ -68,30 +68,37 @@ public class ExampleMonteCarlo {
 		task.Return((sum/counter)*area); 
 		
 		CloudSD params = new CloudSD(config,"params").init(new double[]{0.25,0.5,0.75,1.0});
-		CloudSD[] result = new CloudSD[3];
-		for(int j=0; j<3; j++) {
+		CloudSD[] result = new CloudSD[config.getTotalNumClients()];
+		
+		long start, end, totalTime;
+		long start2, end2, applyTime;
+		start = System.currentTimeMillis();
+		start2 = System.currentTimeMillis();
+		for(int j=0; j<config.getTotalNumClients(); j++) {
 			config.useClient(config.getClientByIndex(j));
 			
 			CloudFunc func = task.build(new LCVar[]{a,b,c,d});
-			func.isAsyncApply(true);
+			func.isAsyncApply(isAsync);
 			result[j] = new CloudSD(config, "result"+j).resize(1);
 			
-			long start = System.currentTimeMillis();
 			func.apply(result[j], params);
-			System.out.println("apply time="+(System.currentTimeMillis()-start));
 		}
+		end2 = System.currentTimeMillis();
+		applyTime = end2 - start2;
 		
-//		try {
-//			Thread.sleep(10000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		for(int j=0; j<3; j++) {
+		double rltSum = 0.0;
+		for(int j=0; j<config.getTotalNumClients(); j++) {
 			config.useClient(config.getClientByIndex(j));
 			result[j].fetchToLocal();
-			System.out.println(result[j].getData(0));
+			double rlt = result[j].getData(0);
+			rltSum += rlt;
+			System.out.println(rlt);
 		}
+		end = System.currentTimeMillis();
+		totalTime = end-start;
+		System.out.println("apply time="+applyTime+" getDataTime="+(totalTime-applyTime)+" totalTime="+totalTime);
+		
+		System.out.println("final result="+rltSum/config.getTotalNumClients());
 	}
 	
 	public static void MonteCarloTowAnnulusVerifiy() {
@@ -157,9 +164,16 @@ public class ExampleMonteCarlo {
 	}
 	
 	public static void main(String[] args) {
-		for(int N=10000000; N<100000000; N*=10) {
-			MonteCarloTwoAnnulusImp1(N);
+		System.out.println("Current working dir="+System.getProperty("user.dir"));
+		int N = 1000000;
+		String configFile = "local";
+		boolean isAsync = false;
+		if(args.length == 3) {
+			N = Integer.valueOf(args[0]);
+			configFile = args[1];
+			isAsync = Boolean.valueOf(args[2]);
 		}
+		MonteCarloTwoAnnulusImp1(N, configFile, isAsync);
 		//MonteCarloTwoAnnulusImp2();
 		//MonteCarloTowAnnulusVerifiy();
 	}
