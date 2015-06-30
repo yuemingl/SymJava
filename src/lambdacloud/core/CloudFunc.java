@@ -2,6 +2,7 @@ package lambdacloud.core;
 
 import io.netty.channel.Channel;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
@@ -131,8 +132,17 @@ public class CloudFunc extends LCBase {
 				e.printStackTrace();
 			}
 		} else {
-			Path path = Paths.get(clazz.getProtectionDomain().getCodeSource().getLocation().getPath()+
-					clazz.getName().replace(".", "/")+".class");
+			String filePath = System.getProperty("user.dir")+"/"+clazz.getName().replace(".", "/")+".class";
+			File f = new File(filePath);
+			if(!f.exists()) {
+				filePath = System.getProperty("user.dir")+"/bin/"+clazz.getName().replace(".", "/")+".class";
+				f = new File(filePath);
+				if(!f.exists()) {
+					filePath = clazz.getProtectionDomain().getCodeSource().getLocation().getPath()+
+							clazz.getName().replace(".", "/")+".class";
+				}
+			}
+			Path path = Paths.get(filePath);
 			try {
 				byte[] data = Files.readAllBytes(path);
 				IR ir =  new IR();

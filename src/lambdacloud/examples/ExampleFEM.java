@@ -10,7 +10,7 @@ public class ExampleFEM {
 	public static void main(String[] args) {
 		System.out.println("Current working dir="+System.getProperty("user.dir"));
 		
-		String configFile = "local";
+		String configFile = "job_google.conf";
 		int nData = 1000;
 		int nEle = 100000;
 		boolean isAsync = false;
