@@ -21,9 +21,10 @@ import symjava.relational.Lt;
 public class Example3 {
 
 	public static void main(String[] args) {
-		CloudConfig config = CloudConfig.instance("job1.conf");
-		config.useClient(config.getClientByIndex(2));
+		CloudConfig config = CloudConfig.instance("job_rackspace.conf");
+		//config.useClient(config.getClientByIndex(2));
 		System.out.println("Current host: "+config.currentClient().host);
+		
 		LCBuilder task = new LCBuilder(config);
 
 		LCDoubleArray argData = new LCDoubleArray("argData"); //double[] argData;
