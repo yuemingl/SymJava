@@ -1,13 +1,81 @@
 package lambdacloud.examples;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
+import lambdacloud.core.lang.LCReturn;
+import lambdacloud.core.lang.LCVar;
+import lambdacloud.examples.ExampleMonteCarlo.MyFrame;
+import lambdacloud.examples.ExampleMonteCarlo.MyFrame.MyPanel;
+import lambdacloud.test.CompileUtils;
+import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeFuncImpFEM;
+import symjava.relational.Ge;
+import symjava.relational.Le;
+import symjava.symbolic.Expr;
 
 public class ExampleFEM {
 	
+	public static class MyFrame extends JFrame {
+		private static final long serialVersionUID = 1L;
+		public MyFrame() {
+			setTitle("Finite Element Assembly Demo - Random Mesh");
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			double[] data = new double[50];
+			for(int i=0; i<data.length; i++) {
+				data[i] = Math.random()*420;
+			}
+			add(new MyPanel(data));
+			setSize(550, 550);
+			setLocationRelativeTo(null);
+		}
+		
+		public static class MyPanel extends JPanel {
+			private static final long serialVersionUID = 1L;
+			double[] data;
+			public MyPanel(double[] data) {
+				this.data = data;
+			}
+			private void doDrawing(Graphics g) {
+				Graphics2D g2d = (Graphics2D) g;
+				g2d.setStroke(new BasicStroke(2));
+				Dimension size = getSize();
+				Insets insets = getInsets();
+				int w = size.width - insets.left - insets.right;
+				int h = size.height - insets.top - insets.bottom;
+				System.out.println(w+", "+h);
+				for (int i = 0; i < data.length; i++) {
+					int x1 = (int)data[i];
+					g2d.drawLine(x1, 0, x1, h);
+					g2d.drawLine(0, x1, w, x1);
+				}
+			}
+	
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				doDrawing(g);
+			}
+		}
+	}
+	
 	public static void main(String[] args) {
+		FEMImp1(args);
+		
+//		MyFrame frame = new MyFrame();
+//		frame.setVisible(true);
+	}
+	
+	public static void FEMImp1(String[] args) {
 		System.out.println("Current working dir="+System.getProperty("user.dir"));
 		
 		String configFile = "job_google.conf";
