@@ -3,17 +3,15 @@ package lambdacloud.examples;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
-import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCBuilder;
 import lambdacloud.core.lang.LCDouble;
 import lambdacloud.core.lang.LCDoubleArray;
 import lambdacloud.core.lang.LCInt;
-import lambdacloud.core.lang.LCVar;
 import symjava.relational.Lt;
 
 /**
  * This example shows how to use LCBuilder to create a function
- * that sums up the numbers in the argument. We also use local
+ * that sums up the numbers from the arguments. We also use local
  * configuration for cloud shared data (CloudSD) and cloud function
  * (CloudFunc)
  *
