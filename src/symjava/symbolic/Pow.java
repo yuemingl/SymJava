@@ -36,6 +36,10 @@ public class Pow extends BinaryOp {
 		//TODO? x^3 + x^2 + x + 1
 		sortKey = base.getSortKey()+"power"+String.valueOf(displayExp);
 	}
+	
+	public String toString() {
+		return "pow("+arg1+","+arg2+")";
+	}
 
 	public static Expr simplifiedIns(Expr base, Expr exponent) {
 		if(base instanceof SymReal<?> && exponent instanceof SymReal<?>) {

@@ -35,6 +35,10 @@ public class Sqrt extends BinaryOp {
 		sortKey = expr.getSortKey()+"sqrt["+root+"]"+String.valueOf(root);
 	}
 
+	public String toString() {
+		return "sqrt("+arg1+")";
+	}
+	
 	@Override
 	public Expr diff(Expr expr) {
 		return Pow.simplifiedIns(arg1, 1.0/arg2).diff(expr);

@@ -26,6 +26,8 @@ public class BlackScholes {
 		//http://quantlib.org/slides/dima-code.zip
 		
 		// Define symbols to construct the Black-Scholes formula
+		long start, end;
+		start = System.currentTimeMillis();
 		Symbol spot = new Symbol("spot"); //spot price
 		Symbol strike = new Symbol("strike"); //strike price
 		Symbol rd = new Symbol("rd");
@@ -66,11 +68,16 @@ public class BlackScholes {
 		Eq[] eq = new Eq[] {
 			new Eq(res-price, C0, freeVars, params)
 		};
+		end = System.currentTimeMillis();
+		System.out.println("time1 = "+(end-start));
 		
+		start = System.currentTimeMillis();
 		// Use Newton's method to find the root
 		double[] guess = new double[]{ 0.10 };
 		double[] constParams = new double[] {100.0, 110.0, 0.002, 0.01, 0.5, 1};
 		Newton.solve(eq, guess, constParams, 100, 1e-5);
+		end = System.currentTimeMillis();
+		System.out.println("time2 = "+(end-start));
 	}
 	
 	public static void test2() {

@@ -117,6 +117,14 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
+	 * Return the LaTex representation of the expression
+	 * @return
+	 */
+	public String toLaTex() {
+		return label;
+	}
+	
+	/**
 	 * Set the label(or name) of the expression
 	 * @param label
 	 * @return

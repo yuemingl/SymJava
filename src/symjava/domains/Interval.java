@@ -67,7 +67,7 @@ public class Interval extends Domain1D {
 	
 	@Override
 	public String toString() {
-		return "["+start+","+end+"]";
+		return "interval("+this.getCoordVars()[0]+","+start+","+end+","+this.getStepSize()+")";
 	}
 	
 	@Override

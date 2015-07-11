@@ -30,6 +30,10 @@ public class Integrate extends Expr {
 		this.sortKey = integrand.toString()+domain.toString();
 	}
 	
+	public String toString() {
+		return "integrate("+integrand+","+domain+")";
+	}
+	
 	public static Expr apply(Expr integrand, Domain domain) {
 		return new Integrate(integrand, domain);
 	}
