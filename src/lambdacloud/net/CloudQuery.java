@@ -9,6 +9,8 @@ public class CloudQuery {
 	public static final int CLOUD_VAR        = 0; // Fetch a CloudVar from cloud
 	public static final int CLOUD_FUNC_EVAL  = 1; // Evaluate a function on the cloud
 	public static final int TARGET_INFO      = 2; // Query info of target machine on the cloud
+	public static final int CLOUD_LIB_INVOKE = 10; // Query info of target machine on the cloud
+	
 
 	public int qryType;    // One of the static integer define in this class
 	public String objName; // Name of CloudVar or CloudFunc

@@ -154,6 +154,25 @@ public class Eq extends BinaryOp implements Relation {
 		computeUnknowns();
 	}
 	
+	public String toString() {
+		String sFreeVars = "array(";
+		if(this.freeVars != null) {
+			//sFreeVars += this.freeVars.length +",";
+			sFreeVars += Utils.joinLabels(this.freeVars, ",");
+		}
+		sFreeVars += ")";
+		
+		String sParams = "array(";
+		if(this.params != null) {
+			//sParams += this.params.length +",";
+			sParams += Utils.joinLabels(this.params, ",");
+		}
+		sParams += ")";
+		
+		
+		return "eq("+arg1+","+arg2+","+sFreeVars+","+sParams+")";
+	}
+	
 	private void computeUnknowns() {
 		this.unknowns = new Expr[freeVars.length + dependentVars.length];
 		int idx = 0;

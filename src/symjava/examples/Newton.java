@@ -15,15 +15,26 @@ import Jama.Matrix;
  *
  */
 public class Newton {
-	public static void solve(Eq[] eqs, double[] init, int maxIter, double eps) {
-		solve(eqs, init, new double[0], maxIter, eps);
+	public static double[] solve(Eq[] eqs, double[] init, int maxIter, double eps) {
+		return solve(eqs, init, new double[0], maxIter, eps);
 	}
 	
-	public static void solve(Eq[] eqs, double[] init, double[] params, int maxIter, double eps) {
+	public static double[] solve(Expr[] eqs, double[] init, int maxIter, double eps) {
+		return solve(eqs, init, new double[0], maxIter, eps);
+	}
+	
+	public static double[] solve(Expr[] eqs, double[] init, double[] params, int maxIter, double eps) {
+		Eq[] tmp = new Eq[eqs.length];
+		for(int i=0; i<eqs.length; i++) {
+			tmp[i] = (Eq)eqs[i];
+		}
+		return solve(tmp, init, params, maxIter, eps);
+	}
+	public static double[] solve(Eq[] eqs, double[] init, double[] params, int maxIter, double eps) {
 		for(Eq eq : eqs) {
 			if(!Symbol.C0.symEquals(eq.rhs())) {
 				System.out.println("The right hand side of the equation must be 0.");
-				return;
+				return null;
 			}
 		}
 		Expr[] unknowns = eqs[0].getUnknowns();
@@ -91,5 +102,6 @@ public class Newton {
 				funArgs[j] = funArgs[j] - x.get(j, 0);
 			}
 		}
+		return funArgs;
 	}
 }

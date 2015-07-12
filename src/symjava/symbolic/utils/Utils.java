@@ -389,6 +389,22 @@ public class Utils {
 			sb.delete(sb.length()-deliminator.length(), sb.length());
 		return sb.toString();
 	}
+	
+	public static String joinLabels(String[] list, int startIdx, int endIdx, String deliminator) {
+		StringBuilder sb = new StringBuilder();
+		if(list == null) return null;
+		for(int i=startIdx; i<endIdx; i++) {
+			sb.append(list[i]);
+			sb.append(deliminator);
+		}
+		if(sb.length() > deliminator.length())
+			sb.delete(sb.length()-deliminator.length(), sb.length());
+		return sb.toString();
+	}
+
+	public static String joinLabels(String[] list, String deliminator) {
+		return joinLabels(list, 0, list.length, deliminator);
+	}
 
 	public static String joinLabels(List<Expr> list, String deliminator) {
 		return joinLabels(list.toArray(new Expr[0]), deliminator);
