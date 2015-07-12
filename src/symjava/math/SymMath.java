@@ -21,8 +21,8 @@ public class SymMath {
 	/**
 	 * Pre defined constant symbols
 	 */
-	public static SymConst PI = new SymConst("\\pi", Math.PI);
-	public static SymConst PI2 = new SymConst("2\\pi", 2*Math.PI);
+	public static SymConst PI = new SymConst("pi", Math.PI);
+	public static SymConst PI2 = new SymConst("2*pi", 2*Math.PI);
 	public static SymConst E = new SymConst("e", Math.E);
 	
 	/**
