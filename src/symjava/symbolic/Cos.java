@@ -22,7 +22,7 @@ public class Cos extends UnaryOp {
 
 	@Override
 	public Expr diff(Expr expr) {
-		return Negate.simplifiedIns(Sin.simplifiedIns(expr)).multiply(arg.diff(expr));
+		return Negate.simplifiedIns(Sin.simplifiedIns(arg)).multiply(arg.diff(expr));
 	}
 
 	public static Expr simplifiedIns(Expr expr) {
