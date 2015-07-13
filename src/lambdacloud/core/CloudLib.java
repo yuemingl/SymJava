@@ -30,6 +30,20 @@ public class CloudLib {
 		return ret+"]";
 	}
 	
+	public static String convertParam(double[][] param) {
+		String ret = "[[D:[";
+		for(int i=0; i<param.length; i++) {
+			ret +="[";
+			for(double d : param[i])
+				ret += String.valueOf(d)+",";
+			if(i == param.length-1)
+				ret +="]";
+			else
+				ret +="],";
+		}
+		return ret+"]";
+	}
+	
 	public static String convertParam(double param) {
 		return "D:"+String.valueOf(param);
 	}
@@ -47,21 +61,69 @@ public class CloudLib {
 			ret += e.toString()+";";
 		return ret+"]";
 	}
+	public static String convertEqs(String[] eqs) {
+		String ret = "[E:[";
+		for(String e : eqs) 
+			ret += e+";";
+		return ret+"]";
+	}
+	
+	public static String convertEq(String eq) {
+		String ret = "E:"+eq.toString();
+		return ret;
+	}
 	
 	public void solverNewton(Eq[] eqs, double[] init, int maxIter, double eps, CloudSD output) {
 		solverNewton(eqs, init, new double[0], maxIter, eps, output);
 	}
+
+	public void solverNewton(String[] eqs, double[] init, int maxIter, double eps, CloudSD output) {
+		solverNewton(eqs, init, new double[0], maxIter, eps, output);
+	}
 	
+	public void solverNewton(String[] eqs, double[] init, double[] params, int maxIter, double eps, CloudSD output) {
+		String sEqs = convertEqs(eqs);
+		String sInit = convertParam(init);
+		String sParam = convertParam(params);
+		String sMaxIter = convertParam(maxIter);
+		String sEps = convertParam(eps);
+		invokeStatic("symjava.examples.Newton","solve", new String[]{sEqs, sInit, sParam, sMaxIter, sEps}, output);
+	}
+
 	public void solverNewton(Eq[] eqs, double[] init, double[] params, int maxIter, double eps, CloudSD output) {
 		String sEqs = convertParam(eqs);
 		String sInit = convertParam(init);
 		String sParam = convertParam(params);
 		String sMaxIter = convertParam(maxIter);
 		String sEps = convertParam(eps);
-		
 		invokeStatic("symjava.examples.Newton","solve", new String[]{sEqs, sInit, sParam, sMaxIter, sEps}, output);
 	}
 	
+	public double[] solverGaussNewton(Eq eq, double[] init, double[][] data, int maxIter, double eps) {
+		String sEq = convertParam(eq);
+		String sInit = convertParam(init);
+		String sParam = convertParam(data);
+		String sMaxIter = convertParam(maxIter);
+		String sEps = convertParam(eps);
+		CloudSD output = new CloudSD().init(init.length);
+		invokeStatic("symjava.examples.GaussNewton","solve", new String[]{sEq, sInit, sParam, sMaxIter, sEps}, output);
+		output.fetchToLocal();
+		System.out.println(output.getName());
+		return output.getData();
+	}
+	
+	public double[] solverGaussNewton(String eq, double[] init, double[][] data, int maxIter, double eps) {
+		String sEq = convertEq(eq);
+		String sInit = convertParam(init);
+		String sParam = convertParam(data);
+		String sMaxIter = convertParam(maxIter);
+		String sEps = convertParam(eps);
+		CloudSD output = new CloudSD().init(init.length);
+		invokeStatic("symjava.examples.GaussNewton","solve", new String[]{sEq, sInit, sParam, sMaxIter, sEps}, output);
+		output.fetchToLocal();
+		System.out.println(output.getName());
+		return output.getData();
+	}
 	
 	protected void invokeStatic(String className, String methodName, String[] args, CloudSD output) {
 		CloudClient client = currentCloudConfig().currentClient();
@@ -85,7 +147,7 @@ public class CloudLib {
 			output.setLabel(rlt.getLabel());
 			output.data = rlt.data;
 			output.isOnCloud = rlt.isOnCloud;
-		}		
+		}
 	}
 	
 	

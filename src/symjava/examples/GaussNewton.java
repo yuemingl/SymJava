@@ -14,7 +14,10 @@ import symjava.symbolic.utils.JIT;
  */
 public class GaussNewton {
 
-	public static void solve(Eq eq, double[] init, double[][] data, int maxIter, double eps) {
+	public static double[] solve(Expr eq, double[] init, double[][] data, int maxIter, double eps) {
+		return solve((Eq)eq, init, data, maxIter, eps);
+	}
+	public static double[] solve(Eq eq, double[] init, double[][] data, int maxIter, double eps) {
 		int n = data.length;
 		
 		//Construct Jacobian Matrix and Residuals
@@ -57,6 +60,7 @@ public class GaussNewton {
 				System.out.print(String.format("%s=%.5f",eq.getParams()[j], init[j])+" ");
 			}
 			System.out.println();
-		}		
+		}
+		return init;
 	}
 }
