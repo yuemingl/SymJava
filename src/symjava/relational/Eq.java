@@ -18,6 +18,7 @@ import com.sun.org.apache.bcel.internal.generic.PUSH;
 
 import symjava.symbolic.Expr;
 import symjava.symbolic.Expr.TYPE;
+import symjava.symbolic.Symbol;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
@@ -155,22 +156,17 @@ public class Eq extends BinaryOp implements Relation {
 	}
 	
 	public String toString() {
-		String sFreeVars = "array(";
-		if(this.freeVars != null) {
-			//sFreeVars += this.freeVars.length +",";
-			sFreeVars += Utils.joinLabels(this.freeVars, ",");
+		String sFreeVars = "";
+		if(this.freeVars.length > 0) {
+			sFreeVars = ", array("+Utils.joinLabels(this.freeVars, ",")+")";
 		}
-		sFreeVars += ")";
 		
-		String sParams = "array(";
-		if(this.params != null) {
-			//sParams += this.params.length +",";
-			sParams += Utils.joinLabels(this.params, ",");
+		String sParams = "";
+		if(this.params.length > 0) {
+			sParams += ", array("+Utils.joinLabels(this.params, ",")+")";
 		}
-		sParams += ")";
 		
-		
-		return "eq("+arg1+","+arg2+","+sFreeVars+","+sParams+")";
+		return "eq("+arg1+", "+arg2+sFreeVars+sParams+")";
 	}
 	
 	private void computeUnknowns() {
@@ -338,6 +334,11 @@ public class Eq extends BinaryOp implements Relation {
 	@Override
 	public TYPE getType() {
 		return TYPE.INT;
-	}	
+	}
+	
+	public void moveRHS2LHS() {
+		this.arg1 = this.arg1 - this.arg2;
+		this.arg2 = Symbol.C0;
+	}
 }
 

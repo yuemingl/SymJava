@@ -15,6 +15,13 @@ import Jama.Matrix;
  *
  */
 public class Newton {
+	public static double[] solve(Expr eq) {
+		return solve(new Eq[]{(Eq)eq}, new double[]{0.1}, new double[0], 100, 1e-5);
+	}
+	public static double[] solve(Expr eq, double init) {
+		return solve(new Eq[]{(Eq)eq}, new double[]{init}, new double[0], 100, 1e-5);
+	}
+	
 	public static double[] solve(Eq[] eqs, double[] init, int maxIter, double eps) {
 		return solve(eqs, init, new double[0], maxIter, eps);
 	}
@@ -32,10 +39,11 @@ public class Newton {
 	}
 	public static double[] solve(Eq[] eqs, double[] init, double[] params, int maxIter, double eps) {
 		for(Eq eq : eqs) {
-			if(!Symbol.C0.symEquals(eq.rhs())) {
-				System.out.println("The right hand side of the equation must be 0.");
-				return null;
-			}
+			eq.moveRHS2LHS();
+//			if(!Symbol.C0.symEquals(eq.rhs())) {
+//				System.out.println("The right hand side of the equation must be 0.");
+//				return null;
+//			}
 		}
 		Expr[] unknowns = eqs[0].getUnknowns();
 		Expr[] funParams = eqs[0].getParams();
