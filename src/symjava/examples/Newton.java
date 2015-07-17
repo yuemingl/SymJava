@@ -16,20 +16,25 @@ import Jama.Matrix;
  */
 public class Newton {
 	public static double[] solve(Expr eq) {
-		return solve(new Eq[]{(Eq)eq}, new double[]{0.1}, new double[0], 100, 1e-5);
+		return solve(new Eq[]{(Eq)eq}, new double[]{0.1}, new double[0], 30, 1e-8);
 	}
+
 	public static double[] solve(Expr eq, double init) {
-		return solve(new Eq[]{(Eq)eq}, new double[]{init}, new double[0], 100, 1e-5);
+		return solve(new Eq[]{(Eq)eq}, new double[]{init}, new double[0], 30, 1e-8);
 	}
 	
-	public static double[] solve(Eq[] eqs, double[] init, int maxIter, double eps) {
-		return solve(eqs, init, new double[0], maxIter, eps);
+	public static double[] solve(Expr eq, double init, int maxIter, double eps) {
+		return solve(new Expr[]{eq}, new double[]{init}, new double[0], maxIter, eps);
 	}
 	
 	public static double[] solve(Expr[] eqs, double[] init, int maxIter, double eps) {
 		return solve(eqs, init, new double[0], maxIter, eps);
 	}
 	
+	public static double[] solve(Expr[] eqs, double[] init) {
+		return solve(eqs, init, new double[0], 30, 1e-8);
+	}
+
 	public static double[] solve(Expr[] eqs, double[] init, double[] params, int maxIter, double eps) {
 		Eq[] tmp = new Eq[eqs.length];
 		for(int i=0; i<eqs.length; i++) {
@@ -37,6 +42,7 @@ public class Newton {
 		}
 		return solve(tmp, init, params, maxIter, eps);
 	}
+
 	public static double[] solve(Eq[] eqs, double[] init, double[] params, int maxIter, double eps) {
 		for(Eq eq : eqs) {
 			eq.moveRHS2LHS();
