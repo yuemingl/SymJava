@@ -34,10 +34,26 @@ public class Eq extends BinaryOp implements Relation {
 	Expr[] unknowns; //freeVars + dependentVars, for example: x, y in y=a*x+b
 	
 	/**
-	 * Create an equation without any symbolic parameters except free variables
-	 * For example:
-	 * Eq eq = new Eq(y, 2*x+1); //y == 2*x+1
+	 * Create an equation without any symbolic parameters. 
+	 * The free variables and dependent variables are extracted 
+	 * from the lhs and rhs expressions automatically
 	 * 
+	 * Examples:
+	 * Eq eq1 = new Eq(y, 2*x+1);    // y = 2*x+1
+	 *   free variables: [x]
+	 *   dependent variables: [y]
+	 *   unknowns: [x,y]
+	 * Eq eq2 = new Eq(x^2-2*x+1,0); // x^2-2*x+1 = 0
+	 *   free variables: [x]
+	 *   dependent variables:
+	 *   unknowns: [x]
+	 * Eq eq3 = new Eq(cos(x), x); // cos(x) = x
+	 *   free variables: [x]
+	 *   dependent variables: [x]
+	 *   unknowns: [x]
+	 * Note: In definition of eq3, one may need to pass more parameters to exactly 
+	 *    define free variables and dependent variables 
+	 *   
 	 * @param lhs
 	 * @param rhs
 	 */
@@ -45,17 +61,25 @@ public class Eq extends BinaryOp implements Relation {
 		super(lhs, rhs);
 		this.label = arg1 + " == " + arg2;
 		this.sortKey = this.label;
-		this.freeVars = Utils.extractSymbols(rhs).toArray(new Expr[0]);
 		this.params = new Expr[0];
-		this.dependentVars = Utils.extractSymbols(lhs).toArray(new Expr[0]);
-		computeUnknowns();
+		Expr[] rhsVars = Utils.extractSymbols(rhs).toArray(new Expr[0]);
+		Expr[] lhsVars = Utils.extractSymbols(lhs).toArray(new Expr[0]);
+		if(rhsVars.length == 0) {
+			this.freeVars = lhsVars;
+			this.dependentVars = new Expr[0];
+		} else {
+			this.freeVars = rhsVars;
+			this.dependentVars = lhsVars;
+		}
+		this.unknowns = Utils.extractSymbols(lhs, rhs).toArray(new Expr[0]);
 	}
 	
 	/**
-	 * Create an equation that may contain symbolic parameters on the right hand side
+	 * Create an equation that may contain symbolic parameters on the right hand side.
 	 * The free variables are specified by the parameter freeVars
-	 * The paramters on the right hand side of the equation can be extracted automatically.
-	 * For example:
+	 * The parameters on the right hand side of the equation are extracted automatically.
+	 * 
+	 * Examples:
 	 * Eq eq = Eq(y, a*x+b, new Expr[]{x}); 
 	 * This will create equation y=a*x+b with
 	 *   freeVars = [x]
