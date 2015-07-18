@@ -7,6 +7,7 @@ import symjava.numeric.NumVector;
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
+import symjava.symbolic.utils.Utils;
 
 /**
  * A general Gauss Newton solver using SymJava for simbolic computations
@@ -17,6 +18,16 @@ public class GaussNewton {
 	public static double[] solve(Expr eq, double[] init, double[][] data, int maxIter, double eps) {
 		return solve((Eq)eq, init, data, maxIter, eps);
 	}
+	public static double[] solve(Expr eq, double[] init, double[][] data) {
+		return solve((Eq)eq, init, data, 30, 1e-8);
+	}
+	public static double[] solve(Expr eq, double[][] data) {
+		Eq eq1 = (Eq)eq;
+		Expr[] params = eq1.getParams();
+		System.out.println("Model parameters: "+Utils.joinLabels(params, ","));
+		return solve((Eq)eq, new double[params.length], data, 30, 1e-8);
+	}
+	
 	public static double[] solve(Eq eq, double[] init, double[][] data, int maxIter, double eps) {
 		int n = data.length;
 		

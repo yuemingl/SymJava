@@ -35,6 +35,9 @@ public class Example2 {
 		
 		//Here we go ...
 		GaussNewton.solve(eq, initialGuess, data, 100, 1e-4);
+		
+		//symjava.examples.GaussNewton.solve(eq(y,a*x/(b+x)),[0.9,0.2],[[0.038,0.05],[0.194,0.127],[0.425,0.094],[0.626,0.2122],[1.253,0.2729],[2.5,0.2665],[3.74,0.3317]],100,0.0001)
+		
 
 	}
 	
