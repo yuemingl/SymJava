@@ -45,7 +45,7 @@ public class Grad extends SymVector {
 			for(Expr x : args) {
 				data.add(f.diff(x));
 			}
-		}	
+		}
 	}
 	
 	public Grad(Expr f, Expr[] args) {
@@ -139,7 +139,10 @@ public class Grad extends SymVector {
 					return super.toString();
 				}
 			}
-			return "\\nabla{"+((Derivative)this.data.get(0)).getFunc().toString()+"}";
+			if(data.size() > 0)
+				return "\\nabla{"+((Derivative)this.data.get(0)).getFunc().toString()+"}";
+			else
+				return "0";
 		}
 		return "\\nabla{"+this.func.getLabel()+"}";
 	}

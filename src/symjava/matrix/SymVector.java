@@ -13,6 +13,7 @@ import symjava.symbolic.Symbols;
  *
  */
 public class SymVector extends Expr implements Iterable<Expr> {
+	protected boolean isRow = true;
 	protected Vector<Expr> data = new Vector<Expr>();
 	
 	public SymVector() {
@@ -34,6 +35,11 @@ public class SymVector extends Expr implements Iterable<Expr> {
 
 	public SymVector(double[] array) {
 		for(double e : array)
+			data.add(Expr.valueOf(e));
+	}
+	
+	public SymVector(int[] array) {
+		for(int e : array)
 			data.add(Expr.valueOf(e));
 	}
 	
@@ -80,11 +86,25 @@ public class SymVector extends Expr implements Iterable<Expr> {
 //	  \end{array} } \right]
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		if(data.size() >= 1)
+			sb.append(data.get(0));
+		for(int j=1; j<data.size(); j++) {
+			sb.append(", " + data.get(j));
+		}
+		sb.append("]");
+		if(!isRow) sb.append("'");
+		return sb.toString();
+	}
+	
+	public String toLatex() {
+		StringBuilder sb = new StringBuilder();
 		sb.append("\\left[ {\\begin{array}{c}");
 		for(int j=0; j<data.size(); j++) {
 			sb.append(data.get(j)+"\\\\\n");
 		}
 		sb.append("\\end{array} } \\right]");
+		if(isRow) sb.append("'");
 		return sb.toString();
 	}
 
@@ -112,6 +132,12 @@ public class SymVector extends Expr implements Iterable<Expr> {
 	public NumVector toNumVector(Expr[] args) {
 		NumVector ret = new NumVector(this, args);
 		return ret;
+	}
+	
+	public SymVector trans() {
+		SymVector rlt = new SymVector(this.data.toArray(new Expr[0]));
+		rlt.isRow = !this.isRow;
+		return rlt;
 	}
 
 	@Override
