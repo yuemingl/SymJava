@@ -18,6 +18,10 @@ public class Exp extends Pow {
 		label = "e^" + displayExp + "";
 		sortKey = "epower"+String.valueOf(displayExp);
 	}
+	
+	public String toString() {
+		return label;
+	}
 
 	public static Expr simplifiedIns(Expr expr) {
 		return new Exp(expr);

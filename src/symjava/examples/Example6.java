@@ -249,7 +249,7 @@ solve(wf, mesh, diri, "triangle.dat");
 	/**
 	 * Hard code the solver for
 	 * 
-	 * dot(grad(u), grad(v)) == (-2*(x*x+y*y)+36)*v)
+	 * dot(grad(u), grad(v)) == (-2*(x*x+y*y)+36)*v
 	 * 
 	 * @param mesh
 	 * @param dirichlet
