@@ -8,6 +8,10 @@ public class Log2 extends Log {
 		sortKey = label;
 	}
 	
+	public String toString() {
+		return "log2(" + arg2 + ")";
+	}
+
 	public static Expr simplifiedIns(Expr expr) {
 		return new Log2(expr);
 	}

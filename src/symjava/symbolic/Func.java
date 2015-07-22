@@ -16,6 +16,11 @@ public class Func extends NaryOp {
 
 	/**
 	 * Construct an abstract function
+	 * Note: For an abstract function with only one argument, define it by
+	 * passing an array for the second parameter
+	 * 
+	 *   Func f = new Func("F", new Expr[]{Symbol.x}); // F(x)
+	 *   
 	 * @param name
 	 * @param args
 	 */
@@ -26,6 +31,13 @@ public class Func extends NaryOp {
 		this.sortKey = label;
 	}
 	
+	/**
+	 * Construct a function with expression expr
+	 * For example: 
+	 *    Func f = new Func("F", Symbol.x); // F(x)=x
+	 * @param name
+	 * @param expr
+	 */
 	public Func(String name, Expr expr) {
 		super(new Expr[] {expr});
 		//Extract free variables from expr
@@ -146,6 +158,11 @@ public class Func extends NaryOp {
 	public boolean symEquals(Expr other) {
 		if(other instanceof Func) {
 			Func o = (Func)other;
+			//TODO support map(expr, [e1,e2,e3])
+			if(this.label.equals("_") && other.label.equals("_"))
+				return true;
+			if(this.label.equals("__") && other.label.equals("__"))
+				return true;
 			Boolean rlt = Utils.symCompareNull(this.expr, o.expr);
 			if(rlt != null && rlt == false)
 				return false;

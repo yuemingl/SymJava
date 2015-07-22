@@ -97,6 +97,9 @@ public class Symbol extends Expr {
 	}
 	
 	public String getPrefix() {
+		//TODO Fixit suport reduce
+		if(this.toString().equals("_")||this.toString().equals("__"))
+			return this.toString();
 		String[] ss = this.toString().split("_");
 		return ss[0];
 	}

@@ -37,6 +37,13 @@ public class Log extends BinaryOp {
 		sortKey = label;
 	}
 	
+	public String toString() {
+		if(!arg1.symEquals(SymMath.E))
+			return "log(" + arg1 + "," + arg2 + ")";
+		else
+			return "log(" + arg2 + ")";
+	}
+	
 	public static Expr simplifiedIns(Expr base, Expr expr) {
 		if(base instanceof SymReal<?> && expr instanceof SymReal<?>) {
 			return new SymDouble(
@@ -71,6 +78,17 @@ public class Log extends BinaryOp {
 		return this;
 	}
 
+	@Override
+	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;
+		Expr sl = arg1.subs(from, to);
+		Expr sr = arg2.subs(from, to);
+		if(sl == arg1 && sr == arg2)
+			return this;
+		return new Log(sl, sr);
+	}
+	
 	@Override
 	public boolean symEquals(Expr other) {
 		return false;

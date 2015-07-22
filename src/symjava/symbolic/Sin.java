@@ -36,6 +36,16 @@ public class Sin extends UnaryOp {
 	}
 
 	@Override
+	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;
+		Expr sl = arg.subs(from, to);
+		if(sl == arg)
+			return this;
+		return new Sin(sl);
+	}
+	
+	@Override
 	public boolean symEquals(Expr other) {
 		if(other instanceof Sin) {
 			return Utils.symCompare(this.arg, ((Sin) other).arg);

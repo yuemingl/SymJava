@@ -35,7 +35,17 @@ public class Tan extends UnaryOp {
 	public Expr simplify() {
 		return this;
 	}
-
+	
+	@Override
+	public Expr subs(Expr from, Expr to) {
+		if(Utils.symCompare(this, from))
+			return to;
+		Expr sl = arg.subs(from, to);
+		if(sl == arg)
+			return this;
+		return new Tan(sl);
+	}
+	
 	@Override
 	public boolean symEquals(Expr other) {
 		if(other instanceof Tan) {
