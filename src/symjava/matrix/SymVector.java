@@ -86,13 +86,13 @@ public class SymVector extends Expr implements Iterable<Expr> {
 //	  \end{array} } \right]
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("[");
+		sb.append("vector(");
 		if(data.size() >= 1)
 			sb.append(data.get(0));
 		for(int j=1; j<data.size(); j++) {
 			sb.append(", " + data.get(j));
 		}
-		sb.append("]");
+		sb.append(")");
 		if(!isRow) sb.append("'");
 		return sb.toString();
 	}
