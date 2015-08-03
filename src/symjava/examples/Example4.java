@@ -43,7 +43,7 @@ public class Example4 {
 		Expr[] dxs2 = new Expr[] { du, dl, dq };
 		SymMatrix Lxx = new SymMatrix();
 		for(Expr Lxi : Lx) {
-			Lxx.add(Grad.apply(Lxi, xs, dxs2));
+			Lxx.append(Grad.apply(Lxi, xs, dxs2));
 		}
 		System.out.println("\nHessian Matrix =");
 		System.out.println(Lxx);

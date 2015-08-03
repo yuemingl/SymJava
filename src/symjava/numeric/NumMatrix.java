@@ -6,7 +6,7 @@ import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
 public class NumMatrix {
-	BytecodeVecFunc func;
+	public BytecodeVecFunc func;
 	int nRow;
 	int nCol;
 	double[] lastEvalData;

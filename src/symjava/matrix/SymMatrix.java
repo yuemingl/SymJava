@@ -3,6 +3,7 @@ package symjava.matrix;
 import java.util.Vector;
 
 import symjava.numeric.NumMatrix;
+import symjava.symbolic.Add;
 import symjava.symbolic.Expr;
 
 /**
@@ -13,7 +14,7 @@ public class SymMatrix extends Expr {
 	/**
 	 * Row vectors
 	 */
-	Vector<SymVector> data = null;
+	Vector<SymVector> data = new Vector<SymVector>();;
 	
 	public SymMatrix() {
 	}
@@ -22,13 +23,21 @@ public class SymMatrix extends Expr {
 	}
 	
 	public SymMatrix(Expr[][] array) {
-		data = new Vector<SymVector>();
 		for(Expr[] row : array)
 			data.add(new SymVector(row));
 	}
 	
+	public SymMatrix(int[][] array) {
+		for(int[] row : array)
+			data.add(new SymVector(row));
+	}
+	
+	public SymMatrix(double[][] array) {
+		for(double[] row : array)
+			data.add(new SymVector(row));
+	}
+	
 	public SymMatrix(int m, int n) {
-		data = new Vector<SymVector>();
 		data.setSize(m);
 		for(int i=0; i<data.size(); i++) {
 			data.set(i, new SymVector(n));
@@ -39,6 +48,11 @@ public class SymMatrix extends Expr {
 		return data == null;
 	}
 	
+	/**
+	 * operator overload for m[i][j]
+	 * @param i
+	 * @return
+	 */
 	public SymVector get(int i) {
 		return data.get(i);
 	}
@@ -52,7 +66,7 @@ public class SymMatrix extends Expr {
 		row.set(j, expr);
 	}
 	
-	public void add(SymVector v) {
+	public void append(SymVector v) {
 		data.add(v);
 	}
 	
@@ -129,6 +143,30 @@ public class SymMatrix extends Expr {
 		return mat;
 	}
 
+	@Override
+	public Expr add(Expr other) {
+		SymMatrix o = (SymMatrix)other;
+		SymMatrix ret = new SymMatrix();
+		for(int i=0; i<data.size(); i++) {
+			ret.append((SymVector)(this.get(i).add(o.get(i))));
+		}
+		return ret;
+	}
+	
+	@Override
+	public Expr multiply(Expr other) {
+		if(other instanceof SymVector) {
+			SymVector ret = new SymVector();
+			for(int i=0; i<this.rowDim(); i++) {
+				ret.append(this.get(i).dot((SymVector)other));
+			}
+			return ret;
+		} else if(other instanceof SymMatrix) {
+			
+		} 
+		return null;
+	}
+	
 	@Override
 	public Expr simplify() {
 		// TODO Auto-generated method stub

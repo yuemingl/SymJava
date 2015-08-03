@@ -10,6 +10,8 @@ import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
 import symjava.bytecode.IR;
 import symjava.bytecode.VecFuncs;
+import symjava.matrix.SymMatrix;
+import symjava.numeric.NumMatrix;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 import symjava.symbolic.Symbol;
@@ -35,6 +37,10 @@ public class JIT {
 			Func func = new Func("JITFunc_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), expr);
 			return func.toBytecodeFunc(true, false);
 		}
+	}
+	
+	public static NumMatrix compile(Expr[] args, SymMatrix m) {
+		return new NumMatrix(m, args);
 	}
 	
 	public static BytecodeVecFunc compile(Expr[] args, Expr[] exprs) {
