@@ -27,7 +27,7 @@ import symjava.symbolic.Expr;
 public class Example2 {
 
 	public static void main(String[] args) {
-		CloudConfig.setGlobalTarget("job1.conf");
+		CloudConfig.setGlobalTarget("job_local.conf");
 		
 		LCVar x = LCVar.getDouble("x");
 		LCVar y = LCVar.getDouble("y");

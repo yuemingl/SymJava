@@ -20,7 +20,7 @@ import com.sun.org.apache.bcel.internal.generic.PUSH;
 
 /**
  * The base type of the local variables in a compiled function.
- * Particular type of a local variable is defined in a sub-class of CloudVar.
+ * Particular type of a local variable is defined in a sub-class of LCVar.
  * <br>
  * 
  * The local variables are exactly the same as the local variables in a Java function
