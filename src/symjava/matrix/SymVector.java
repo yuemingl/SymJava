@@ -4,8 +4,10 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import symjava.numeric.NumVector;
+import symjava.symbolic.Add;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbols;
+import symjava.symbolic.utils.AddList;
 
 /**
  * SymVector is a vector of symbolic expressions 
@@ -140,6 +142,23 @@ public class SymVector extends Expr implements Iterable<Expr> {
 		return rlt;
 	}
 
+	public Expr add(Expr other) {
+		SymVector o = (SymVector)other;
+		SymVector ret = new SymVector();
+		for(int i=0; i<this.dim(); i++) {
+			ret.append(this.get(i).add(o.get(i)));
+		}
+		return ret;
+	}
+	
+	public Expr dot(SymVector other) {
+		AddList adds = new AddList();
+		for(int i=0; i<this.dim(); i++) {
+			adds.add(this.get(i).multiply(other.get(i)));
+		}
+		return adds.toExpr();
+	}
+	
 	@Override
 	public Expr simplify() {
 		// TODO Auto-generated method stub

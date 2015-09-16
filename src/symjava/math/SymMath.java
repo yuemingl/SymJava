@@ -186,7 +186,7 @@ public class SymMath {
 		SymVector grad = Grad.apply(f, args);
 		SymMatrix mat = new SymMatrix();
 		for(Expr e : grad) {
-			mat.add(Grad.apply(e, args));
+			mat.append(Grad.apply(e, args));
 		}
 		return mat;
 	}
