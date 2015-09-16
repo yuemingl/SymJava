@@ -4,8 +4,10 @@ import static symjava.math.SymMath.sqrt;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
-import lambdacloud.core.lang.LCVar;
 import symjava.symbolic.Expr;
+import static symjava.symbolic.Symbol.x;
+import static symjava.symbolic.Symbol.y;
+
 
 /**
  * In this example, we define a function on the fly.
@@ -29,11 +31,8 @@ public class Example2 {
 	public static void main(String[] args) {
 		CloudConfig.setGlobalTarget("job_local.conf");
 		
-		LCVar x = LCVar.getDouble("x");
-		LCVar y = LCVar.getDouble("y");
-		
 		Expr expr = sqrt(x*x + y*y);
-		CloudFunc f = new CloudFunc(new LCVar[]{x, y}, expr);
+		CloudFunc f = new CloudFunc(new Expr[]{x, y}, expr);
 		
 		CloudSD input = new CloudSD("input").init(new double[]{3, 4});
 		

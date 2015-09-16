@@ -133,7 +133,7 @@ public class CloudSD extends Symbol {
 	 * @param index
 	 * @param value
 	 */
-	public void set(int index, double value) {
+	public void setData(int index, double value) {
 		data[index] = value;
 	}
 	

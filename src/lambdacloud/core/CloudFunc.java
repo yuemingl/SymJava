@@ -44,17 +44,17 @@ public class CloudFunc extends LCBase {
 		this.name = name;
 	}
 	
-	public CloudFunc(String name, LCVar[] args, Expr expr) {
+	public CloudFunc(String name, Expr[] args, Expr expr) {
 		this.name = name;
 		this.compile(args, expr);
 	}
 	
-	public CloudFunc(String name, LCVar[] args, Expr[] expr) {
+	public CloudFunc(String name, Expr[] args, Expr[] expr) {
 		this.name = name;
 		this.compile(args, expr);
 	}
 	
-	public CloudFunc(LCVar[] args, Expr expr) {
+	public CloudFunc(Expr[] args, Expr expr) {
 		this.name = generateName();
 		this.compile(args, expr);
 	}
@@ -169,7 +169,7 @@ public class CloudFunc extends LCBase {
 	}
 
 	
-	public CloudFunc compile(LCVar[] args, Expr expr) {
+	public CloudFunc compile(Expr[] args, Expr expr) {
 		Expr compileExpr = expr;
 		if(!(expr instanceof LCBase)) {
 			compileExpr = new LCReturn(expr);
@@ -228,7 +228,8 @@ public class CloudFunc extends LCBase {
 			if(currentCloudConfig().isLocal()) {
 				try {
 					Object ret = method.invoke(this.clazz.newInstance(), inputs[0].getData());
-					output.data[0] = ((Double)ret).doubleValue();
+					output.resize(1);
+					output.setData(0, ((Double)ret).doubleValue());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -240,7 +241,8 @@ public class CloudFunc extends LCBase {
 				Double val1;
 				try {
 					val1 = (Double)method.invoke(clazz.newInstance(), inputs[0].getData());
-					output.set(0, val1.doubleValue());
+					output.resize(1);
+					output.setData(0, val1.doubleValue());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -249,8 +251,8 @@ public class CloudFunc extends LCBase {
 			if(inputs.length == 0) {
 				switch(funcType) {
 				case 1:
-					
-					output.set(0, func.apply());
+					output.resize(1);
+					output.setData(0, func.apply());
 					break;
 				case 2:
 					break;
@@ -266,7 +268,8 @@ public class CloudFunc extends LCBase {
 				case 1:
 					data = inputs[0].getData();
 					d = func.apply(data);
-					output.set(0, d);
+					output.resize(1);
+					output.setData(0, d);
 					break;
 				case 2:
 					data = inputs[0].getData();

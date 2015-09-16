@@ -27,7 +27,7 @@ import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class CompileUtils {
 	
-	public static IR getIR(String name, Expr expr, LCVar ...args) {
+	public static IR getIR(String name, Expr expr, Expr ...args) {
 		ClassGen cg = _compile(name, expr, args);
 		IR ir =  new IR();
 		ir.type = 1;
@@ -43,14 +43,14 @@ public class CompileUtils {
 		return fun;
 	}
 	
-	public static BytecodeFunc compile(String name, Expr expr, LCVar ...args) {
+	public static BytecodeFunc compile(String name, Expr expr, Expr ...args) {
 		ClassGen cg = _compile(name, expr, args);
 		FuncClassLoader<BytecodeFunc> fcl = new FuncClassLoader<BytecodeFunc>();
 		BytecodeFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 	
-	public static ClassGen _compile(String name, Expr expr, LCVar ...args) {
+	public static ClassGen _compile(String name, Expr expr, Expr ...args) {
 		String packageName = "symjava.bytecode";
 		String clsName = name;
 		if(clsName == null)
