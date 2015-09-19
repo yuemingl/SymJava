@@ -26,16 +26,6 @@ public class SymMatrix extends Expr {
 		for(Expr[] row : array)
 			data.add(new SymVector(row));
 	}
-	public SymMatrix(int[][] array) {
-		data = new Vector<SymVector>();
-		for(int[] row : array)
-			data.add(new SymVector(row));
-	}
-	public SymMatrix(double[][] array) {
-		data = new Vector<SymVector>();
-		for(double[] row : array)
-			data.add(new SymVector(row));
-	}
 	
 	public SymMatrix(int[][] array) {
 		for(int[] row : array)
