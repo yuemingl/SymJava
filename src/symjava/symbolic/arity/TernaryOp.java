@@ -26,6 +26,7 @@ public abstract class TernaryOp extends Expr {
 		if(index == 0) arg1 = arg;
 		else if(index == 1) arg2 = arg;
 		else if(index == 2) arg3 = arg;
+		updateLabel();
 		return this;
 	}	
 }

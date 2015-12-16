@@ -38,6 +38,7 @@ public abstract class BinaryOp extends Expr {
 	public Expr setArg(int index, Expr arg) {
 		if(index == 0) arg1 = arg;
 		else if(index == 1) arg2 = arg;
+		updateLabel();
 		return this;
 	}
 }

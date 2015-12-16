@@ -440,7 +440,7 @@ abstract public class Expr implements Cloneable {
 		return subs(from, new SymDouble(to));
 	}
 	
-	protected Expr clone() {
+	public Expr clone() {
 		try {
 			return (Expr) super.clone();
 		} catch (CloneNotSupportedException e) {
@@ -520,5 +520,7 @@ abstract public class Expr implements Cloneable {
 	public Expr setArg(int index, Expr arg) {
 		throw new UnsupportedOperationException();
 	}
+	
+	abstract public void updateLabel();
 }
 

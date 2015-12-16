@@ -3,10 +3,16 @@ package lambdacloud.examples;
 import static symjava.math.SymMath.sqrt;
 import static symjava.symbolic.Symbol.x;
 import static symjava.symbolic.Symbol.y;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
 import lambdacloud.core.Session;
+import lambdacloud.core.graph.GraphBuilder;
+import lambdacloud.core.graph.Node;
 import lambdacloud.core.lang.LCDevice;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.AddList;
@@ -32,17 +38,29 @@ public class Example4 {
 		System.out.println(expr);
 		System.out.println(expr2);
 		
-		Session sess = new Session();
 		
-		CloudSD input = new CloudSD("input").init(new double[]{3, 4});
-		CloudSD output = new CloudSD("output").resize(1);
-		//sess.run(expr, input, output);
-		sess.run(expr2, input, output);
-		if(output.fetchToLocal()) {
-			for(double d : output.getData()) {
-				System.out.println(d);
-			}
-		}
+
+		
+		
+		
+		
+		Session sess = new Session();
+		Map<String, Double> dict = new HashMap<String, Double>();
+		dict.put(x.toString(), 3.0);
+		dict.put(y.toString(), 4.0);
+		
+		double rlt = sess.run(expr, dict);
+		System.out.println(rlt);
+		
+//		CloudSD input = new CloudSD("input").init(new double[]{3, 4});
+//		CloudSD output = new CloudSD("output").resize(1);
+//		//sess.run(expr, input, output);
+//		sess.run(expr2, input, output);
+//		if(output.fetchToLocal()) {
+//			for(double d : output.getData()) {
+//				System.out.println(d);
+//			}
+//		}
 	}
 
 }

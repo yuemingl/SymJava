@@ -16,6 +16,7 @@ public abstract class NaryOp extends Expr {
 	
 	public Expr setArg(int index, Expr arg) {
 		args[index] = arg;
+		updateLabel();
 		return this;
 	}	
 }

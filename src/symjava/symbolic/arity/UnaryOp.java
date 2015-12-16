@@ -25,6 +25,7 @@ public abstract class UnaryOp extends Expr {
 	
 	public Expr setArg(int index, Expr arg) {
 		this.arg = arg;
+		updateLabel();
 		return this;
 	}
 	

@@ -17,28 +17,14 @@ import com.sun.org.apache.bcel.internal.generic.Type;
 public class Sqrt extends BinaryOp {
 	public Sqrt(Expr expr) {
 		super(expr, Expr.valueOf(2));
-		label = "\\sqrt{" + expr + "}";
-		sortKey = expr.getSortKey()+"sqrt[2]"+String.valueOf(arg2);
+		updateLabel();
 	}
 	
 	public Sqrt(Expr expr, Expr root) {
 		super(expr, root);
-		String displayRoot = String.format("%s", this.arg2);
-		if(root instanceof SymReal<?>) {
-			SymReal<?> realExp = (SymReal<?>)root;
-			if(realExp.isInteger()) {
-				displayRoot = String.format("%d", realExp.getIntValue());
-			}
-		}
-		label = "\\sqrt["+displayRoot+"]{" + expr + "}";
-		//TODO
-		sortKey = expr.getSortKey()+"sqrt["+root+"]"+String.valueOf(root);
+		updateLabel();
 	}
 
-	public String toString() {
-		return "sqrt("+arg1+")";
-	}
-	
 	@Override
 	public Expr diff(Expr expr) {
 		return Pow.simplifiedIns(arg1, 1.0/arg2).diff(expr);
@@ -110,5 +96,19 @@ public class Sqrt extends BinaryOp {
 				new Type[] { Type.DOUBLE, Type.DOUBLE },
 		Constants.INVOKESTATIC));
 		return startPos;
-	}	
+	}
+
+	@Override
+	public void updateLabel() {
+		if(arg2 instanceof SymReal<?>) {
+			SymReal<?> t = (SymReal<?>)arg2;
+			if(t.isInteger() && t.getIntValue() == 2) {
+				label = "sqrt(" + arg1 + ")";
+				sortKey = arg1.getSortKey()+"sqrt[2]"+arg2;
+				return;
+			}
+		}
+		label = "sqrtn(" + arg1 + "," + arg2 + ")";
+		sortKey = arg1.getSortKey()+"sqrt"+arg2.getSortKey();
+	}
 }

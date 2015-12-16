@@ -21,8 +21,7 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
 public class Add extends BinaryOp {
 	public Add(Expr l, Expr r) {
 		super(l, r);
-		label = l + " + " + r;
-		sortKey = arg1.getSortKey()+arg2.getSortKey();
+		updateLabel();
 	}
 	
 	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
@@ -160,6 +159,12 @@ public class Add extends BinaryOp {
 		else
 			il.append(IADD);
 		return startPos;
+	}
+
+	@Override
+	public void updateLabel() {
+		label = arg1 + " + " + arg2;
+		sortKey = arg1.getSortKey()+arg2.getSortKey();
 	}
 
 }

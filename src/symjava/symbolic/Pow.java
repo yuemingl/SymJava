@@ -18,23 +18,7 @@ public class Pow extends BinaryOp {
 	
 	public Pow(Expr base, Expr exponent) {
 		super(base, exponent);
-		String displayExp = String.format("%s", this.arg2);
-		if(exponent instanceof SymReal<?>) {
-			SymReal<?> realExp = (SymReal<?>)exponent;
-			if(realExp.isInteger()) {
-				displayExp = String.format("%d", realExp.getIntValue());
-			}
-			if(realExp.isNegative())
-				displayExp = "{"+displayExp+"}";
-		}
-		if(base instanceof Symbol) {
-			label = base + "^" + displayExp + "";
-			label = "pow(" + base + ","+displayExp+")";
-		} else {
-			label = "("+base + ")^" + displayExp;
-		}
-		//TODO? x^3 + x^2 + x + 1
-		sortKey = base.getSortKey()+"power"+String.valueOf(displayExp);
+		updateLabel();
 	}
 	
 	public String toString() {
@@ -147,5 +131,29 @@ public class Pow extends BinaryOp {
 		il.append(factory.createInvoke("java.lang.Math", "pow",
 				Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
 		return startPos;
+	}
+
+	@Override
+	public void updateLabel() {
+		Expr base = arg1;
+		Expr exponent = arg2;
+//		String displayExp = exponent.toString();
+//		if(exponent instanceof SymReal<?>) {
+//			SymReal<?> realExp = (SymReal<?>)exponent;
+//			if(realExp.isInteger()) {
+//				displayExp = String.format("%d", realExp.getIntValue());
+//			}
+//			if(realExp.isNegative())
+//				displayExp = "{"+displayExp+"}";
+//		}
+//		if(base instanceof Symbol) {
+//			label = base + "^" + displayExp + "";
+//		} else {
+//			label = "("+base + ")^" + displayExp;
+//		}
+		//TODO? x^3 + x^2 + x + 1
+		label = "pow(" + base + ","+exponent+")";
+		sortKey = base.getSortKey()+"power"+exponent.getSortKey();
+		
 	}		
 }
