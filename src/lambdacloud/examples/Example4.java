@@ -38,12 +38,6 @@ public class Example4 {
 		System.out.println(expr);
 		System.out.println(expr2);
 		
-		
-
-		
-		
-		
-		
 		Session sess = new Session();
 		Map<String, Double> dict = new HashMap<String, Double>();
 		dict.put(x.toString(), 3.0);
@@ -52,15 +46,6 @@ public class Example4 {
 		double rlt = sess.run(expr, dict);
 		System.out.println(rlt);
 		
-//		CloudSD input = new CloudSD("input").init(new double[]{3, 4});
-//		CloudSD output = new CloudSD("output").resize(1);
-//		//sess.run(expr, input, output);
-//		sess.run(expr2, input, output);
-//		if(output.fetchToLocal()) {
-//			for(double d : output.getData()) {
-//				System.out.println(d);
-//			}
-//		}
 	}
 
 }

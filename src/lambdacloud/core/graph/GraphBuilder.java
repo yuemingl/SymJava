@@ -1,5 +1,6 @@
 package lambdacloud.core.graph;
 
+import lambdacloud.core.CloudFunc;
 import lambdacloud.test.CompileUtils;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
@@ -22,10 +23,9 @@ public class GraphBuilder {
 		//root.func = CompileUtils.compile(null, root.expr, Utils.extractSymbols(root.expr).toArray(new Expr[0]));
 		root.args = Utils.extractSymbols(root.expr);
 		root.func = JIT.compile(root.expr);
+		root.cfunc = new CloudFunc(root.args.toArray(new Expr[0]), root.expr);
 	}
 	
-	
-
 	public static Node helper(Expr expr) {
 		Expr[] args = expr.args();
 		if(args == null || args.length == 0) 
