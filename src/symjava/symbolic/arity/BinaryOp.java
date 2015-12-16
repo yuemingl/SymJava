@@ -35,4 +35,9 @@ public abstract class BinaryOp extends Expr {
 		return Utils.getConvertedType(arg1.getType(), arg2.getType());
 	}
 	
+	public Expr setArg(int index, Expr arg) {
+		if(index == 0) arg1 = arg;
+		else if(index == 1) arg2 = arg;
+		return this;
+	}
 }

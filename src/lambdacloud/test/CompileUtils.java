@@ -43,6 +43,10 @@ public class CompileUtils {
 		return fun;
 	}
 	
+	public static void compileGraph(List<BytecodeFunc> retGraph, Expr expr, Expr ...args) {
+		
+	}
+	
 	public static BytecodeFunc compile(String name, Expr expr, Expr ...args) {
 		ClassGen cg = _compile(name, expr, args);
 		FuncClassLoader<BytecodeFunc> fcl = new FuncClassLoader<BytecodeFunc>();

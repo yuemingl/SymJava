@@ -22,4 +22,10 @@ public abstract class UnaryOp extends Expr {
 	public TYPE getType() {
 		return arg.getType();
 	}
+	
+	public Expr setArg(int index, Expr arg) {
+		this.arg = arg;
+		return this;
+	}
+	
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import lambdacloud.core.lang.LCAssign;
+import lambdacloud.core.lang.LCDevice;
 import symjava.logic.And;
 import symjava.logic.Not;
 import symjava.logic.Or;
@@ -505,5 +506,19 @@ abstract public class Expr implements Cloneable {
 	public Expr assign(int val) {
 		return new LCAssign(this, Expr.valueOf(val));
 	}	
+	
+	LCDevice device = null;
+	public Expr runOn(LCDevice dev) {
+		device = dev;
+		return this;
+	}
+	
+	public LCDevice getDevice() {
+		return device;
+	}
+	
+	public Expr setArg(int index, Expr arg) {
+		throw new UnsupportedOperationException();
+	}
 }
 

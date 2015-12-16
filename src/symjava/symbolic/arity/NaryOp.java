@@ -13,4 +13,9 @@ public abstract class NaryOp extends Expr {
 	public Expr[] args() {
 		return args;
 	}
+	
+	public Expr setArg(int index, Expr arg) {
+		args[index] = arg;
+		return this;
+	}	
 }
