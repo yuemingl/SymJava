@@ -8,12 +8,18 @@ import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
 
+import com.sun.org.apache.bcel.internal.Constants;
+import com.sun.org.apache.bcel.internal.generic.ALOAD;
+import com.sun.org.apache.bcel.internal.generic.ArrayType;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.ObjectType;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
+import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class Multiply extends BinaryOp {
 	public Multiply(Expr l, Expr r) {
@@ -26,14 +32,7 @@ public class Multiply extends BinaryOp {
 			arg1 = l;
 			arg2 = r;
 		}
-		label =  SymPrinting.addParenthsesIfNeeded(arg1, this) 
-				+ "*" + 
-				SymPrinting.addParenthsesIfNeeded(arg2, this);
-		if(this.isCoeffMulSymbol()) {
-			sortKey = this.getSymbolTerm().getSortKey();//+this.getCoeffTerm().getSortKey();
-		} else {
-			sortKey = arg1.getSortKey()+arg2.getSortKey();
-		}
+		updateLabel();
 	}
 	
 	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
@@ -180,6 +179,40 @@ public class Multiply extends BinaryOp {
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
 		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		if(arg1.getType() == TYPE.MATRIX) {
+			arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			if(arg2.getType() == TYPE.VECTOR) {
+				il.append(factory.createInvoke("Jama.Matrix", "times",
+						new ObjectType("Jama.Matrix"), new Type[] { new ObjectType("Jama.Matrix") },
+						//Type.getType(Jama.Matrix.class), new Type[] { Type.getType(Jama.Matrix.class) },
+						Constants.INVOKEVIRTUAL));
+
+				//Copy results to outAry
+				il.append(factory.createInvoke("Jama.Matrix", "getColumnPackedCopy",
+						new ArrayType(Type.DOUBLE,1), new Type[] {},
+						Constants.INVOKEVIRTUAL));
+				il.append(new PUSH(cp, 0));
+				il.append(InstructionConstants.ALOAD_1); //outAry (output buffer)
+				il.append(InstructionConstants.ILOAD_2); //outPos (start position of output buffer)
+				Vector x = (Vector)arg2;
+				il.append(new PUSH(cp, x.nDim));
+				//Call System.arraycopy(src, srcPos, dest, destPos, length);
+				il.append(factory.createInvoke("java.lang.System", "arraycopy",
+						Type.VOID, new Type[] { Type.OBJECT, Type.INT, Type.OBJECT, Type.INT, Type.INT },
+						Constants.INVOKESTATIC));
+				
+				//test only
+				//il.append(new ALOAD(indexLVT));
+				//il.append(new PUSH(cp, 1.0));
+				//return il.append(InstructionConstants.DRETURN);
+				
+			} else if(arg2.getType() == TYPE.DOUBLE) {
+				
+			}
+			
+			return startPos;
+		}
+		
 		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
 		BytecodeUtils.typeCast(il, arg1.getType(), ty);
 		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
@@ -195,5 +228,17 @@ public class Multiply extends BinaryOp {
 		else
 			il.append(InstructionConstants.IMUL);
 		return startPos;
+	}
+
+	@Override
+	public void updateLabel() {
+		label =  SymPrinting.addParenthsesIfNeeded(arg1, this) 
+				+ "*" + 
+				SymPrinting.addParenthsesIfNeeded(arg2, this);
+		if(this.isCoeffMulSymbol()) {
+			sortKey = this.getSymbolTerm().getSortKey();//+this.getCoeffTerm().getSortKey();
+		} else {
+			sortKey = arg1.getSortKey()+arg2.getSortKey();
+		}		
 	}	
 }

@@ -14,6 +14,15 @@ public class Session {
 		return run(n, dict);
 	}
 	
+	/**
+	 * TODO
+	 * run() return a double
+	 * run() could return an array of Tensor
+	 * 
+	 * @param root
+	 * @param dict
+	 * @return
+	 */
 	public double run(Node root, Map<String, Double> dict) {
 		double[] args = new double[root.args.size()];
 		for(int i=0; i<root.args.size(); i++) {

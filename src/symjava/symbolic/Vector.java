@@ -1,12 +1,32 @@
 package symjava.symbolic;
 
+import java.util.Map;
+
+import com.sun.org.apache.bcel.internal.Constants;
+import com.sun.org.apache.bcel.internal.generic.ALOAD;
+import com.sun.org.apache.bcel.internal.generic.ASTORE;
+import com.sun.org.apache.bcel.internal.generic.ArrayType;
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.LocalVariableGen;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.NEW;
+import com.sun.org.apache.bcel.internal.generic.ObjectType;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
+import com.sun.org.apache.bcel.internal.generic.Type;
+
 import symjava.matrix.SymVector;
+import symjava.symbolic.Expr.TYPE;
 
 public class Vector extends Tensor {
 
 	public int nStart;
 	public int nDim;
-
+	protected int indexLVT = -1;
+	
 	public Vector(String name, int nDim) {
 		super(name);
 		this.nStart = 0;
@@ -35,7 +55,48 @@ public class Vector extends Tensor {
 		return new SymVector(items);
 	}
 
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		if(indexLVT == -1) {
+			//jama.Matrix l_m = null;
+			LocalVariableGen lg = mg.addLocalVariable("l_"+getLabel(),
+					new ObjectType("Jama.Matrix"), null, null);
+			indexLVT = lg.getIndex();
+//			il.append(InstructionConstants.ACONST_NULL);
+//			lg.setStart(il.append(new DSTORE(idx)));
 
+			// First time touch the matrix, declare a local reference of Java.Matrix
+			il.append(new NEW(cp.addClass("Jama.Matrix")));
+		    il.append(InstructionConstants.DUP);
+
+		    //prepare argument: double[] vals
+			il.append(new ALOAD(argsStartPos));
+			il.append(new PUSH(cp, argsMap.get(this.label)));
+			il.append(InstructionConstants.AALOAD); //Load double from array 
+			
+			//prepare argument: double m - number of rows
+    		il.append(new PUSH(cp, nDim));
+			il.append(factory.createInvoke("Jama.Matrix", "<init>",
+				Type.VOID, new Type[] { new ArrayType(Type.DOUBLE, 1), Type.INT },
+				Constants.INVOKESPECIAL));
+
+			//jama.Matrix l_m = new jama.Matrix(args[], nRow);
+			lg.setStart(il.append(new ASTORE(indexLVT)));
+		}
+		return il.append(new ALOAD(indexLVT));
+		//il.append(new ALOAD(indexLVT));
+		//il.append(new PUSH(cp, 1.0));
+		//return il.append(InstructionConstants.DRETURN);
+	}
+	
+	@Override
+	public TYPE getType() {
+		return TYPE.VECTOR;
+	}
+	
 	public static void main(String[] args) {
 		Vector v = new Vector("A",8);
 		SymVector sv = v.split(3);

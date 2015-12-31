@@ -491,7 +491,8 @@ abstract public class Expr implements Cloneable {
 		throw new UnsupportedOperationException();//il.append(InstructionConstants.NOP);
 	}
 	
-	public enum TYPE {INT, LONG, FLOAT, DOUBLE, BOOLEAN, BYTE, CHAR, SHORT, VOID};
+	public enum TYPE {INT, LONG, FLOAT, DOUBLE, BOOLEAN, BYTE, CHAR, SHORT, VOID,
+		MATRIX, VECTOR, TENSOR};
 	
 	public abstract TYPE getType();
 	

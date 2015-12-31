@@ -138,21 +138,35 @@ public class CompileUtils {
 	 * @param args
 	 * @return
 	 */
-	public static BytecodeBatchFunc compileVec(Expr expr, LCArray output, LCVar ...args) {
+	public static BytecodeBatchFunc compileVec(Expr expr, LCArray output, Expr ...args) {
 		ClassGen cg = _compileVec(null, expr, output, args);
 		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
 		BytecodeBatchFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 
-	public static BytecodeBatchFunc compileVec(String name, Expr expr, LCArray output, LCVar ...args) {
+	public static BytecodeBatchFunc compileVec(String name, Expr expr, LCArray output, Expr ...args) {
 		ClassGen cg = _compileVec(name, expr, output, args);
 		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
 		BytecodeBatchFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 	
-	public static ClassGen _compileVec(String name, Expr expr, LCArray output, LCVar ...args) {
+	/**
+	 * TODO: remove parameter output 
+	 * @param expr
+	 * @param args
+	 * @return
+	 */
+	public static BytecodeBatchFunc compileVec(Expr expr, Expr ...args) {
+		LCArray output = LCArray.getDoubleArray("output");
+		ClassGen cg = _compileVec(null, expr, output, args);
+		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
+		BytecodeBatchFunc fun = fcl.newInstance(cg);
+		return fun;
+	}
+	
+	public static ClassGen _compileVec(String name, Expr expr, LCArray output, Expr ...args) {
 		String packageName = "symjava.bytecode";
 		String clsName = name;
 		if(clsName == null)

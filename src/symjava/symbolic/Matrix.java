@@ -20,6 +20,7 @@ import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
 import symjava.matrix.SymMatrix;
+import symjava.symbolic.Expr.TYPE;
 
 public class Matrix extends Tensor {
 	public int nRowStart;
@@ -80,13 +81,13 @@ public class Matrix extends Tensor {
 		if(indexLVT == -1) {
 			//jama.Matrix l_m = null;
 			LocalVariableGen lg = mg.addLocalVariable("l_"+getLabel(),
-					new ObjectType("jama.Matrix"), null, null);
+					new ObjectType("Jama.Matrix"), null, null);
 			indexLVT = lg.getIndex();
 //			il.append(InstructionConstants.ACONST_NULL);
 //			lg.setStart(il.append(new DSTORE(idx)));
 
 			// First time touch the matrix, declare a local reference of Java.Matrix
-			il.append(new NEW(cp.addClass("jama.Matrix")));
+			il.append(new NEW(cp.addClass("Jama.Matrix")));
 		    il.append(InstructionConstants.DUP);
 
 		    //prepare argument: double[] vals
@@ -94,22 +95,33 @@ public class Matrix extends Tensor {
 			//il.append(new PUSH(cp, argsMap.get(this.label)));
 			//il.append(InstructionConstants.DALOAD); //Load double from array 
 			//////////////il.append(new ALOAD(argsMap.get(this.label))); //Load reference from local variable (from function arguments)
-			il.append(new ALOAD(1)); //Load reference from local variable (from function arguments)
+			//il.append(new ALOAD(1)); //Load reference from local variable (from function arguments)
+		    
+			il.append(new ALOAD(argsStartPos));
+			il.append(new PUSH(cp, argsMap.get(this.label)));
+			il.append(InstructionConstants.AALOAD); //Load double from array 
+		    
 			//prepare argument: double m - number of rows
     		il.append(new PUSH(cp, nRow));
-			il.append(factory.createInvoke("jama.Matrix", "<init>",
+			il.append(factory.createInvoke("Jama.Matrix", "<init>",
 				Type.VOID, new Type[] { new ArrayType(Type.DOUBLE, 1), Type.INT },
 				Constants.INVOKESPECIAL));
 
 			//jama.Matrix l_m = new jama.Matrix(args[], nRow);
 			lg.setStart(il.append(new ASTORE(indexLVT)));
 		}
-		//return il.append(new ALOAD(indexLVT));
-		il.append(new ALOAD(indexLVT));
-		il.append(new PUSH(cp, 1.0));
-		return il.append(InstructionConstants.DRETURN);
+		return il.append(new ALOAD(indexLVT));
+		//For test purpose
+		//il.append(new ALOAD(indexLVT));
+		//il.append(new PUSH(cp, 1.0));
+		//return il.append(InstructionConstants.DRETURN);
 	}
 
+	@Override
+	public TYPE getType() {
+		return TYPE.MATRIX;
+	}
+	
 	public static void main(String[] args) {
 		Matrix m = new Matrix("A",6,8);
 		SymMatrix sm = m.split(3, 2);
