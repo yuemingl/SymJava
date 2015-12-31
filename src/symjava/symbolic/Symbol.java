@@ -142,6 +142,7 @@ public class Symbol extends Expr {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
+//Note: local variable implementation has been moved to LCVar		
 //		if(this.isDeclaredAsLocal) {
 //			// Load from a local variable
 //			return il.append(new DLOAD(indexLVT));

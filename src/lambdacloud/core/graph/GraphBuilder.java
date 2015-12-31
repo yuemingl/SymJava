@@ -42,7 +42,7 @@ public class GraphBuilder {
 					Symbol arg = ss.get(idx++);
 					ret.expr.setArg(i, arg);
 					//ret.args.add(arg);
-					ret.children.put(arg.toLaTex(), n);
+					ret.children.put(arg.toString(), n);
 				} else {
 					ret.expr.setArg(i, n.expr);
 					//ret.args.addAll(n.args);
