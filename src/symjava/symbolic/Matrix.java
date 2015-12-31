@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.sun.org.apache.bcel.internal.Constants;
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
+import com.sun.org.apache.bcel.internal.generic.ASTORE;
 import com.sun.org.apache.bcel.internal.generic.ArrayType;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.DSTORE;
@@ -92,17 +93,21 @@ public class Matrix extends Tensor {
 			//il.append(new ALOAD(argsStartPos));
 			//il.append(new PUSH(cp, argsMap.get(this.label)));
 			//il.append(InstructionConstants.DALOAD); //Load double from array 
-			il.append(new ALOAD(argsMap.get(this.label))); //Load reference from local variable (from function arguments)
+			//////////////il.append(new ALOAD(argsMap.get(this.label))); //Load reference from local variable (from function arguments)
+			il.append(new ALOAD(1)); //Load reference from local variable (from function arguments)
 			//prepare argument: double m - number of rows
     		il.append(new PUSH(cp, nRow));
 			il.append(factory.createInvoke("jama.Matrix", "<init>",
-				Type.VOID, new Type[] { new ArrayType(Type.DOUBLE, 1), Type.DOUBLE },
+				Type.VOID, new Type[] { new ArrayType(Type.DOUBLE, 1), Type.INT },
 				Constants.INVOKESPECIAL));
 
 			//jama.Matrix l_m = new jama.Matrix(args[], nRow);
-			lg.setStart(il.append(new DSTORE(indexLVT)));
+			lg.setStart(il.append(new ASTORE(indexLVT)));
 		}
-		return il.append(new ALOAD(indexLVT));
+		//return il.append(new ALOAD(indexLVT));
+		il.append(new ALOAD(indexLVT));
+		il.append(new PUSH(cp, 1.0));
+		return il.append(InstructionConstants.DRETURN);
 	}
 
 	public static void main(String[] args) {
