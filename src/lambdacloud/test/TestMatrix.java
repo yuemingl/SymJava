@@ -6,8 +6,11 @@ import symjava.symbolic.Matrix;
 import symjava.symbolic.Vector;
 
 public class TestMatrix {
-
 	public static void main(String[] args) {
+		test1();
+		test2();
+	}
+	public static void test1() {
 		// TODO Auto-generated method stub
 		Matrix A = new Matrix("A",3,3);
 		Vector x = new Vector("x",3);
@@ -27,5 +30,17 @@ public class TestMatrix {
 		for(double i : outAry)
 			System.out.println(i);
 	}
-
+	
+	public static void test2() {
+		Vector x = new Vector("x",3);
+		Vector y = new Vector("y",3);
+		
+		BytecodeBatchFunc fun =  CompileUtils.compileVec(x+y, x, y);
+		double[] outAry = new double[4];
+		double[] data_x = new double[] {1,2,3}; //columewise
+		double[] data_y = new double[] {1,2,3};
+		fun.apply(outAry, 0, data_x, data_y);
+		for(double i : outAry)
+			System.out.println(i);
+	}
 }

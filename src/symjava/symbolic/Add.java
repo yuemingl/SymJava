@@ -8,15 +8,19 @@ import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.LADD
 import java.util.List;
 import java.util.Map;
 
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
 
+import com.sun.org.apache.bcel.internal.Constants;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.ObjectType;
+import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class Add extends BinaryOp {
 	public Add(Expr l, Expr r) {
@@ -143,8 +147,22 @@ public class Add extends BinaryOp {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
 		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		if(arg1.getType() == TYPE.MATRIX && arg2.getType() == TYPE.MATRIX) {
+			arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			il.append(factory.createInvoke("Jama.Matrix", "plus",
+					new ObjectType("Jama.Matrix"), new Type[] { new ObjectType("Jama.Matrix") },
+					Constants.INVOKEVIRTUAL));
+			return startPos;
+		} else if(arg1.getType() == TYPE.VECTOR && arg2.getType() == TYPE.VECTOR) {
+			arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			il.append(factory.createInvoke("Jama.Matrix", "plus",
+					new ObjectType("Jama.Matrix"), new Type[] { new ObjectType("Jama.Matrix") },
+					Constants.INVOKEVIRTUAL));
+			return startPos;
+		}
+		
+		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
 		BytecodeUtils.typeCast(il, arg1.getType(), ty);
 		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		BytecodeUtils.typeCast(il, arg2.getType(), ty);

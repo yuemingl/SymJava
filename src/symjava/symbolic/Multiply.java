@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
@@ -186,7 +187,7 @@ public class Multiply extends BinaryOp {
 						new ObjectType("Jama.Matrix"), new Type[] { new ObjectType("Jama.Matrix") },
 						//Type.getType(Jama.Matrix.class), new Type[] { Type.getType(Jama.Matrix.class) },
 						Constants.INVOKEVIRTUAL));
-
+/* Move the return part out of here to class CompileUtil
 				//Copy results to outAry
 				il.append(factory.createInvoke("Jama.Matrix", "getColumnPackedCopy",
 						new ArrayType(Type.DOUBLE,1), new Type[] {},
@@ -200,7 +201,7 @@ public class Multiply extends BinaryOp {
 				il.append(factory.createInvoke("java.lang.System", "arraycopy",
 						Type.VOID, new Type[] { Type.OBJECT, Type.INT, Type.OBJECT, Type.INT, Type.INT },
 						Constants.INVOKESTATIC));
-				
+*/
 				//test only
 				//il.append(new ALOAD(indexLVT));
 				//il.append(new PUSH(cp, 1.0));
@@ -240,5 +241,18 @@ public class Multiply extends BinaryOp {
 		} else {
 			sortKey = arg1.getSortKey()+arg2.getSortKey();
 		}		
+	}
+	
+	@Override
+	public TYPE getType() {
+		if(arg1.getType() == TYPE.MATRIX) {
+			if(arg2.getType() == TYPE.VECTOR)
+				return TYPE.VECTOR;
+			else if(arg2.getType() == TYPE.MATRIX)
+				return TYPE.MATRIX;
+			else
+				return TYPE.MATRIX;
+		}	
+		return Utils.getConvertedType(arg1.getType(), arg2.getType());
 	}	
 }
