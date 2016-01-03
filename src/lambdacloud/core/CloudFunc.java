@@ -33,8 +33,10 @@ public class CloudFunc extends LCBase {
 	protected BytecodeVecFunc vecFunc;
 	protected BytecodeBatchFunc batchFunc;
 	protected boolean isOnCloud = false;
-	protected Class<?> clazz;
+	
+	protected Class<?> clazz; //a java class of func
 	protected Method method;
+	
 	protected CloudConfig localConfig = null;
 	protected boolean isAsync = false;
 	
@@ -174,9 +176,11 @@ public class CloudFunc extends LCBase {
 	public CloudFunc compile(Expr[] args, Expr expr) {
 		Expr compileExpr = expr;
 		//TODO Do we need LCReturn? It depends on how the compile function treat the return value of an expr
-		//if(!(expr instanceof LCBase)) {
-		//	compileExpr = new LCReturn(expr);
-		//}
+		if(!(expr instanceof LCBase)) {
+			compileExpr = new LCReturn(expr);
+		}
+		
+		
 		if(currentCloudConfig().isLocal()) {
 			funcType = 1;
 			func = CompileUtils.compile(name, compileExpr, args);
@@ -290,10 +294,12 @@ public class CloudFunc extends LCBase {
 				
 			}
 		} else {
+			//Store argument on cloud first if necessary
 			for(int i=0; i<inputs.length; i++) 
 				if(!inputs[i].isOnCloud()) {
 					inputs[i].storeToCloud();
 				}
+			
 			CloudClient client = currentCloudConfig().currentClient();
 			CloudVarHandler handler = client.getCloudVarHandler();
 			try {
@@ -364,5 +370,13 @@ public class CloudFunc extends LCBase {
 	public TypeInfo getTypeInfo() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public int getFuncType() {
+		return this.funcType;
+	}
+	
+	public void setFuncType(int type) {
+		this.funcType = type;
 	}
 }

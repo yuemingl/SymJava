@@ -43,6 +43,7 @@ public class GraphBuilder {
 			Node n = helper(args[i]);
 			if(n != null) {
 				if(n.isDevice()) {
+					//
 					TypeInfo ti = args[i].getTypeInfo();
 					if(ti.type == TYPE.VECTOR) {
 						Vector arg = new Vector("__vec_"+(idx++), ti.dim[0]);

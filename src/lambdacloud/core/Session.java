@@ -14,6 +14,30 @@ public class Session {
 		return run(n, dict);
 	}
 	
+	public double[] runVec(Node root, Map<String, double[]> dict) {
+		int nArgs = root.args.size();
+		CloudSD[] inputs = new CloudSD[nArgs];
+		for(int i=0; i<nArgs; i++) {
+			inputs[i] = new CloudSD(root.args.get(i).toString());
+			double[] d = dict.get(root.args.get(i).toString());
+			if(d == null) {
+				Node child = root.children.get(root.args.get(i).toString());
+				inputs[i].init(runVec(child, dict));
+			} else {
+				inputs[i].init(d);
+			}
+		}
+		CloudSD output = new CloudSD("output").resize(4); //TODO
+
+		root.cfunc.apply(output, inputs);
+		if(output.fetchToLocal()) {
+			for(double d : output.getData()) {
+				System.out.println(d);
+			}
+		}		
+		return output.getData();
+	}
+	
 	/**
 	 * TODO
 	 * run() return a double

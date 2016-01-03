@@ -6,7 +6,10 @@ import static symjava.symbolic.Symbol.y;
 import java.util.HashMap;
 import java.util.Map;
 
+import lambdacloud.core.CloudConfig;
 import lambdacloud.core.Session;
+import lambdacloud.core.graph.GraphBuilder;
+import lambdacloud.core.graph.Node;
 import lambdacloud.core.lang.LCDevice;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
@@ -146,14 +149,38 @@ public class TestMatrix {
 		
 		Expr res = new Concat(yy[0],yy[1])+y0;
 		
-		Session sess = new Session();
-		Map<String, Double> dict = new HashMap<String, Double>();
-		dict.put(A.toString(), 3.0);
-		dict.put(x.toString(), 3.0);
-		dict.put(y.toString(), 4.0);
+		Map<String, double[]> dict = new HashMap<String, double[]>();
+		/*
+		1 2 3 4   0   1   13
+		1 2 1 3 * 1 + 2 = 9
+		1 2 2 1   2   3   10
+		2 3 1 4   1   4   13
+		*/
+		dict.put(A.toString(), new double[]{1,1,1,2,2,2,2,3,3,1,2,1,4,3,1,4});
+		dict.put(x.toString(), new double[]{0,1,2,1});
+		dict.put(y0.toString(), new double[]{1,2,3,4});
 		
-		double rlt = sess.run(res, dict);
-		System.out.println(rlt);
+		//test
+		//those parameters should be able automatically generated accroding to the definition of AA and xx
+		double[] data_A_11 = new double[] {2,1,1,4}; //columewise
+		double[] data_A_10 = new double[] {1,2,2,3}; //columewise
+		double[] data_A_01 = new double[] {3,1,4,3}; //columewise
+		double[] data_A_00 = new double[] {1,1,2,2}; //columewise
+		double[] data_x_0 = new double[] {0,1};
+		double[] data_x_1 = new double[] {2,1};
+		dict.put(AA[0][0].toString(), data_A_00);
+		dict.put(AA[0][1].toString(), data_A_01);
+		dict.put(AA[1][0].toString(), data_A_10);
+		dict.put(AA[1][1].toString(), data_A_11);
+		dict.put(xx[0].toString(), data_x_0);
+		dict.put(xx[1].toString(), data_x_1);
+		
+		CloudConfig.setGlobalTarget("job_local.conf");
+		Node n = GraphBuilder.build(res);
+		Session sess1 = new Session();
+		double[] rlt = sess1.runVec(n, dict);
+		for(double d : rlt)
+			System.out.println(d);
 
 
 	}

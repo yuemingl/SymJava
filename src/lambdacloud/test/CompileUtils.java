@@ -41,10 +41,13 @@ public class CompileUtils {
 	public static IR getIR(String name, Expr expr, Expr ...args) {
 		ClassGen cg = null;
 		IR ir =  new IR();
+		
+		//Reset flags to generate matrix, vector declaration in a new func
 		bytecodeGenResetAll(expr);
+		
 		if(expr.getType() == TYPE.MATRIX || expr.getType() == TYPE.VECTOR) {
 			LCArray output = LCArray.getDoubleArray("output");
-			cg = _compileVec(null, expr, output, args);
+			cg = _compileVec(name, expr, output, args);
 			ir.type = 3; //BytecodeBatchFunc
 			
 			//only for test purpose
@@ -257,49 +260,49 @@ public class CompileUtils {
 		
 		expr.bytecodeGen(fullClsName, mg, cp, factory, il, argsMap, 3, null);
 		
-		//
-		if(expr.getType() == TYPE.VECTOR) {
-			//Copy results to outAry
-			LocalVariableGen lg = mg.addLocalVariable("l_ret_len",
-					Type.INT, null, null);
-			int idx = lg.getIndex();
-			il.append(factory.createInvoke("Jama.Matrix", "getColumnPackedCopy",
-					new ArrayType(Type.DOUBLE,1), new Type[] {},
-					Constants.INVOKEVIRTUAL));
-			il.append(InstructionConstants.DUP);
-			il.append(InstructionConstants.ARRAYLENGTH);
-			lg.setStart(il.append(new ISTORE(idx)));
-			
-			il.append(new PUSH(cp, 0));
-			il.append(InstructionConstants.ALOAD_1); //outAry (output buffer)
-			il.append(InstructionConstants.ILOAD_2); //outPos (start position of output buffer)
-			il.append(new ILOAD(idx));
-			//Call System.arraycopy(src, srcPos, dest, destPos, length);
-			il.append(factory.createInvoke("java.lang.System", "arraycopy",
-					Type.VOID, new Type[] { Type.OBJECT, Type.INT, Type.OBJECT, Type.INT, Type.INT },
-					Constants.INVOKESTATIC));
-			/*
-	        33: invokevirtual #20                 // Method Jama/Matrix.getColumnPackedCopy:()[D
-	        36: dup           
-	        37: arraylength   
-	        38: istore        6
-	        40: iconst_0      
-	        41: aload_1       
-	        42: iload_2       
-	        43: iload         6
-	        45: invokestatic  #26                 // Method java/lang/System.arraycopy:(Ljava/lang/Object;ILjava/lang/Object;II)V
-              LocalVariableTable:
-        Start  Length  Slot  Name   Signature
-               0      49     0  this   Lsymjava/bytecode/Multiply1451587171120;
-               0      49     1 outAry   [D
-               0      49     2 outPos   I
-               0      49     3  args   [[D
-              11      38     4   l_A   LJama/Matrix;
-              26      23     5   l_x   LJama/Matrix;
-              38      11     6 l_ret_len   I
-
-	        */
-		}
+//Move to LCReturn
+//		if(expr.getType() == TYPE.VECTOR) {
+//			//Copy results to outAry
+//			LocalVariableGen lg = mg.addLocalVariable("l_ret_len",
+//					Type.INT, null, null);
+//			int idx = lg.getIndex();
+//			il.append(factory.createInvoke("Jama.Matrix", "getColumnPackedCopy",
+//					new ArrayType(Type.DOUBLE,1), new Type[] {},
+//					Constants.INVOKEVIRTUAL));
+//			il.append(InstructionConstants.DUP);
+//			il.append(InstructionConstants.ARRAYLENGTH);
+//			lg.setStart(il.append(new ISTORE(idx)));
+//			
+//			il.append(new PUSH(cp, 0));
+//			il.append(InstructionConstants.ALOAD_1); //outAry (output buffer)
+//			il.append(InstructionConstants.ILOAD_2); //outPos (start position of output buffer)
+//			il.append(new ILOAD(idx));
+//			//Call System.arraycopy(src, srcPos, dest, destPos, length);
+//			il.append(factory.createInvoke("java.lang.System", "arraycopy",
+//					Type.VOID, new Type[] { Type.OBJECT, Type.INT, Type.OBJECT, Type.INT, Type.INT },
+//					Constants.INVOKESTATIC));
+//			/*
+//	        33: invokevirtual #20                 // Method Jama/Matrix.getColumnPackedCopy:()[D
+//	        36: dup           
+//	        37: arraylength   
+//	        38: istore        6
+//	        40: iconst_0      
+//	        41: aload_1       
+//	        42: iload_2       
+//	        43: iload         6
+//	        45: invokestatic  #26                 // Method java/lang/System.arraycopy:(Ljava/lang/Object;ILjava/lang/Object;II)V
+//              LocalVariableTable:
+//        Start  Length  Slot  Name   Signature
+//               0      49     0  this   Lsymjava/bytecode/Multiply1451587171120;
+//               0      49     1 outAry   [D
+//               0      49     2 outPos   I
+//               0      49     3  args   [[D
+//              11      38     4   l_A   LJama/Matrix;
+//              26      23     5   l_x   LJama/Matrix;
+//              38      11     6 l_ret_len   I
+//
+//	        */
+//		}
 		il.append(InstructionConstants.RETURN);
 		
 		mg.setMaxStack();

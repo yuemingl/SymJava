@@ -155,8 +155,10 @@ public class Symbol extends Expr {
 	}
 	
 	@Override
-	public TypeInfo getType() {
-		return TYPE.DOUBLE;
+	public TypeInfo getTypeInfo() {
+		TypeInfo ti = new TypeInfo();
+		ti.type = TYPE.DOUBLE;
+		return ti;
 	}
 
 	@Override

@@ -16,8 +16,7 @@ public class SymReal<T extends Number> extends Expr {
 	
 	public SymReal(T val) {
 		this.value = val;
-		label = String.valueOf(val);
-		sortKey = label;
+		updateLabel();
 		isSimplified = true;
 	}
 
@@ -124,22 +123,30 @@ public class SymReal<T extends Number> extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
+	public TypeInfo getTypeInfo() {
+		TypeInfo ti = new TypeInfo();
 		if(value instanceof Double)
-			return TYPE.DOUBLE;
+			ti.type = TYPE.DOUBLE;
 		else if(value instanceof Integer)
-			return TYPE.INT;
+			ti.type = TYPE.INT;
 		else if(value instanceof Long)
-			return TYPE.LONG;
+			ti.type = TYPE.LONG;
 		else if(value instanceof Float)
-			return TYPE.FLOAT;
+			ti.type = TYPE.FLOAT;
 		else 
 			throw new RuntimeException();
+		return ti;
 	}
 
 	@Override
 	public Expr[] args() {
 		return new Expr[0];
+	}
+
+	@Override
+	public void updateLabel() {
+		label = String.valueOf(value);
+		sortKey = label;
 	}	
 
 }
