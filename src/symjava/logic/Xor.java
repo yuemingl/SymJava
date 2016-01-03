@@ -16,6 +16,7 @@ import com.sun.org.apache.bcel.internal.generic.PUSH;
 
 import symjava.symbolic.Expr;
 import symjava.symbolic.Expr.TYPE;
+import symjava.symbolic.TypeInfo;
 import symjava.symbolic.arity.BinaryOp;
 
 public class Xor extends BinaryOp implements Logic {
@@ -56,7 +57,7 @@ public class Xor extends BinaryOp implements Logic {
 	}
 	
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		return TYPE.INT;
 	}	
 	

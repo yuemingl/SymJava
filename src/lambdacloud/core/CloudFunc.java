@@ -23,6 +23,8 @@ import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
 import symjava.bytecode.IR;
 import symjava.symbolic.Expr;
+import symjava.symbolic.TypeInfo;
+import symjava.symbolic.utils.FuncClassLoader;
 import symjava.symbolic.utils.JIT;
 
 public class CloudFunc extends LCBase {
@@ -171,9 +173,10 @@ public class CloudFunc extends LCBase {
 	
 	public CloudFunc compile(Expr[] args, Expr expr) {
 		Expr compileExpr = expr;
-		if(!(expr instanceof LCBase)) {
-			compileExpr = new LCReturn(expr);
-		}
+		//TODO Do we need LCReturn? It depends on how the compile function treat the return value of an expr
+		//if(!(expr instanceof LCBase)) {
+		//	compileExpr = new LCReturn(expr);
+		//}
 		if(currentCloudConfig().isLocal()) {
 			funcType = 1;
 			func = CompileUtils.compile(name, compileExpr, args);
@@ -182,6 +185,8 @@ public class CloudFunc extends LCBase {
 		} else {
 			//send the exprssion to the server
 			funcIR = CompileUtils.getIR(name, compileExpr, args);
+			
+
 			//funcIR = JIT.getIR(name, args, expr);
 			CloudFuncHandler handler = currentCloudConfig().currentClient().getCloudFuncHandler();
 			Channel ch = currentCloudConfig().currentClient().getChannel();
@@ -348,8 +353,15 @@ public class CloudFunc extends LCBase {
 	public BytecodeBatchFunc getBytecodeBatchFunc() {
 		return this.batchFunc;
 	}
+	
 	@Override
 	public Expr[] args() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public TypeInfo getTypeInfo() {
 		// TODO Auto-generated method stub
 		return null;
 	}

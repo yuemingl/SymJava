@@ -7,6 +7,7 @@ import symjava.matrix.SymVector;
 import symjava.symbolic.Add;
 import symjava.symbolic.Expr;
 import symjava.symbolic.SymReal;
+import symjava.symbolic.TypeInfo;
 import symjava.symbolic.utils.Utils;
 
 /**
@@ -148,7 +149,7 @@ public class Dot extends Expr {
 	}
 
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		// TODO Auto-generated method stub
 		return null;
 	}

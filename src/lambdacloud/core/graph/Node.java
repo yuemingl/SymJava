@@ -22,4 +22,7 @@ public class Node {
 	public Node() {
 		
 	}
+	public String toString() {
+		return expr.toString();
+	}
 }

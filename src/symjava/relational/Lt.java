@@ -16,6 +16,7 @@ import com.sun.org.apache.bcel.internal.generic.PUSH;
 
 import symjava.symbolic.Expr;
 import symjava.symbolic.Expr.TYPE;
+import symjava.symbolic.TypeInfo;
 import symjava.symbolic.arity.BinaryOp;
 
 public class Lt extends BinaryOp implements Relation {
@@ -72,7 +73,7 @@ public class Lt extends BinaryOp implements Relation {
 	}	
 	
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		return TYPE.INT;
 	}	
 	

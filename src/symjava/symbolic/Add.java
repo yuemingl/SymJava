@@ -184,5 +184,9 @@ public class Add extends BinaryOp {
 		label = arg1 + " + " + arg2;
 		sortKey = arg1.getSortKey()+arg2.getSortKey();
 	}
-
+	
+	@Override
+	public TypeInfo getTypeInfo() {
+		return arg1.getTypeInfo();
+	}	
 }

@@ -124,7 +124,7 @@ public class SymReal<T extends Number> extends Expr {
 	}
 
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		if(value instanceof Double)
 			return TYPE.DOUBLE;
 		else if(value instanceof Integer)

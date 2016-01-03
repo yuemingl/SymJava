@@ -32,13 +32,36 @@ import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class CompileUtils {
-	
+	public static void bytecodeGenResetAll(Expr expr) {
+		Expr[] tmp = expr.args();
+		for(int i=0; i<tmp.length; i++) 
+			bytecodeGenResetAll(tmp[i]);
+		expr.bytecodeGenReset();
+	}
 	public static IR getIR(String name, Expr expr, Expr ...args) {
-		ClassGen cg = _compile(name, expr, args);
+		ClassGen cg = null;
 		IR ir =  new IR();
-		ir.type = 1;
+		bytecodeGenResetAll(expr);
+		if(expr.getType() == TYPE.MATRIX || expr.getType() == TYPE.VECTOR) {
+			LCArray output = LCArray.getDoubleArray("output");
+			cg = _compileVec(null, expr, output, args);
+			ir.type = 3; //BytecodeBatchFunc
+			
+			//only for test purpose
+			System.out.println("getIR newInstance start");
+			FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
+			fcl.newInstance(cg);
+			System.out.println("getIR newInstance end");
+
+		} else {
+			cg = _compile(name, expr, args);
+			ir.type = 1;
+		}
 		ir.name = cg.getJavaClass().getClassName();
 		ir.bytes = cg.getJavaClass().getBytes();
+		
+		
+		
 		return ir;
 	}
 	
@@ -90,7 +113,8 @@ public class CompileUtils {
 			System.out.println(fullClsName);
 			StringBuilder sb = new StringBuilder();
 			sb.append("double apply(double[] ").append(args[0].getLabel());
-			sb.append(");");
+			sb.append(") = ");
+			sb.append(expr);
 			System.out.println(sb.toString());
 		} else { 
 			//double apply(double x, double y, ...)
@@ -104,7 +128,8 @@ public class CompileUtils {
 				sb.append("double ").append(a).append(", ");
 			if(args.length > 0)
 			sb.delete(sb.length()-2, sb.length());
-			sb.append(");");
+			sb.append(") = ");
+			sb.append(expr);
 			System.out.println(sb.toString());
 		}
 		
@@ -197,12 +222,15 @@ public class CompileUtils {
 				il, cp);
 		
 		HashMap<String, Integer> argsMap = new HashMap<String, Integer>();
-		if(args != null) {
-			for(int i=0; i<args.length; i++) {
-				argsMap.put(args[i].getLabel(), i);
-			}
+		//extract arguments automatically
+		if(args == null || args.length == 0)
+			args = Utils.extractSymbols(expr).toArray(new Expr[]{});
+		for(int i=0; i<args.length; i++) {
+			argsMap.put(args[i].getLabel(), i);
 		}
+
 		//special symbol for output
+		//TODO remove?
 		argsMap.put(output.getLabel(), 1);
 		
 		System.out.println(fullClsName);
@@ -211,7 +239,8 @@ public class CompileUtils {
 		for(Expr a : args)
 			sb.append(" double[] ").append(a).append(",");
 		sb.delete(sb.length()-1, sb.length());
-		sb.append(");");
+		sb.append(") = ");
+		sb.append(expr);
 		System.out.println(sb.toString());
 		
 		// Declare local variables

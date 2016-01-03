@@ -35,7 +35,7 @@ public class Vector extends Tensor {
 
 	public Vector(String name, int nStart, int nDim) {
 		super(name);
-		this.label = name+"("+nStart+","+nDim+")";
+		this.label = name;//+"("+nStart+","+nDim+")";
 		this.nStart = nStart;
 		this.nDim = nDim; 
 	}
@@ -45,13 +45,13 @@ public class Vector extends Tensor {
 		if(nDim%nBlock > 0)
 			n = (nDim+(nBlock-nDim%nBlock))/nBlock;
 		int last_n = nDim%n==0?n:nDim%n;
-		System.out.println(n);
-		System.out.println(last_n);
+		//System.out.println(n);
+		//System.out.println(last_n);
 		Expr[] items = new Expr[nBlock];
 		for(int j=0; j<nBlock-1; j++) {
-			items[j] = new Vector(this.label, j*n, n);
+			items[j] = new Vector(this.label+"_"+j, j*n, n);
 		}
-		items[nBlock-1] = new Vector(this.label, (nBlock-1)*n, last_n);
+		items[nBlock-1] = new Vector(this.label+"_"+(nBlock-1), (nBlock-1)*n, last_n);
 		return new SymVector(items);
 	}
 
@@ -93,8 +93,16 @@ public class Vector extends Tensor {
 	}
 	
 	@Override
-	public TYPE getType() {
-		return TYPE.VECTOR;
+	public TypeInfo getTypeInfo() {
+		TypeInfo ti = new TypeInfo();
+		ti.type = TYPE.VECTOR;
+		ti.dim = new int[1];
+		ti.dim[0] = nDim;
+		return ti;
+	}
+	
+	public void bytecodeGenReset() {
+		this.indexLVT = -1;
 	}
 	
 	public static void main(String[] args) {

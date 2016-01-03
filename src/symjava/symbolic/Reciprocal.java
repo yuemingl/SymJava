@@ -84,7 +84,7 @@ public class Reciprocal extends UnaryOp {
 	
 	
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		return TYPE.DOUBLE;
 	}
 }

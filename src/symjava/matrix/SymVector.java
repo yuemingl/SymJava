@@ -7,6 +7,7 @@ import symjava.numeric.NumVector;
 import symjava.symbolic.Add;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbols;
+import symjava.symbolic.TypeInfo;
 import symjava.symbolic.utils.AddList;
 
 /**
@@ -178,7 +179,7 @@ public class SymVector extends Expr implements Iterable<Expr> {
 	}
 
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		// TODO Auto-generated method stub
 		return null;
 	}

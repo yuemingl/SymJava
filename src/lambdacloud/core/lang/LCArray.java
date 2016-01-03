@@ -3,6 +3,7 @@ package lambdacloud.core.lang;
 import java.util.Map;
 
 import symjava.symbolic.Expr;
+import symjava.symbolic.TypeInfo;
 
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
@@ -118,7 +119,7 @@ public abstract class LCArray extends LCVar {
 	}
 
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		return TYPE.DOUBLE;
 	}
 

@@ -1,5 +1,7 @@
 package lambdacloud.core.lang;
 
+import symjava.symbolic.TypeInfo;
+
 
 public class LCChar extends LCVar {
 	public LCChar(String name) {
@@ -7,7 +9,7 @@ public class LCChar extends LCVar {
 	}
 	
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		return TYPE.CHAR;
 	}	
 }

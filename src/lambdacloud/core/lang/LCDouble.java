@@ -1,5 +1,7 @@
 package lambdacloud.core.lang;
 
+import symjava.symbolic.TypeInfo;
+
 
 public class LCDouble extends LCVar {
 	public LCDouble(String name) {
@@ -7,7 +9,7 @@ public class LCDouble extends LCVar {
 	}
 
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		return TYPE.DOUBLE;
 	}
 }

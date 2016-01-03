@@ -1,6 +1,7 @@
 package lambdacloud.core.lang;
 
 import symjava.symbolic.Expr;
+import symjava.symbolic.TypeInfo;
 
 public abstract class LCBase extends Expr {
 	protected LCBase parent = null;
@@ -22,7 +23,7 @@ public abstract class LCBase extends Expr {
 	}
 
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		throw new UnsupportedOperationException();
 	}
 

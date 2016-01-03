@@ -244,15 +244,24 @@ public class Multiply extends BinaryOp {
 	}
 	
 	@Override
-	public TYPE getType() {
+	public TypeInfo getTypeInfo() {
 		if(arg1.getType() == TYPE.MATRIX) {
 			if(arg2.getType() == TYPE.VECTOR)
-				return TYPE.VECTOR;
-			else if(arg2.getType() == TYPE.MATRIX)
-				return TYPE.MATRIX;
-			else
-				return TYPE.MATRIX;
-		}	
-		return Utils.getConvertedType(arg1.getType(), arg2.getType());
+				return arg2.getTypeInfo();
+			else if(arg2.getType() == TYPE.MATRIX) {
+				//A_mn * B_nl = C_ml
+				TypeInfo ti = new TypeInfo();
+				ti.type = TYPE.MATRIX;
+				ti.dim = new int[2];
+				ti.dim[0] = arg1.getTypeInfo().dim[0];
+				ti.dim[1] = arg2.getTypeInfo().dim[1];
+				return ti;
+			} else
+				return arg1.getTypeInfo(); //matrix * scalar?
+		}
+		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
+		TypeInfo tyi = new TypeInfo();
+		tyi.type = ty;
+		return tyi;
 	}	
 }

@@ -3,8 +3,12 @@ package lambdacloud.core.graph;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.test.CompileUtils;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Matrix;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.Symbols;
+import symjava.symbolic.TypeInfo;
+import symjava.symbolic.Expr.TYPE;
+import symjava.symbolic.Vector;
 import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
@@ -22,7 +26,7 @@ public class GraphBuilder {
 		//no return
 		//root.func = CompileUtils.compile(null, root.expr, Utils.extractSymbols(root.expr).toArray(new Expr[0]));
 		root.args = Utils.extractSymbols(root.expr);
-		root.func = JIT.compile(root.expr);
+		//root.func = JIT.compile(root.expr);
 		root.cfunc = new CloudFunc(root.args.toArray(new Expr[0]), root.expr);
 	}
 	
@@ -39,10 +43,25 @@ public class GraphBuilder {
 			Node n = helper(args[i]);
 			if(n != null) {
 				if(n.isDevice()) {
-					Symbol arg = ss.get(idx++);
-					ret.expr.setArg(i, arg);
-					//ret.args.add(arg);
-					ret.children.put(arg.toString(), n);
+					TypeInfo ti = args[i].getTypeInfo();
+					if(ti.type == TYPE.VECTOR) {
+						Vector arg = new Vector("__vec_"+(idx++), ti.dim[0]);
+						ret.expr.setArg(i, arg);
+						//ret.args.add(arg);
+						ret.children.put(arg.toString(), n);
+						
+					} else if(ti.type == TYPE.MATRIX) {
+						Matrix arg = new Matrix("__mat_"+(idx++), ti.dim[0], ti.dim[1]);
+						ret.expr.setArg(i, arg);
+						//ret.args.add(arg);
+						ret.children.put(arg.toString(), n);
+					} else {
+						Symbol arg = ss.get(idx++);
+						ret.expr.setArg(i, arg);
+						//ret.args.add(arg);
+						ret.children.put(arg.toString(), n);
+						
+					}
 				} else {
 					ret.expr.setArg(i, n.expr);
 					//ret.args.addAll(n.args);

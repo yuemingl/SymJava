@@ -463,6 +463,7 @@ abstract public class Expr implements Cloneable {
        return this.label.equals(((Expr)obj).label);
     }
     
+////////////////////////////////////////////////////////////////////////////
 //	/**
 //	 * Assign the result of evaluation of the expression to a local variable
 //	 * when compiling. The local variable must be a symbol which is declared 
@@ -490,11 +491,26 @@ abstract public class Expr implements Cloneable {
 			Map<Expr, Integer> funcRefsMap) {
 		throw new UnsupportedOperationException();//il.append(InstructionConstants.NOP);
 	}
+
+	
+	/**
+	 * Reset the compile flags for an expression. 
+	 * For example, a matrix is defined and stored to a local variable at the first reference of it
+	 * The following reference of it just load the local variable.
+	 * By calling this function, the state is reset.
+	 */
+	public void bytecodeGenReset() {
+		
+	}
 	
 	public enum TYPE {INT, LONG, FLOAT, DOUBLE, BOOLEAN, BYTE, CHAR, SHORT, VOID,
 		MATRIX, VECTOR, TENSOR};
+
+	public abstract TypeInfo getTypeInfo();
 	
-	public abstract TYPE getType();
+	public TYPE getType() {
+		return getTypeInfo().type;
+	}
 	
 	public Expr assign(Expr expr) {
 		return new LCAssign(this, expr);
@@ -507,6 +523,7 @@ abstract public class Expr implements Cloneable {
 	public Expr assign(int val) {
 		return new LCAssign(this, Expr.valueOf(val));
 	}	
+/////////////////////////////////////////////////////////////////////////
 	
 	LCDevice device = null;
 	public Expr runOn(LCDevice dev) {

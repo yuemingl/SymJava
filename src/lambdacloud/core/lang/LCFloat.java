@@ -1,5 +1,7 @@
 package lambdacloud.core.lang;
 
+import symjava.symbolic.TypeInfo;
+
 
 public class LCFloat extends LCVar {
 	public LCFloat(String name) {
@@ -7,7 +9,7 @@ public class LCFloat extends LCVar {
 	}
 	
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		return TYPE.FLOAT;
 	}
 }

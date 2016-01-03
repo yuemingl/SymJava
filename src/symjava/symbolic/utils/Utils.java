@@ -20,6 +20,7 @@ import symjava.symbolic.Reciprocal;
 import symjava.symbolic.Subtract;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.Symbols;
+import symjava.symbolic.Tensor;
 
 public class Utils {
 
@@ -308,7 +309,7 @@ public class Utils {
 		for(int i=0; i<exprs.length; i++) {
 			BytecodeUtils.post_order(exprs[i], list);
 			for(Expr e : list) {
-				if(e instanceof Symbol) {
+				if(e instanceof Symbol || e instanceof Tensor) {
 					set.add((Symbol)e);
 				} else if(e instanceof Symbols) {
 					set.add((Symbols)e);

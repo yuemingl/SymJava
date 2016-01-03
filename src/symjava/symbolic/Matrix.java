@@ -38,7 +38,7 @@ public class Matrix extends Tensor {
 
 	public Matrix(String name, int nRowStart, int nColStart, int nRow, int nCol) {
 		super(name);
-		this.label = name+"("+nRowStart+","+nColStart+","+nRow+","+nCol+")";
+		this.label = name;//+"("+nRowStart+","+nColStart+","+nRow+","+nCol+")";
 		this.nRowStart = nRowStart;
 		this.nColStart = nColStart;
 		this.nRow = nRow;
@@ -67,7 +67,7 @@ public class Matrix extends Tensor {
 				int nc = n;
 				if(j == nColBlock-1) nc = last_n;
 
-				items[i][j] = new Matrix(this.label, i*m, j*n, nr, nc);
+				items[i][j] = new Matrix(this.label+"_"+i+"_"+j, i*m, j*n, nr, nc);
 			}
 		}
 		return new SymMatrix(items);
@@ -118,8 +118,17 @@ public class Matrix extends Tensor {
 	}
 
 	@Override
-	public TYPE getType() {
-		return TYPE.MATRIX;
+	public TypeInfo getTypeInfo() {
+		TypeInfo ti = new TypeInfo();
+		ti.type = TYPE.MATRIX;
+		ti.dim = new int[2];
+		ti.dim[0] = this.nRow;
+		ti.dim[1] = this.nCol;
+		return ti;
+	}
+	
+	public void bytecodeGenReset() {
+		this.indexLVT = -1;
 	}
 	
 	public static void main(String[] args) {

@@ -104,7 +104,7 @@ public class Integrate extends Expr {
 	}
 
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		return TYPE.DOUBLE;
 	}
 

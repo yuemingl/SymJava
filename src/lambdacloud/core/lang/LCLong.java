@@ -1,5 +1,7 @@
 package lambdacloud.core.lang;
 
+import symjava.symbolic.TypeInfo;
+
 
 public class LCLong extends LCVar {
 	public LCLong(String name) {
@@ -7,7 +9,7 @@ public class LCLong extends LCVar {
 	}
 	
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		return TYPE.LONG;
 	}
 }

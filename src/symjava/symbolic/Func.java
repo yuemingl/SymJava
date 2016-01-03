@@ -196,8 +196,14 @@ public class Func extends NaryOp {
 	}
 
 	@Override
-	public TYPE getType() {
-		return expr.getType();
+	public TypeInfo getTypeInfo() {
+		return expr.getTypeInfo();
+	}
+
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

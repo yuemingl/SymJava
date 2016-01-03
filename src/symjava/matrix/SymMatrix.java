@@ -5,6 +5,7 @@ import java.util.Vector;
 import symjava.numeric.NumMatrix;
 import symjava.symbolic.Add;
 import symjava.symbolic.Expr;
+import symjava.symbolic.TypeInfo;
 
 /**
  * SymMatrix is a matrix of symbolic expressions
@@ -162,7 +163,7 @@ public class SymMatrix extends Expr {
 			}
 			return ret;
 		} else if(other instanceof SymMatrix) {
-			
+			//TODO
 		} 
 		return null;
 	}
@@ -192,8 +193,14 @@ public class SymMatrix extends Expr {
 	}
 
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}
 }

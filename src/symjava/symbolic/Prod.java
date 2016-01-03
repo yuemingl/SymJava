@@ -25,7 +25,7 @@ public class Prod extends Expr {
 	}
 
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		// TODO Auto-generated method stub
 		return null;
 	}

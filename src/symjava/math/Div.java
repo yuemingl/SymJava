@@ -5,6 +5,7 @@ import java.util.List;
 
 import symjava.matrix.SymVector;
 import symjava.symbolic.Expr;
+import symjava.symbolic.TypeInfo;
 import symjava.symbolic.arity.NaryOp;
 import symjava.symbolic.utils.Utils;
 
@@ -87,7 +88,7 @@ public class Div extends NaryOp {
 	}
 
 	@Override
-	public TYPE getType() {
+	public TypeInfo getType() {
 		// TODO Auto-generated method stub
 		return null;
 	}
