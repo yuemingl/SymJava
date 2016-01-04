@@ -33,6 +33,11 @@ public class CloudFunc extends LCBase {
 	protected BytecodeFunc func;
 	protected BytecodeVecFunc vecFunc;
 	protected BytecodeBatchFunc batchFunc;
+	
+	//Info for BytecodeBatchFunc
+	protected int outAryLen;
+	protected int numArgs;
+
 	protected boolean isOnCloud = false;
 	
 	protected Class<?> clazz; //a java class of func
@@ -151,7 +156,7 @@ public class CloudFunc extends LCBase {
 			try {
 				byte[] data = Files.readAllBytes(path);
 				IR ir =  new IR();
-				ir.type = 1;
+				ir.type = FUNC_TYPE.SCALAR;
 				ir.name = clazz.getName();
 				ir.bytes = data;
 				this.funcIR = ir;
@@ -189,8 +194,10 @@ public class CloudFunc extends LCBase {
 			
 		} else {
 			//send the exprssion to the server
-			funcIR = CompileUtils.getIR(name, compileExpr, args);
-			
+			this.funcIR = CompileUtils.getIR(name, compileExpr, args);
+			this.funcType = funcIR.type;
+			this.outAryLen = funcIR.outAryLen;
+			this.numArgs = funcIR.numArgs;
 
 			//funcIR = JIT.getIR(name, args, expr);
 			CloudFuncHandler handler = currentCloudConfig().currentClient().getCloudFuncHandler();
@@ -400,4 +407,20 @@ public class CloudFunc extends LCBase {
 			throw new RuntimeException("");
 		}
 	}
-}
+	
+	public int getOutAryLen() {
+		return this.outAryLen;
+	}
+	
+	public void setOutAryLen(int len) {
+		this.outAryLen = len;
+	}
+	
+	public int getNumArgs() {
+		return this.numArgs;
+	}
+	
+	public void setNumArgs(int num) {
+		this.numArgs = num;
+	}
+ }

@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 
 import symjava.bytecode.IR;
 import lambdacloud.core.CloudFunc;
+import lambdacloud.core.CloudFunc.FUNC_TYPE;
 
 /**
  */
@@ -38,9 +39,23 @@ public class CloudFuncEncoder extends MessageToByteEncoder<CloudFunc> {
 
 		// Write a message.
 		out.writeByte((byte) 'F'); // magic number
-		out.writeInt(funcIR.type);
+		out.writeInt(getFuncType(funcIR.type));
+		out.writeInt(func.getOutAryLen());
+		out.writeInt(func.getNumArgs());
 		out.writeInt(nameLen);
 		out.writeInt(dataLen);
 		out.writeBytes(allData);
+	}
+	
+	protected int getFuncType(FUNC_TYPE funcType) {
+		switch(funcType) {
+		case SCALAR:
+			return 1;
+		case VECTOR:
+			return 2;
+		case BATCH:
+			return 3;
+		}
+		return -1;
 	}
 }

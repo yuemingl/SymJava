@@ -179,6 +179,7 @@ public class TestMatrix {
 		Node n = GraphBuilder.build(res);
 		Session sess1 = new Session();
 		double[] rlt = sess1.runVec(n, dict);
+		System.out.println("------------");
 		for(double d : rlt)
 			System.out.println(d);
 

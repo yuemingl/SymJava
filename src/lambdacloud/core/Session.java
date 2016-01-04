@@ -27,14 +27,15 @@ public class Session {
 				inputs[i].init(d);
 			}
 		}
-		CloudSD output = new CloudSD("output").resize(4); //TODO
+		CloudSD output = new CloudSD();//"output").resize(4); //TODO
 
 		root.cfunc.apply(output, inputs);
+		System.out.println("run: "+root);
 		if(output.fetchToLocal()) {
 			for(double d : output.getData()) {
 				System.out.println(d);
 			}
-		}		
+		}
 		return output.getData();
 	}
 	

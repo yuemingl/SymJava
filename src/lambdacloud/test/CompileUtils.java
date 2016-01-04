@@ -6,6 +6,7 @@ import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
 import java.util.HashMap;
 import java.util.List;
 
+import lambdacloud.core.CloudFunc.FUNC_TYPE;
 import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCVar;
 import symjava.bytecode.BytecodeBatchFunc;
@@ -48,7 +49,9 @@ public class CompileUtils {
 		if(expr.getType() == TYPE.MATRIX || expr.getType() == TYPE.VECTOR) {
 			LCArray output = LCArray.getDoubleArray("output");
 			cg = _compileVec(name, expr, output, args);
-			ir.type = 3; //BytecodeBatchFunc
+			ir.type = FUNC_TYPE.BATCH; //BytecodeBatchFunc
+			ir.outAryLen = expr.getTypeInfo().dim[0];
+			ir.numArgs = args.length;
 			
 			//only for test purpose
 			System.out.println("getIR newInstance start");
@@ -58,7 +61,7 @@ public class CompileUtils {
 
 		} else {
 			cg = _compile(name, expr, args);
-			ir.type = 1;
+			ir.type = FUNC_TYPE.SCALAR;
 		}
 		ir.name = cg.getJavaClass().getClassName();
 		ir.bytes = cg.getJavaClass().getBytes();
