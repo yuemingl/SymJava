@@ -193,7 +193,7 @@ public class SymMatrix extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
+	public TypeInfo getTypeInfo() {
 		// TODO Auto-generated method stub
 		return null;
 	}

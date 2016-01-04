@@ -58,4 +58,10 @@ public class Abs extends UnaryOp {
 				new Type[] { Type.DOUBLE },
 		Constants.INVOKESTATIC));
 	}
+
+	@Override
+	public void updateLabel() {
+		label = "|" + arg + "|";
+		sortKey = label;
+	}
 }

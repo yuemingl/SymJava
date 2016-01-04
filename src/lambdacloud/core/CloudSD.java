@@ -103,7 +103,7 @@ public class CloudSD extends Symbol {
 	}
 	
 	private static String generateName() {
-		return "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		return "CloudSD"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
 	}
 	
 	/**
@@ -302,7 +302,10 @@ public class CloudSD extends Symbol {
 	}
 	
 	public String toString() {
-		return this.getName()+" data.length="+this.data.length;
+		if(this.data.length == 0)
+			return this.getName()+", isOnCloud="+isOnCloud+", No data tranfered";
+		else
+			return this.getName()+", isOnCloud="+isOnCloud+", data.length="+this.data.length;
 	}
 
 }

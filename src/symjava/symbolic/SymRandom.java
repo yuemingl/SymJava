@@ -32,8 +32,10 @@ public class SymRandom extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
-		return TYPE.DOUBLE;
+	public TypeInfo getTypeInfo() {
+		TypeInfo ti = new TypeInfo();
+		ti.type = TYPE.DOUBLE;
+		return ti;
 	}
 	
 	@Override
@@ -47,5 +49,9 @@ public class SymRandom extends Expr {
 			Map<Expr, Integer> funcRefsMap) {
 		return il.append(factory.createInvoke("java.lang.Math", "random",
 				Type.DOUBLE, new Type[] { }, Constants.INVOKESTATIC));
+	}
+
+	@Override
+	public void updateLabel() {
 	}	
 }

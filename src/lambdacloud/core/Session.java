@@ -14,7 +14,7 @@ public class Session {
 		return run(n, dict);
 	}
 	
-	public double[] runVec(Node root, Map<String, double[]> dict) {
+	public CloudSD runVec(Node root, Map<String, double[]> dict) {
 		int nArgs = root.args.size();
 		CloudSD[] inputs = new CloudSD[nArgs];
 		for(int i=0; i<nArgs; i++) {
@@ -22,7 +22,8 @@ public class Session {
 			double[] d = dict.get(root.args.get(i).toString());
 			if(d == null) {
 				Node child = root.children.get(root.args.get(i).toString());
-				inputs[i].init(runVec(child, dict));
+				CloudSD ret = runVec(child, dict);
+				inputs[i] = ret;
 			} else {
 				inputs[i].init(d);
 			}
@@ -36,7 +37,7 @@ public class Session {
 				System.out.println(d);
 			}
 		}
-		return output.getData();
+		return output;
 	}
 	
 	/**

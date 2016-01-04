@@ -166,4 +166,8 @@ public class Symbol extends Expr {
 		return new Expr[0];
 	}
 
+	@Override
+	public void updateLabel() {
+	}
+
 }

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lambdacloud.core.CloudConfig;
+import lambdacloud.core.CloudSD;
 import lambdacloud.core.Session;
 import lambdacloud.core.graph.GraphBuilder;
 import lambdacloud.core.graph.Node;
@@ -178,9 +179,9 @@ public class TestMatrix {
 		CloudConfig.setGlobalTarget("job_local.conf");
 		Node n = GraphBuilder.build(res);
 		Session sess1 = new Session();
-		double[] rlt = sess1.runVec(n, dict);
+		CloudSD rlt = sess1.runVec(n, dict);
 		System.out.println("------------");
-		for(double d : rlt)
+		for(double d : rlt.getData())
 			System.out.println(d);
 
 

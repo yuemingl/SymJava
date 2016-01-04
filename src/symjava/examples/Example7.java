@@ -51,9 +51,14 @@ public class Example7 {
 				return null;
 			}
 			@Override
-			public TypeInfo getType() {
+			public TypeInfo getTypeInfo() {
 				// TODO Auto-generated method stub
 				return null;
+			}
+			@Override
+			public void updateLabel() {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		

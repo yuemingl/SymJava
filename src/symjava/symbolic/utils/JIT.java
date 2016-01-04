@@ -3,6 +3,8 @@ package symjava.symbolic.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import lambdacloud.core.CloudFunc.FUNC_TYPE;
+
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
 
 import symjava.bytecode.BytecodeBatchFunc;
@@ -108,7 +110,7 @@ public class JIT {
 		Func func = new Func(className, expr, args);
 		ClassGen genClass = BytecodeUtils.genClassBytecodeFunc(func, false, false);
 		IR ir =  new IR();
-		ir.type = 1;
+		ir.type = FUNC_TYPE.SCALAR;
 		ir.name = genClass.getJavaClass().getClassName();
 		ir.bytes = genClass.getJavaClass().getBytes();
 		return ir;
