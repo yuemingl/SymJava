@@ -28,6 +28,7 @@ import symjava.symbolic.utils.FuncClassLoader;
 import symjava.symbolic.utils.JIT;
 
 public class CloudFunc extends LCBase {
+	public static enum FUNC_TYPE { SCALAR, VECTOR, BATCH }
 	protected String name;
 	protected BytecodeFunc func;
 	protected BytecodeVecFunc vecFunc;
@@ -41,7 +42,7 @@ public class CloudFunc extends LCBase {
 	protected boolean isAsync = false;
 	
 	//1=BytecodeFunc, 2=BytecodeVecFunc, 3=BytecodeBatchFunc
-	protected int funcType = 0; 
+	protected FUNC_TYPE funcType; 
 	protected IR funcIR = null;
 	
 	public CloudFunc(String name) {
@@ -182,7 +183,7 @@ public class CloudFunc extends LCBase {
 		
 		
 		if(currentCloudConfig().isLocal()) {
-			funcType = 1;
+			funcType = FUNC_TYPE.SCALAR;
 			func = CompileUtils.compile(name, compileExpr, args);
 			//func = JIT.compile(args, expr);
 			
@@ -210,7 +211,7 @@ public class CloudFunc extends LCBase {
 	
 	public CloudFunc compile(Expr[] args, Expr[] exprs) {
 		if(currentCloudConfig().isLocal()) {
-			funcType = 2;
+			funcType = FUNC_TYPE.VECTOR;
 			vecFunc = JIT.compile(args, exprs);
 		} else {
 			//send the exprssion to the server
@@ -259,13 +260,13 @@ public class CloudFunc extends LCBase {
 			}
 			if(inputs.length == 0) {
 				switch(funcType) {
-				case 1:
+				case SCALAR:
 					output.resize(1);
 					output.setData(0, func.apply());
 					break;
-				case 2:
+				case VECTOR:
 					break;
-				case 3:
+				case BATCH:
 					break;
 				default:
 					throw new RuntimeException();
@@ -274,18 +275,18 @@ public class CloudFunc extends LCBase {
 				double[] data = null;
 				double d;
 				switch(funcType) {
-				case 1:
+				case SCALAR:
 					data = inputs[0].getData();
 					d = func.apply(data);
 					output.resize(1);
 					output.setData(0, d);
 					break;
-				case 2:
+				case VECTOR:
 					data = inputs[0].getData();
 					double[] out = output.getData();
 					vecFunc.apply(out, 0, data);
 					break;
-				case 3:
+				case BATCH:
 					break;
 				default:
 					throw new RuntimeException();
@@ -372,11 +373,31 @@ public class CloudFunc extends LCBase {
 		return null;
 	}
 	
-	public int getFuncType() {
+	public FUNC_TYPE getFuncType() {
 		return this.funcType;
 	}
 	
-	public void setFuncType(int type) {
+	public void setFuncType(FUNC_TYPE type) {
 		this.funcType = type;
+	}
+	
+	/**
+	 * For net work transfer of function type
+	 * @param type
+	 */
+	public void setFuncType(int type) {
+		switch(type) {
+		case 1:
+			this.funcType = FUNC_TYPE.SCALAR;
+			break;
+		case 2:
+			this.funcType = FUNC_TYPE.VECTOR;
+			break;
+		case 3:
+			this.funcType = FUNC_TYPE.BATCH;
+			break;
+		default:
+			throw new RuntimeException("");
+		}
 	}
 }
