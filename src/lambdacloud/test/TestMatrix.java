@@ -27,8 +27,9 @@ public class TestMatrix {
 //		test2();
 //		test3();
 //		test4();
-		test5();
-		test6();
+//		test5();
+//		test6();
+		test7();
 	}
 	public static void test1() {
 		// TODO Auto-generated method stub
@@ -183,7 +184,41 @@ public class TestMatrix {
 		System.out.println("------------");
 		for(double d : rlt.getData())
 			System.out.println(d);
-
-
 	}
+	
+	public static void test7() {
+		int dim = 4;
+		Matrix A = new Matrix("A", dim, dim);
+		Vector x = new Vector("x", dim);
+		Vector y0 = new Vector("y0", dim);
+
+		SymMatrix AA = A.split(2, 2);
+		SymVector xx = x.split(2);
+		SymVector yy = (SymVector)(AA*xx);
+		System.out.println(yy);
+		yy[0].runOn(new LCDevice("/cpu:0"));
+		yy[1].runOn(new LCDevice("/cpu:0"));
+		
+		Expr res = new Concat(yy[0],yy[1])+y0;
+		
+		Map<String, double[]> dict = new HashMap<String, double[]>();
+		/*
+		1 2 3 4   0   1   13
+		1 2 1 3 * 1 + 2 = 9
+		1 2 2 1   2   3   10
+		2 3 1 4   1   4   13
+		*/
+		dict.put(A.toString(), new double[]{1,1,1,2,2,2,2,3,3,1,2,1,4,3,1,4});
+		dict.put(x.toString(), new double[]{0,1,2,1});
+		dict.put(y0.toString(), new double[]{1,2,3,4});
+		
+		CloudConfig.setGlobalTarget("job_local.conf");
+		Node n = GraphBuilder.build(res);
+		Session sess1 = new Session();
+		CloudSD rlt = sess1.runVec(n, dict);
+		System.out.println("------------");
+		for(double d : rlt.getData())
+			System.out.println(d);
+	}
+
 }

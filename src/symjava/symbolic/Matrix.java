@@ -27,6 +27,8 @@ public class Matrix extends Tensor {
 	public int nColStart;
 	public int nRow;
 	public int nCol;
+	public Matrix parent;
+	
 	protected int indexLVT = -1; 
 	public Matrix(String name, int nRow, int nCol) {
 		super(name);
@@ -35,15 +37,25 @@ public class Matrix extends Tensor {
 		this.nRow = nRow;
 		this.nCol = nCol;
 	}
-
-	public Matrix(String name, int nRowStart, int nColStart, int nRow, int nCol) {
-		super(name);
-		this.label = name;//+"("+nRowStart+","+nColStart+","+nRow+","+nCol+")";
+	
+	public Matrix(Matrix parent, int nRowStart, int nColStart, int nRow, int nCol) {
+		super(parent.label+"_"+nRowStart+"_"+nColStart+"_"+nRow+"_"+nCol);
 		this.nRowStart = nRowStart;
 		this.nColStart = nColStart;
 		this.nRow = nRow;
 		this.nCol = nCol; 
+		this.parent = parent;
 	}
+
+	public Matrix(Matrix parent, String name, int nRowStart, int nColStart, int nRow, int nCol) {
+		super(name);
+		this.nRowStart = nRowStart;
+		this.nColStart = nColStart;
+		this.nRow = nRow;
+		this.nCol = nCol;
+		this.parent = parent;
+	}
+	
 	
 	public SymMatrix split(int nRowBlock, int nColBlock) {
 		int m = nRow/nRowBlock;
@@ -67,7 +79,7 @@ public class Matrix extends Tensor {
 				int nc = n;
 				if(j == nColBlock-1) nc = last_n;
 
-				items[i][j] = new Matrix(this.label+"_"+i+"_"+j, i*m, j*n, nr, nc);
+				items[i][j] = new Matrix(this, this.label+"_"+i+"_"+j, i*m, j*n, nr, nc);
 			}
 		}
 		return new SymMatrix(items);
@@ -129,6 +141,11 @@ public class Matrix extends Tensor {
 	
 	public void bytecodeGenReset() {
 		this.indexLVT = -1;
+	}
+	
+	@Override
+	public Expr getParent() {
+		return this.parent;
 	}
 	
 	public static void main(String[] args) {

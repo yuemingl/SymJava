@@ -540,5 +540,12 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	abstract public void updateLabel();
+	
+	/**
+	 * Parent expression, for example sub-matrix
+	 */
+	public Expr getParent() {
+		return null;
+	}
 }
 

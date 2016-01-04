@@ -19,12 +19,11 @@ import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
 import symjava.matrix.SymVector;
-import symjava.symbolic.Expr.TYPE;
 
 public class Vector extends Tensor {
-
 	public int nStart;
 	public int nDim;
+	public Vector parent;
 	protected int indexLVT = -1;
 	
 	public Vector(String name, int nDim) {
@@ -33,11 +32,18 @@ public class Vector extends Tensor {
 		this.nDim = nDim;
 	}
 
-	public Vector(String name, int nStart, int nDim) {
-		super(name);
-		this.label = name;//+"("+nStart+","+nDim+")";
+	public Vector(Vector parent, int nStart, int nDim) {
+		super(parent.label+"_"+nStart+"_"+nDim);
 		this.nStart = nStart;
-		this.nDim = nDim; 
+		this.nDim = nDim;
+		this.parent = parent;
+	}
+	
+	public Vector(Vector parent, String name, int nStart, int nDim) {
+		super(name);
+		this.nStart = nStart;
+		this.nDim = nDim;
+		this.parent = parent;
 	}
 	
 	public SymVector split(int nBlock) {
@@ -49,9 +55,9 @@ public class Vector extends Tensor {
 		//System.out.println(last_n);
 		Expr[] items = new Expr[nBlock];
 		for(int j=0; j<nBlock-1; j++) {
-			items[j] = new Vector(this.label+"_"+j, j*n, n);
+			items[j] = new Vector(this, this.label+"_"+j, j*n, n);
 		}
-		items[nBlock-1] = new Vector(this.label+"_"+(nBlock-1), (nBlock-1)*n, last_n);
+		items[nBlock-1] = new Vector(this, this.label+"_"+(nBlock-1), (nBlock-1)*n, last_n);
 		return new SymVector(items);
 	}
 
@@ -103,6 +109,11 @@ public class Vector extends Tensor {
 	
 	public void bytecodeGenReset() {
 		this.indexLVT = -1;
+	}
+	
+	@Override
+	public Expr getParent() {
+		return this.parent;
 	}
 	
 	public static void main(String[] args) {
