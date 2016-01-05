@@ -32,10 +32,10 @@ public class GraphBuilder {
 	
 	public static Node helper(Expr expr) {
 		Expr[] args = expr.args();
-		if(args == null || args.length == 0) 
-			return null;
 		Node ret = new Node();
 		ret.expr = expr.clone();
+		if(args == null || args.length == 0) 
+			return ret;
 
 		Symbols ss = new Symbols("__x");
 		int idx = 0;

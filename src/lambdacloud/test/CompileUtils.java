@@ -50,7 +50,10 @@ public class CompileUtils {
 			LCArray output = LCArray.getDoubleArray("output");
 			cg = _compileVec(name, expr, output, args);
 			ir.type = FUNC_TYPE.BATCH; //BytecodeBatchFunc
-			ir.outAryLen = expr.getTypeInfo().dim[0];
+			if(expr.getType() == TYPE.VECTOR)
+				ir.outAryLen = expr.getTypeInfo().dim[0];
+			else if(expr.getType() == TYPE.MATRIX)
+				ir.outAryLen = expr.getTypeInfo().dim[0]*expr.getTypeInfo().dim[1];
 			ir.numArgs = args.length;
 			
 			//only for test purpose

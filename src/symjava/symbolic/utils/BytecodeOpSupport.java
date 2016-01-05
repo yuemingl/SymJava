@@ -15,6 +15,18 @@ public class BytecodeOpSupport {
 		return new Jama.Matrix(data, len);
 	}
 	
+	//-------------Math functions for Jama.Matrix----------------
+	
+	public static Jama.Matrix sin(Jama.Matrix arg) {
+		double[][] data = arg.getArray();
+		for(int i=0; i<data.length; i++) {
+			for(int j=0; j<data[0].length; j++) {
+				data[i][j] = Math.sin(data[i][j]);
+			}
+		}
+		return arg;
+	}
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 

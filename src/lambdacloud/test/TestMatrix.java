@@ -1,7 +1,5 @@
 package lambdacloud.test;
 
-import static symjava.symbolic.Symbol.x;
-import static symjava.symbolic.Symbol.y;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +11,6 @@ import lambdacloud.core.graph.GraphBuilder;
 import lambdacloud.core.graph.Node;
 import lambdacloud.core.lang.LCDevice;
 import symjava.bytecode.BytecodeBatchFunc;
-import symjava.bytecode.BytecodeFunc;
 import symjava.matrix.SymMatrix;
 import symjava.matrix.SymVector;
 import symjava.symbolic.Concat;

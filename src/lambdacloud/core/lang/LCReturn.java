@@ -50,7 +50,7 @@ public class LCReturn extends LCBase {
 			il.append(InstructionConstants.RETURN);
 		
 		InstructionHandle startPos = arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		if(arg.getType() == TYPE.VECTOR) {
+		if(arg.getType() == TYPE.MATRIX || arg.getType() == TYPE.VECTOR) {
 			//Copy results to outAry
 			LocalVariableGen lg = mg.addLocalVariable("l_ret_len",
 					Type.INT, null, null);
