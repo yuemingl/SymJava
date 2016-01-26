@@ -14,7 +14,6 @@ import static symjava.math.SymMath.*;
 public class TestMath {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		Matrix A = new Matrix("A",4,4);
 		Map<String, double[]> dict = new HashMap<String, double[]>();
 		/*
@@ -28,7 +27,8 @@ public class TestMath {
 		
 		CloudConfig.setGlobalTarget("job_local.conf");
 		//Node n = GraphBuilder.build(A);
-		Node n = GraphBuilder.build(sin(A));
+		//Node n = GraphBuilder.build(sin(A));
+		Node n = GraphBuilder.build(abs(A));
 		Session sess1 = new Session();
 		CloudSD rlt = sess1.runVec(n, dict);
 		System.out.println("------------");

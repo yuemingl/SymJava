@@ -26,6 +26,16 @@ public class BytecodeOpSupport {
 		}
 		return arg;
 	}
+
+	public static Jama.Matrix abs(Jama.Matrix arg) {
+		double[][] data = arg.getArray();
+		for(int i=0; i<data.length; i++) {
+			for(int j=0; j<data[0].length; j++) {
+				data[i][j] = Math.abs(data[i][j]);
+			}
+		}
+		return arg;
+	}
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

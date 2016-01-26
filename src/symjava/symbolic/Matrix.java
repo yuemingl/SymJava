@@ -90,7 +90,8 @@ public class Matrix extends Tensor {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		if(indexLVT == -1) {
+		// Create an instance of Jama.Matrix and store it to local variable index with this.indexLVT
+		if(indexLVT == -1) { 
 			//jama.Matrix l_m = null;
 			LocalVariableGen lg = mg.addLocalVariable("l_"+getLabel(),
 					new ObjectType("Jama.Matrix"), null, null);
@@ -122,7 +123,9 @@ public class Matrix extends Tensor {
 			//jama.Matrix l_m = new jama.Matrix(args[], nRow);
 			lg.setStart(il.append(new ASTORE(indexLVT)));
 		}
+		// Retrun the local reference of the matrix
 		return il.append(new ALOAD(indexLVT));
+		
 		//For test purpose
 		//il.append(new ALOAD(indexLVT));
 		//il.append(new PUSH(cp, 1.0));

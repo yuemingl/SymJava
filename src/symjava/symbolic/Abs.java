@@ -8,8 +8,10 @@ import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.ObjectType;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.UnaryOp;
 import symjava.symbolic.utils.Utils;
 
@@ -52,11 +54,19 @@ public class Abs extends UnaryOp {
 			ConstantPoolGen cp, InstructionFactory factory,
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
-		arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		return  il.append(factory.createInvoke("java.lang.Math", "abs",
-				Type.DOUBLE, 
-				new Type[] { Type.DOUBLE },
-		Constants.INVOKESTATIC));
+		InstructionHandle startPos = arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		if(arg.getType() == TYPE.MATRIX || arg.getType() == TYPE.VECTOR) {
+			il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeOpSupport", "abs",
+					new ObjectType("Jama.Matrix"), 
+					new Type[] { new ObjectType("Jama.Matrix") },
+					Constants.INVOKESTATIC));
+		} else {
+			il.append(factory.createInvoke("java.lang.Math", "abs",
+					Type.DOUBLE, 
+					new Type[] { Type.DOUBLE },
+					Constants.INVOKESTATIC));
+		}
+		return startPos;
 	}
 
 	@Override
