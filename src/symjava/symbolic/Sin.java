@@ -63,12 +63,12 @@ public class Sin extends UnaryOp {
 			il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeOpSupport", "sin",
 					new ObjectType("Jama.Matrix"), 
 					new Type[] { new ObjectType("Jama.Matrix") },
-			Constants.INVOKESTATIC));
+					Constants.INVOKESTATIC));
 		} else {
 			il.append(factory.createInvoke("java.lang.Math", "sin",
 					Type.DOUBLE, 
 					new Type[] { Type.DOUBLE },
-			Constants.INVOKESTATIC));
+					Constants.INVOKESTATIC));
 		}
 		return startPos;
 	}

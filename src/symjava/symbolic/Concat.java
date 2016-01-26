@@ -19,6 +19,10 @@ import com.sun.org.apache.bcel.internal.generic.ObjectType;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
+/**
+ * Concatenate symbol matrices or vectors with the same dimension(s)
+ * 
+ */
 public class Concat extends NaryOp {
 
 	public Concat(Expr ...args) {

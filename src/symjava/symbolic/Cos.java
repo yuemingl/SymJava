@@ -2,6 +2,7 @@ package symjava.symbolic;
 
 import java.util.Map;
 
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.UnaryOp;
 import symjava.symbolic.utils.Utils;
 
@@ -11,13 +12,13 @@ import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.ObjectType;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class Cos extends UnaryOp {
 	public Cos(Expr arg) {
 		super(arg);
-		label = "cos(" + arg + ")";
-		sortKey = label;
+		updateLabel();
 	}
 
 	@Override
@@ -58,10 +59,24 @@ public class Cos extends UnaryOp {
 			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
 			Map<Expr, Integer> funcRefsMap) {
 		InstructionHandle startPos = arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		il.append(factory.createInvoke("java.lang.Math", "cos",
-				Type.DOUBLE, 
-				new Type[] { Type.DOUBLE },
-		Constants.INVOKESTATIC));
+		if(arg.getType() == TYPE.MATRIX || arg.getType() == TYPE.VECTOR) {
+			il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeOpSupport", "cos",
+					new ObjectType("Jama.Matrix"), 
+					new Type[] { new ObjectType("Jama.Matrix") },
+					Constants.INVOKESTATIC));
+		} else {
+			il.append(factory.createInvoke("java.lang.Math", "cos",
+					Type.DOUBLE, 
+					new Type[] { Type.DOUBLE },
+					Constants.INVOKESTATIC));
+		}
+		
 		return startPos;
+	}
+
+	@Override
+	public void updateLabel() {
+		label = "cos(" + arg + ")";
+		sortKey = label;
 	}
 }
