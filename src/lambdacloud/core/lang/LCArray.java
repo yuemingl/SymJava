@@ -119,8 +119,8 @@ public abstract class LCArray extends LCVar {
 	}
 
 	@Override
-	public TypeInfo getType() {
-		return TYPE.DOUBLE;
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiDouble;
 	}
 
 	public abstract LCArray get(int index);

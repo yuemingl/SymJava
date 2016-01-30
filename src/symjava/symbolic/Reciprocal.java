@@ -17,8 +17,7 @@ public class Reciprocal extends UnaryOp {
 
 	public Reciprocal(Expr base) {
 		super(base);
-		label =  "1/" +  SymPrinting.addParenthsesIfNeeded(base, this);		
-		sortKey = base.getSortKey();
+		updateLabel();
 	}
 	
 	@Override
@@ -81,10 +80,11 @@ public class Reciprocal extends UnaryOp {
 		il.append(InstructionConstants.DDIV);
 		return startPos;
 	}
-	
-	
+
 	@Override
-	public TypeInfo getType() {
-		return TYPE.DOUBLE;
+	public void updateLabel() {
+		label =  "1/" +  SymPrinting.addParenthsesIfNeeded(arg, this);		
+		sortKey = arg.getSortKey();
 	}
+	
 }

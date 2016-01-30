@@ -11,13 +11,18 @@ import com.sun.org.apache.bcel.internal.generic.PUSH;
 
 import symjava.symbolic.utils.Utils;
 
+/**
+ * A SymReal object is a symbolic representation of a real number
+ *
+ * @param <T>
+ */
 public class SymReal<T extends Number> extends Expr {
 	protected T value;
 	
 	public SymReal(T val) {
 		this.value = val;
-		updateLabel();
 		isSimplified = true;
+		updateLabel();
 	}
 
 	public T getValue() {
@@ -124,18 +129,16 @@ public class SymReal<T extends Number> extends Expr {
 
 	@Override
 	public TypeInfo getTypeInfo() {
-		TypeInfo ti = new TypeInfo();
 		if(value instanceof Double)
-			ti.type = TYPE.DOUBLE;
+			return TypeInfo.tiDouble;
 		else if(value instanceof Integer)
-			ti.type = TYPE.INT;
+			return TypeInfo.tiInt;
 		else if(value instanceof Long)
-			ti.type = TYPE.LONG;
+			return TypeInfo.tiLong;
 		else if(value instanceof Float)
-			ti.type = TYPE.FLOAT;
+			return TypeInfo.tiFloat;
 		else 
 			throw new RuntimeException();
-		return ti;
 	}
 
 	@Override

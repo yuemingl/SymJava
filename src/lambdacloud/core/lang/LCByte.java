@@ -8,7 +8,7 @@ public class LCByte extends LCVar {
 	}
 
 	@Override
-	public TypeInfo getType() {
-		return TYPE.BYTE;
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiByte;
 	}
 }

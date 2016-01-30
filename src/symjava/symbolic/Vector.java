@@ -100,9 +100,7 @@ public class Vector extends Tensor {
 	
 	@Override
 	public TypeInfo getTypeInfo() {
-		TypeInfo ti = new TypeInfo();
-		ti.type = TYPE.VECTOR;
-		ti.dim = new int[1];
+		TypeInfo ti = new TypeInfo(TYPE.VECTOR, new int[1]);
 		ti.dim[0] = nDim;
 		return ti;
 	}

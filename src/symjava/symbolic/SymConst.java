@@ -52,12 +52,17 @@ public class SymConst extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
-		return TYPE.DOUBLE;
-	}
-	
-	@Override
 	public Expr[] args() {
 		return new Expr[0];
-	}	
+	}
+
+	@Override
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiDouble;
+	}
+
+	@Override
+	public void updateLabel() {
+		//Do nothing
+	}
 }

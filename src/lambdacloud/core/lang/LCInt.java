@@ -9,8 +9,8 @@ public class LCInt extends LCVar {
 	}
 	
 	@Override
-	public TypeInfo getType() {
-		return TYPE.INT;
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiInt;
 	}
 	
 	public LCInc inc() {

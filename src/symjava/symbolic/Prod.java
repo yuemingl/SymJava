@@ -1,6 +1,7 @@
 package symjava.symbolic;
 
 /**
+ * TODO
  * a*b*c*d...
  *
  */
@@ -25,15 +26,21 @@ public class Prod extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
+	public Expr[] args() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Expr[] args() {
+	public TypeInfo getTypeInfo() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

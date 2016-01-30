@@ -17,11 +17,14 @@ import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
+/**
+ * a % b
+ *
+ */
 public class Remainder extends BinaryOp {
 	public Remainder(Expr arg1, Expr arg2) {
 		super(arg1, arg2);
-		this.label = arg1+"%"+arg2;
-		this.sortKey = this.label;
+		updateLabel();
 	}
 
 	@Override
@@ -31,13 +34,13 @@ public class Remainder extends BinaryOp {
 
 	@Override
 	public boolean symEquals(Expr other) {
+		//TODO
 		return false;
 	}
 
 	@Override
 	public Expr diff(Expr expr) {
-		//???
-		return this;
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
@@ -61,5 +64,11 @@ public class Remainder extends BinaryOp {
 		else
 			il.append(IREM);
 		return startPos;
+	}
+
+	@Override
+	public void updateLabel() {
+		this.label = arg1+"%"+arg2;
+		this.sortKey = this.label;
 	}
 }

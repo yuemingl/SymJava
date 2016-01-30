@@ -250,9 +250,7 @@ public class Multiply extends BinaryOp {
 				return arg2.getTypeInfo();
 			else if(arg2.getType() == TYPE.MATRIX) {
 				//A_mn * B_nl = C_ml
-				TypeInfo ti = new TypeInfo();
-				ti.type = TYPE.MATRIX;
-				ti.dim = new int[2];
+				TypeInfo ti = new TypeInfo(TYPE.MATRIX, new int[2]);
 				ti.dim[0] = arg1.getTypeInfo().dim[0];
 				ti.dim[1] = arg2.getTypeInfo().dim[1];
 				return ti;
@@ -260,8 +258,7 @@ public class Multiply extends BinaryOp {
 				return arg1.getTypeInfo(); //matrix * scalar?
 		}
 		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
-		TypeInfo tyi = new TypeInfo();
-		tyi.type = ty;
+		TypeInfo tyi = new TypeInfo(ty);
 		return tyi;
-	}	
+	}
 }

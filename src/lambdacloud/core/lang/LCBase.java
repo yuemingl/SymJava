@@ -23,7 +23,7 @@ public abstract class LCBase extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
+	public TypeInfo getTypeInfo() {
 		throw new UnsupportedOperationException();
 	}
 

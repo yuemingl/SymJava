@@ -134,9 +134,7 @@ public class Matrix extends Tensor {
 
 	@Override
 	public TypeInfo getTypeInfo() {
-		TypeInfo ti = new TypeInfo();
-		ti.type = TYPE.MATRIX;
-		ti.dim = new int[2];
+		TypeInfo ti = new TypeInfo(TYPE.MATRIX, new int[2]);
 		ti.dim[0] = this.nRow;
 		ti.dim[1] = this.nCol;
 		return ti;

@@ -8,7 +8,7 @@ public class LCBoolean extends LCVar {
 	}
 	
 	@Override
-	public TypeInfo getType() {
-		return TYPE.BOOLEAN;
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiBoolean;
 	}
 }

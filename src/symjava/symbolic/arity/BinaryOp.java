@@ -32,11 +32,9 @@ public abstract class BinaryOp extends Expr {
 
 	@Override
 	public TypeInfo getTypeInfo() {
-		//TODO make it support matrix and vector and tensor?
+		//TODO make it support matrix, vector and tensor?
 		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
-		TypeInfo tyi = new TypeInfo();
-		tyi.type = ty;
-		return tyi;
+		return new TypeInfo(ty);
 	}
 	
 	public Expr setArg(int index, Expr arg) {

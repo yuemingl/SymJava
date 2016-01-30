@@ -10,6 +10,10 @@ import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
+/**
+ * Represents a random number in the range [0.0, 1.0]
+ *
+ */
 public class SymRandom extends Expr {
 	public SymRandom() {
 		this.label = "random()";
@@ -33,9 +37,7 @@ public class SymRandom extends Expr {
 
 	@Override
 	public TypeInfo getTypeInfo() {
-		TypeInfo ti = new TypeInfo();
-		ti.type = TYPE.DOUBLE;
-		return ti;
+		return TypeInfo.tiDouble;
 	}
 	
 	@Override

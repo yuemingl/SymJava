@@ -183,6 +183,9 @@ public class TestMatrix {
 			System.out.println(d);
 	}
 	
+	/**
+	 * Automatic data dict split for matrices and vectors
+	 */
 	public static void test7() {
 		int dim = 4;
 		Matrix A = new Matrix("A", dim, dim);
@@ -191,11 +194,12 @@ public class TestMatrix {
 
 		SymMatrix AA = A.split(2, 2);
 		SymVector xx = x.split(2);
+		//yy = AA * xx
 		SymVector yy = (SymVector)(AA*xx);
 		System.out.println(yy);
 		yy[0].runOn(new LCDevice("/cpu:0"));
 		yy[1].runOn(new LCDevice("/cpu:0"));
-		
+		// res = yy + y0
 		Expr res = new Concat(yy[0],yy[1])+y0;
 		
 		Map<String, double[]> dict = new HashMap<String, double[]>();

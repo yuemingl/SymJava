@@ -9,7 +9,7 @@ public class LCFloat extends LCVar {
 	}
 	
 	@Override
-	public TypeInfo getType() {
-		return TYPE.FLOAT;
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiFloat;
 	}
 }

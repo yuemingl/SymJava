@@ -4,6 +4,7 @@ import java.util.Map;
 
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
+import symjava.symbolic.TypeInfo;
 import symjava.symbolic.utils.BytecodeUtils;
 
 import com.sun.org.apache.bcel.internal.generic.ALOAD;
@@ -75,5 +76,11 @@ public class LCAssign extends LCBase {
 	@Override
 	public Expr[] args() {
 		return new Expr[]{lhs, rhs};
+	}
+
+	@Override
+	public TypeInfo getTypeInfo() {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 }

@@ -46,6 +46,27 @@ public class BytecodeOpSupport {
 		}
 		return arg;
 	}
+	
+	public static Jama.Matrix negate(Jama.Matrix arg) {
+		double[][] data = arg.getArray();
+		for(int i=0; i<data.length; i++) {
+			for(int j=0; j<data[0].length; j++) {
+				data[i][j] = -data[i][j];
+			}
+		}
+		return arg;
+	}
+	
+	public static Jama.Matrix log(double base, Jama.Matrix arg) {
+		double[][] data = arg.getArray();
+		for(int i=0; i<data.length; i++) {
+			for(int j=0; j<data[0].length; j++) {
+				data[i][j] = Math.log(data[i][j])/Math.log(base);
+			}
+		}
+		return arg;
+	}
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 

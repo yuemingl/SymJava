@@ -57,8 +57,14 @@ public class And extends BinaryOp implements Logic {
 	}
 	
 	@Override
-	public TypeInfo getType() {
-		return TYPE.INT;
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiInt;
+	}
+
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}	
 	
 }

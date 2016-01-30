@@ -149,8 +149,14 @@ public class Dot extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
+	public TypeInfo getTypeInfo() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}
 }

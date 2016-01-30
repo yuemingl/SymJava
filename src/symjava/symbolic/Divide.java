@@ -23,10 +23,7 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
 public class Divide extends BinaryOp {
 	public Divide(Expr numerator, Expr denominator) {
 		super(numerator, denominator);
-		label =  SymPrinting.addParenthsesIfNeeded(arg1, this) 
-				+ "/" + 
-				SymPrinting.addParenthsesIfNeeded2(arg2, this);
-		sortKey = arg1.getSortKey()+arg2.getSortKey();
+		updateLabel();
 	}
 	
 	public static Expr shallowSimplifiedIns(Expr numerator, Expr denominator) {
@@ -131,5 +128,13 @@ public class Divide extends BinaryOp {
 		else
 			il.append(InstructionConstants.IDIV);
 		return startPos;
+	}
+
+	@Override
+	public void updateLabel() {
+		label =  SymPrinting.addParenthsesIfNeeded(arg1, this) 
+				+ "/" + 
+				SymPrinting.addParenthsesIfNeeded2(arg2, this);
+		sortKey = arg1.getSortKey()+arg2.getSortKey();		
 	}
 }

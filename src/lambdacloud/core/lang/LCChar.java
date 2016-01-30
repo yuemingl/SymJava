@@ -9,7 +9,7 @@ public class LCChar extends LCVar {
 	}
 	
 	@Override
-	public TypeInfo getType() {
-		return TYPE.CHAR;
-	}	
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiChar;
+	}
 }

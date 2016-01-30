@@ -8,7 +8,7 @@ public class LCShort extends LCVar {
 	}
 	
 	@Override
-	public TypeInfo getType() {
-		return TYPE.SHORT;
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiShort;
 	}
 }

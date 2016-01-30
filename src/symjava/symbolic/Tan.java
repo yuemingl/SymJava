@@ -17,8 +17,7 @@ public class Tan extends UnaryOp {
 
 	public Tan(Expr arg) {
 		super(arg);
-		label = "tan(" + arg + ")";
-		sortKey = label;
+		updateLabel();
 	}
 
 	@Override
@@ -65,5 +64,12 @@ public class Tan extends UnaryOp {
 				new Type[] { Type.DOUBLE },
 		Constants.INVOKESTATIC));
 		return startPos;
+	}
+
+	@Override
+	public void updateLabel() {
+		label = "tan(" + arg + ")";
+		sortKey = label;
+		
 	}
 }

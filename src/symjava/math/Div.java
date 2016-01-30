@@ -88,9 +88,15 @@ public class Div extends NaryOp {
 	}
 
 	@Override
-	public TypeInfo getType() {
+	public TypeInfo getTypeInfo() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

@@ -9,7 +9,7 @@ public class LCDouble extends LCVar {
 	}
 
 	@Override
-	public TypeInfo getType() {
-		return TYPE.DOUBLE;
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiDouble;
 	}
 }

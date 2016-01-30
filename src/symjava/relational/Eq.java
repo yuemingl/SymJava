@@ -356,14 +356,20 @@ public class Eq extends BinaryOp implements Relation {
 		return startPos;
 	}
 	
-	@Override
-	public TypeInfo getType() {
-		return TYPE.INT;
-	}
-	
 	public void moveRHS2LHS() {
 		this.arg1 = this.arg1 - this.arg2;
 		this.arg2 = Symbol.C0;
+	}
+	
+	@Override
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiInt;
+	}
+	
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

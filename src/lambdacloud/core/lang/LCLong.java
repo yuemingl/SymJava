@@ -9,7 +9,7 @@ public class LCLong extends LCVar {
 	}
 	
 	@Override
-	public TypeInfo getType() {
-		return TYPE.LONG;
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiLong;
 	}
 }

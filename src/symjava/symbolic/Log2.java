@@ -4,15 +4,16 @@ public class Log2 extends Log {
 
 	public Log2(Expr expr) {
 		super(Expr.valueOf(2), expr);
-		label = "log2(" + expr + ")";
-		sortKey = label;
-	}
-	
-	public String toString() {
-		return "log2(" + arg2 + ")";
+		updateLabel();
 	}
 
 	public static Expr simplifiedIns(Expr expr) {
 		return new Log2(expr);
 	}
+
+	@Override
+	public void updateLabel() {
+		label = "log2(" + arg2 + ")";
+		sortKey = label;
+	}	
 }

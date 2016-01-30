@@ -72,9 +72,16 @@ public class Lt extends BinaryOp implements Relation {
 		return startPos;
 	}	
 	
+	
 	@Override
-	public TypeInfo getType() {
-		return TYPE.INT;
-	}	
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiInt;
+	}
+
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

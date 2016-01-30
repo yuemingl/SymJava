@@ -17,6 +17,14 @@ public class Sum extends Expr {
 	public int end;
 	HashMap<Integer, Expr> cache = new HashMap<Integer, Expr>();
 	
+	/**
+	 * \Sigma_{i=start}^{end}{x_i}
+	 * 
+	 * @param summandTemplate
+	 * @param indexExpr
+	 * @param start
+	 * @param end
+	 */
 	public Sum(Expr summandTemplate, Expr indexExpr, int start, int end) {
  		this.summandTemplate = summandTemplate;
  		this.indexExpr = indexExpr;
@@ -121,15 +129,21 @@ public class Sum extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
+	public Expr[] args() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Expr[] args() {
+	public TypeInfo getTypeInfo() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

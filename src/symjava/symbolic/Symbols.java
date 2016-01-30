@@ -31,8 +31,7 @@ public class Symbols extends Expr {
 	public Symbols(String namePrefix) {
 		this.namePrefix = new Symbol(namePrefix);
 		this.indexExpr = new Symbol("i");
-		this.label = namePrefix + "_" +indexExpr;
-		sortKey = label;
+		updateLabel();
 	}
 	
 	/**
@@ -46,11 +45,7 @@ public class Symbols extends Expr {
 	public Symbols(String namePrefix, Expr indexExpr) {
 		this.namePrefix = new Symbol(namePrefix);
 		this.indexExpr = indexExpr;
-		if(indexExpr instanceof Symbol)
-			this.label = namePrefix + "_" + indexExpr;
-		else
-			this.label = namePrefix + "_{" + indexExpr+"}";
-		sortKey = label;
+		updateLabel();
 	}
 	
 	public Symbol get(int index) {
@@ -153,15 +148,24 @@ public class Symbols extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
+	public Expr[] args() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Expr[] args() {
+	public TypeInfo getTypeInfo() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void updateLabel() {
+		if(indexExpr instanceof Symbol)
+			this.label = namePrefix + "_" + indexExpr;
+		else
+			this.label = namePrefix + "_{" + indexExpr+"}";
+		sortKey = label;
 	}
 
 }

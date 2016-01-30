@@ -17,7 +17,7 @@ import com.sun.org.apache.bcel.internal.generic.PUSH;
  * An object of Symbol has a string name which is its unique id,
  * just like the name of a variable in Java.
  * 
- * Two objects of Symbol with the same name are the same thing in SymJava. 
+ * Two Symbol objects with the same name are treated as the same thing. 
  * 
  * @see symEquals()
  * 
@@ -156,9 +156,7 @@ public class Symbol extends Expr {
 	
 	@Override
 	public TypeInfo getTypeInfo() {
-		TypeInfo ti = new TypeInfo();
-		ti.type = TYPE.DOUBLE;
-		return ti;
+		return TypeInfo.tiDouble;
 	}
 
 	@Override

@@ -1,9 +1,11 @@
 package symjava.symbolic;
 
-import java.util.List;
-
 import symjava.symbolic.utils.Utils;
 
+/**
+ * TODO
+ * 
+ */
 public class SymComplex extends Expr {
 	Expr real;
 	Expr imaginary;
@@ -45,13 +47,19 @@ public class SymComplex extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
+	public TypeInfo getTypeInfo() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public Expr[] args() {
 		return new Expr[] {real, imaginary};
+	}
+
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}	
 
 }

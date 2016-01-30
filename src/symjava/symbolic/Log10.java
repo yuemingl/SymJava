@@ -5,16 +5,17 @@ public class Log10 extends Log {
 
 	public Log10(Expr expr) {
 		super(Expr.valueOf(10), expr);
-		label = "log10(" + expr + ")";
-		sortKey = label;
+		updateLabel();
 	}
-	
-	public String toString() {
-		return "log10(" + arg2 + ")";
-	}
-	
 	
 	public static Expr simplifiedIns(Expr expr) {
 		return new Log10(expr);
 	}
+
+	@Override
+	public void updateLabel() {
+		label = "log10(" + arg2 + ")";
+		sortKey = label;
+	}
+
 }

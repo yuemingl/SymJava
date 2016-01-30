@@ -17,17 +17,16 @@ public class Integrate extends Expr {
 	public Expr integrand = null;
 	public Domain domain = null;
 	
+	/**
+	 * \int_{domain}{integrand}
+	 * 
+	 * @param integrand
+	 * @param domain
+	 */
 	public Integrate(Expr integrand, Domain domain) {
 		this.integrand = integrand;
 		this.domain = domain;
-		String postfix = "d" + Utils.joinLabels(domain.getCoordVars(),"d");
-		if(domain instanceof Interval) {
-			Interval o = (Interval)domain;
-			this.label = "\\int_{"+o.getStart()+"}^{"+o.getEnd()+"}{"+integrand+"}" + postfix;
-		}
-		else
-			this.label = "\\int_{"+domain+"}{"+integrand+"}" + postfix;
-		this.sortKey = integrand.toString()+domain.toString();
+		updateLabel();
 	}
 	
 	public String toString() {
@@ -104,14 +103,26 @@ public class Integrate extends Expr {
 	}
 
 	@Override
-	public TypeInfo getType() {
-		return TYPE.DOUBLE;
+	public Expr[] args() {
+		//DOTO
+		return integrand.args();
 	}
 
 	@Override
-	public Expr[] args() {
-		// TODO Auto-generated method stub
+	public TypeInfo getTypeInfo() {
 		return null;
+	}
+
+	@Override
+	public void updateLabel() {
+		String postfix = "d" + Utils.joinLabels(domain.getCoordVars(),"d");
+		if(domain instanceof Interval) {
+			Interval o = (Interval)domain;
+			this.label = "\\int_{"+o.getStart()+"}^{"+o.getEnd()+"}{"+integrand+"}" + postfix;
+		}
+		else
+			this.label = "\\int_{"+domain+"}{"+integrand+"}" + postfix;
+		this.sortKey = integrand.toString()+domain.toString();
 	}
 
 }

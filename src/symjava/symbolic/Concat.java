@@ -75,9 +75,7 @@ public class Concat extends NaryOp {
 	
 	@Override
 	public TypeInfo getTypeInfo() {
-		TypeInfo ti = new TypeInfo();
-		ti.type = TYPE.VECTOR;
-		ti.dim = new int[1];
+		TypeInfo ti = new TypeInfo(TYPE.VECTOR, new int[1]);
 		for(int i=0; i<args.length; i++)
 			ti.dim[0] += args[i].getTypeInfo().dim[0];
 		return ti;

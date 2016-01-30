@@ -40,9 +40,9 @@ public class LCLength extends LCBase {
 	}
 	
 	@Override
-	public TypeInfo getType() {
-		return TYPE.INT;
-	}	
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiInt;
+	}
 	
 	@Override
 	public Expr[] args() {
