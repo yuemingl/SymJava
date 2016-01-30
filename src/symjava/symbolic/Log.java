@@ -8,12 +8,19 @@ import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.ObjectType;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
 import symjava.math.SymMath;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
+/**
+ * logarithm
+ * 
+ * log(A): if A is a matrix do element wise log
+ *
+ */
 public class Log extends BinaryOp {
 	
 	/**
@@ -22,8 +29,8 @@ public class Log extends BinaryOp {
 	 */
 	public Log(Expr expr) {
 		super(SymMath.E, expr);
-		label = "log(" + expr + ")";
-		sortKey = label;
+		updateLabel();
+
 	}
 	
 	/**
@@ -41,7 +48,7 @@ public class Log extends BinaryOp {
 		if(!arg1.symEquals(SymMath.E))
 			return "log(" + arg1 + "," + arg2 + ")";
 		else
-			return "log(" + arg2 + ")";
+			return label;
 	}
 	
 	public static Expr simplifiedIns(Expr base, Expr expr) {
@@ -100,8 +107,25 @@ public class Log extends BinaryOp {
 			Map<Expr, Integer> funcRefsMap) {
 		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
-		il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
-				Type.DOUBLE, new Type[] { Type.DOUBLE,  Type.DOUBLE }, Constants.INVOKESTATIC));
+		if(arg2.getType() == TYPE.MATRIX || arg2.getType() == TYPE.VECTOR) {
+			il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeOpSupport", "log",
+					new ObjectType("Jama.Matrix"), 
+					new Type[] { Type.DOUBLE, new ObjectType("Jama.Matrix") },
+					Constants.INVOKESTATIC));
+		} else {
+			il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
+					Type.DOUBLE, new Type[] { Type.DOUBLE,  Type.DOUBLE }, Constants.INVOKESTATIC));
+		}
+		
 		return startPos;
+	}
+
+	@Override
+	public void updateLabel() {
+		if(arg1.symEquals(SymMath.E))
+			label = "log(" + arg2 + ")";
+		else
+			label = "log_{"+arg1+"}(" + arg2 + ")";
+		sortKey = label;
 	}
 }
