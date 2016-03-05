@@ -50,6 +50,8 @@ public class CloudFunc extends LCBase {
 	protected FUNC_TYPE funcType; 
 	protected IR funcIR = null;
 	
+	int device;
+	
 	public CloudFunc(String name) {
 		this.name = name;
 	}
@@ -65,11 +67,6 @@ public class CloudFunc extends LCBase {
 	}
 	
 	public CloudFunc(Expr[] args, Expr expr) {
-		this.name = generateName();
-		this.compile(args, expr);
-	}
-	
-	public CloudFunc(LCVar[] args, Expr[] expr) {
 		this.name = generateName();
 		this.compile(args, expr);
 	}
@@ -93,13 +90,13 @@ public class CloudFunc extends LCBase {
 		this.compile(args, expr);
 	}
 	
-	public CloudFunc(CloudConfig config, LCVar[] args, Expr expr) {
+	public CloudFunc(CloudConfig config, Expr[] args, Expr expr) {
 		this.name = generateName();
 		this.localConfig = config;
 		this.compile(args, expr);
 	}
 	
-	public CloudFunc(CloudConfig config, LCVar[] args, Expr[] expr) {
+	public CloudFunc(CloudConfig config, Expr[] args, Expr[] expr) {
 		this.name = generateName();
 		this.localConfig = config;
 		this.compile(args, expr);
@@ -181,27 +178,34 @@ public class CloudFunc extends LCBase {
 	
 	public CloudFunc compile(Expr[] args, Expr expr) {
 		Expr compileExpr = expr;
+		
+		this.device = Integer.parseInt(expr.getDevice().name);
+		System.out.println("CloudFunc: compile " + expr + ", send to device: " + expr.getDevice().name);
+		
+		CloudConfig config = currentCloudConfig();
+		config.useClient(config.getClientByIndex(this.device));
+
 		//TODO Do we need LCReturn? It depends on how the compile function treat the return value of an expr
 		if(!(expr instanceof LCBase)) {
 			compileExpr = new LCReturn(expr);
 		}
 		
 		
-		if(currentCloudConfig().isLocal()) {
+		if(config.isLocal()) {
 			funcType = FUNC_TYPE.SCALAR;
 			func = CompileUtils.compile(name, compileExpr, args);
 			//func = JIT.compile(args, expr);
 			
 		} else {
-			//send the exprssion to the server
+			//send the expression to the server
 			this.funcIR = CompileUtils.getIR(name, compileExpr, args);
 			this.funcType = funcIR.type;
 			this.outAryLen = funcIR.outAryLen;
 			this.numArgs = funcIR.numArgs;
 
 			//funcIR = JIT.getIR(name, args, expr);
-			CloudFuncHandler handler = currentCloudConfig().currentClient().getCloudFuncHandler();
-			Channel ch = currentCloudConfig().currentClient().getChannel();
+			CloudFuncHandler handler = config.currentClient().getCloudFuncHandler();
+			Channel ch = config.currentClient().getChannel();
 			try {
 				ch.writeAndFlush(this).sync();
 			} catch (InterruptedException e) {
@@ -237,12 +241,21 @@ public class CloudFunc extends LCBase {
 	}
 	
 	public void apply(CloudSD output, CloudSD ...inputs) {
-		output.useCloudConfig(currentCloudConfig());
-		for(int i=0; i<inputs.length; i++) 
-			inputs[i].useCloudConfig(currentCloudConfig());
+		
+		CloudConfig config = currentCloudConfig();
+		config.useClient(config.getClientByIndex(this.device));
+		
+		output.useCloudConfig(config);
+		
+		//for input see the priority of cloud config
+		//TODO need better implementation for the priority in CloudSD
+		for(int i=0; i<inputs.length; i++) {
+			inputs[i].currentCloudConfig();
+			inputs[i].useCloudConfig(config);
+		}
 		
 		if(this.clazz != null) {
-			if(currentCloudConfig().isLocal()) {
+			if(config.isLocal()) {
 				try {
 					Object ret = method.invoke(this.clazz.newInstance(), inputs[0].getData());
 					output.resize(1);
@@ -253,7 +266,7 @@ public class CloudFunc extends LCBase {
 				return;
 			}
 		}
-		if(currentCloudConfig().isLocal()) {
+		if(config.isLocal()) {
 			if(this.clazz != null) {
 				Double val1;
 				try {
@@ -283,6 +296,7 @@ public class CloudFunc extends LCBase {
 				double d;
 				switch(funcType) {
 				case SCALAR:
+					//TODO Support multiple CloudSD inputs
 					data = inputs[0].getData();
 					d = func.apply(data);
 					output.resize(1);
@@ -308,7 +322,7 @@ public class CloudFunc extends LCBase {
 					inputs[i].storeToCloud();
 				}
 			
-			CloudClient client = currentCloudConfig().currentClient();
+			CloudClient client = config.currentClient();
 			CloudVarHandler handler = client.getCloudVarHandler();
 			try {
 				CloudQuery qry = new CloudQuery();
