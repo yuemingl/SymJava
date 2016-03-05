@@ -1,5 +1,7 @@
 package lambdacloud.core;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import io.netty.channel.Channel;
 import lambdacloud.core.lang.LCAssign;
 import lambdacloud.net.CloudQuery;
@@ -42,6 +44,8 @@ import symjava.symbolic.utils.Utils;
  *
  */
 public class CloudSD extends Symbol {
+	private static AtomicInteger cdsVarNameGenerator = new AtomicInteger(0);
+	
 	double[] data = new double[0];
 	boolean isOnCloud = false;
 	protected CloudConfig localConfig = null;
@@ -121,7 +125,7 @@ public class CloudSD extends Symbol {
 	}
 	
 	private static String generateName() {
-		return "CloudSD"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		return "csd"+cdsVarNameGenerator.incrementAndGet();
 	}
 	
 	/**

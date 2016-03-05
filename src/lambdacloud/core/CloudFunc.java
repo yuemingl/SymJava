@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lambdacloud.core.lang.LCBase;
 import lambdacloud.core.lang.LCReturn;
@@ -28,6 +29,8 @@ import symjava.symbolic.utils.FuncClassLoader;
 import symjava.symbolic.utils.JIT;
 
 public class CloudFunc extends LCBase {
+	private static AtomicInteger cfuncNameGenerator = new AtomicInteger(0);
+	
 	public static enum FUNC_TYPE { SCALAR, VECTOR, BATCH }
 	protected String name;
 	protected BytecodeFunc func;
@@ -36,7 +39,7 @@ public class CloudFunc extends LCBase {
 	
 	//Info for BytecodeBatchFunc
 	protected int outAryLen;
-	protected int numArgs;
+	protected int numArgs; //
 
 	protected boolean isOnCloud = false;
 	
@@ -103,7 +106,7 @@ public class CloudFunc extends LCBase {
 	}
 	
 	private static String generateName() {
-		return "CloudFunc"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		return "cfunc"+cfuncNameGenerator.incrementAndGet();
 	}
 	
 	/**
