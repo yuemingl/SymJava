@@ -16,6 +16,25 @@ public class Session {
 		return run(n, dict);
 	}
 	
+	public CloudSD runVec(Expr expr, Map<String, double[]> dict) {
+		CloudConfig.setGlobalTarget("job_local.conf");
+		Node n = GraphBuilder.build(expr);
+		return runVec(n, dict);
+	}
+	
+	/**
+	 * Test for scalar
+	 * The optimization is suitable for matrix and vectors
+	 * @param expr
+	 * @param dict
+	 * @return
+	 */
+	public CloudSD runOpt(Expr expr, Map<String, Double> dict) {
+		CloudConfig.setGlobalTarget("job_local.conf");
+		Node n = GraphBuilder.build(expr);
+		return runOpt(n, dict);
+	}
+	
 	public CloudSD runVec(Node root, Map<String, double[]> dict) {
 		int nArgs = root.args.size();
 		CloudSD[] inputs = new CloudSD[nArgs];
@@ -90,6 +109,38 @@ public class Session {
 		}
 		
 		return output.getData(0);
+	}
+
+	/**
+	 * The run_opt method does not fetch a CloudSD from another server.
+	 * That is to say, only the name is passed to apply() function.
+	 * This avoid to fetch data from different server every time.
+	 * 
+	 * @param root
+	 * @param dict
+	 * @return
+	 */
+	public CloudSD runOpt(Node root, Map<String, Double> dict) {
+		CloudSD[] args = new CloudSD[root.args.size()];
+		for(int i=0; i<root.args.size(); i++) {
+			Double d = dict.get(root.args.get(i).toString());
+			if(d == null) {
+				Node child = root.children.get(root.args.get(i).toString());
+				args[i] = runOpt(child, dict);
+			} else {
+				//for arguments in the dict will be changed to a CloudSD
+				args[i] = new CloudSD().init(new double[]{d});
+			}
+		}
+		CloudSD output = new CloudSD("").resize(1);
+		System.out.print("apply: "+root+" args:[");
+		//Utils.joinLabels(args, ", ");
+		for(int i=0; i<args.length; i++) {
+			System.out.print(args[i].getFullName()+", ");
+		}
+		System.out.println("]");
+		root.cfunc.apply(output, args);
+		return output;
 	}
 	
 	public double runLocal(Expr expr, Map<String, Double> dict) {
