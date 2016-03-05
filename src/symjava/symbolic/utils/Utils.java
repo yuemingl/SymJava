@@ -153,10 +153,18 @@ public class Utils {
 	}
 	
 	public static Expr flattenSortAndSimplify(Expr expr) {
+		//Don't simplify the expr if it is on a device
+		if(expr.getDevice() != null)
+			return expr;
 		List<Expr> addList = flattenAddAndSort(expr);
 		List<Expr> rlt = new ArrayList<Expr>();
 		for(int i=0; i<addList.size(); i++) {
 			Expr e = addList.get(i);
+			//Don't simplify the expr if it is on a device
+			if(e.getDevice() != null) {
+				rlt.add(e);
+				continue;
+			}
 			List<Expr> mulList = flattenMultiplyAndSort(e);
 			if(mulList.size() == 1)
 				rlt.addAll(mulList);
