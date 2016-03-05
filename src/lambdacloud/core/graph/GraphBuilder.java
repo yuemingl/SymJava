@@ -1,6 +1,8 @@
 package lambdacloud.core.graph;
 
+import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
+import lambdacloud.core.lang.LCDevice;
 import lambdacloud.test.CompileUtils;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Matrix;
@@ -27,7 +29,12 @@ public class GraphBuilder {
 		//root.func = CompileUtils.compile(null, root.expr, Utils.extractSymbols(root.expr).toArray(new Expr[0]));
 		root.args = Utils.extractSymbols(root.expr);
 		//root.func = JIT.compile(root.expr);
-		root.cfunc = new CloudFunc(root.args.toArray(new Expr[0]), root.expr);
+		
+		//Use LCDevice directly or use CloudConfig?
+		LCDevice device = root.expr.getDevice();
+		//CloudConfig config = new CloudConfig(device.name);
+		CloudConfig.getGlobalConfig().getClientByIndex(Integer.parseInt(device.name));
+		root.cfunc = new CloudFunc(CloudConfig.getGlobalConfig(), root.args.toArray(new Expr[0]), root.expr);
 	}
 	
 	public static Node helper(Expr expr) {
@@ -42,30 +49,33 @@ public class GraphBuilder {
 		for(int i=0; i<args.length; i++) {
 			Node n = helper(args[i]);
 			if(n != null) {
+				//If node n is a device node (run on a device: CPU or GPU),
+				//update the arguments to new symbol names instead of the sub-expressions
+				//The actual arguments need to be evaluated from children field.
 				if(n.isDevice()) {
-					//
 					TypeInfo ti = args[i].getTypeInfo();
 					if(ti.type == TYPE.VECTOR) {
 						Vector arg = new Vector("__vec_"+(idx++), ti.dim[0]);
 						ret.expr.setArg(i, arg);
-						//ret.args.add(arg);
+						//ret.args.add(arg); //added at compile time
 						ret.children.put(arg.toString(), n);
 						
 					} else if(ti.type == TYPE.MATRIX) {
 						Matrix arg = new Matrix("__mat_"+(idx++), ti.dim[0], ti.dim[1]);
 						ret.expr.setArg(i, arg);
-						//ret.args.add(arg);
+						//ret.args.add(arg);//added at compile time
 						ret.children.put(arg.toString(), n);
 					} else {
+						//
 						Symbol arg = ss.get(idx++);
 						ret.expr.setArg(i, arg);
-						//ret.args.add(arg);
+						//ret.args.add(arg);//added at compile time
 						ret.children.put(arg.toString(), n);
 						
 					}
 				} else {
 					ret.expr.setArg(i, n.expr);
-					//ret.args.addAll(n.args);
+					//ret.args.addAll(n.args);//added at compile time
 					ret.children.putAll(n.children);
 				}
 			}
