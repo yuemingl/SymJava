@@ -9,6 +9,12 @@ import java.util.List;
 
 import lambdacloud.net.CloudClient;
 
+/**
+ * A CloudConfig is constructed from a config file
+ * There can be multiple clients in a cloud config object
+ * @author yuemingliu
+ *
+ */
 public class CloudConfig {
 	protected String target = "local";
 	protected static CloudConfig globalConfig = null;
