@@ -535,6 +535,14 @@ abstract public class Expr implements Cloneable {
 		return device;
 	}
 	
+	/**
+	 * Set the argument of the current expression
+	 * Depends on the specific implementation
+	 * 
+	 * @param index The position of the argument
+	 * @param arg The expression of the argument
+	 * @return
+	 */
 	public Expr setArg(int index, Expr arg) {
 		throw new UnsupportedOperationException();
 	}

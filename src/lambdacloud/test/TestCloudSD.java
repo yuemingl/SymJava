@@ -6,6 +6,11 @@ import lambdacloud.core.CloudSD;
 public class TestCloudSD {
 
 	public static void main(String[] args) {
+		//test1();
+		test2();
+	}
+	
+	public static void test1() {
 		CloudConfig.setGlobalTarget("job_aws.conf");
 		
 		// Store var123 to the cloud
@@ -31,6 +36,17 @@ public class TestCloudSD {
 				System.out.println(d);
 			}
 		}
+	}
+	
+	public static void test2() {
+		CloudSD v1 = new CloudSD("csd://127.0.0.1:8322/var1");
+		v1.init(new double[]{1,2,3});
+		System.out.println(v1.getName());
+		System.out.println(v1.getFullName());
+		v1.storeToCloud();
+		v1.fetchToLocal();
+		for(double d : v1.getData())
+			System.out.println(d);
 	}
 
 }
