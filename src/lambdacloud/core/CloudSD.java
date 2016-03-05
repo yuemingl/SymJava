@@ -14,16 +14,25 @@ import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
 /**
- * CSD stands for Cloud Shared Data.
+ * Cloud Shared Data (CloudSD)
  * <br>
- * An instance of CSD represents a shared data set on the cloud server.
+ * An instance of CloudSD represents a shared data set on the cloud server.
  * The data set can be created on local machine and stored to the cloud side.
+ * A data set on the cloud server can be download to local machine by 
+ * providing its name.
  * <br>
- * For example:
+ * 
+ * priority:
+ * 1. csd://ip_address/var_name
+ * 2. useCloudConfig
+ * 3. globalCloudConfig
+ * 
+ * 
+ * <br>
+ * Example:
  * <p><blockquote><pre>
- *     CSD data = new CSD("myvar").init(new double[]{1, 2, 3, 4, 5});
+ *     CloudSD data = new CloudSD("myvar").init(new double[]{1, 2, 3, 4, 5});
  *     data.sotoreToCloud();
- *     //A data set on the cloud server can be download to local machine by providing its name.
  *     if(data.fetchToLocal()) {
  *       for(double d : data.getData()) {
  *         System.out.println(d);
@@ -37,6 +46,9 @@ public class CloudSD extends Symbol {
 	boolean isOnCloud = false;
 	protected CloudConfig localConfig = null;
 	
+	/**
+	 * Construct a CloudSD object with random name
+	 */
 	public CloudSD() {
 		super(generateName());
 	}
@@ -45,6 +57,12 @@ public class CloudSD extends Symbol {
 		super(name);
 	}
 	
+	/**
+	 * Construct a CloudSD object with random name
+	 * based on the given expression
+	 * 
+	 * @param expr
+	 */
 	public CloudSD(Expr expr) {
 		super(generateName());
 		this.compile(this.label, expr);
@@ -187,11 +205,16 @@ public class CloudSD extends Symbol {
 	/**
 	 * Return the name of the cloud variable. The name is the identifier
 	 * of the cloud variable on the cloud server. Any local instance of 
-	 * CloudVar has the same name will be assumed to be the same vaiable 
+	 * CloudSD has the same name will be assumed to be the same variable 
 	 * on the cloud side.
 	 * @return
 	 */
 	public String getName() {
+		String[] arr = this.label.split("/");
+		return arr[arr.length-1];
+	}
+	
+	public String getFullName() {
 		return this.label;
 	}
 	
@@ -203,60 +226,107 @@ public class CloudSD extends Symbol {
 		return data;
 	}
 	
+	private String[] parseName(String name) {
+		if(name.startsWith("csd://")) {
+			String host_ip = this.label.substring(6);
+			host_ip = host_ip.substring(0, host_ip.indexOf('/'));
+			String[] arr = host_ip.split(":");
+			if(arr.length == 2) return arr;
+		}
+		return null;
+	}
+	
 	/**
 	 * Store the local variable to the cloud. 
+	* priority:
+	* 1. csd://ip_address/var_name
+	* 2. useCloudConfig
+	* 3. globalCloudConfig
+	 * TODO change name to store()
 	 */
 	public boolean storeToCloud() {
-		CloudClient client = currentCloudConfig().currentClient();
-		if(!currentCloudConfig().isLocal()) {
-			CloudVarRespHandler handler = client.getCloudVarRespHandler();
+		String[] host_ip = parseName(this.getFullName());
+		if(host_ip != null) {
+			CloudClient c = new CloudClient(host_ip[0], Integer.valueOf(host_ip[1]));
 			try {
-				client.getChannel().writeAndFlush(this).sync();
-			} catch (InterruptedException e) {
+				c.connect();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			CloudVarResp resp = handler.getCloudResp();
-			if(resp.status == 0)
-				this.isOnCloud = true;
-			else
-				this.isOnCloud = false;
+			System.out.println("storeToCloud(): Connected to " + Utils.joinLabels(host_ip,":"));
+			return storeToCloud(c);
+		}
+		CloudClient client = currentCloudConfig().currentClient();
+		if(!currentCloudConfig().isLocal()) {
+			return storeToCloud(client);
 		} else {
 			this.isOnCloud = false;
 		}
 		return this.isOnCloud;
 	}
 	
+	private boolean storeToCloud(CloudClient client) {
+		CloudVarRespHandler handler = client.getCloudVarRespHandler();
+		try {
+			client.getChannel().writeAndFlush(this).sync();
+			CloudVarResp resp = handler.getCloudResp();
+			if(resp.status == 0)
+				this.isOnCloud = true;
+			else
+				this.isOnCloud = false;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	/**
 	 * Fetch a cloud variable to local. The name of the variable 
 	 * on the cloud must be specified. Return true if success.
 	 * Call getData() to access the data in the cloud variable
+	 * TODO change name to fetch()
 	 * @return
 	 */
 	public boolean fetchToLocal() {
+		String[] host_ip = parseName(this.getFullName());
+		if(host_ip != null && host_ip.length == 2) {
+			CloudClient c = new CloudClient(host_ip[0], Integer.valueOf(host_ip[1]));
+			try {
+				c.connect();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			System.out.println("fetchToLocal(): Connected to " + Utils.joinLabels(host_ip,":"));
+			return fetchToLocal(c);
+		}
 		if(currentCloudConfig().isLocal())
 			return true;
 		else {
 			CloudClient client = currentCloudConfig().currentClient();
-			Channel ch = client.getChannel();
-			CloudQuery qry = new CloudQuery();
-			qry.objName = this.getLabel();
-			qry.qryType = CloudQuery.CLOUD_VAR;
-			try {
-				ch.writeAndFlush(qry).sync();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			CloudVarHandler h = client.getCloudVarHandler();
-			
-			while(true) {
-				CloudSD var = h.getCloudVar();
-				this.data = var.data;
-				this.isOnCloud = var.isOnCloud();
-				if(this.data.length > 0)
-					return this.isOnCloud;
-			}
-			//return this.isOnCloud;
+			return fetchToLocal(client);
 		}
+	}
+	
+	private boolean fetchToLocal(CloudClient client) {
+		Channel ch = client.getChannel();
+		CloudQuery qry = new CloudQuery();
+		qry.objName = this.getFullName();
+		qry.qryType = CloudQuery.CLOUD_VAR;
+		try {
+			ch.writeAndFlush(qry).sync();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		CloudVarHandler h = client.getCloudVarHandler();
+		
+		//while(true) {
+			CloudSD var = h.getCloudVar();
+			this.data = var.data;
+			this.isOnCloud = var.isOnCloud();
+			if(this.data.length > 0)
+				return this.isOnCloud;
+			return false;
+		//}
 	}
 	
 	public boolean isOnCloud() {
