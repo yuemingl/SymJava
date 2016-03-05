@@ -329,7 +329,7 @@ public class CloudFunc extends LCBase {
 				qry.qryType = CloudQuery.CLOUD_FUNC_EVAL;
 				qry.objName = name;
 				for(int i=0; i<inputs.length; i++) 
-					qry.argNames.add(inputs[i].getLabel());
+					qry.argNames.add(inputs[i].getFullName());
 				qry.outputName = output.getName();
 				if(this.isAsync)
 					client.getChannel().writeAndFlush(qry);
