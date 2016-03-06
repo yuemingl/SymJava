@@ -40,7 +40,7 @@ public class TestCloudSD {
 	
 	public static void test2() {
 		CloudSD v1 = new CloudSD("csd://127.0.0.1:8322/var1");
-		v1.init(new double[]{1,2,3});
+		v1.init(new double[]{1,2,3,4,5,6,7,8,9,10,11});
 		System.out.println(v1.getName());
 		System.out.println(v1.getFullName());
 		v1.storeToCloud();

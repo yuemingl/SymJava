@@ -29,7 +29,7 @@ public class CloudFuncHandler extends
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx,
 			final CloudFuncResp msg) {
-		System.err.println("messageReceived: CloudFuncResp="+msg);
+		System.err.println("Received CloudFuncResp: "+msg);
 		queue.offer(msg);
 	}
 

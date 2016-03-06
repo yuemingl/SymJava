@@ -129,14 +129,14 @@ public class Session {
 				args[i] = runOpt(child, dict);
 			} else {
 				//for arguments in the dict will be changed to a CloudSD
-				args[i] = new CloudSD().init(new double[]{d});
+				args[i] = new CloudSD(root.args.get(i).toString()).init(new double[]{d});
 			}
 		}
 		CloudSD output = new CloudSD("").resize(1);
-		System.out.print("apply: "+root+" args:[");
+		System.out.print(">>Session eval: "+root+"; args:\n[");
 		//Utils.joinLabels(args, ", ");
 		for(int i=0; i<args.length; i++) {
-			System.out.print(args[i].getFullName()+", ");
+			System.out.println("\t"+args[i]);
 		}
 		System.out.println("]");
 		root.cfunc.apply(output, args);

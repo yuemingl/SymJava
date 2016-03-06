@@ -30,7 +30,7 @@ public class CloudVarRespHandler extends
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx,
 			final CloudVarResp msg) {
-		System.err.println("messageReceived: CloudVarResp="+msg);
+		System.err.println("Received CloudVarResp: "+msg);
 		queue.offer(msg);
 	}
 

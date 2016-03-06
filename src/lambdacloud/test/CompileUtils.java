@@ -130,7 +130,7 @@ public class CompileUtils {
 			for(int i=0; i<args.length; i++) {
 				argsMap.put(args[i].getLabel(), i);
 			}
-			System.out.println(fullClsName);
+			System.out.print(">>CompileUtils: "+fullClsName+": ");
 			StringBuilder sb = new StringBuilder();
 			sb.append("double apply(");
 			for(Expr a : args)

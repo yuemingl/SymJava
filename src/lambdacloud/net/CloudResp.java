@@ -36,6 +36,9 @@ public class CloudResp {
 	}
 	
 	public String toString() {
-		return objName+":"+String.valueOf(status)+" "+message;
+		if(status != 0)
+			return objName+":"+String.valueOf(status)+" "+message;
+		else
+			return objName;
 	}
 }

@@ -215,7 +215,10 @@ public class CloudSD extends Symbol {
 	 */
 	public String getName() {
 		String[] arr = this.label.split("/");
-		return arr[arr.length-1];
+		if(arr.length > 1)
+			return arr[arr.length-1];
+		else
+			return this.label;
 	}
 	
 	public String getFullName() {
@@ -376,10 +379,38 @@ public class CloudSD extends Symbol {
 	}
 	
 	public String toString() {
-		if(this.data.length == 0)
-			return this.getName()+", isOnCloud="+isOnCloud+", No data tranfered";
+		if(this.data.length == 0) {
+			if(isOnCloud)
+				return this.getFullName()+" = [] (on Cloud)";
+			else
+				return this.getFullName()+" = [] (Error?)";
+				
+		}
+		else {
+			if(isOnCloud)
+				return this.getFullName()+" = "+printData()+" (on Cloud & Local)";
+			else
+				return this.getFullName()+" = "+printData()+" (Local)";
+				
+		}
+	}
+	
+	private String printData() {
+		if(data == null || data.length == 0)
+			return "[]";
+		int max = 10;
+		if(data.length < max) max = data.length;
+		StringBuilder sb = new StringBuilder();
+		sb.append("[").append(data[0]);
+		for(int i=1; i<max; i++) {
+			sb.append(", ").append(data[i]);
+		}
+		if(data.length > max)
+			sb.append(", ...]; len="+data.length);
 		else
-			return this.getName()+", isOnCloud="+isOnCloud+", data.length="+this.data.length;
+			sb.append("]");
+		return sb.toString();
 	}
 
 }
+
