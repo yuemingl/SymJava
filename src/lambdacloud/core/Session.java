@@ -67,7 +67,7 @@ public class Session {
 				inputs[i] = new CloudSD(arg.toString()).init(d);
 			}
 		}
-		CloudSD output = new CloudSD();//"output").resize(4); //TODO
+		CloudSD output = new CloudSD("");//"output").resize(4); //TODO
 
 		root.cfunc.apply(output, inputs);
 		System.out.println("run: "+root);

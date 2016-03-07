@@ -197,10 +197,11 @@ public class TestMatrix {
 		//yy = AA * xx
 		SymVector yy = (SymVector)(AA*xx);
 		System.out.println(yy);
-		yy[0].runOn(new LCDevice("/cpu:0"));
-		yy[1].runOn(new LCDevice("/cpu:0"));
+		yy[0].runOn(new LCDevice("2"));
+		yy[1].runOn(new LCDevice("1"));
 		// res = yy + y0
 		Expr res = new Concat(yy[0],yy[1])+y0;
+		res.runOn(new LCDevice("0"));
 		
 		Map<String, double[]> dict = new HashMap<String, double[]>();
 		/*
