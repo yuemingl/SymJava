@@ -11,7 +11,7 @@ import lambdacloud.core.graph.Node;
 import symjava.symbolic.Matrix;
 import static symjava.math.SymMath.*;
 
-public class TestMath {
+public class TestMathFunction {
 
 	public static void main(String[] args) {
 		Matrix A = new Matrix("A",4,4);
