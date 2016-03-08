@@ -214,11 +214,9 @@ public class TestMatrix {
 		dict.put(x.toString(), new double[]{0,1,2,1});
 		dict.put(y0.toString(), new double[]{1,2,3,4});
 		
-		CloudConfig.setGlobalTarget("job_local.conf");
-		Node n = GraphBuilder.build(res);
 		Session sess1 = new Session();
-		CloudSD rlt = sess1.runVec(n, dict);
-		System.out.println("------------");
+		CloudSD rlt = sess1.runVec(res, dict);
+		System.out.println("Test done, fetch data:");
 		for(double d : rlt.getData())
 			System.out.println(d);
 	}

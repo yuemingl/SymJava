@@ -69,13 +69,20 @@ public class Session {
 		}
 		CloudSD output = new CloudSD("");//"output").resize(4); //TODO
 
-		root.cfunc.apply(output, inputs);
-		System.out.println("run: "+root);
-		if(output.fetchToLocal()) {
-			for(double d : output.getData()) {
-				System.out.println(d);
-			}
+		System.out.print(">>Session eval: "+root+"; args:\n[");
+		for(int i=0; i<inputs.length; i++) {
+			System.out.println("\t"+inputs[i]);
 		}
+		System.out.print("]");
+		root.cfunc.apply(output, inputs);
+		if(output.fetchToLocal()) {
+			System.out.print("Return: [");
+			for(double d : output.getData()) {
+				System.out.print(d+" ");
+			}
+			System.out.println("]");
+		}
+		
 		return output;
 	}
 	

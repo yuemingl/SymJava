@@ -260,7 +260,7 @@ public class CloudSD extends Symbol {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			System.out.println("storeToCloud(): Connected to " + Utils.joinLabels(host_ip,":"));
+			System.err.println("storeToCloud(): Connected to " + Utils.joinLabels(host_ip,":"));
 			return storeToCloud(c);
 		}
 		CloudClient client = currentCloudConfig().currentClient();
@@ -303,7 +303,7 @@ public class CloudSD extends Symbol {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			System.out.println("fetchToLocal(): Connected to " + Utils.joinLabels(host_ip,":"));
+			System.err.println("fetchToLocal(): Connected to " + Utils.joinLabels(host_ip,":"));
 			return fetchToLocal(c);
 		}
 		if(currentCloudConfig().isLocal())
