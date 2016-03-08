@@ -1,20 +1,19 @@
 package lambdacloud.test;
 
 import static lambdacloud.core.LambdaCloud.CPU;
-import static lambdacloud.core.LambdaCloud.GPU;
 import static symjava.math.SymMath.sqrt;
-import static symjava.symbolic.Symbol.*;
+import static symjava.symbolic.Symbol.x;
+import static symjava.symbolic.Symbol.y;
+import static symjava.symbolic.Symbol.z;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import symjava.symbolic.Expr;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
 import lambdacloud.core.Session;
-import lambdacloud.core.graph.GraphBuilder;
-import lambdacloud.core.graph.Node;
+import symjava.symbolic.Expr;
 
 public class TestServers {
 
