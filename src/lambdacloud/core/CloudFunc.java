@@ -182,8 +182,10 @@ public class CloudFunc extends LCBase {
 	public CloudFunc compile(Expr[] args, Expr expr) {
 		Expr compileExpr = expr;
 		
-		this.device = Integer.parseInt(expr.getDevice().name);
-		System.out.println("CloudFunc: compile " + expr + ", send to device: " + expr.getDevice().name);
+		this.device = 0;
+		if(null != expr.getDevice())
+			this.device = Integer.parseInt(expr.getDevice().name);
+		//System.out.println("CloudFunc: compile " + expr + ", send to device: " + expr.getDevice().name);
 		
 		CloudConfig config = currentCloudConfig();
 		config.useClient(config.getClientByIndex(this.device));
