@@ -33,6 +33,10 @@ public class GraphBuilder {
 		//Use LCDevice directly or use CloudConfig?
 		LCDevice device = root.expr.getDevice();
 		//CloudConfig config = new CloudConfig(device.name);
+		if(device == null) {
+			device = new LCDevice("0");
+			root.expr.runOn(device);
+		}
 		CloudConfig.getGlobalConfig().getClientByIndex(Integer.parseInt(device.name));
 		root.cfunc = new CloudFunc(CloudConfig.getGlobalConfig(), root.args.toArray(new Expr[0]), root.expr);
 	}
