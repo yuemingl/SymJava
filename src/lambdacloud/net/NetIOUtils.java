@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 import lambdacloud.core.CloudSD;
 
 public class NetIOUtils {
-	public static CloudSD createCloudVar(byte[] data, int nameLen, int dataLen) {
+	public static CloudSD createCloudSD(byte[] data, int nameLen, int dataLen) {
 		String name = null;
 		try {
 			name = new String(data, 0, nameLen, "UTF-8");
@@ -17,7 +17,7 @@ public class NetIOUtils {
 		return new CloudSD(name).init(ddata);
 	}
 	
-	public static CloudSDResp createCloudVarResp(byte[] data, int status, int nameLen, int messageLen) {
+	public static CloudSDResp createCloudSDResp(byte[] data, int status, int nameLen, int messageLen) {
 		CloudSDResp resp = new CloudSDResp();
 		resp.status = status;
 		try {

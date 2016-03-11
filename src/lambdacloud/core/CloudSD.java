@@ -101,10 +101,10 @@ public class CloudSD extends Symbol {
 
 	public CloudSD compile(String name, Expr expr) {
 		if(currentCloudConfig().isLocal()) {
-			CloudSD[] args = Utils.extractCloudVars(expr).toArray(new CloudSD[0]);
+			CloudSD[] args = Utils.extractCloudSDs(expr).toArray(new CloudSD[0]);
 			BytecodeBatchFunc fexpr = JIT.compileBatchFunc(args, expr);
 			data = new double[args[0].size()];
-			fexpr.apply(data, 0, Utils.getDataFromCloudVars(args));
+			fexpr.apply(data, 0, Utils.getDataFromCloudSDs(args));
 		} else {
 			//expr contains server references
 		}
@@ -273,7 +273,7 @@ public class CloudSD extends Symbol {
 	}
 	
 	private boolean storeToCloud(CloudClient client) {
-		CloudSDRespHandler handler = client.getCloudVarRespHandler();
+		CloudSDRespHandler handler = client.getCloudSDRespHandler();
 		try {
 			client.getChannel().writeAndFlush(this).sync();
 			CloudSDResp resp = handler.getCloudResp();
@@ -318,16 +318,16 @@ public class CloudSD extends Symbol {
 		Channel ch = client.getChannel();
 		CloudQuery qry = new CloudQuery();
 		qry.objName = this.getFullName();
-		qry.qryType = CloudQuery.CLOUD_VAR;
+		qry.qryType = CloudQuery.CLOUD_SD;
 		try {
 			ch.writeAndFlush(qry).sync();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		CloudSDHandler h = client.getCloudVarHandler();
+		CloudSDHandler h = client.getCloudSDHandler();
 		
 		//while(true) {
-			CloudSD var = h.getCloudVar();
+			CloudSD var = h.getCloudSD();
 			this.data = var.data;
 			this.isOnCloud = var.isOnCloud();
 			if(this.data.length > 0)

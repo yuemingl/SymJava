@@ -12,7 +12,7 @@ public class CloudSDHandler extends SimpleChannelInboundHandler<CloudSD> {
 
 	final BlockingQueue<CloudSD> queue = new LinkedBlockingQueue<CloudSD>();
 
-	public CloudSD getCloudVar() {
+	public CloudSD getCloudSD() {
 		boolean interrupted = false;
 		try {
 			for (;;) {
@@ -31,7 +31,7 @@ public class CloudSDHandler extends SimpleChannelInboundHandler<CloudSD> {
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, final CloudSD msg) {
-		System.err.println("Received CloudVar: "+msg);
+		System.err.println("Received CloudSD: "+msg);
 		queue.offer(msg);
 	}
 

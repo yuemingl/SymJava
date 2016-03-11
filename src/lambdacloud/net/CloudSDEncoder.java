@@ -34,7 +34,7 @@ public class CloudSDEncoder extends MessageToByteEncoder<CloudSD> {
 		System.arraycopy(buf.array(), 0, allData, nameLen, dataLen);
 
 		// Write a message.
-		out.writeByte((byte) 'V'); // magic number
+		out.writeByte((byte) 'D'); // magic number
 		out.writeInt(nameLen); // name length
 		out.writeInt(var.isOnCloud()?1:0);
 		out.writeInt(dataLen); // data length

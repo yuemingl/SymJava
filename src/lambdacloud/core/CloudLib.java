@@ -127,7 +127,7 @@ public class CloudLib {
 	
 	protected void invokeStatic(String className, String methodName, String[] args, CloudSD output) {
 		CloudClient client = currentCloudConfig().currentClient();
-		CloudSDHandler handler = client.getCloudVarHandler();
+		CloudSDHandler handler = client.getCloudSDHandler();
 		try {
 			CloudQuery qry = new CloudQuery();
 			qry.qryType = CloudQuery.CLOUD_LIB_INVOKE;
@@ -143,7 +143,7 @@ public class CloudLib {
 			e.printStackTrace();
 		}
 		if(!this.isAsync) {
-			CloudSD rlt = handler.getCloudVar(); //blockqueue
+			CloudSD rlt = handler.getCloudSD(); //blockqueue
 			output.setLabel(rlt.getLabel());
 			output.data = rlt.data;
 			output.isOnCloud = rlt.isOnCloud;

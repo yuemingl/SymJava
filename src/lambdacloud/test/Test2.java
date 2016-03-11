@@ -10,7 +10,7 @@ import symjava.symbolic.Expr;
 		for(int i=0; i<10; i++) {
 			f.apply(output, input);
 			Expr update = input + 1.0*output;
-			input = update; //Cast update to type CloudVar
+			input = update; //Cast update to type CloudSD
 		}
 
  *
@@ -42,7 +42,7 @@ public class Test2 {
 		for(int i=0; i<10; i++) {
 			f.apply(output, input);
 			Expr update = input + 1.0*output;
-			input = update; //Cast update to type CloudVar
+			input = update; //Cast update to type CloudSD
 			if(input.fetchToLocal()) {
 				for(double d : input.getData())
 					System.out.println(d);

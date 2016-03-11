@@ -328,7 +328,7 @@ public class CloudFunc extends LCBase {
 				}
 			
 			CloudClient client = config.currentClient();
-			CloudSDHandler handler = client.getCloudVarHandler();
+			CloudSDHandler handler = client.getCloudSDHandler();
 			try {
 				CloudQuery qry = new CloudQuery();
 				qry.qryType = CloudQuery.CLOUD_FUNC_EVAL;
@@ -344,7 +344,7 @@ public class CloudFunc extends LCBase {
 				e.printStackTrace();
 			}
 			if(!this.isAsync) {
-				CloudSD rlt = handler.getCloudVar(); //blockqueue
+				CloudSD rlt = handler.getCloudSD(); //blockqueue
 				output.setLabel(rlt.getLabel());
 				output.data = rlt.data;
 				output.isOnCloud = rlt.isOnCloud;

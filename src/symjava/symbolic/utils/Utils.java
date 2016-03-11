@@ -337,7 +337,7 @@ public class Utils {
 		return rlt;
 	}
 	
-	public static List<CloudSD> extractCloudVars(Expr ...exprs) {
+	public static List<CloudSD> extractCloudSDs(Expr ...exprs) {
 		Set<Expr> set = new HashSet<Expr>();
 		List<Expr> list = new ArrayList<Expr>();
 		for(int i=0; i<exprs.length; i++) {
@@ -358,11 +358,11 @@ public class Utils {
 		return rlt2;
 	}
 	
-	public static double[][] getDataFromCloudVars(CloudSD[] cloudVars) {
-		double[][] rlt = new double[cloudVars.length][];
-		for(int i=0; i<cloudVars.length; i++) {
-			if(cloudVars[i].fetchToLocal())
-				rlt[i] = cloudVars[i].getData();
+	public static double[][] getDataFromCloudSDs(CloudSD[] cloudSDs) {
+		double[][] rlt = new double[cloudSDs.length][];
+		for(int i=0; i<cloudSDs.length; i++) {
+			if(cloudSDs[i].fetchToLocal())
+				rlt[i] = cloudSDs[i].getData();
 		}
 		return rlt;
 	}

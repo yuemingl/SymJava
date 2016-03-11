@@ -42,8 +42,8 @@ public class CloudClientInitializer extends ChannelInitializer<SocketChannel> {
         
         // and then business logic.
         pipeline.addLast("CloudFuncHandler", new CloudFuncHandler());
-        pipeline.addLast("CloudVarHandler", new CloudSDHandler());
-        pipeline.addLast("CloudVarRespHandler", new CloudSDRespHandler());
+        pipeline.addLast("CloudSDHandler", new CloudSDHandler());
+        pipeline.addLast("CloudSDRespHandler", new CloudSDRespHandler());
         
     }
 }

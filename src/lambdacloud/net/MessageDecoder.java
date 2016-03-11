@@ -24,7 +24,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
 		// Check the magic number.
 		int magicNumber = in.readUnsignedByte();
 		// System.err.println("Client: Magic number received: "+(char)magicNumber);
-		if (magicNumber == 'V') { // CloudVar
+		if (magicNumber == 'D') { // CloudSD
 			if (in.readableBytes() < 12) {
 				in.resetReaderIndex();
 				return; // Wait until the whole data is available.
@@ -38,7 +38,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
 			}
 			byte[] decoded = new byte[nameLen + dataLen];
 			in.readBytes(decoded);
-			CloudSD var = NetIOUtils.createCloudVar(decoded, nameLen, dataLen);
+			CloudSD var = NetIOUtils.createCloudSD(decoded, nameLen, dataLen);
 			var.setOnCloudFlag(onCloudFlag == 1 ? true : false);
 			out.add(var);
 			// System.out.println("decoded:"+var.getLabel());
@@ -58,7 +58,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
 			byte[] decoded = new byte[nameLen + messageLen];
 			in.readBytes(decoded);
 			if (respType == 1)
-				out.add(NetIOUtils.createCloudVarResp(decoded, status, nameLen,
+				out.add(NetIOUtils.createCloudSDResp(decoded, status, nameLen,
 						messageLen));
 			else if (respType == 2)
 				out.add(NetIOUtils.createCloudFuncResp(decoded, status,

@@ -85,8 +85,8 @@ public class TestLCBuilder {
 
 	public static void test() {
 //		LC cloudTask = new LC("local");
-//		CloudVar x = cloudTask.declareDouble("x");
-//		CloudVar y = cloudTask.declareDouble("y");
+//		CloudSD x = cloudTask.declareDouble("x");
+//		CloudSD y = cloudTask.declareDouble("y");
 //		CSD output1 = cloudTask.declareCSD("output1");
 //		CSD output2 = cloudTask.declareCSD("output2");
 //		
@@ -95,8 +95,8 @@ public class TestLCBuilder {
 //		//assign is not supported for CSD?
 //		cloudTask.append(output1.assign(sqrt(x*x+y*y)));
 //
-//		CloudVar i = cloudTask.declareInt("i");
-//		CloudVar sum = cloudTask.declareDouble("sum");
+//		CloudSD i = cloudTask.declareInt("i");
+//		CloudSD sum = cloudTask.declareDouble("sum");
 //		
 //		//for(i=0; i<10; i++) {
 //		CloudLoop loop = cloudTask.forLoop(i.assign(0), Lt.apply(i, 10), i.assign(i+1));

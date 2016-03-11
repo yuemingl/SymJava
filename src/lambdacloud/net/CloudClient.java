@@ -24,8 +24,8 @@ public final class CloudClient {
 	Channel ch;
 	EventLoopGroup group;
 	
-	CloudSDHandler varHandler;
-	CloudSDRespHandler varRespHandler;
+	CloudSDHandler csdHandler;
+	CloudSDRespHandler csdRespHandler;
 	CloudFuncHandler funcHandler;
 	
 	static final boolean SSL = System.getProperty("ssl") != null;
@@ -54,25 +54,25 @@ public final class CloudClient {
             // Make a new connection.
             f = b.connect(host, port).sync();
             ch = f.channel();
-            varHandler = (CloudSDHandler)f.channel().pipeline().get("CloudVarHandler");
-            varRespHandler = (CloudSDRespHandler)f.channel().pipeline().get("CloudVarRespHandler");
+            csdHandler = (CloudSDHandler)f.channel().pipeline().get("CloudSDHandler");
+            csdRespHandler = (CloudSDRespHandler)f.channel().pipeline().get("CloudSDRespHandler");
             funcHandler = (CloudFuncHandler)f.channel().pipeline().get("CloudFuncHandler");
             
-            //ch.writeAndFlush(new CloudVar("xxxxxxx").init(1,2,3,4,5,6,7));
+            //ch.writeAndFlush(new CloudSD("xxxxxxx").init(1,2,3,4,5,6,7));
             
          } finally {
             //group.shutdownGracefully();
         }
     }
     
-    public CloudSDHandler getCloudVarHandler() {
+    public CloudSDHandler getCloudSDHandler() {
         // Get the handler instance to retrieve the answer.
-        return varHandler;
+        return csdHandler;
     }
     
-    public CloudSDRespHandler getCloudVarRespHandler() {
+    public CloudSDRespHandler getCloudSDRespHandler() {
         // Get the handler instance to retrieve the answer.
-        return varRespHandler;
+        return csdRespHandler;
     }
     
     public CloudFuncHandler getCloudFuncHandler() {
