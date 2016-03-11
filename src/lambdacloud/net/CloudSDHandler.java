@@ -8,7 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import lambdacloud.core.CloudSD;
 
-public class CloudVarHandler extends SimpleChannelInboundHandler<CloudSD> {
+public class CloudSDHandler extends SimpleChannelInboundHandler<CloudSD> {
 
 	final BlockingQueue<CloudSD> queue = new LinkedBlockingQueue<CloudSD>();
 

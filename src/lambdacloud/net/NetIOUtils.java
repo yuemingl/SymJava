@@ -17,8 +17,8 @@ public class NetIOUtils {
 		return new CloudSD(name).init(ddata);
 	}
 	
-	public static CloudVarResp createCloudVarResp(byte[] data, int status, int nameLen, int messageLen) {
-		CloudVarResp resp = new CloudVarResp();
+	public static CloudSDResp createCloudVarResp(byte[] data, int status, int nameLen, int messageLen) {
+		CloudSDResp resp = new CloudSDResp();
 		resp.status = status;
 		try {
 			resp.objName = new String(data, 0, nameLen, "UTF-8");

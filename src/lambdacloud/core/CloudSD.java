@@ -5,9 +5,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import io.netty.channel.Channel;
 import lambdacloud.core.lang.LCAssign;
 import lambdacloud.net.CloudQuery;
-import lambdacloud.net.CloudVarHandler;
-import lambdacloud.net.CloudVarRespHandler;
-import lambdacloud.net.CloudVarResp;
+import lambdacloud.net.CloudSDHandler;
+import lambdacloud.net.CloudSDRespHandler;
+import lambdacloud.net.CloudSDResp;
 import lambdacloud.net.CloudClient;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.symbolic.Expr;
@@ -273,10 +273,10 @@ public class CloudSD extends Symbol {
 	}
 	
 	private boolean storeToCloud(CloudClient client) {
-		CloudVarRespHandler handler = client.getCloudVarRespHandler();
+		CloudSDRespHandler handler = client.getCloudVarRespHandler();
 		try {
 			client.getChannel().writeAndFlush(this).sync();
-			CloudVarResp resp = handler.getCloudResp();
+			CloudSDResp resp = handler.getCloudResp();
 			if(resp.status == 0)
 				this.isOnCloud = true;
 			else
@@ -324,7 +324,7 @@ public class CloudSD extends Symbol {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		CloudVarHandler h = client.getCloudVarHandler();
+		CloudSDHandler h = client.getCloudVarHandler();
 		
 		//while(true) {
 			CloudSD var = h.getCloudVar();

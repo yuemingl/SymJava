@@ -24,8 +24,8 @@ public final class CloudClient {
 	Channel ch;
 	EventLoopGroup group;
 	
-	CloudVarHandler varHandler;
-	CloudVarRespHandler varRespHandler;
+	CloudSDHandler varHandler;
+	CloudSDRespHandler varRespHandler;
 	CloudFuncHandler funcHandler;
 	
 	static final boolean SSL = System.getProperty("ssl") != null;
@@ -54,8 +54,8 @@ public final class CloudClient {
             // Make a new connection.
             f = b.connect(host, port).sync();
             ch = f.channel();
-            varHandler = (CloudVarHandler)f.channel().pipeline().get("CloudVarHandler");
-            varRespHandler = (CloudVarRespHandler)f.channel().pipeline().get("CloudVarRespHandler");
+            varHandler = (CloudSDHandler)f.channel().pipeline().get("CloudVarHandler");
+            varRespHandler = (CloudSDRespHandler)f.channel().pipeline().get("CloudVarRespHandler");
             funcHandler = (CloudFuncHandler)f.channel().pipeline().get("CloudFuncHandler");
             
             //ch.writeAndFlush(new CloudVar("xxxxxxx").init(1,2,3,4,5,6,7));
@@ -65,12 +65,12 @@ public final class CloudClient {
         }
     }
     
-    public CloudVarHandler getCloudVarHandler() {
+    public CloudSDHandler getCloudVarHandler() {
         // Get the handler instance to retrieve the answer.
         return varHandler;
     }
     
-    public CloudVarRespHandler getCloudVarRespHandler() {
+    public CloudSDRespHandler getCloudVarRespHandler() {
         // Get the handler instance to retrieve the answer.
         return varRespHandler;
     }

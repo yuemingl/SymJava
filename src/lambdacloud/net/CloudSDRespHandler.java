@@ -6,11 +6,11 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class CloudVarRespHandler extends
-		SimpleChannelInboundHandler<CloudVarResp> {
-	final BlockingQueue<CloudVarResp> queue = new LinkedBlockingQueue<CloudVarResp>();
+public class CloudSDRespHandler extends
+		SimpleChannelInboundHandler<CloudSDResp> {
+	final BlockingQueue<CloudSDResp> queue = new LinkedBlockingQueue<CloudSDResp>();
 
-	public CloudVarResp getCloudResp() {
+	public CloudSDResp getCloudResp() {
 		boolean interrupted = false;
 		try {
 			for (;;) {
@@ -29,7 +29,7 @@ public class CloudVarRespHandler extends
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx,
-			final CloudVarResp msg) {
+			final CloudSDResp msg) {
 		System.err.println("Received CloudVarResp: "+msg);
 		queue.offer(msg);
 	}

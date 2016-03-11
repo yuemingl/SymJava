@@ -17,7 +17,7 @@ import lambdacloud.net.CloudClient;
 import lambdacloud.net.CloudFuncHandler;
 import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudResp;
-import lambdacloud.net.CloudVarHandler;
+import lambdacloud.net.CloudSDHandler;
 import lambdacloud.test.CompileUtils;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
@@ -328,7 +328,7 @@ public class CloudFunc extends LCBase {
 				}
 			
 			CloudClient client = config.currentClient();
-			CloudVarHandler handler = client.getCloudVarHandler();
+			CloudSDHandler handler = client.getCloudVarHandler();
 			try {
 				CloudQuery qry = new CloudQuery();
 				qry.qryType = CloudQuery.CLOUD_FUNC_EVAL;

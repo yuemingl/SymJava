@@ -4,7 +4,7 @@ import symjava.relational.Eq;
 import symjava.symbolic.Expr;
 import lambdacloud.net.CloudClient;
 import lambdacloud.net.CloudQuery;
-import lambdacloud.net.CloudVarHandler;
+import lambdacloud.net.CloudSDHandler;
 
 public class CloudLib {
 	protected CloudConfig localConfig = null;
@@ -127,7 +127,7 @@ public class CloudLib {
 	
 	protected void invokeStatic(String className, String methodName, String[] args, CloudSD output) {
 		CloudClient client = currentCloudConfig().currentClient();
-		CloudVarHandler handler = client.getCloudVarHandler();
+		CloudSDHandler handler = client.getCloudVarHandler();
 		try {
 			CloudQuery qry = new CloudQuery();
 			qry.qryType = CloudQuery.CLOUD_LIB_INVOKE;

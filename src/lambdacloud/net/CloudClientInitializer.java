@@ -35,15 +35,15 @@ public class CloudClientInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(ZlibCodecFactory.newZlibDecoder(ZlibWrapper.GZIP));
 
         // Add the number codec first,
-        pipeline.addLast(new CloudVarEncoder());
+        pipeline.addLast(new CloudSDEncoder());
         pipeline.addLast(new CloudQueryEncoder());
         pipeline.addLast(new CloudFuncEncoder());
         pipeline.addLast(new MessageDecoder());
         
         // and then business logic.
         pipeline.addLast("CloudFuncHandler", new CloudFuncHandler());
-        pipeline.addLast("CloudVarHandler", new CloudVarHandler());
-        pipeline.addLast("CloudVarRespHandler", new CloudVarRespHandler());
+        pipeline.addLast("CloudVarHandler", new CloudSDHandler());
+        pipeline.addLast("CloudVarRespHandler", new CloudSDRespHandler());
         
     }
 }
