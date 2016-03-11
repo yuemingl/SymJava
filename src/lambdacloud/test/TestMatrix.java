@@ -196,7 +196,7 @@ public class TestMatrix {
 		SymVector xx = x.split(2);
 		//yy = AA * xx
 		SymVector yy = (SymVector)(AA*xx);
-		System.out.println(yy);
+		System.out.println("Test: yy="+yy);
 		yy[0].runOn(new LCDevice("2"));
 		yy[1].runOn(new LCDevice("1"));
 		// res = yy + y0

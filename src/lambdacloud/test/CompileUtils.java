@@ -39,6 +39,7 @@ public class CompileUtils {
 			bytecodeGenResetAll(tmp[i]);
 		expr.bytecodeGenReset();
 	}
+	
 	public static IR getIR(String name, Expr expr, Expr ...args) {
 		ClassGen cg = null;
 		IR ir =  new IR();
@@ -56,11 +57,12 @@ public class CompileUtils {
 				ir.outAryLen = expr.getTypeInfo().dim[0]*expr.getTypeInfo().dim[1];
 			ir.numArgs = args.length;
 			
-			//only for test purpose
-			System.out.println("getIR newInstance start");
+			///////////////////////////////////////////////////////////////////////////////
+			//Generate new instance here only for test purpose (will have exception if the IR is wrong) 
+			System.out.println("getIR(): create a new instance to test for: "+expr);
 			FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
 			fcl.newInstance(cg);
-			System.out.println("getIR newInstance end");
+			///////////The test code above can be deleted in prod env/////////////////////
 
 		} else {
 			cg = _compile(name, expr, args);
@@ -68,8 +70,6 @@ public class CompileUtils {
 		}
 		ir.name = cg.getJavaClass().getClassName();
 		ir.bytes = cg.getJavaClass().getBytes();
-		
-		
 		
 		return ir;
 	}
@@ -81,9 +81,8 @@ public class CompileUtils {
 		return fun;
 	}
 	
-	public static void compileGraph(List<BytecodeFunc> retGraph, Expr expr, Expr ...args) {
-		
-	}
+//	public static void compileGraph(List<BytecodeFunc> retGraph, Expr expr, Expr ...args) {
+//	}
 	
 	public static BytecodeFunc compile(String name, Expr expr, Expr ...args) {
 		ClassGen cg = _compile(name, expr, args);
@@ -171,6 +170,7 @@ public class CompileUtils {
 	}
 	
 	/**
+	 * Compile a BytecodeBatchFunc:
 	 * void apply(double[] output, int outPos, double[] x, double[] y, ...)
 	 * 
 	 * @param expr
@@ -242,7 +242,7 @@ public class CompileUtils {
 		//TODO remove?
 		argsMap.put(output.getLabel(), 1);
 		
-		System.out.println(fullClsName);
+		System.out.println("Generating bytecoe for: "+fullClsName);
 		StringBuilder sb = new StringBuilder();
 		sb.append("void apply(double[] output, int outPos,");
 		for(Expr a : args)
