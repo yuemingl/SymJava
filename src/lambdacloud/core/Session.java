@@ -10,12 +10,27 @@ import symjava.symbolic.Vector;
 import symjava.symbolic.utils.Utils;
 
 public class Session {
-	public double run(Expr expr, Map<String, Double> dict) {
+	/**
+	 * Always fetch data to local
+	 * @param expr
+	 * @param dict
+	 * @return
+	 */
+	public double runSimple(Expr expr, Map<String, Double> dict) {
 		CloudConfig.setGlobalTarget("job_local.conf");
 		Node n = GraphBuilder.build(expr);
-		return run(n, dict);
+		return runSimple(n, dict);
 	}
 	
+	/**
+	 * For matrix and vector
+	 * 
+	 * Allow data fetch from server node
+	 * 
+	 * @param expr
+	 * @param dict
+	 * @return
+	 */
 	public CloudSD runVec(Expr expr, Map<String, double[]> dict) {
 		CloudConfig.setGlobalTarget("job_local.conf");
 		Node n = GraphBuilder.build(expr);
@@ -23,8 +38,9 @@ public class Session {
 	}
 	
 	/**
-	 * Test for scalar
-	 * The optimization is suitable for matrix and vectors
+	 * Allow data fetch from server node
+	 * It is use to test for scalar. The optimization is suitable for matrix and vectors
+	 * 
 	 * @param expr
 	 * @param dict
 	 * @return
@@ -95,13 +111,13 @@ public class Session {
 	 * @param dict
 	 * @return
 	 */
-	public double run(Node root, Map<String, Double> dict) {
+	public double runSimple(Node root, Map<String, Double> dict) {
 		double[] args = new double[root.args.size()];
 		for(int i=0; i<root.args.size(); i++) {
 			Double d = dict.get(root.args.get(i).toString());
 			if(d == null) {
 				Node child = root.children.get(root.args.get(i).toString());
-				args[i] = run(child, dict);
+				args[i] = runSimple(child, dict);
 			} else {
 				args[i] = d;
 			}
@@ -110,9 +126,9 @@ public class Session {
 		CloudSD output = new CloudSD("output").resize(1);
 		root.cfunc.apply(output, input);
 		if(output.fetchToLocal()) {
-			for(double d : output.getData()) {
-				System.out.println(d);
-			}
+//			for(double d : output.getData()) {
+//				System.out.println(d);
+//			}
 		}
 		
 		return output.getData(0);
@@ -161,7 +177,7 @@ public class Session {
 			Double d = dict.get(root.args.get(i).toString());
 			if(d == null) {
 				Node child = root.children.get(root.args.get(i).toString());
-				args[i] = run(child, dict);
+				args[i] = runSimple(child, dict);
 			} else {
 				args[i] = d;
 			}

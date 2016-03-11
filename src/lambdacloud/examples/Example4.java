@@ -1,74 +1,52 @@
 package lambdacloud.examples;
 
-import static symjava.math.SymMath.sqrt;
+import static lambdacloud.core.LambdaCloud.CPU;
 import static symjava.symbolic.Symbol.x;
 import static symjava.symbolic.Symbol.y;
-import static lambdacloud.core.LambdaCloud.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import lambdacloud.core.CloudConfig;
-import lambdacloud.core.CloudFunc;
-import lambdacloud.core.CloudSD;
 import lambdacloud.core.Session;
-import lambdacloud.core.graph.GraphBuilder;
-import lambdacloud.core.graph.Node;
 import lambdacloud.core.lang.LCDevice;
 import symjava.symbolic.Expr;
-import symjava.symbolic.utils.AddList;
 
+/**
+ * Different ways to compute x*x + y*y on two devices
+ * 
+ *
+ */
 public class Example4 {
 
 	public static void main(String[] args) {
-		test1();
-		test2();
-	}
-	
-	public static void test1() {
-		// TODO Auto-generated method stub
-		//CloudConfig.setGlobalTarget("job_local.conf");
-		
-		Expr sum = x*x + y*y;
-		Expr[] ops = sum.args();
-		for(int i=0; i<ops.length; i++) {
-			ops[i].runOn(new LCDevice("/cpu:"+i));
-		};
+		Session sess = new Session();
+		Map<String, Double> dict = new HashMap<String, Double>();
+		dict.put(x.toString(), 3.0);
+		dict.put(y.toString(), 4.0);
 
-		LCDevice cpu1 = new LCDevice("/cpu:0");
-		LCDevice cpu2 = new LCDevice("/cpu:1");
+		//Set device in the expression
+		Expr sum1 = CPU(x*x) + CPU(y*y);
+		double rlt1 = sess.runSimple(sum1, dict);
+		System.out.println("Example 1: "+sum1);
+		System.out.println("Result: "+rlt1);
+		
+		//use runOn() method of a term or an expression
+		LCDevice cpu1 = new LCDevice("0");
+		LCDevice cpu2 = new LCDevice("1");
 		Expr sum2 = (x*x).runOn(cpu1) + (y*y).runOn(cpu2);
+		double rlt2 = sess.runSimple(sum1, dict);
+		System.out.println("Example 2: "+sum2);
+		System.out.println("Result: "+rlt2);
 		
-		Expr expr = sqrt(sum);
-		Expr expr2 = sqrt(sum2);
-		System.out.println(expr);
-		System.out.println(expr2);
-		
-		Session sess = new Session();
-		Map<String, Double> dict = new HashMap<String, Double>();
-		dict.put(x.toString(), 3.0);
-		dict.put(y.toString(), 4.0);
-		
-		double rlt = sess.run(expr, dict);
-		System.out.println(rlt);
-		
-	}
-	
-	public static void test2() {
-		
-		Expr sum = CPU(x*x) + CPU(y*y);
-		Expr expr = GPU(sqrt(sum));
-		
-		System.out.println(expr);
-		
-		Session sess = new Session();
-		Map<String, Double> dict = new HashMap<String, Double>();
-		dict.put(x.toString(), 3.0);
-		dict.put(y.toString(), 4.0);
-		
-		double rlt = sess.run(expr, dict);
-		System.out.println(rlt);
-		
+		//Set device for each term of an expression (use args())
+		Expr sum3 = x*x + y*y;
+		Expr[] ops = sum3.args();
+		for(int i=0; i<ops.length; i++) {
+			ops[i].runOn(new LCDevice(i));
+		}
+		double rlt3 = sess.runSimple(sum1, dict);
+		System.out.println("Example 3: "+sum2);
+		System.out.println("Result: "+rlt3);
 	}
 
 }

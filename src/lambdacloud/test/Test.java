@@ -12,12 +12,15 @@ public class Test {
 	}
 	
 	public static void test() {
-		CloudConfig.setGlobalTarget("job_aws.conf");
+		CloudConfig.setGlobalTarget("job_local.conf");
 		
+		//declare local variables
 		LCVar x = LCVar.getDouble("x");
 		LCVar y = LCVar.getDouble("y");
+		LCVar z = LCVar.getDouble("z");
 		
-		Expr expr = x + y;
+		Expr expr = x + y + z;
+		//x,y are not local now since they are passed as arguments
 		CloudFunc f = new CloudFunc(new LCVar[]{x, y}, expr);
 		
 		CloudSD input = new CloudSD("input").init(new double[]{1, 2});
