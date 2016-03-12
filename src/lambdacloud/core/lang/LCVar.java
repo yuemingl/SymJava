@@ -19,12 +19,11 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 
 /**
- * The base type of the local variables in a compiled function.
- * Particular type of a local variable is defined in a sub-class of LCVar.
+ * The base type of local variables in a compiled function.
+ * Type of a local variable is defined in sub-classes of LCVar.
  * <br>
- * 
- * The local variables are exactly the same as the local variables in a Java function
- * that is used to store temporary values.
+ * The local variables are the same as the local variables in a Java function,
+ * which is used to store temporary values. 
  *  
  */
 public abstract class LCVar extends Symbol {

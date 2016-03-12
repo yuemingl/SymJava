@@ -140,7 +140,7 @@ public class TestMatrix {
 		Expr res = new Concat(yy[0],yy[1])+y0;
 		
 		System.out.println(res);
-		//Doesn't work
+		//Doesn't work because the symbol AA[0][0] has no name?
 		//BytecodeBatchFunc fun = CompileUtils.compileVec(new LCReturn(res), A,x,y0,AA[0][0],AA[1][0],xx[0],xx[1]);
 		BytecodeBatchFunc fun = CompileUtils.compileVec(new LCReturn(res));
 /*
@@ -150,10 +150,10 @@ public class TestMatrix {
 2 3 1 4   1   4   13
 */
 		double[] outAry = new double[4];
-		double[] data_A_11 = new double[] {2,1,1,4}; //columewise
-		double[] data_A_10 = new double[] {1,2,2,3}; //columewise
-		double[] data_A_01 = new double[] {3,1,4,3}; //columewise
-		double[] data_A_00 = new double[] {1,1,2,2}; //columewise
+		double[] data_A_11 = new double[] {2,1,1,4};
+		double[] data_A_10 = new double[] {1,2,2,3};
+		double[] data_A_01 = new double[] {3,1,4,3};
+		double[] data_A_00 = new double[] {1,1,2,2};
 		double[] data_x_0 = new double[] {0,1};
 		double[] data_x_1 = new double[] {2,1};
 		double[] data_y0 = new double[] {1,2,3,4};
@@ -220,7 +220,7 @@ public class TestMatrix {
 
 		SymMatrix AA = A.split(2, 2);
 		SymVector xx = x.split(2);
-		//yy = AA * xx
+		// yy = AA * xx
 		SymVector yy = (SymVector)(AA*xx);
 		// res = yy + y0
 		Expr res = CPU( new Concat( CPU(yy[0]), CPU(yy[1]) )+y0 );

@@ -31,8 +31,8 @@ public class Example4 {
 		System.out.println("Result: "+rlt1);
 		
 		//use runOn() method of a term or an expression
-		LCDevice cpu1 = new LCDevice("0");
-		LCDevice cpu2 = new LCDevice("1");
+		LCDevice cpu1 = new LCDevice(0);
+		LCDevice cpu2 = new LCDevice(1);
 		Expr sum2 = (x*x).runOn(cpu1) + (y*y).runOn(cpu2);
 		double rlt2 = sess.runSimple(sum1, dict);
 		System.out.println("Example 2: "+sum2);

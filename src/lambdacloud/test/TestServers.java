@@ -18,7 +18,7 @@ import symjava.symbolic.Expr;
 public class TestServers {
 
 	public static void main(String[] args) {
-		//test_multiple_inputs_for_bytecodefunc();
+		test_multiple_inputs_for_bytecodefunc();
 		test();
 	}
 	
