@@ -242,7 +242,7 @@ public class CompileUtils {
 		//TODO remove?
 		argsMap.put(output.getLabel(), 1);
 		
-		System.out.println("Generating bytecoe for: "+fullClsName);
+		System.out.println("Generating bytecode for: "+fullClsName);
 		StringBuilder sb = new StringBuilder();
 		sb.append("void apply(double[] output, int outPos,");
 		for(Expr a : args)

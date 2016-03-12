@@ -1,15 +1,14 @@
 package lambdacloud.test;
 
+import static lambdacloud.core.LambdaCloud.CPU;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudSD;
 import lambdacloud.core.Session;
-import lambdacloud.core.graph.GraphBuilder;
-import lambdacloud.core.graph.Node;
 import lambdacloud.core.lang.LCDevice;
+import lambdacloud.core.lang.LCReturn;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.matrix.SymMatrix;
 import symjava.matrix.SymVector;
@@ -20,78 +19,112 @@ import symjava.symbolic.Vector;
 
 public class TestMatrix {
 	public static void main(String[] args) {
-//		test1();
-//		test2();
-//		test3();
-//		test4();
-//		test5();
-//		test6();
-		test7();
-	}
-	public static void test1() {
-		// TODO Auto-generated method stub
-		Matrix A = new Matrix("A",3,3);
-		Vector x = new Vector("x",3);
-		
-		//CompileUtils.compile("test1", A, A);
-		//CompileUtils.compile("test2", x, x);
-		
-		//BytecodeFunc fun = CompileUtils.compile("test2", A*x, A, x);
-		//double ret = fun.apply(new double[9]);
-		//System.out.println(ret);
-		
-		BytecodeBatchFunc fun =  CompileUtils.compileVec(A*x, A, x);
-		double[] outAry = new double[4];
-		double[] data_A = new double[] {1,4,7,2,5,8,3,6,9}; //columewise
-		double[] data_x = new double[] {1,2,3};
-		fun.apply(outAry, 1, data_A, data_x);
-		for(double i : outAry)
-			System.out.println(i);
+		testBasic1();
+		testBasic2();
+		testBasic3();
+		testBasic4();
+		testConcat1();
+		testConcat2();
+		testMatrixSplit1();
+		testMatrixSplit2();
+		testMatrixSplit3();
 	}
 	
-	public static void test2() {
+	public static boolean assertEqual(double[] a, double[] b) {
+		if(a.length != b.length) {
+			System.err.println("Failed! a.length != b.length: "+a.length+" != "+b.length);
+			return false;
+		}
+		for(int i=0; i<a.length; i++) {
+			if(Math.abs(a[i]-b[i])>1e-8) {
+				System.err.println("Failed! a["+i+"] != b["+i+"]: "+a[i]+" != "+b[i]);
+				return false;
+			}
+		}
+		System.out.println("Passed!");
+		return true;
+	}
+	
+	public static void testBasic1() {
+		Matrix A = new Matrix("A",3,3);
+		BytecodeBatchFunc fun =  CompileUtils.compileVec(new LCReturn(A));
+		/**
+		 * 1 2 3
+		 * 4 5 6
+		 * 7 8 9
+		 */
+		double[] data_A = new double[] {1,4,7,2,5,8,3,6,9}; // Column-wise
+		double[] outAry = new double[9];
+		fun.apply(outAry, 0, data_A);
+		assertEqual(new double[]{1,4,7,2,5,8,3,6,9}, outAry);
+	}
+	
+	public static void testBasic2() {
+		Vector x = new Vector("x",3);
+		BytecodeBatchFunc fun =  CompileUtils.compileVec(new LCReturn(x));
+		double[] data_x = new double[] {1,2,3};
+		double[] outAry = new double[3];
+		fun.apply(outAry, 0, data_x);
+		assertEqual(new double[]{1,2,3}, outAry);
+	}
+	
+	public static void testBasic3() {
+		Matrix A = new Matrix("A",3,3);
+		Vector x = new Vector("x",3);
+		BytecodeBatchFunc fun =  CompileUtils.compileVec(new LCReturn(A*x));
+		/**
+		 * 1 2 3
+		 * 4 5 6
+		 * 7 8 9
+		 */
+		double[] data_A = new double[] {1,4,7,2,5,8,3,6,9}; // Column-wise
+		double[] data_x = new double[] {1,2,3};
+		double[] outAry = new double[3];
+		fun.apply(outAry, 0, data_A, data_x);
+		assertEqual(new double[]{14,32,50}, outAry);
+	}
+	
+	public static void testBasic4() {
 		Vector x = new Vector("x",3);
 		Vector y = new Vector("y",3);
 		
-		BytecodeBatchFunc fun =  CompileUtils.compileVec(x+y, x, y);
+		BytecodeBatchFunc fun =  CompileUtils.compileVec(new LCReturn(x+y), x, y);
 		double[] outAry = new double[4];
-		double[] data_x = new double[] {1,2,3}; //columewise
+		double[] data_x = new double[] {1,2,3};
 		double[] data_y = new double[] {1,2,3};
-		fun.apply(outAry, 0, data_x, data_y);
-		for(double i : outAry)
-			System.out.println(i);
+		fun.apply(outAry, 1, data_x, data_y); //output at position 1
+		assertEqual(new double[]{0,2,4,6}, outAry);
 	}
 	
-	public static void test3() {
+	public static void testConcat1() {
 		Vector x = new Vector("x",3);
 		Vector y = new Vector("y",2);
-		Vector z = new Vector("z",3);
+		Vector z = new Vector("z",4);
 		
-		BytecodeBatchFunc fun =  CompileUtils.compileVec(new Concat(x,y,z), x, y, z);
+		BytecodeBatchFunc fun =  CompileUtils.compileVec(new LCReturn(new Concat(x,y,z)), x, y, z);
 		double[] outAry = new double[9];
-		double[] data_x = new double[] {1,2,3}; //columewise
+		double[] data_x = new double[] {1,2,3};
 		double[] data_y = new double[] {4,5};
-		double[] data_z = new double[] {6,7,8};
+		double[] data_z = new double[] {6,7,8,9};
 		fun.apply(outAry, 0, data_x, data_y, data_z);
-		for(double i : outAry)
-			System.out.println(i);
+		assertEqual(new double[]{1,2,3,4,5,6,7,8,9}, outAry);
 	}
 	
-	public static void test4() {
+	public static void testConcat2() {
 		Vector x = new Vector("x",3);
 		Vector y = new Vector("y",2);
 		Vector z = new Vector("z",5);
 		
-		BytecodeBatchFunc fun =  CompileUtils.compileVec(new Concat(x,y)+z, x, y, z);
-		double[] outAry = new double[9];
-		double[] data_x = new double[] {1,2,3}; //columewise
+		BytecodeBatchFunc fun =  CompileUtils.compileVec(new LCReturn(new Concat(x,y)+z), x, y, z);
+		double[] outAry = new double[5];
+		double[] data_x = new double[] {1,2,3};
 		double[] data_y = new double[] {4,5};
 		double[] data_z = new double[] {1,2,3,4,5};
 		fun.apply(outAry, 0, data_x, data_y, data_z);
-		for(double i : outAry)
-			System.out.println(i);
+		assertEqual(new double[]{2,4,6,8,10}, outAry);
 	}
-	public static void test5() {
+	
+	public static void testMatrixSplit1() {
 		int dim = 4;
 		Matrix A = new Matrix("A", dim, dim);
 		Vector x = new Vector("x", dim);
@@ -101,15 +134,15 @@ public class TestMatrix {
 		SymVector xx = x.split(2);
 		SymVector yy = (SymVector)(AA*xx);
 		System.out.println(yy);
-		yy[0].runOn(new LCDevice("/cpu:0"));
-		yy[1].runOn(new LCDevice("/cpu:0"));
+		yy[0].runOn(new LCDevice(0));
+		yy[1].runOn(new LCDevice(1));
 		
 		Expr res = new Concat(yy[0],yy[1])+y0;
 		
 		System.out.println(res);
-		//BytecodeBatchFunc fun = CompileUtils.compileVec(res, A,x,y0,AA[0][0],AA[1][0],xx[0],xx[1]);
-		BytecodeBatchFunc fun = CompileUtils.compileVec(res);
-		//void apply(double[] output, int outPos, double[] A_1_1, double[] A_1_0, double[] A_0_1, double[] A_0_0, double[] x_0, double[] x_1, double[] y0);
+		//Doesn't work
+		//BytecodeBatchFunc fun = CompileUtils.compileVec(new LCReturn(res), A,x,y0,AA[0][0],AA[1][0],xx[0],xx[1]);
+		BytecodeBatchFunc fun = CompileUtils.compileVec(new LCReturn(res));
 /*
 1 2 3 4   0   1   13
 1 2 1 3 * 1 + 2 = 9
@@ -124,16 +157,12 @@ public class TestMatrix {
 		double[] data_x_0 = new double[] {0,1};
 		double[] data_x_1 = new double[] {2,1};
 		double[] data_y0 = new double[] {1,2,3,4};
+		//void apply(double[] output, int outPos, double[] A_1_1, double[] A_1_0, double[] A_0_1, double[] A_0_0, double[] x_0, double[] x_1, double[] y0);
 		fun.apply(outAry, 0, data_A_11, data_A_10, data_A_01, data_A_00, data_x_0, data_x_1, data_y0);
-		for(double i : outAry)
-			System.out.println(i); 
-		//13.0
-		//9.0
-		//10.0
-		//13.0
+		assertEqual(new double[]{13,9,10,13}, outAry);
 	}
 	
-	public static void test6() {
+	public static void testMatrixSplit2() {
 		int dim = 4;
 		Matrix A = new Matrix("A", dim, dim);
 		Vector x = new Vector("x", dim);
@@ -143,8 +172,8 @@ public class TestMatrix {
 		SymVector xx = x.split(2);
 		SymVector yy = (SymVector)(AA*xx);
 		System.out.println(yy);
-		yy[0].runOn(new LCDevice("/cpu:0"));
-		yy[1].runOn(new LCDevice("/cpu:0"));
+		yy[0].runOn(new LCDevice(0));
+		yy[1].runOn(new LCDevice(1));
 		
 		Expr res = new Concat(yy[0],yy[1])+y0;
 		
@@ -159,12 +188,12 @@ public class TestMatrix {
 		dict.put(x.toString(), new double[]{0,1,2,1});
 		dict.put(y0.toString(), new double[]{1,2,3,4});
 		
-		//test
-		//those parameters should be able automatically generated accroding to the definition of AA and xx
-		double[] data_A_11 = new double[] {2,1,1,4}; //columewise
-		double[] data_A_10 = new double[] {1,2,2,3}; //columewise
-		double[] data_A_01 = new double[] {3,1,4,3}; //columewise
-		double[] data_A_00 = new double[] {1,1,2,2}; //columewise
+		//those parameters should be able automatically generated according to the definition of AA and xx
+		//see testMatrixSplit3()
+		double[] data_A_11 = new double[] {2,1,1,4};
+		double[] data_A_10 = new double[] {1,2,2,3};
+		double[] data_A_01 = new double[] {3,1,4,3};
+		double[] data_A_00 = new double[] {1,1,2,2};
 		double[] data_x_0 = new double[] {0,1};
 		double[] data_x_1 = new double[] {2,1};
 		dict.put(AA[0][0].toString(), data_A_00);
@@ -174,19 +203,16 @@ public class TestMatrix {
 		dict.put(xx[0].toString(), data_x_0);
 		dict.put(xx[1].toString(), data_x_1);
 		
-		CloudConfig.setGlobalTarget("job_local.conf");
-		Node n = GraphBuilder.build(res);
 		Session sess1 = new Session();
-		CloudSD rlt = sess1.runVec(n, dict);
-		System.out.println("------------");
-		for(double d : rlt.getData())
-			System.out.println(d);
+		CloudSD rlt = sess1.runVec(res, dict);
+		rlt.fetchToLocal();
+		assertEqual(new double[]{13,9,10,13}, rlt.getData());
 	}
 	
 	/**
 	 * Automatic data dict split for matrices and vectors
 	 */
-	public static void test7() {
+	public static void testMatrixSplit3() {
 		int dim = 4;
 		Matrix A = new Matrix("A", dim, dim);
 		Vector x = new Vector("x", dim);
@@ -196,12 +222,9 @@ public class TestMatrix {
 		SymVector xx = x.split(2);
 		//yy = AA * xx
 		SymVector yy = (SymVector)(AA*xx);
-		System.out.println("Test: yy="+yy);
-		yy[0].runOn(new LCDevice("2"));
-		yy[1].runOn(new LCDevice("1"));
 		// res = yy + y0
-		Expr res = new Concat(yy[0],yy[1])+y0;
-		res.runOn(new LCDevice("0"));
+		Expr res = CPU( new Concat( CPU(yy[0]), CPU(yy[1]) )+y0 );
+		System.out.println("Test: res="+res);
 		
 		Map<String, double[]> dict = new HashMap<String, double[]>();
 		/*
@@ -214,11 +237,10 @@ public class TestMatrix {
 		dict.put(x.toString(), new double[]{0,1,2,1});
 		dict.put(y0.toString(), new double[]{1,2,3,4});
 		
-		Session sess1 = new Session();
-		CloudSD rlt = sess1.runVec(res, dict);
-		System.out.println("Test done, fetch data:");
-		for(double d : rlt.getData())
-			System.out.println(d);
+		Session sess = new Session();
+		CloudSD rlt = sess.runVec(res, dict);
+		rlt.fetchToLocal();
+		assertEqual(new double[]{13,9,10,13}, rlt.getData());
 	}
 
 }
