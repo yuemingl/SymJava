@@ -97,13 +97,13 @@ public class TestLCLoop {
 		// Define the cloud shared variables to store the initial value and solution
 		CloudSD x0 = new CloudSD("x0");
 		x0.init(new double[] { 1.0 });
-		x0.storeToCloud();
+		x0.push();
 		CloudSD ans = new CloudSD("ans").resize(1);
 
 		func.apply(ans, x0); // Run the function on the cloud task server
 		
 		// Get the result. (=0.7390851)
-		ans.fetchToLocal();
+		ans.fetch();
 		System.out.println("Solution: "+ans.getData(0));
 		System.out.println("Verify: "+applyTest(1.0));
 	}

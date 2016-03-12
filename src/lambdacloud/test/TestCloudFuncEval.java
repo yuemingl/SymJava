@@ -16,7 +16,7 @@ public class TestCloudFuncEval {
 		
 		double[] data = { 3, 4 };
 		CloudSD input = new CloudSD("var123").init(data);
-		input.storeToCloud();
+		input.push();
 
 		LCVar x = LCVar.getDouble("x");
 		LCVar y = LCVar.getDouble("y");
@@ -36,7 +36,7 @@ public class TestCloudFuncEval {
 		System.out.println("Time: "+(end-begin)+"ms");
 		
 		System.out.println(output.getName());
-		if(output.fetchToLocal()) {
+		if(output.fetch()) {
 			for (double d : output.getData())
 				System.out.println(d);
 		}

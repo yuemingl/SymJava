@@ -17,7 +17,7 @@ public class TestClassFile {
 		CloudSD output = new CloudSD("output").resize(1);
 		f.apply(output, input);
 		
-		if(output.fetchToLocal()) {
+		if(output.fetch()) {
 			for(double d : output.getData()) {
 				System.out.println(d);
 			}

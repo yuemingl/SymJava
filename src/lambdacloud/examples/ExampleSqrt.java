@@ -34,7 +34,7 @@ public class ExampleSqrt {
 		//sever
 		CloudSD output = new CloudSD("bs_sol").init(1);
 		lib.solverNewton(eq, guess, 100, 1e-5, output);
-		output.fetchToLocal();
+		output.fetch();
 		System.out.println(output.getData(0));
 	}
 	
@@ -46,7 +46,7 @@ public class ExampleSqrt {
 		//sever
 		CloudSD output = new CloudSD("bs_sol").init(1);
 		lib.solverNewton(new String[]{" eq(x^2-612, 0) "}, guess, 100, 1e-5, output);
-		output.fetchToLocal();
+		output.fetch();
 		System.out.println(output.getData(0));
 	}
 }

@@ -34,10 +34,10 @@ public class TestLCBuilder {
 		CloudSD output = new CloudSD("output").resize(1);
 		task.build(new LCVar[]{x, y}).apply(output, input);
 		
-		if( output.fetchToLocal() ) 
+		if( output.fetch() ) 
 			System.out.println("output="+output.getData(0)); //-1
 		
-		if( input.fetchToLocal() ) {
+		if( input.fetch() ) {
 			System.out.println("input=");
 			for(double d: input.getData())
 				System.out.println(d); //5.0
@@ -57,7 +57,7 @@ public class TestLCBuilder {
 		CloudSD output = new CloudSD("output").resize(1);
 
 		task.build(new LCVar[]{x, y}).apply(output, input);
-		if( output.fetchToLocal() ) 
+		if( output.fetch() ) 
 			System.out.println(output.getData(0)); //5.0
 	}
 	
@@ -79,7 +79,7 @@ public class TestLCBuilder {
 		CloudSD input = new CloudSD("input").init(new double[]{1});
 		CloudSD output = new CloudSD("output").resize(1);
 		cloudTask.build().apply(output, input);
-		if( output.fetchToLocal() ) 
+		if( output.fetch() ) 
 			System.out.println(output.getData(0)); //45.0
 	}
 

@@ -361,7 +361,7 @@ public class Utils {
 	public static double[][] getDataFromCloudSDs(CloudSD[] cloudSDs) {
 		double[][] rlt = new double[cloudSDs.length][];
 		for(int i=0; i<cloudSDs.length; i++) {
-			if(cloudSDs[i].fetchToLocal())
+			if(cloudSDs[i].fetch())
 				rlt[i] = cloudSDs[i].getData();
 		}
 		return rlt;

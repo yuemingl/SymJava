@@ -35,7 +35,7 @@ import symjava.symbolic.utils.Utils;
  * <p><blockquote><pre>
  *     CloudSD data = new CloudSD("myvar").init(new double[]{1, 2, 3, 4, 5});
  *     data.sotoreToCloud();
- *     if(data.fetchToLocal()) {
+ *     if(data.fetch()) {
  *       for(double d : data.getData()) {
  *         System.out.println(d);
  *       }
@@ -251,7 +251,7 @@ public class CloudSD extends Symbol {
 	* 3. globalCloudConfig
 	 * TODO change name to store()
 	 */
-	public boolean storeToCloud() {
+	public boolean push() {
 		String[] host_ip = parseName(this.getFullName());
 		if(host_ip != null) {
 			CloudClient c = new CloudClient(host_ip[0], Integer.valueOf(host_ip[1]));
@@ -260,19 +260,19 @@ public class CloudSD extends Symbol {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			System.err.println("storeToCloud(): Connected to " + Utils.joinLabels(host_ip,":"));
-			return storeToCloud(c);
+			System.err.println("Pushing data ( Connected to " + Utils.joinLabels(host_ip,":")+" )");
+			return push(c);
 		}
 		CloudClient client = currentCloudConfig().currentClient();
 		if(!currentCloudConfig().isLocal()) {
-			return storeToCloud(client);
+			return push(client);
 		} else {
 			this.isOnCloud = false;
 		}
 		return this.isOnCloud;
 	}
 	
-	private boolean storeToCloud(CloudClient client) {
+	private boolean push(CloudClient client) {
 		CloudSDRespHandler handler = client.getCloudSDRespHandler();
 		try {
 			client.getChannel().writeAndFlush(this).sync();
@@ -284,7 +284,7 @@ public class CloudSD extends Symbol {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return this.isOnCloud;
 	}
 	
 	/**
@@ -294,7 +294,7 @@ public class CloudSD extends Symbol {
 	 * TODO change name to fetch()
 	 * @return
 	 */
-	public boolean fetchToLocal() {
+	public boolean fetch() {
 		String[] host_ip = parseName(this.getFullName());
 		if(host_ip != null && host_ip.length == 2) {
 			CloudClient c = new CloudClient(host_ip[0], Integer.valueOf(host_ip[1]));
@@ -303,18 +303,18 @@ public class CloudSD extends Symbol {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			System.err.println("fetchToLocal(): Connected to " + Utils.joinLabels(host_ip,":"));
-			return fetchToLocal(c);
+			System.err.println("Fetch data ( Connected to " + Utils.joinLabels(host_ip,":")+" )");
+			return fetch(c);
 		}
 		if(currentCloudConfig().isLocal())
 			return true;
 		else {
 			CloudClient client = currentCloudConfig().currentClient();
-			return fetchToLocal(client);
+			return fetch(client);
 		}
 	}
 	
-	private boolean fetchToLocal(CloudClient client) {
+	private boolean fetch(CloudClient client) {
 		Channel ch = client.getChannel();
 		CloudQuery qry = new CloudQuery();
 		qry.objName = this.getFullName();

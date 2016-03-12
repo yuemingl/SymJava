@@ -45,12 +45,12 @@ public class Example3 {
 
 		CloudSD myOutput = new CloudSD(config, "myOutput").resize(1);
 		CloudSD myData = new CloudSD(config, "myData").init(new double[] {2,2,3,3,4,4});
-		myData.storeToCloud();
+		myData.push();
 		
 		// Evaluating on the cloud server
 		func.apply(myOutput, myData);
 
-		if(myOutput.fetchToLocal()) {
+		if(myOutput.fetch()) {
 			for(double d : myOutput.getData()) {
 				System.out.println(d);
 			}

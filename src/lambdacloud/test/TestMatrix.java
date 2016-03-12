@@ -205,7 +205,7 @@ public class TestMatrix {
 		
 		Session sess1 = new Session();
 		CloudSD rlt = sess1.runVec(res, dict);
-		rlt.fetchToLocal();
+		rlt.fetch();
 		assertEqual(new double[]{13,9,10,13}, rlt.getData());
 	}
 	
@@ -239,7 +239,7 @@ public class TestMatrix {
 		
 		Session sess = new Session();
 		CloudSD rlt = sess.runVec(res, dict);
-		rlt.fetchToLocal();
+		rlt.fetch();
 		assertEqual(new double[]{13,9,10,13}, rlt.getData());
 	}
 

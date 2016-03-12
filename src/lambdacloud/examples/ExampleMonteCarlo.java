@@ -104,7 +104,7 @@ public class ExampleMonteCarlo {
 		double rltSum = 0.0;
 		for(int j=0; j<config.getTotalNumClients(); j++) {
 			config.useClient(config.getClientByIndex(j));
-			result[j].fetchToLocal();
+			result[j].fetch();
 			double rlt = result[j].getData(0);
 			rltSum += rlt;
 			System.out.println(rlt);
@@ -174,7 +174,7 @@ public class ExampleMonteCarlo {
 		inputParams.init(new double[]{0.13, 0.25, 0.38, 0.5});
 		mc.apply(result, inputParams);
 		
-		result.fetchToLocal();
+		result.fetch();
 		System.out.println(result.getData(0));
 	}
 	

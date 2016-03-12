@@ -30,7 +30,7 @@ public class Test {
 		f.apply(output, input);
 		long end = System.currentTimeMillis();
 		System.out.println("Time: "+((end-begin)/1000.0));
-		if(output.fetchToLocal()) {
+		if(output.fetch()) {
 			for(double d : output.getData()) {
 				System.out.println(d);
 			}

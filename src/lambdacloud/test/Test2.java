@@ -43,14 +43,14 @@ public class Test2 {
 			f.apply(output, input);
 			Expr update = input + 1.0*output;
 			input = update; //Cast update to type CloudSD
-			if(input.fetchToLocal()) {
+			if(input.fetch()) {
 				for(double d : input.getData())
 					System.out.println(d);
 			}
 		}
 		long end = System.currentTimeMillis();
 		System.out.println("Time: "+((end-begin)/1000.0));
-		if(output.fetchToLocal()) {
+		if(output.fetch()) {
 			for(double d : output.getData()) {
 				System.out.println(d);
 			}

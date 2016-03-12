@@ -35,7 +35,7 @@ public class TestServers {
 		
 		f.apply(output, input1, input2);
 		
-		if(output.fetchToLocal()) {
+		if(output.fetch()) {
 			for(double d : output.getData()) {
 				System.out.println(d);
 			}
@@ -56,7 +56,7 @@ public class TestServers {
 		dict.put(y.toString(), 4.0);
 		
 		CloudSD output = sess.runOpt(expr, dict);
-		if(output.fetchToLocal()) {
+		if(output.fetch()) {
 			for(double d : output.getData()) {
 				System.out.println(d);
 			}

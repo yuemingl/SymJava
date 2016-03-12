@@ -91,7 +91,7 @@ public class Session {
 		}
 		System.out.print("]");
 		root.cfunc.apply(output, inputs);
-		if(output.fetchToLocal()) {
+		if(output.fetch()) {
 			System.out.print("Return: [");
 			for(double d : output.getData()) {
 				System.out.print(d+" ");
@@ -125,7 +125,7 @@ public class Session {
 		CloudSD input = new CloudSD("input").init(args);
 		CloudSD output = new CloudSD("output").resize(1);
 		root.cfunc.apply(output, input);
-		if(output.fetchToLocal()) {
+		if(output.fetch()) {
 //			for(double d : output.getData()) {
 //				System.out.println(d);
 //			}

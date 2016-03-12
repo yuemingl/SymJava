@@ -5,31 +5,33 @@ import lambdacloud.core.CloudSD;
 
 /**
  * This example shows how to use class CloudSD (Cloud Shared Data)
- * to store your data to LambdaCloud and to fetch it from the cloud.
+ * to push (store) your data to LambdaCloud and to fetch it to local.
  *
  */
 public class Example1 {
 
 	public static void main(String[] args) {
 		// Set your secure configure file. 
-		// You can register an account and download it from 
+		// You can register an account and download the config file from 
 		// http://lambdacloud.io
 		CloudConfig.setGlobalTarget("job_local.conf");
 		
-		// Store myData to the cloud, which is initialized by 
-		// an array of double numbers.
+		// Store myData to the cloud, which is initialized by an array of double numbers.
 		double[] data = {1,2,3,4,5,6};
-		CloudSD myData = new CloudSD("myData").init(data);
-		myData.storeToCloud();
+		CloudSD myData = new CloudSD("myData1").init(data);
+		if(myData.push())
+			System.out.println("myData1 is on the cloud now.");
 		
-		// The data myData should be on the cloud now. 
-		// We fetch it to local machine and print out the numbers.
-		// In order to fetch a named shared data, you need define
-		// an instance of CloudSD with the name.
-		CloudSD data2 = new CloudSD("myData");
-		data2.fetchToLocal();
-		if(data2.isOnCloud()) {
-			for(double d : data2.getData()) {
+		// We can fetch it to our local machine at some where else
+		// as long as we create an instance of CloudSD and provide
+		// the name myData1
+		anotherFunction();
+	}
+	
+	public static void anotherFunction() {
+		CloudSD data = new CloudSD("myData1");
+		if(data.fetch()) {
+			for(double d : data.getData()) {
 				System.out.println(d);
 			}
 		}

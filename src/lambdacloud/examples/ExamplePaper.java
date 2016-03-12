@@ -29,7 +29,7 @@ public class ExamplePaper {
 		fun.apply(output, input);
 		
 		//Fetch the evaluation result to local
-		if(output.fetchToLocal()) {
+		if(output.fetch()) {
 			System.out.println(output.getData(0));
 		}
 

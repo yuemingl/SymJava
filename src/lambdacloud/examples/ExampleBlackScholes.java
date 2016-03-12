@@ -59,7 +59,7 @@ public class ExampleBlackScholes {
 		//sever
 		CloudSD output = new CloudSD("bs_sol").init(1);
 		lib.solverNewton(eq, guess, constParams, 100, 1e-5, output);
-		output.fetchToLocal();
+		output.fetch();
 		System.out.println("Results from server: "+output.getData(0));
 
 	}

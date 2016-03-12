@@ -107,7 +107,7 @@ public class CloudLib {
 		String sEps = convertParam(eps);
 		CloudSD output = new CloudSD().init(init.length);
 		invokeStatic("symjava.examples.GaussNewton","solve", new String[]{sEq, sInit, sParam, sMaxIter, sEps}, output);
-		output.fetchToLocal();
+		output.fetch();
 		System.out.println(output.getName());
 		return output.getData();
 	}
@@ -120,7 +120,7 @@ public class CloudLib {
 		String sEps = convertParam(eps);
 		CloudSD output = new CloudSD().init(init.length);
 		invokeStatic("symjava.examples.GaussNewton","solve", new String[]{sEq, sInit, sParam, sMaxIter, sEps}, output);
-		output.fetchToLocal();
+		output.fetch();
 		System.out.println(output.getName());
 		return output.getData();
 	}

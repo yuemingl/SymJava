@@ -16,12 +16,12 @@ public class TestCloudSD {
 		// Store var123 to the cloud
 		double[] data = {1,2,3,4,5,6};
 		CloudSD var = new CloudSD("var123").init(data);
-		var.storeToCloud();
+		var.push();
 		
 		// The variable var123 should be on the cloud now. 
 		// We fetch it to local and print out the numbers
 		CloudSD var2 = new CloudSD("var123");
-		var2.fetchToLocal();
+		var2.fetch();
 		if(var2.isOnCloud()) {
 			for(double d : var2.getData()) {
 				System.out.println(d);
@@ -30,7 +30,7 @@ public class TestCloudSD {
 		
 		// This variable should not be on the cloud
 		CloudSD var3 = new CloudSD("out123");
-		var3.fetchToLocal();
+		var3.fetch();
 		if(var3.isOnCloud()) {
 			for(double d : var3.getData()) {
 				System.out.println(d);
@@ -43,8 +43,8 @@ public class TestCloudSD {
 		v1.init(new double[]{1,2,3,4,5,6,7,8,9,10,11});
 		System.out.println(v1.getName());
 		System.out.println(v1.getFullName());
-		v1.storeToCloud();
-		v1.fetchToLocal();
+		v1.push();
+		v1.fetch();
 		for(double d : v1.getData())
 			System.out.println(d);
 	}

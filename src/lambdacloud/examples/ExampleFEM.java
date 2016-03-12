@@ -121,7 +121,7 @@ public class ExampleFEM {
 		applyTime = end2 - start2;
 
 		for(int i=0; i<CloudConfig.getGlobalConfig().getTotalNumClients(); i++) {
-			if(output.fetchToLocal()) {
+			if(output.fetch()) {
 				for(double d : output.getData()) {
 					System.out.println("output="+d);
 				}

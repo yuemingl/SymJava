@@ -40,7 +40,7 @@ public class Example2 {
 		f.apply(output, input);
 		//You have to fetch the result to local after evaluating, 
 		//since it's stored on cloud by default
-		if(output.fetchToLocal()) {
+		if(output.fetch()) {
 			for(double d : output.getData()) {
 				System.out.println(d);
 			}

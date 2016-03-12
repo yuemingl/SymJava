@@ -324,7 +324,7 @@ public class CloudFunc extends LCBase {
 			//Store argument on cloud first if necessary
 			for(int i=0; i<inputs.length; i++) 
 				if(!inputs[i].isOnCloud()) {
-					inputs[i].storeToCloud();
+					inputs[i].push();
 				}
 			
 			CloudClient client = config.currentClient();

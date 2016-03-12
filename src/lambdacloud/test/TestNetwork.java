@@ -41,18 +41,18 @@ public class TestNetwork {
 		long start1, start2;
 		long end1, end2;
 		CloudSD warmup = new CloudSD("test_network_warmup").init(new double[10]);
-		warmup.storeToCloud();
+		warmup.push();
 		
 		start1 = System.currentTimeMillis();
 		CloudSD var = new CloudSD("test_network_var").init(data);
 		for(int i=0; i<3; i++)
-			var.storeToCloud();
+			var.push();
 		end1 = System.currentTimeMillis();
 		
 		start2 = System.currentTimeMillis();
 		CloudSD var2 = new CloudSD("test_network_var");
 		for(int i=0; i<3; i++)
-			var2.fetchToLocal();
+			var2.fetch();
 		end2 = System.currentTimeMillis();
 		
 		double sec1 = (end1-start1)/1000.0;
