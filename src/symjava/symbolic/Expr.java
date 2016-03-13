@@ -495,9 +495,10 @@ abstract public class Expr implements Cloneable {
 	
 	/**
 	 * Reset the compile flags for an expression. 
-	 * For example, a matrix is defined and stored to a local variable at the first reference of it
-	 * The following reference of it just load the local variable.
-	 * By calling this function, the state is reset.
+	 * 
+	 * For example, a matrix is defined and stored to new a local variable when it is referenced
+	 * at the first time. The following references of the matrix just load the local variable.
+	 * By calling this function, the state is reset to define a new local variable.
 	 */
 	public void bytecodeGenReset() {
 		

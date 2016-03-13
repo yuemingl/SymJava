@@ -33,7 +33,7 @@ public class TestMatrix {
 	
 	public static void testBasic1() {
 		Matrix A = new Matrix("A",3,3);
-		BytecodeVecFunc fun =  CompileUtils.compileVec(new LCReturn(A));
+		BytecodeVecFunc fun =  CompileUtils.compileVecFunc(new LCReturn(A));
 		/**
 		 * 1 2 3
 		 * 4 5 6
@@ -47,7 +47,7 @@ public class TestMatrix {
 	
 	public static void testBasic2() {
 		Vector x = new Vector("x",3);
-		BytecodeVecFunc fun =  CompileUtils.compileVec(new LCReturn(x));
+		BytecodeVecFunc fun =  CompileUtils.compileVecFunc(new LCReturn(x));
 		double[] data_x = new double[] {1,2,3};
 		double[] outAry = new double[3];
 		fun.apply(outAry, 0, data_x);
@@ -57,7 +57,7 @@ public class TestMatrix {
 	public static void testBasic3() {
 		Matrix A = new Matrix("A",3,3);
 		Vector x = new Vector("x",3);
-		BytecodeVecFunc fun =  CompileUtils.compileVec(new LCReturn(A*x));
+		BytecodeVecFunc fun =  CompileUtils.compileVecFunc(new LCReturn(A*x));
 		/**
 		 * 1 2 3
 		 * 4 5 6
@@ -74,7 +74,7 @@ public class TestMatrix {
 		Vector x = new Vector("x",3);
 		Vector y = new Vector("y",3);
 		
-		BytecodeVecFunc fun =  CompileUtils.compileVec(new LCReturn(x+y), x, y);
+		BytecodeVecFunc fun =  CompileUtils.compileVecFunc(new LCReturn(x+y), x, y);
 		double[] outAry = new double[4];
 		double[] data_x = new double[] {1,2,3};
 		double[] data_y = new double[] {1,2,3};
@@ -87,7 +87,7 @@ public class TestMatrix {
 		Vector y = new Vector("y",2);
 		Vector z = new Vector("z",4);
 		
-		BytecodeVecFunc fun =  CompileUtils.compileVec(new LCReturn(new Concat(x,y,z)), x, y, z);
+		BytecodeVecFunc fun =  CompileUtils.compileVecFunc(new LCReturn(new Concat(x,y,z)), x, y, z);
 		double[] outAry = new double[9];
 		double[] data_x = new double[] {1,2,3};
 		double[] data_y = new double[] {4,5};
@@ -101,7 +101,7 @@ public class TestMatrix {
 		Vector y = new Vector("y",2);
 		Vector z = new Vector("z",5);
 		
-		BytecodeVecFunc fun =  CompileUtils.compileVec(new LCReturn(new Concat(x,y)+z), x, y, z);
+		BytecodeVecFunc fun =  CompileUtils.compileVecFunc(new LCReturn(new Concat(x,y)+z), x, y, z);
 		double[] outAry = new double[5];
 		double[] data_x = new double[] {1,2,3};
 		double[] data_y = new double[] {4,5};
@@ -128,7 +128,7 @@ public class TestMatrix {
 		System.out.println(res);
 		//Doesn't work because the symbol AA[0][0] has no name?
 		//BytecodeVecFunc fun = CompileUtils.compileVec(new LCReturn(res), A,x,y0,AA[0][0],AA[1][0],xx[0],xx[1]);
-		BytecodeVecFunc fun = CompileUtils.compileVec(new LCReturn(res));
+		BytecodeVecFunc fun = CompileUtils.compileVecFunc(new LCReturn(res));
 /*
 1 2 3 4   0   1   13
 1 2 1 3 * 1 + 2 = 9

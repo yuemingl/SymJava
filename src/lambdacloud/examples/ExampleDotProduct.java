@@ -25,7 +25,7 @@ public class ExampleDotProduct {
 
 		lcs.append(output[1].assign(sum));
 		
-		BytecodeVecFunc f = CompileUtils.compileVec(lcs, output, x, y);
+		BytecodeVecFunc f = CompileUtils.compileVecFunc(lcs, output, x, y);
 		
 		double[] out = new double[6];
 		double[] xx = new double[] {1,2,3,4,5,6};
