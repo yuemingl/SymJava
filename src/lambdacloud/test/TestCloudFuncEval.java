@@ -1,31 +1,25 @@
 package lambdacloud.test;
 
-import static symjava.math.SymMath.*;
+import static symjava.math.SymMath.sqrt;
 import static symjava.symbolic.Symbol.x;
 import static symjava.symbolic.Symbol.y;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
-import lambdacloud.core.lang.LCVar;
-import symjava.symbolic.Expr;
 
 public class TestCloudFuncEval {
 
 	public static void main(String[] args) {
-		CloudConfig.setGlobalTarget("job_aws.conf");
+		CloudConfig.setGlobalTarget("job_local.conf");
 		
 		double[] data = { 3, 4 };
 		CloudSD input = new CloudSD("var123").init(data);
-		input.push();
-
-		LCVar x = LCVar.getDouble("x");
-		LCVar y = LCVar.getDouble("y");
+		//input.push(); // The input will be pushed to cloud automatically when evaluating a function
 
 		// This function will be sent to cloud
-		CloudFunc func = new CloudFunc("func123", 
-				sqrt(x*x + y*y), new LCVar[] { x, y });
+		CloudFunc func = new CloudFunc(sqrt(x*x + y*y));
 
-		CloudSD output = new CloudSD("out123").resize(1);
+		CloudSD output = new CloudSD();
 		// Evaluate the function on the cloud and 
 		// return the reference of the result
 		long begin = System.currentTimeMillis();
