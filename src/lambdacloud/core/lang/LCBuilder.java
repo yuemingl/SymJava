@@ -92,7 +92,7 @@ public class LCBuilder {
 	}
 	
 	public CloudFunc build(LCVar ...args) {
-		CloudFunc func = new CloudFunc(this.config, args, new LCStatements(this.stmts));
+		CloudFunc func = new CloudFunc(this.config, new LCStatements(this.stmts), args);
 		return func;
 	}
 	

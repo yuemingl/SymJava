@@ -26,7 +26,7 @@ public class TestServers {
 		CloudConfig config = CloudConfig.setGlobalTarget("job_local.conf");
 		
 		Expr sum = x + y + z;
-		CloudFunc f = new CloudFunc(config, new Expr[]{x,y,z}, sum);
+		CloudFunc f = new CloudFunc(config, sum, new Expr[]{x,y,z});
 		
 		//CloudSD input1 = new CloudSD("input1").init(new double[]{1, 2});
 		CloudSD input1 = new CloudSD("csd://127.0.0.1:8323/input11").init(new double[]{1, 2});

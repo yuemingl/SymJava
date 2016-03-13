@@ -23,7 +23,7 @@ public class TestCloudFuncEval {
 
 		// This function will be sent to cloud
 		CloudFunc func = new CloudFunc("func123", 
-				new LCVar[] { x, y }, sqrt(x*x + y*y));
+				sqrt(x*x + y*y), new LCVar[] { x, y });
 
 		CloudSD output = new CloudSD("out123").resize(1);
 		// Evaluate the function on the cloud and 

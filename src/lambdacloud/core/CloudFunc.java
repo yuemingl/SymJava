@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lambdacloud.core.lang.LCBase;
@@ -27,6 +28,7 @@ import symjava.symbolic.Expr;
 import symjava.symbolic.TypeInfo;
 import symjava.symbolic.utils.FuncClassLoader;
 import symjava.symbolic.utils.JIT;
+import symjava.symbolic.utils.Utils;
 
 public class CloudFunc extends LCBase {
 	private static AtomicInteger cfuncNameGenerator = new AtomicInteger(0);
@@ -55,53 +57,83 @@ public class CloudFunc extends LCBase {
 	
 	int device;
 	
-	public CloudFunc(String name) {
-		this.name = name;
+	public CloudFunc(Expr expr) {
+		this.name = generateName();
+		this.compile(expr);
 	}
 	
-	public CloudFunc(String name, Expr[] args, Expr expr) {
-		this.name = name;
-		this.compile(args, expr);
-	}
-	
-	public CloudFunc(String name, Expr[] args, Expr[] expr) {
-		this.name = name;
-		this.compile(args, expr);
-	}
-	
-	public CloudFunc(Expr[] args, Expr expr) {
+	public CloudFunc(Expr expr, Expr... args) {
 		this.name = generateName();
 		this.compile(args, expr);
 	}
+
+	public CloudFunc(Expr[] expr, Expr... args) {
+		this.name = generateName();
+		this.compile(args, expr);
+	}
+
+	/**
+	 * What purpose by providing only a name? Get an existing function from cloud?
+	 * @param name
+	 */
+	public CloudFunc(String name) {
+		this.name = name;
+	}
+
+	public CloudFunc(String name, Expr expr) {
+		this.name = name;
+		this.compile(expr);
+	}
 	
+	public CloudFunc(String name, Expr expr, Expr... args) {
+		this.name = name;
+		this.compile(args, expr);
+	}
+	
+	public CloudFunc(String name, Expr[] expr, Expr... args) {
+		this.name = name;
+		this.compile(args, expr);
+	}
+	
+	public CloudFunc(CloudConfig config, Expr expr) {
+		this.name = generateName();
+		this.localConfig = config;
+		this.compile(expr);
+	}
+	
+	public CloudFunc(CloudConfig config, Expr expr, Expr... args) {
+		this.name = generateName();
+		this.localConfig = config;
+		this.compile(args, expr);
+	}
+
+	public CloudFunc(CloudConfig config, Expr[] expr, Expr... args) {
+		this.name = generateName();
+		this.localConfig = config;
+		this.compile(args, expr);
+	}
+
 	public CloudFunc(CloudConfig config, String name) {
 		this.name = name;
 		this.localConfig = config;
 	}
 	
-	public CloudFunc(CloudConfig config, String name, LCVar[] args, Expr expr) {
+	public CloudFunc(CloudConfig config, String name, Expr expr) {
+		this.name = name;
+		this.localConfig = config;
+		this.compile(expr);
+	}
+
+	public CloudFunc(CloudConfig config, String name, Expr expr, Expr... args) {
+		this.name = name;
+		this.localConfig = config;
+		this.compile(args, expr);
+	}
+	
+	public CloudFunc(CloudConfig config, String name, Expr[] expr, Expr... args) {
 		this.name = name;
 		this.localConfig = config;
 
-		this.compile(args, expr);
-	}
-	
-	public CloudFunc(CloudConfig config, String name, LCVar[] args, Expr[] expr) {
-		this.name = name;
-		this.localConfig = config;
-
-		this.compile(args, expr);
-	}
-	
-	public CloudFunc(CloudConfig config, Expr[] args, Expr expr) {
-		this.name = generateName();
-		this.localConfig = config;
-		this.compile(args, expr);
-	}
-	
-	public CloudFunc(CloudConfig config, Expr[] args, Expr[] expr) {
-		this.name = generateName();
-		this.localConfig = config;
 		this.compile(args, expr);
 	}
 	
@@ -178,6 +210,16 @@ public class CloudFunc extends LCBase {
 		}
 	}
 
+	/**
+	 * Add this to support constructor with only expr
+	 * 
+	 * @param expr
+	 * @return
+	 */
+	public CloudFunc compile(Expr expr) {
+		List<Expr> args = Utils.extractSymbols(expr);
+		return compile(args.toArray(new Expr[0]), expr);
+	}
 	
 	public CloudFunc compile(Expr[] args, Expr expr) {
 		Expr compileExpr = expr;

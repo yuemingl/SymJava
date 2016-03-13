@@ -21,7 +21,7 @@ public class Test {
 		
 		Expr expr = x + y + z;
 		//x,y are not local now since they are passed as arguments
-		CloudFunc f = new CloudFunc(new LCVar[]{x, y}, expr);
+		CloudFunc f = new CloudFunc(expr, new LCVar[]{x, y});
 		
 		CloudSD input = new CloudSD("input").init(new double[]{1, 2});
 		CloudSD output = new CloudSD("output").resize(1);

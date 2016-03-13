@@ -19,7 +19,7 @@ public class ExamplePaper {
 		Expr Rdy = R.diff(y); 
 		
 		//Define a function on the cloud
-		CloudFunc fun = new CloudFunc(new Expr[]{x, y}, Rdy);
+		CloudFunc fun = new CloudFunc(Rdy, new Expr[]{x, y});
 		
 		//Evaluate the function on the cloud by providing
 		//input and output parameters

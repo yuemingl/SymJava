@@ -168,7 +168,7 @@ public class ExampleMonteCarlo {
 		Expr I = Integrate.apply(sin(sqrt(log(x+y+1)) ), omega);
 		System.out.println(I);
 		
-		CloudFunc mc = new CloudFunc("MonteCarlo1", new LCVar[]{a, b, c, d}, I);
+		CloudFunc mc = new CloudFunc("MonteCarlo1", I, new LCVar[]{a, b, c, d});
 		CloudSD result = new CloudSD("result");
 		CloudSD inputParams = new CloudSD("params");
 		inputParams.init(new double[]{0.13, 0.25, 0.38, 0.5});

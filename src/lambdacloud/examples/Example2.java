@@ -32,7 +32,7 @@ public class Example2 {
 		CloudConfig.setGlobalTarget("job_local.conf");
 		
 		Expr expr = sqrt(x*x + y*y);
-		CloudFunc f = new CloudFunc(new Expr[]{x, y}, expr);
+		CloudFunc f = new CloudFunc(expr, new Expr[]{x, y});
 		
 		CloudSD input = new CloudSD("input").init(new double[]{3, 4});
 		

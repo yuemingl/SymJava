@@ -38,7 +38,7 @@ public class GraphBuilder {
 			root.expr.runOn(device);
 		}
 		CloudConfig.getGlobalConfig().getClientByIndex(Integer.parseInt(device.name));
-		root.cfunc = new CloudFunc(CloudConfig.getGlobalConfig(), root.args.toArray(new Expr[0]), root.expr);
+		root.cfunc = new CloudFunc(CloudConfig.getGlobalConfig(), root.expr, root.args.toArray(new Expr[0]));
 	}
 	
 	public static Node helper(Expr expr) {

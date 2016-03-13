@@ -5,7 +5,7 @@ import lambdacloud.core.CloudSD;
 
 /**
  * This example shows how to use class CloudSD (Cloud Shared Data)
- * to push (store) your data to LambdaCloud and to fetch it to local.
+ * to push (store) your data to the cloud and fetch it to the local.
  *
  */
 public class Example1 {

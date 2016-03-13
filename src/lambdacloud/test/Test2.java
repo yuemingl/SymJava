@@ -31,7 +31,7 @@ public class Test2 {
 			x + y,
 			x - y
 		};
-		CloudFunc f = new CloudFunc("a_vector_function", new LCVar[]{x, y}, exprs);
+		CloudFunc f = new CloudFunc("a_vector_function", exprs, new LCVar[]{x, y});
 		
 		CloudSD input = new CloudSD("input").init(new double[]{2, 1});
 		CloudSD output = new CloudSD("output").resize(2);
