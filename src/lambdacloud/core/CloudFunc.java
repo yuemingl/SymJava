@@ -270,7 +270,7 @@ public class CloudFunc extends LCBase {
 	public CloudFunc compile(Expr[] args, Expr[] exprs) {
 		if(currentCloudConfig().isLocal()) {
 			funcType = FUNC_TYPE.VECTOR;
-			batchFunc = JIT.compile(args, exprs);
+			batchFunc = JIT.compileBatchFunc(args, exprs);
 		} else {
 			//send the exprssion to the server
 		}

@@ -45,7 +45,7 @@ public class JIT {
 		return new NumMatrix(m, args);
 	}
 	
-	public static BytecodeBatchFunc compile(Expr[] args, Expr[] exprs) {
+	public static BytecodeBatchFunc compileBatchFunc(Expr[] args, Expr[] exprs) {
 		boolean isWriteFile = true;
 		boolean staticMethod = false;
 		try {

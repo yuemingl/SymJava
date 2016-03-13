@@ -43,7 +43,7 @@ public class BenchmarkGriewank {
 		
 		Expr[] args = xi.get(0, N);
 		start = System.currentTimeMillis();
-		BytecodeBatchFunc f = JIT.compile(args, grad);
+		BytecodeBatchFunc f = JIT.compileBatchFunc(args, grad);
 		long compileTime = System.currentTimeMillis() - start;
 		
 		double[] outAry = new double[N];
