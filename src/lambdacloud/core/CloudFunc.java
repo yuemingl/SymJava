@@ -20,9 +20,9 @@ import lambdacloud.net.CloudQuery;
 import lambdacloud.net.CloudResp;
 import lambdacloud.net.CloudSDHandler;
 import lambdacloud.test.CompileUtils;
-import symjava.bytecode.BytecodeBatchFunc;
-import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
+import symjava.bytecode.BytecodeFunc;
+import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.IR;
 import symjava.symbolic.Expr;
 import symjava.symbolic.TypeInfo;
@@ -35,8 +35,8 @@ public class CloudFunc extends LCBase {
 	
 	public static enum FUNC_TYPE { SCALAR, VECTOR, BATCH }
 	protected String name;
-	protected BytecodeFunc func;
-	protected BytecodeVecFunc vecFunc;
+	protected BytecodeFunc      func;
+	protected BytecodeVecFunc   vecFunc;
 	protected BytecodeBatchFunc batchFunc;
 	
 	//Info for BytecodeBatchFunc
@@ -270,7 +270,7 @@ public class CloudFunc extends LCBase {
 	public CloudFunc compile(Expr[] args, Expr[] exprs) {
 		if(currentCloudConfig().isLocal()) {
 			funcType = FUNC_TYPE.VECTOR;
-			vecFunc = JIT.compile(args, exprs);
+			batchFunc = JIT.compile(args, exprs);
 		} else {
 			//send the exprssion to the server
 		}
@@ -332,9 +332,9 @@ public class CloudFunc extends LCBase {
 					output.setData(0, func.apply());
 					break;
 				case VECTOR:
-					break;
+					throw new UnsupportedOperationException();
 				case BATCH:
-					break;
+					throw new UnsupportedOperationException();
 				default:
 					throw new RuntimeException();
 				}
@@ -350,11 +350,11 @@ public class CloudFunc extends LCBase {
 					output.setData(0, d);
 					break;
 				case VECTOR:
+					throw new UnsupportedOperationException();
+				case BATCH:
 					data = inputs[0].getData();
 					double[] out = output.getData();
-					vecFunc.apply(out, 0, data);
-					break;
-				case BATCH:
+					batchFunc.apply(out, 0, data);
 					break;
 				default:
 					throw new RuntimeException();
@@ -410,23 +410,23 @@ public class CloudFunc extends LCBase {
 		this.func = f;
 		return this;
 	}
-	public CloudFunc setBytecodeVecFunc(BytecodeVecFunc f) {
-		this.vecFunc = f;
-		return this;
-	}
 	public CloudFunc setBytecodeBatchFunc(BytecodeBatchFunc f) {
 		this.batchFunc = f;
+		return this;
+	}
+	public CloudFunc setBytecodeVecFunc(BytecodeVecFunc f) {
+		this.vecFunc = f;
 		return this;
 	}
 	
 	public BytecodeFunc getBytecodeFunc() {
 		return this.func;
 	}
-	public BytecodeVecFunc getBytecodeVecFunc() {
-		return this.vecFunc;
-	}
 	public BytecodeBatchFunc getBytecodeBatchFunc() {
 		return this.batchFunc;
+	}
+	public BytecodeVecFunc getBytecodeVecFunc() {
+		return this.vecFunc;
 	}
 	
 	@Override

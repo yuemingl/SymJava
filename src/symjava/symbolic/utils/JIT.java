@@ -7,9 +7,9 @@ import lambdacloud.core.CloudFunc.FUNC_TYPE;
 
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
 
-import symjava.bytecode.BytecodeBatchFunc;
-import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
+import symjava.bytecode.BytecodeFunc;
+import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.IR;
 import symjava.bytecode.VecFuncs;
 import symjava.matrix.SymMatrix;
@@ -45,12 +45,12 @@ public class JIT {
 		return new NumMatrix(m, args);
 	}
 	
-	public static BytecodeVecFunc compile(Expr[] args, Expr[] exprs) {
+	public static BytecodeBatchFunc compile(Expr[] args, Expr[] exprs) {
 		boolean isWriteFile = true;
 		boolean staticMethod = false;
 		try {
 			int NMaxExpr = 36;
-			FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
+			FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
 			List<Expr> nonZeroList = new ArrayList<Expr>();
 			List<Integer> nonZeroIdx = new ArrayList<Integer>();
 			for(int i=0; i<exprs.length; i++) {
@@ -69,9 +69,9 @@ public class JIT {
 					batchOutPos.add(nonZeroIdx.get(i));
 					if(i%NMaxExpr == NMaxExpr-1) {
 						String className = "JITVecFunc_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX__"+i+"___outof___"+exprs.length+"___XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
-						ClassGen genClass = BytecodeUtils.genClassBytecodeVecFunc(className, batchExprs, batchOutPos, args, 
+						ClassGen genClass = BytecodeUtils.genClassBytecodeBatchFunc(className, batchExprs, batchOutPos, args, 
 								isWriteFile, staticMethod);
-						BytecodeVecFunc func = fcl.newInstance(genClass);
+						BytecodeBatchFunc func = fcl.newInstance(genClass);
 						ret.addFunc(func, batchOutPos.get(0));
 						batchExprs.clear();
 						batchOutPos.clear();
@@ -80,15 +80,15 @@ public class JIT {
 				int remain = N%NMaxExpr;
 				if(remain > 0) {
 					String className = "JITVecFunc_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX__"+(N-remain)+"___outof___"+exprs.length+"___XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
-					ClassGen genClass = BytecodeUtils.genClassBytecodeVecFunc(className, batchExprs, batchOutPos, args, 
+					ClassGen genClass = BytecodeUtils.genClassBytecodeBatchFunc(className, batchExprs, batchOutPos, args, 
 							isWriteFile, staticMethod);
-					BytecodeVecFunc func = fcl.newInstance(genClass);
+					BytecodeBatchFunc func = fcl.newInstance(genClass);
 					ret.addFunc(func, batchOutPos.get(0));
 				}
 				return ret;
 			} else {
 				String className = "JITVecFunc_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX__"+exprs.length+"___XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
-				ClassGen genClass = BytecodeUtils.genClassBytecodeVecFunc(className, nonZeroList, nonZeroIdx, args, 
+				ClassGen genClass = BytecodeUtils.genClassBytecodeBatchFunc(className, nonZeroList, nonZeroIdx, args, 
 						isWriteFile, staticMethod);
 				return fcl.newInstance(genClass);
 			}
@@ -98,10 +98,10 @@ public class JIT {
 		return null;
 	}
 	
-	public static BytecodeBatchFunc compileBatchFunc(Expr[] args, Expr expr) {
+	public static BytecodeVecFunc compileVecFunc(Expr[] args, Expr expr) {
 		String className = "JITVecFunc_YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
-		ClassGen genClass = BytecodeUtils.genClassBytecodeBatchFunc(className,expr, args, true, false);
-		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
+		ClassGen genClass = BytecodeUtils.genClassBytecodeVecFunc(className,expr, args, true, false);
+		FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
 		return fcl.newInstance(genClass);
 	}
 	
@@ -129,7 +129,7 @@ public class JIT {
 //			System.out.println(d);
 		
 		Expr expr = Symbol.x + Symbol.y;
-		BytecodeBatchFunc vecFunc = JIT.compileBatchFunc(new Expr[]{Symbol.x, Symbol.y}, expr);
+		BytecodeVecFunc vecFunc = JIT.compileVecFunc(new Expr[]{Symbol.x, Symbol.y}, expr);
 		double[] outAry = new double[3];
 		double[][] params = {
 				{1.0,  2.0, 3.0},

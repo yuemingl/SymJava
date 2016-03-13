@@ -9,7 +9,7 @@ import lambdacloud.net.CloudSDHandler;
 import lambdacloud.net.CloudSDRespHandler;
 import lambdacloud.net.CloudSDResp;
 import lambdacloud.net.CloudClient;
-import symjava.bytecode.BytecodeBatchFunc;
+import symjava.bytecode.BytecodeVecFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.utils.JIT;
@@ -102,7 +102,7 @@ public class CloudSD extends Symbol {
 	public CloudSD compile(String name, Expr expr) {
 		if(currentCloudConfig().isLocal()) {
 			CloudSD[] args = Utils.extractCloudSDs(expr).toArray(new CloudSD[0]);
-			BytecodeBatchFunc fexpr = JIT.compileBatchFunc(args, expr);
+			BytecodeVecFunc fexpr = JIT.compileVecFunc(args, expr);
 			data = new double[args[0].size()];
 			fexpr.apply(data, 0, Utils.getDataFromCloudSDs(args));
 		} else {

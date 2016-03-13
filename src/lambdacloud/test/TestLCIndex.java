@@ -3,7 +3,7 @@ package lambdacloud.test;
 import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCAssign;
 import lambdacloud.core.lang.LCStatements;
-import symjava.bytecode.BytecodeBatchFunc;
+import symjava.bytecode.BytecodeVecFunc;
 import symjava.symbolic.Expr;
 
 public class TestLCIndex {
@@ -15,7 +15,7 @@ public class TestLCIndex {
 		LCArray output = LCArray.getDoubleArray("output");
 		
 		lcs.append(new LCAssign(output[0], x[2]));
-		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, output, x);
+		BytecodeVecFunc f = CompileUtils.compileVec(lcs, output, x);
 		double[] out = new double[10];
 		double[] xx = new double[] {1,2,3};
 		f.apply(out, 0, xx);
@@ -30,7 +30,7 @@ public class TestLCIndex {
 		LCArray output = LCArray.getDoubleArray("output");
 		
 		lcs.append(new LCAssign(output[0], x[2]*y[2]));
-		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, output, x, y);
+		BytecodeVecFunc f = CompileUtils.compileVec(lcs, output, x, y);
 		double[] out = new double[10];
 		double[] xx = new double[] {1,2,3};
 		double[] yy = new double[] {2,1,2};

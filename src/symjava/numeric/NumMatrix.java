@@ -1,12 +1,12 @@
 package symjava.numeric;
 
-import symjava.bytecode.BytecodeVecFunc;
+import symjava.bytecode.BytecodeBatchFunc;
 import symjava.matrix.SymMatrix;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
 public class NumMatrix {
-	public BytecodeVecFunc func;
+	public BytecodeBatchFunc func;
 	int nRow;
 	int nCol;
 	double[] lastEvalData;

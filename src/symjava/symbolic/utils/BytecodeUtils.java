@@ -288,12 +288,12 @@ public class BytecodeUtils {
 		return cg;
 	}
 	
-	public static ClassGen genClassBytecodeVecFunc(String className, List<Expr> exprs, List<Integer> outPos, Expr[] args, 
+	public static ClassGen genClassBytecodeBatchFunc(String className, List<Expr> exprs, List<Integer> outPos, Expr[] args, 
 			boolean writeClassFile, boolean staticMethod) {
 		String packageName = "symjava.bytecode";
 		String fullClsName = packageName+"."+className;
 		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",
-				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeVecFunc"});
+				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeBatchFunc"});
 		ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
 		InstructionList il = new InstructionList();
 		InstructionFactory factory = new InstructionFactory(cg);
@@ -364,7 +364,7 @@ public class BytecodeUtils {
 	 * @param staticMethod NOT supported
 	 * @return
 	 */
-	public static ClassGen genClassBytecodeBatchFunc(String className, Expr expr, Expr[] args,
+	public static ClassGen genClassBytecodeVecFunc(String className, Expr expr, Expr[] args,
 			boolean writeClassFile, boolean staticMethod) {
 		
 		System.out.println("JIT Batch: "+expr);
@@ -372,7 +372,7 @@ public class BytecodeUtils {
 		String packageName = "symjava.bytecode";
 		String fullClsName = packageName+"."+className;
 		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",
-				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeBatchFunc"});
+				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeVecFunc"});
 		ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
 		InstructionList il = new InstructionList();
 		InstructionFactory factory = new InstructionFactory(cg);

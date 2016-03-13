@@ -1,15 +1,12 @@
 package symjava.examples;
 
+import static symjava.math.SymMath.pow;
 import static symjava.symbolic.Symbol.x;
-import static symjava.math.SymMath.*;
 
 import java.util.ArrayList;
 
-import lambdacloud.core.CloudSD;
-import lambdacloud.core.CloudConfig;
-import lambdacloud.core.CloudFunc;
-import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
+import symjava.bytecode.BytecodeVecFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 import symjava.symbolic.utils.JIT;
@@ -77,14 +74,14 @@ public class BenchmarkSqrt {
 			exprs.add(expr);
 		}
 		
-		ArrayList<BytecodeBatchFunc> funcs = new ArrayList<BytecodeBatchFunc>();
+		ArrayList<BytecodeVecFunc> funcs = new ArrayList<BytecodeVecFunc>();
 		int batchLen = 10000;
 		double[] outAry = new double[batchLen];
 		double[] args = new double[batchLen];
 
 		for(int i=0; i<n; i++) {
 			Func func = new Func("func"+i, exprs.get(i));
-			BytecodeBatchFunc bfunc = JIT.compileBatchFunc(func.args(), func);
+			BytecodeVecFunc bfunc = JIT.compileVecFunc(func.args(), func);
 			funcs.add(bfunc);
 		}
 		

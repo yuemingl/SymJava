@@ -3,7 +3,7 @@ package lambdacloud.test;
 import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCLength;
 import lambdacloud.core.lang.LCStatements;
-import symjava.bytecode.BytecodeBatchFunc;
+import symjava.bytecode.BytecodeVecFunc;
 import symjava.symbolic.Expr;
 
 /**
@@ -24,7 +24,7 @@ public class TestLCLength {
 		lcs.append(output[1].assign(x.size()));
 		lcs.append(output[2].assign(new LCLength(x)));
 		
-		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, x);
+		BytecodeVecFunc f = CompileUtils.compileVec(lcs, x);
 		
 		double[] out = new double[10];
 		double[] xx = new double[] {1,2,3};

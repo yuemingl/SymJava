@@ -9,7 +9,7 @@ import java.util.List;
 import lambdacloud.core.CloudFunc.FUNC_TYPE;
 import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCVar;
-import symjava.bytecode.BytecodeBatchFunc;
+import symjava.bytecode.BytecodeVecFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.IR;
 import symjava.symbolic.Expr;
@@ -50,7 +50,7 @@ public class CompileUtils {
 		if(expr.getType() == TYPE.MATRIX || expr.getType() == TYPE.VECTOR) {
 			LCArray output = LCArray.getDoubleArray("output");
 			cg = _compileVec(name, expr, output, args);
-			ir.type = FUNC_TYPE.BATCH; //BytecodeBatchFunc
+			ir.type = FUNC_TYPE.VECTOR; //BytecodeVecFunc
 			if(expr.getType() == TYPE.VECTOR)
 				ir.outAryLen = expr.getTypeInfo().dim[0];
 			else if(expr.getType() == TYPE.MATRIX)
@@ -60,7 +60,7 @@ public class CompileUtils {
 			///////////////////////////////////////////////////////////////////////////////
 			//Generate new instance here only for test purpose (will have exception if the IR is wrong) 
 			System.out.println("getIR(): create a new instance to test for: "+expr);
-			FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
+			FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
 			fcl.newInstance(cg);
 			///////////The test code above can be deleted in prod env/////////////////////
 
@@ -170,7 +170,7 @@ public class CompileUtils {
 	}
 	
 	/**
-	 * Compile a BytecodeBatchFunc:
+	 * Compile a BytecodeVecFunc:
 	 * void apply(double[] output, int outPos, double[] x, double[] y, ...)
 	 * 
 	 * @param expr
@@ -178,17 +178,17 @@ public class CompileUtils {
 	 * @param args
 	 * @return
 	 */
-	public static BytecodeBatchFunc compileVec(Expr expr, LCArray output, Expr ...args) {
+	public static BytecodeVecFunc compileVec(Expr expr, LCArray output, Expr ...args) {
 		ClassGen cg = _compileVec(null, expr, output, args);
-		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
-		BytecodeBatchFunc fun = fcl.newInstance(cg);
+		FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
+		BytecodeVecFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 
-	public static BytecodeBatchFunc compileVec(String name, Expr expr, LCArray output, Expr ...args) {
+	public static BytecodeVecFunc compileVec(String name, Expr expr, LCArray output, Expr ...args) {
 		ClassGen cg = _compileVec(name, expr, output, args);
-		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
-		BytecodeBatchFunc fun = fcl.newInstance(cg);
+		FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
+		BytecodeVecFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 	
@@ -198,11 +198,11 @@ public class CompileUtils {
 	 * @param args
 	 * @return
 	 */
-	public static BytecodeBatchFunc compileVec(Expr expr, Expr ...args) {
+	public static BytecodeVecFunc compileVec(Expr expr, Expr ...args) {
 		LCArray output = LCArray.getDoubleArray("output");
 		ClassGen cg = _compileVec(null, expr, output, args);
-		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
-		BytecodeBatchFunc fun = fcl.newInstance(cg);
+		FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
+		BytecodeVecFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 	
@@ -213,7 +213,7 @@ public class CompileUtils {
 			clsName = expr.getClass().getSimpleName() + System.currentTimeMillis();
 		String fullClsName = packageName+"."+clsName;
 		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",
-				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeBatchFunc"});
+				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeVecFunc"});
 		ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
 		InstructionList il = new InstructionList();
 		InstructionFactory factory = new InstructionFactory(cg);

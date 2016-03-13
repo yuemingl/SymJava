@@ -6,7 +6,7 @@ import lambdacloud.core.lang.LCLoop;
 import lambdacloud.core.lang.LCStatements;
 import lambdacloud.core.lang.LCVar;
 import lambdacloud.test.CompileUtils;
-import symjava.bytecode.BytecodeBatchFunc;
+import symjava.bytecode.BytecodeVecFunc;
 import symjava.relational.Lt;
 
 public class ExampleDotProduct {
@@ -25,7 +25,7 @@ public class ExampleDotProduct {
 
 		lcs.append(output[1].assign(sum));
 		
-		BytecodeBatchFunc f = CompileUtils.compileVec(lcs, output, x, y);
+		BytecodeVecFunc f = CompileUtils.compileVec(lcs, output, x, y);
 		
 		double[] out = new double[6];
 		double[] xx = new double[] {1,2,3,4,5,6};

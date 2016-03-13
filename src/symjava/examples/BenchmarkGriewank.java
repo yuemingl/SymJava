@@ -1,6 +1,6 @@
 package symjava.examples;
 
-import symjava.bytecode.BytecodeVecFunc;
+import symjava.bytecode.BytecodeBatchFunc;
 import symjava.math.SymMath;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
@@ -43,7 +43,7 @@ public class BenchmarkGriewank {
 		
 		Expr[] args = xi.get(0, N);
 		start = System.currentTimeMillis();
-		BytecodeVecFunc f = JIT.compile(args, grad);
+		BytecodeBatchFunc f = JIT.compile(args, grad);
 		long compileTime = System.currentTimeMillis() - start;
 		
 		double[] outAry = new double[N];

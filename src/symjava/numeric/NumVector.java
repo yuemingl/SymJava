@@ -1,12 +1,12 @@
 package symjava.numeric;
 
-import symjava.bytecode.BytecodeVecFunc;
+import symjava.bytecode.BytecodeBatchFunc;
 import symjava.matrix.SymVector;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
 public class NumVector {
-	BytecodeVecFunc func;
+	BytecodeBatchFunc func;
 	int size;
 	double[] lastEvalData;
 	
