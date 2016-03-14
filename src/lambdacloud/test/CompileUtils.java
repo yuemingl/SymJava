@@ -9,6 +9,7 @@ import java.util.List;
 import lambdacloud.core.CloudFunc.FUNC_TYPE;
 import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCVar;
+import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeVecFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.IR;
@@ -182,6 +183,13 @@ public class CompileUtils {
 		return cg;
 	}
 
+	public static BytecodeBatchFunc compileBatchFunc(String name, Expr[] exprs, Expr ...args) {
+		ClassGen cg = _compileBatchFunc(name, exprs, args);
+		FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
+		BytecodeBatchFunc fun = fcl.newInstance(cg);
+		return fun;
+	}
+	
 	/**
 	 * Compile a list of expressions
 	 * 
@@ -218,7 +226,6 @@ public class CompileUtils {
 		
 		//The following are copied from _compile()
 		//Don't know how to change it accordingly.
-		/**
 		if(args.length == 1 && args[0] instanceof LCArray) {
 			//double apply(double[] args)
 			((LCArray)args[0]).setArgsDim(1);
@@ -227,7 +234,7 @@ public class CompileUtils {
 			StringBuilder sb = new StringBuilder();
 			sb.append("double apply(double[] ").append(args[0].getLabel());
 			sb.append(") = ");
-			sb.append(expr);
+			sb.append(Utils.joinLabels(exprs,", "));
 			System.out.println(sb.toString());
 		} else { 
 			//double apply(double x, double y, ...)
@@ -242,14 +249,12 @@ public class CompileUtils {
 			if(args.length > 0)
 			sb.delete(sb.length()-2, sb.length());
 			sb.append(") = ");
-			sb.append(expr);
+			sb.append(Utils.joinLabels(exprs,", "));
 			System.out.println(sb.toString());
 		}
-		*/
 		
-		/**
 		// Declare local variables
-		List<Expr> vars = Utils.extractSymbols(expr);
+		List<Expr> vars = Utils.extractSymbols(exprs);
 		for(Expr var : vars) {
 			if(var instanceof LCVar) {
 				LCVar cv = (LCVar)var;
@@ -259,14 +264,13 @@ public class CompileUtils {
 				cv.setLVTIndex(indexLVT);
 			}
 		}
-		*/
 		
 		for(int i=0; i<exprs.length; i++) {
 			if(!Utils.symCompare(Symbol.C0, exprs[i])) {
 				il.append(new ALOAD(1));
 				//il.append(new PUSH(cp,outPos.get(i)));
 				il.append(new PUSH(cp,i));//TODO use an list to specify the position like what in class JIT
-				exprs[i].bytecodeGen(fullClsName, mg, cp, factory, il, argsMap, 1, null);
+				exprs[i].bytecodeGen(fullClsName, mg, cp, factory, il, argsMap, 3, null);//3: position of args in BytecodeBatchFunc.apply()
 				//addToInstructionList(mg, cp, factory, il, 3, exprs.get(i), args, argsMap);
 				il.append(new DASTORE());
 			}
