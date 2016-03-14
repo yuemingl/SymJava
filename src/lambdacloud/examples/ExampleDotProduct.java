@@ -23,7 +23,7 @@ public class ExampleDotProduct {
 		lcs.append(new LCLoop(i.assign(0), Lt.apply(i, x.getLength()), i.inc())
 			.appendBody(sum.assign( sum + x[i]*y[i] )));
 
-		lcs.append(output[1].assign(sum));
+		lcs.append(output[2].assign(sum));
 		
 		BytecodeVecFunc f = CompileUtils.compileVec(lcs, output, x, y);
 		

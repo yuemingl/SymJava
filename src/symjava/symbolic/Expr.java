@@ -465,7 +465,7 @@ abstract public class Expr implements Cloneable {
     
 ////////////////////////////////////////////////////////////////////////////
 //	/**
-//	 * Assign the result of evaluation of the expression to a local variable
+//	 * Assign the result of evaluating an expression to a local variable
 //	 * when compiling. The local variable must be a symbol which is declared 
 //	 * as a local variable.
 //	 * <p>
