@@ -20,7 +20,7 @@ public class NumVector {
 	
 	public NumVector(SymVector sv, Expr[] args) {
 		this.size = sv.dim();
-		this.func = JIT.compile(args, sv.getData());
+		this.func = JIT.compileBatchFunc(args, sv.getData());
 	}
 	
 	public int dim() {

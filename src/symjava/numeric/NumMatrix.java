@@ -34,7 +34,7 @@ public class NumMatrix {
 				exprs[idx++] = sm.get(i, j);
 			}
 		}
-		this.func = JIT.compile(args, exprs);
+		this.func = JIT.compileBatchFunc(args, exprs);
 	}
 	
 	public int rowDim() {

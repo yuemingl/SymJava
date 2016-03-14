@@ -24,7 +24,7 @@ public class TestLCLength {
 		lcs.append(output[1].assign(x.size()));
 		lcs.append(output[2].assign(new LCLength(x)));
 		
-		BytecodeVecFunc f = CompileUtils.compileVec(lcs, x);
+		BytecodeVecFunc f = CompileUtils.compileVecFunc(lcs, x);
 		
 		double[] out = new double[10];
 		double[] xx = new double[] {1,2,3};

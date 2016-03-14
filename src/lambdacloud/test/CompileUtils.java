@@ -35,7 +35,17 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
+/**
+ * This class use recursive way to generate bytecode for expressions
+ * 
+ *
+ */
 public class CompileUtils {
+	
+	/**
+	 * Recursively reset the compile flags for an expression.
+	 * @param expr
+	 */
 	public static void bytecodeGenResetAll(Expr expr) {
 		Expr[] tmp = expr.args();
 		for(int i=0; i<tmp.length; i++) 
@@ -52,7 +62,7 @@ public class CompileUtils {
 		
 		if(expr.getType() == TYPE.MATRIX || expr.getType() == TYPE.VECTOR) {
 			LCArray output = LCArray.getDoubleArray("output");
-			cg = _compileVec(name, expr, output, args);
+			cg = _compileVecFunc(name, expr, output, args);
 			ir.type = FUNC_TYPE.VECTOR; //BytecodeVecFunc
 			if(expr.getType() == TYPE.VECTOR)
 				ir.outAryLen = expr.getTypeInfo().dim[0];
@@ -288,15 +298,15 @@ public class CompileUtils {
 	 * @param args
 	 * @return
 	 */
-	public static BytecodeVecFunc compileVec(Expr expr, LCArray output, Expr ...args) {
-		ClassGen cg = _compileVec(null, expr, output, args);
+	public static BytecodeVecFunc compileVecFunc(Expr expr, LCArray output, Expr ...args) {
+		ClassGen cg = _compileVecFunc(null, expr, output, args);
 		FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
 		BytecodeVecFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 
-	public static BytecodeVecFunc compileVec(String name, Expr expr, LCArray output, Expr ...args) {
-		ClassGen cg = _compileVec(name, expr, output, args);
+	public static BytecodeVecFunc compileVecFunc(String name, Expr expr, LCArray output, Expr ...args) {
+		ClassGen cg = _compileVecFunc(name, expr, output, args);
 		FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
 		BytecodeVecFunc fun = fcl.newInstance(cg);
 		return fun;
@@ -308,15 +318,15 @@ public class CompileUtils {
 	 * @param args
 	 * @return
 	 */
-	public static BytecodeVecFunc compileVec(Expr expr, Expr ...args) {
+	public static BytecodeVecFunc compileVecFunc(Expr expr, Expr ...args) {
 		LCArray output = LCArray.getDoubleArray("output");
-		ClassGen cg = _compileVec(null, expr, output, args);
+		ClassGen cg = _compileVecFunc(null, expr, output, args);
 		FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
 		BytecodeVecFunc fun = fcl.newInstance(cg);
 		return fun;
 	}
 	
-	public static ClassGen _compileVec(String name, Expr expr, LCArray output, Expr ...args) {
+	public static ClassGen _compileVecFunc(String name, Expr expr, LCArray output, Expr ...args) {
 		String packageName = "symjava.bytecode";
 		String clsName = name;
 		if(clsName == null)
