@@ -97,22 +97,25 @@ public class Pow extends BinaryOp {
 
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
-		if(arg2 instanceof SymReal<?>) {
-			SymReal<?> realExp = (SymReal<?>)arg2;
-			if(realExp.isPositive()) {
-				double exp = realExp.getDoubleValue();
-				for(int i=0; i<(int)exp; i++)
-					outList.add(arg1);
-				double remain = exp - Math.floor(exp);
-				if(remain > 0.0) {
-					outList.add(simplifiedIns(arg1, Expr.valueOf(remain)));
+		if(device != null) {
+			outList.add(this);
+		} else {
+			if(arg2 instanceof SymReal<?>) {
+				SymReal<?> realExp = (SymReal<?>)arg2;
+				if(realExp.isPositive()) {
+					double exp = realExp.getDoubleValue();
+					for(int i=0; i<(int)exp; i++)
+						outList.add(arg1);
+					double remain = exp - Math.floor(exp);
+					if(remain > 0.0) {
+						outList.add(simplifiedIns(arg1, Expr.valueOf(remain)));
+					}
+					return;
 				}
-				return;
 			}
+			outList.add(this);
 		}
-		outList.add(this);
 	}
-	
 	@Override
 	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
 			ConstantPoolGen cp, InstructionFactory factory,

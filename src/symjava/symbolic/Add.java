@@ -128,8 +128,12 @@ public class Add extends BinaryOp {
 	}
 
 	public void flattenAdd(List<Expr> outList) {
-		arg1.flattenAdd(outList);
-		arg2.flattenAdd(outList);
+		if(device != null) {
+			outList.add(this);
+		} else {
+			arg1.flattenAdd(outList);
+			arg2.flattenAdd(outList);
+		}
 	}
 
 	@Override

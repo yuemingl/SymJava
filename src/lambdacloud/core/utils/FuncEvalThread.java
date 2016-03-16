@@ -23,7 +23,7 @@ public class FuncEvalThread implements Runnable {
 			v.fetch(); //block if not ready
 			doubleArgs[i] = v.getData();
 		}
-		System.out.println("\t>>>"+Thread.currentThread().getName()+" evaluating "+func.getName()+"...");
+		System.out.println("\t>>>"+Thread.currentThread().getName()+" evaluating "+func.getName()+"...; Return: "+output);
 		BytecodeFunc bfunc = func.getBytecodeFunc();
 		if(args.length > 0) {
 			//Support multiple CloudSD inputs for BytecodeFunc

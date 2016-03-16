@@ -526,7 +526,7 @@ abstract public class Expr implements Cloneable {
 	}	
 /////////////////////////////////////////////////////////////////////////
 	
-	LCDevice device = null;
+	protected LCDevice device = null;
 	public Expr runOn(LCDevice dev) {
 		device = dev;
 		return this;

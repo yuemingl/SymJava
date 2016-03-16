@@ -37,6 +37,7 @@ public class TestThread {
 	public static void test2() {
 		CloudConfig config = new CloudConfig("local");
 		Expr sum = CPU(x*x) + CPU(y*y) + CPU(z*z) + CPU(x+y+z);
+		//Expr sum = CPU(x*x) + CPU(y+z);
 		//Expr sum = CPU(x) + CPU(y) + CPU(z) + CPU(x);
 		Expr expr = CPU(sqrt(sum));
 		System.out.println(expr);

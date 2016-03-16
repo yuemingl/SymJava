@@ -148,16 +148,20 @@ public class Multiply extends BinaryOp {
 
 	@Override
 	public void flattenAdd(List<Expr> outList) {
-		List<Expr> list1 = new ArrayList<Expr>();
-		List<Expr> list2 = new ArrayList<Expr>();
-		arg1.flattenAdd(list1);
-		arg2.flattenAdd(list2);
-		if(list1.size()==1 && list2.size()==1)
+		if(device != null) {
 			outList.add(this);
-		else {
-			for(Expr e1 : list1) {
-				for(Expr e2 : list2) {
-					outList.add( shallowSimplifiedIns(e1, e2) );
+		} else {
+			List<Expr> list1 = new ArrayList<Expr>();
+			List<Expr> list2 = new ArrayList<Expr>();
+			arg1.flattenAdd(list1);
+			arg2.flattenAdd(list2);
+			if(list1.size()==1 && list2.size()==1)
+				outList.add(this);
+			else {
+				for(Expr e1 : list1) {
+					for(Expr e2 : list2) {
+						outList.add( shallowSimplifiedIns(e1, e2) );
+					}
 				}
 			}
 		}
@@ -165,8 +169,12 @@ public class Multiply extends BinaryOp {
 
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
-		arg1.flattenMultiply(outList);
-		arg2.flattenMultiply(outList);
+		if(device != null) {
+			outList.add(this);
+		} else {
+			arg1.flattenMultiply(outList);
+			arg2.flattenMultiply(outList);
+		}
 	}
 	
 	public boolean symEquals(Expr other) {
