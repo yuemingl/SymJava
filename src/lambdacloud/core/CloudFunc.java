@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lambdacloud.core.lang.LCBase;
 import lambdacloud.core.lang.LCReturn;
 import lambdacloud.core.lang.LCVar;
+import lambdacloud.core.utils.FuncEvalThread;
 import lambdacloud.net.CloudClient;
 import lambdacloud.net.CloudFuncHandler;
 import lambdacloud.net.CloudQuery;
@@ -297,7 +298,6 @@ public class CloudFunc extends LCBase {
 		//for input see the priority of cloud config
 		//TODO need better implementation for the priority in CloudSD
 		for(int i=0; i<inputs.length; i++) {
-			inputs[i].currentCloudConfig();
 			inputs[i].useCloudConfig(config);
 		}
 		
@@ -325,6 +325,15 @@ public class CloudFunc extends LCBase {
 				}
 				return;
 			}
+			if(this.device >= 0) {
+				//Set the flag before starting evaluating thread
+				output.setIsReady(false);
+				//Start a thread to do evaluation, the result will be write back to output once 
+				//it is done. Call the method output.fetch() will block until the data is ready
+				new Thread(new FuncEvalThread(this, output, inputs)).start();
+				return;
+			}
+			
 			if(inputs.length == 0) {
 				switch(funcType) {
 				case SCALAR:
@@ -364,10 +373,11 @@ public class CloudFunc extends LCBase {
 			}
 		} else {
 			//Store argument on cloud first if necessary
-			for(int i=0; i<inputs.length; i++) 
+			for(int i=0; i<inputs.length; i++) {
 				if(!inputs[i].isOnCloud()) {
 					inputs[i].push();
 				}
+			}
 			
 			CloudClient client = config.currentClient();
 			CloudSDHandler handler = client.getCloudSDHandler();

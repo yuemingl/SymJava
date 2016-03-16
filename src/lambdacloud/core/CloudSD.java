@@ -49,6 +49,7 @@ public class CloudSD extends Symbol {
 	double[] data = new double[0];
 	boolean isOnCloud = false;
 	protected CloudConfig localConfig = null;
+	boolean isReady = true;//Indicate if the result of a function is under evaluating 
 	
 	/**
 	 * Construct a CloudSD object with random name
@@ -306,9 +307,23 @@ public class CloudSD extends Symbol {
 			System.err.println("Fetch data ( Connected to " + Utils.joinLabels(host_ip,":")+" )");
 			return fetch(c);
 		}
-		if(currentCloudConfig().isLocal())
+		if(currentCloudConfig().isLocal()) {
+			synchronized(this) {
+				while(!isReady) { //Return immediately if it is ready
+					//Block until it is ready
+					try {
+						System.out.println("Fetching: ["+this.toString()+"]");
+						wait();
+						System.out.println("Fetched: "+"["+this.toString()+"]");
+						return true;
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			System.out.println("Fetched without wait: "+"["+this.toString()+"]");
 			return true;
-		else {
+		} else { 
 			CloudClient client = currentCloudConfig().currentClient();
 			return fetch(client);
 		}
@@ -383,8 +398,7 @@ public class CloudSD extends Symbol {
 			if(isOnCloud)
 				return this.getFullName()+" = [] (on Cloud)";
 			else
-				return this.getFullName()+" = [] (Error?)";
-				
+				return this.getFullName()+" = [] (Local)";
 		}
 		else {
 			if(isOnCloud)
@@ -411,6 +425,11 @@ public class CloudSD extends Symbol {
 			sb.append("]");
 		return sb.toString();
 	}
+	
+	public void setIsReady(boolean flag) {
+		isReady = flag;
+	}
+
 
 }
 
