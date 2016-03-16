@@ -50,6 +50,7 @@ public class CloudSD extends Symbol {
 	boolean isOnCloud = false;
 	protected CloudConfig localConfig = null;
 	boolean isReady = true;//Indicate if the result of a function is under evaluating 
+	boolean isAsync = false;
 	
 	/**
 	 * Construct a CloudSD object with random name
@@ -321,7 +322,8 @@ public class CloudSD extends Symbol {
 					}
 				}
 			}
-			System.out.println("Fetched without wait: "+"["+this.toString()+"]");
+			if(isAsync) //only for test purpose
+				System.out.println("Fetched without waiting: "+"["+this.toString()+"]");
 			return true;
 		} else { 
 			CloudClient client = currentCloudConfig().currentClient();
@@ -428,6 +430,7 @@ public class CloudSD extends Symbol {
 	
 	public void setIsReady(boolean flag) {
 		isReady = flag;
+		if(!isReady) isAsync = true;
 	}
 
 
