@@ -3,27 +3,35 @@ package lambdacloud.core.graph;
 import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.lang.LCDevice;
-import lambdacloud.test.CompileUtils;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.Matrix;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.Symbols;
 import symjava.symbolic.TypeInfo;
-import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.Vector;
-import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
 public class GraphBuilder {
-	public static Node build(Expr expr) {
-		Node n = helper(expr);
-		compile(n);
+	CloudConfig config;
+	
+	public GraphBuilder(CloudConfig config) {
+		this.config = config;
+	}
+	
+	public Node build(Expr expr) {
+		Node n = buildHelper(expr);
+		compileNode(n);
 		return n;
 	}
 	
-	protected static void compile(Node root) {
+	/**
+	 * Bottom up compile the node tree
+	 * @param root
+	 */
+	protected void compileNode(Node root) {
 		for(Node n : root.children.values()) {
-			compile(n);
+			compileNode(n);
 		}
 		//no return
 		//root.func = CompileUtils.compile(null, root.expr, Utils.extractSymbols(root.expr).toArray(new Expr[0]));
@@ -37,11 +45,13 @@ public class GraphBuilder {
 			device = new LCDevice("0");
 			root.expr.runOn(device);
 		}
-		CloudConfig.getGlobalConfig().getClientByIndex(Integer.parseInt(device.name));
-		root.cfunc = new CloudFunc(CloudConfig.getGlobalConfig(), root.expr, root.args.toArray(new Expr[0]));
+		//TODO getClientByDevice???
+		config.getClientByIndex(Integer.parseInt(device.name));
+		root.cfunc = new CloudFunc(config, root.expr, root.args.toArray(new Expr[0]));
 	}
 	
-	public static Node helper(Expr expr) {
+	private static int idx;
+	private Node buildHelper(Expr expr) {
 		Expr[] args = expr.args();
 		Node ret = new Node();
 		ret.expr = expr.clone();
@@ -49,9 +59,8 @@ public class GraphBuilder {
 			return ret;
 
 		Symbols ss = new Symbols("__x");
-		int idx = 0;
 		for(int i=0; i<args.length; i++) {
-			Node n = helper(args[i]);
+			Node n = buildHelper(args[i]);
 			if(n != null) {
 				//If node n is a device node (run on a device: CPU or GPU),
 				//update the arguments to new symbol names instead of the sub-expressions
