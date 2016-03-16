@@ -10,16 +10,37 @@ import symjava.symbolic.Vector;
 import symjava.symbolic.utils.Utils;
 
 public class Session {
+	CloudConfig config;
+	
+	public Session() {
+		config = CloudConfig.setGlobalTarget("job_local.conf");
+	}
+	
+	public Session(CloudConfig config) {
+		this.config = config;
+	}
+	
 	/**
-	 * Always fetch data to local
+	 * In this mode, we always fetch data to local before evaluating a function
+	 * 
 	 * @param expr
 	 * @param dict
 	 * @return
 	 */
 	public double runSimple(Expr expr, Map<String, Double> dict) {
-		CloudConfig.setGlobalTarget("job_local.conf");
-		Node n = GraphBuilder.build(expr);
+		//CloudConfig.setGlobalTarget("job_local.conf");
+		GraphBuilder gb = new GraphBuilder(config);
+		Node n = gb.build(expr);
 		return runSimple(n, dict);
+	}
+	
+	public double runSimpleAsync(Expr expr, Map<String, Double> dict) {
+		//CloudConfig.setGlobalTarget("job_local.conf");
+		GraphBuilder gb = new GraphBuilder(config);
+		Node n = gb.build(expr);
+		CloudSD output = runSimpleAsync(n, dict);
+		output.fetch();
+		return output.getData(0);
 	}
 	
 	/**
@@ -32,8 +53,9 @@ public class Session {
 	 * @return
 	 */
 	public CloudSD runVec(Expr expr, Map<String, double[]> dict) {
-		CloudConfig.setGlobalTarget("job_local.conf");
-		Node n = GraphBuilder.build(expr);
+		//CloudConfig.setGlobalTarget("job_local.conf");
+		GraphBuilder gb = new GraphBuilder(config);
+		Node n = gb.build(expr);
 		return runVec(n, dict);
 	}
 	
@@ -46,8 +68,9 @@ public class Session {
 	 * @return
 	 */
 	public CloudSD runOpt(Expr expr, Map<String, Double> dict) {
-		CloudConfig.setGlobalTarget("job_local.conf");
-		Node n = GraphBuilder.build(expr);
+		//CloudConfig.setGlobalTarget("job_local.conf");
+		GraphBuilder gb = new GraphBuilder(config);
+		Node n = gb.build(expr);
 		return runOpt(n, dict);
 	}
 	
@@ -113,6 +136,7 @@ public class Session {
 	 */
 	public double runSimple(Node root, Map<String, Double> dict) {
 		double[] args = new double[root.args.size()];
+		
 		for(int i=0; i<root.args.size(); i++) {
 			Double d = dict.get(root.args.get(i).toString());
 			if(d == null) {
@@ -122,16 +146,34 @@ public class Session {
 				args[i] = d;
 			}
 		}
+		
 		CloudSD input = new CloudSD("input").init(args);
 		CloudSD output = new CloudSD("output").resize(1);
 		root.cfunc.apply(output, input);
-		if(output.fetch()) {
-//			for(double d : output.getData()) {
-//				System.out.println(d);
-//			}
-		}
-		
+		//Will block
+		output.fetch();
 		return output.getData(0);
+	}
+	
+	public CloudSD runSimpleAsync(Node root, Map<String, Double> dict) {
+		CloudSD[] args = new CloudSD[root.args.size()];
+		
+		for(int i=0; i<root.args.size(); i++) {
+			Double d = dict.get(root.args.get(i).toString());
+			if(d == null) {
+				Node child = root.children.get(root.args.get(i).toString());
+				args[i] = runSimpleAsync(child, dict);
+			} else {
+				args[i] = new CloudSD(config).init(d); 
+			}
+		}
+
+		for(CloudSD csd : args) {
+			csd.fetch();
+		}
+		CloudSD output = new CloudSD();
+		root.cfunc.apply(output, args);
+		return output;
 	}
 
 	/**
@@ -145,6 +187,7 @@ public class Session {
 	 */
 	public CloudSD runOpt(Node root, Map<String, Double> dict) {
 		CloudSD[] args = new CloudSD[root.args.size()];
+		
 		for(int i=0; i<root.args.size(); i++) {
 			Double d = dict.get(root.args.get(i).toString());
 			if(d == null) {
@@ -155,6 +198,7 @@ public class Session {
 				args[i] = new CloudSD(root.args.get(i).toString()).init(new double[]{d});
 			}
 		}
+		
 		CloudSD output = new CloudSD("").resize(1);
 		System.out.print(">>Session eval: "+root+"; args:\n[");
 		//Utils.joinLabels(args, ", ");
@@ -162,12 +206,15 @@ public class Session {
 			System.out.println("\t"+args[i]);
 		}
 		System.out.println("]");
+		
 		root.cfunc.apply(output, args);
+		
 		return output;
 	}
 	
 	public double runLocal(Expr expr, Map<String, Double> dict) {
-		Node n = GraphBuilder.build(expr);
+		GraphBuilder gb = new GraphBuilder(config);
+		Node n = gb.build(expr);
 		return runLocal(n, dict);
 	}
 	
