@@ -31,12 +31,12 @@ public class FuncEvalThread implements Runnable {
 		} else {
 			output.init(bfunc.apply());
 		}
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			Thread.sleep(5000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		synchronized(output) {
 			output.setIsReady(true);
 			output.notify();

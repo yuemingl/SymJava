@@ -34,6 +34,9 @@ public class TestThread {
 		}
 	}
 	
+	/**
+	 * Test multi-thread
+	 */
 	public static void test2() {
 		CloudConfig config = new CloudConfig("local");
 		Expr sum = CPU(x*x) + CPU(y*y) + CPU(z*z) + CPU(x+y+z);
@@ -48,7 +51,14 @@ public class TestThread {
 		dict.put(y.toString(), 3.0);
 		dict.put(z.toString(), 4.0);
 		
-		double d = sess.runSimpleAsync(expr, dict);
-		System.out.println(d);
+		double d = 0.0;
+		d = sess.runSimpleAsync(expr, dict);
+		System.out.println(d); //6.164414002968976
+		
+		d = sess.runSimple(expr, dict);
+		System.out.println(d); //6.164414002968976
+		
+		d = sess.runLocal(expr, dict);
+		System.out.println(d); //6.164414002968976
 	}	
 }

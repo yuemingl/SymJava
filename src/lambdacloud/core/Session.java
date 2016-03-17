@@ -21,7 +21,7 @@ public class Session {
 	}
 	
 	/**
-	 * In this mode, we always fetch data to local before evaluating a function
+	 * In this mode (either in local or on server), we always fetch data to local before evaluating a function
 	 * 
 	 * @param expr
 	 * @param dict
@@ -34,6 +34,12 @@ public class Session {
 		return runSimple(n, dict);
 	}
 	
+	/**
+	 * 
+	 * @param expr
+	 * @param dict
+	 * @return
+	 */
 	public double runSimpleAsync(Expr expr, Map<String, Double> dict) {
 		//CloudConfig.setGlobalTarget("job_local.conf");
 		GraphBuilder gb = new GraphBuilder(config);
@@ -147,8 +153,8 @@ public class Session {
 			}
 		}
 		
-		CloudSD input = new CloudSD("input").init(args);
-		CloudSD output = new CloudSD("output").resize(1);
+		CloudSD input = new CloudSD().init(args);
+		CloudSD output = new CloudSD();
 		root.cfunc.apply(output, input);
 		//Will block
 		output.fetch();
@@ -212,8 +218,15 @@ public class Session {
 		return output;
 	}
 	
+	/**
+	 * Run locally in one thread
+	 * @param expr
+	 * @param dict
+	 * @return
+	 */
 	public double runLocal(Expr expr, Map<String, Double> dict) {
 		GraphBuilder gb = new GraphBuilder(config);
+		gb.enableRunLocal();
 		Node n = gb.build(expr);
 		return runLocal(n, dict);
 	}
@@ -224,7 +237,7 @@ public class Session {
 			Double d = dict.get(root.args.get(i).toString());
 			if(d == null) {
 				Node child = root.children.get(root.args.get(i).toString());
-				args[i] = runSimple(child, dict);
+				args[i] = runLocal(child, dict);
 			} else {
 				args[i] = d;
 			}

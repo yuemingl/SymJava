@@ -10,10 +10,12 @@ import symjava.symbolic.Symbol;
 import symjava.symbolic.Symbols;
 import symjava.symbolic.TypeInfo;
 import symjava.symbolic.Vector;
+import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
 public class GraphBuilder {
 	CloudConfig config;
+	boolean runLocal = false;
 	
 	public GraphBuilder(CloudConfig config) {
 		this.config = config;
@@ -36,18 +38,22 @@ public class GraphBuilder {
 		//no return
 		//root.func = CompileUtils.compile(null, root.expr, Utils.extractSymbols(root.expr).toArray(new Expr[0]));
 		root.args = Utils.extractSymbols(root.expr);
-		//root.func = JIT.compile(root.expr);
 		
-		//Use LCDevice directly or use CloudConfig?
-		LCDevice device = root.expr.getDevice();
-		//CloudConfig config = new CloudConfig(device.name);
-		if(device == null) {
-			device = new LCDevice("0");
-			root.expr.runOn(device);
+		//See Session.runLocal()
+		if(runLocal)
+			root.func = JIT.compile(root.expr);
+		else {
+			//Use LCDevice directly or use CloudConfig?
+			LCDevice device = root.expr.getDevice();
+			//CloudConfig config = new CloudConfig(device.name);
+			if(device == null) {
+				device = new LCDevice("0");
+				root.expr.runOn(device);
+			}
+			//TODO getClientByDevice???
+			config.getClientByIndex(Integer.parseInt(device.name));
+			root.cfunc = new CloudFunc(config, root.expr, root.args.toArray(new Expr[0]));
 		}
-		//TODO getClientByDevice???
-		config.getClientByIndex(Integer.parseInt(device.name));
-		root.cfunc = new CloudFunc(config, root.expr, root.args.toArray(new Expr[0]));
 	}
 	
 	private static int idx;
@@ -94,5 +100,9 @@ public class GraphBuilder {
 			}
 		}
 		return ret;
+	}
+	
+	public void enableRunLocal() {
+		this.runLocal = true;
 	}
 }
