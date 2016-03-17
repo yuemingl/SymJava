@@ -436,6 +436,15 @@ public class CloudFunc extends LCBase {
 		return this.name;
 	}
 	
+	public String getFullName() {
+		CloudConfig config = this.currentCloudConfig();
+		CloudClient client = config.getClientByIndex(this.device);
+		if(client != null) {
+			return "csf://"+client.host+":"+client.port+"/"+this.name;
+		}
+		return name;
+	}
+	
 	public IR getFuncIR() {
 		return this.funcIR;
 	}

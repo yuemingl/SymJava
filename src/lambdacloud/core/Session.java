@@ -116,7 +116,7 @@ public class Session {
 		CloudSD output;
 		output = new CloudSD();
 
-		System.out.print(">>Session eval: "+root.cfunc.getName()+"="+root+"; args:\n[");
+		System.out.print(">>Session eval: "+root.cfunc.getFullName()+"="+root+"; args:\n[");
 		for(int i=0; i<inputs.length; i++) {
 			System.out.println("\t"+inputs[i]);
 		}
@@ -207,8 +207,8 @@ public class Session {
 			}
 		}
 		
-		CloudSD output = new CloudSD("").resize(1);
-		System.out.print(">>Session eval: "+root+"; args:\n[");
+		CloudSD output = new CloudSD();
+		System.out.print(">>Session eval: "+root.cfunc.getFullName()+"="+root+"; args:\n[");
 		//Utils.joinLabels(args, ", ");
 		for(int i=0; i<args.length; i++) {
 			System.out.println("\t"+args[i]);
