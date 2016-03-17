@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCBase;
 import lambdacloud.core.lang.LCReturn;
 import lambdacloud.core.lang.LCVar;
@@ -27,6 +28,7 @@ import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.IR;
 import symjava.symbolic.Expr;
 import symjava.symbolic.TypeInfo;
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.utils.FuncClassLoader;
 import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
@@ -240,10 +242,23 @@ public class CloudFunc extends LCBase {
 		
 		
 		if(config.isLocal()) {
-			funcType = FUNC_TYPE.SCALAR;
-			func = CompileUtils.compile(name, compileExpr, args);
-			//func = JIT.compile(args, expr);
+			//Reset flags to generate matrix, vector declaration in a new func
+			CompileUtils.bytecodeGenResetAll(expr);
 			
+			if(expr.getType() == TYPE.MATRIX || expr.getType() == TYPE.VECTOR) {
+				vecFunc = CompileUtils.compileVecFunc(name, compileExpr, args);
+				this.funcType = FUNC_TYPE.VECTOR; //BytecodeVecFunc
+				if(expr.getType() == TYPE.VECTOR)
+					this.outAryLen = expr.getTypeInfo().dim[0];
+				else if(expr.getType() == TYPE.MATRIX)
+					this.outAryLen = expr.getTypeInfo().dim[0]*expr.getTypeInfo().dim[1];
+				this.numArgs = args.length;
+			} else {
+				funcType = FUNC_TYPE.SCALAR;
+				func = CompileUtils.compile(name, compileExpr, args);
+				//func = JIT.compile(args, expr);
+				
+			}
 		} else {
 			//send the expression to the server
 			this.funcIR = CompileUtils.getIR(name, compileExpr, args);

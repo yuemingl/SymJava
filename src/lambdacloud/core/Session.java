@@ -83,20 +83,20 @@ public class Session {
 	public CloudSD runVec(Node root, Map<String, double[]> dict) {
 		int nArgs = root.args.size();
 		CloudSD[] inputs = new CloudSD[nArgs];
+		
 		for(int i=0; i<nArgs; i++) {
 			Expr arg = root.args.get(i);
 			double[] d = dict.get(arg.toString());
 			if(d == null && arg.getParent() != null) {
+				// Extract sub-matrix or sub-vector from parent matrix or vector
 				d = dict.get(arg.getParent().toString());
 				if(d != null) {
 					if(arg instanceof Matrix) {
-						//extract sub-matrix from parent matrix
 						Matrix m = (Matrix)arg;
 						Matrix p = (Matrix)arg.getParent();
 						Jama.Matrix mat = new Jama.Matrix(d, p.nRow);
 						d = mat.getMatrix(m.nRowStart, m.nRowStart+m.nRow-1, m.nColStart, m.nColStart+m.nCol-1).getColumnPackedCopy();
 					} else if (arg instanceof Vector) {
-						//extract sub-vector from parent vector
 						Vector m = (Vector)arg;
 						Vector p = (Vector)arg.getParent();
 						Jama.Matrix mat = new Jama.Matrix(d, p.nDim);
@@ -112,9 +112,14 @@ public class Session {
 				inputs[i] = new CloudSD(arg.toString()).init(d);
 			}
 		}
-		CloudSD output = new CloudSD("");//"output").resize(4); //TODO
+		//TODO Empty string means the server will return a name for the output
+		CloudSD output;
+		if(config.isLocal())
+			output = new CloudSD();
+		else
+			output = new CloudSD("");
 
-		System.out.print(">>Session eval: "+root+"; args:\n[");
+		System.out.print(">>Session eval: "+root.cfunc.getName()+"="+root+"; args:\n[");
 		for(int i=0; i<inputs.length; i++) {
 			System.out.println("\t"+inputs[i]);
 		}

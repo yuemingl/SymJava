@@ -323,8 +323,12 @@ public class CompileUtils {
 	 * @return
 	 */
 	public static BytecodeVecFunc compileVecFunc(Expr expr, Expr ...args) {
+		return compileVecFunc(null, expr, args);
+	}
+	
+	public static BytecodeVecFunc compileVecFunc(String name, Expr expr, Expr ...args) {
 		LCArray output = LCArray.getDoubleArray("output");
-		ClassGen cg = _compileVecFunc(null, expr, output, args);
+		ClassGen cg = _compileVecFunc(name, expr, output, args);
 		FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
 		BytecodeVecFunc fun = fcl.newInstance(cg);
 		return fun;

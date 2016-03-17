@@ -6,6 +6,7 @@ import static lambdacloud.test.TestUtils.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudSD;
 import lambdacloud.core.Session;
 import lambdacloud.core.lang.LCDevice;
@@ -28,7 +29,7 @@ public class TestMatrix {
 		testConcat2();
 		testMatrixSplit1();
 		testMatrixSplit2();
-		testMatrixSplit3();
+		testMatrixSplit3(new CloudConfig("job_local.conf"));
 	}
 	
 	public static void testBasic1() {
@@ -198,7 +199,7 @@ public class TestMatrix {
 	/**
 	 * Automatic data dict split for matrices and vectors
 	 */
-	public static void testMatrixSplit3() {
+	public static void testMatrixSplit3(CloudConfig config) {
 		int dim = 4;
 		Matrix A = new Matrix("A", dim, dim);
 		Vector x = new Vector("x", dim);
@@ -223,10 +224,68 @@ public class TestMatrix {
 		dict.put(x.toString(), new double[]{0,1,2,1});
 		dict.put(y0.toString(), new double[]{1,2,3,4});
 		
-		Session sess = new Session();
+		Session sess = new Session(config);
 		CloudSD rlt = sess.runVec(res, dict);
 		rlt.fetch();
 		assertEqual(new double[]{13,9,10,13}, rlt.getData());
+		/**
+Using config file: /Users/yueming.liu/workspace/eclipse_kepler/SymJava/conf/job_local.conf
+127.0.0.1:8322
+127.0.0.1:8323
+127.0.0.1:8324
+Test: res=[A_0_0*x_0 + A_0_1*x_1, A_1_0*x_0 + A_1_1*x_1] + y0
+Generating bytecode for: symjava.bytecode.cfunc4
+void apply(double[] output, int outPos, double[] A_1_1, double[] A_1_0, double[] x_0, double[] x_1) = return A_1_0*x_0 + A_1_1*x_1
+getIR(): create a new instance to test for: return A_1_0*x_0 + A_1_1*x_1
+Received CloudFuncResp: symjava.bytecode.cfunc4
+Generating bytecode for: symjava.bytecode.cfunc5
+void apply(double[] output, int outPos, double[] A_0_1, double[] A_0_0, double[] x_0, double[] x_1) = return A_0_0*x_0 + A_0_1*x_1
+getIR(): create a new instance to test for: return A_0_0*x_0 + A_0_1*x_1
+Received CloudFuncResp: symjava.bytecode.cfunc5
+Generating bytecode for: symjava.bytecode.cfunc6
+void apply(double[] output, int outPos, double[] __vec_3, double[] __vec_2, double[] y0) = return [__vec_2, __vec_3] + y0
+getIR(): create a new instance to test for: return [__vec_2, __vec_3] + y0
+Received CloudFuncResp: symjava.bytecode.cfunc6
+>>Session eval: cfunc4=A_1_0*x_0 + A_1_1*x_1; args:
+[	A_1_1 = [2.0, 1.0, 1.0, 4.0] (Local)
+	A_1_0 = [1.0, 2.0, 2.0, 3.0] (Local)
+	x_0 = [0.0, 1.0] (Local)
+	x_1 = [2.0, 1.0] (Local)
+]Received CloudSDResp: A_1_1
+Received CloudSDResp: A_1_0
+Received CloudSDResp: x_0
+Received CloudSDResp: x_1
+Received CloudSD: csd://127.0.0.1:8323/csd16 = [] (on Cloud)
+Fetch data ( Connected to 127.0.0.1:8323 )
+Received CloudSD: csd://127.0.0.1:8323/csd16 = [7.0, 9.0] (on Cloud & Local)
+Return: [7.0 9.0 ]
+>>Session eval: cfunc5=A_0_0*x_0 + A_0_1*x_1; args:
+[	A_0_1 = [3.0, 1.0, 4.0, 3.0] (Local)
+	A_0_0 = [1.0, 1.0, 2.0, 2.0] (Local)
+	x_0 = [0.0, 1.0] (Local)
+	x_1 = [2.0, 1.0] (Local)
+]Received CloudSDResp: A_0_1
+Received CloudSDResp: A_0_0
+Received CloudSDResp: x_0
+Received CloudSDResp: x_1
+Received CloudSD: csd://127.0.0.1:8322/csd22 = [] (on Cloud)
+Fetch data ( Connected to 127.0.0.1:8322 )
+Received CloudSD: csd://127.0.0.1:8322/csd22 = [12.0, 7.0] (on Cloud & Local)
+Return: [12.0 7.0 ]
+>>Session eval: cfunc6=[__vec_2, __vec_3] + y0; args:
+[	csd://127.0.0.1:8323/csd16 = [7.0, 9.0] (on Cloud & Local)
+	csd://127.0.0.1:8322/csd22 = [12.0, 7.0] (on Cloud & Local)
+	y0 = [1.0, 2.0, 3.0, 4.0] (Local)
+]Received CloudSDResp: y0
+Received CloudSD: csd://127.0.0.1:8324/csd7 = [] (on Cloud)
+Fetch data ( Connected to 127.0.0.1:8324 )
+Received CloudSD: csd://127.0.0.1:8324/csd7 = [13.0, 9.0, 10.0, 13.0] (on Cloud & Local)
+Return: [13.0 9.0 10.0 13.0 ]
+Fetch data ( Connected to 127.0.0.1:8324 )
+Received CloudSD: csd://127.0.0.1:8324/csd7 = [13.0, 9.0, 10.0, 13.0] (on Cloud & Local)
+Passed!
+
+		 */
 	}
 
 }
