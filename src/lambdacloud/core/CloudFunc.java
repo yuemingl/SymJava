@@ -34,13 +34,13 @@ import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
 public class CloudFunc extends LCBase {
-	private static AtomicInteger cfuncNameGenerator = new AtomicInteger(0);
-	
 	public static enum FUNC_TYPE { SCALAR, VECTOR, BATCH }
-	protected String name;
+	protected String name; //TODO use label?
 	protected BytecodeFunc      func;
 	protected BytecodeVecFunc   vecFunc;
 	protected BytecodeBatchFunc batchFunc;
+
+	private static AtomicInteger cfuncNameGenerator = new AtomicInteger(0);
 	
 	//Info for BytecodeBatchFunc
 	protected int outAryLen;
@@ -58,6 +58,7 @@ public class CloudFunc extends LCBase {
 	protected FUNC_TYPE funcType; 
 	protected IR funcIR = null;
 	
+	//Need improving
 	int device;
 	
 	public CloudFunc(Expr expr) {
@@ -140,7 +141,7 @@ public class CloudFunc extends LCBase {
 		this.compile(args, expr);
 	}
 	
-	private static String generateName() {
+	private String generateName() {
 		return "cfunc"+cfuncNameGenerator.incrementAndGet();
 	}
 	
@@ -239,7 +240,6 @@ public class CloudFunc extends LCBase {
 		if(!(expr instanceof LCBase)) {
 			compileExpr = new LCReturn(expr);
 		}
-		
 		
 		if(config.isLocal()) {
 			//Reset flags to generate matrix, vector declaration in a new func
@@ -399,10 +399,19 @@ public class CloudFunc extends LCBase {
 			try {
 				CloudQuery qry = new CloudQuery();
 				qry.qryType = CloudQuery.CLOUD_FUNC_EVAL;
-				qry.objName = name;
+				
+				//Function name (without package name)
+				qry.objName = name; 
+				
+				//Arguments list
 				for(int i=0; i<inputs.length; i++) 
 					qry.argNames.add(inputs[i].getFullName());
-				qry.outputName = output.getName();
+				
+				//The server will return a generated name for the output with empty name
+				if(output.isGenName())
+					qry.outputName = "";
+				else
+					qry.outputName = output.getName();
 				if(this.isAsync)
 					client.getChannel().writeAndFlush(qry);
 				else

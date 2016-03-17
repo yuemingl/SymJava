@@ -112,12 +112,9 @@ public class Session {
 				inputs[i] = new CloudSD(arg.toString()).init(d);
 			}
 		}
-		//TODO Empty string means the server will return a name for the output
+		
 		CloudSD output;
-		if(config.isLocal())
-			output = new CloudSD();
-		else
-			output = new CloudSD("");
+		output = new CloudSD();
 
 		System.out.print(">>Session eval: "+root.cfunc.getName()+"="+root+"; args:\n[");
 		for(int i=0; i<inputs.length; i++) {

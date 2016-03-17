@@ -44,19 +44,22 @@ import symjava.symbolic.utils.Utils;
  *
  */
 public class CloudSD extends Symbol {
-	private static AtomicInteger cdsVarNameGenerator = new AtomicInteger(0);
-	
-	double[] data = new double[0];
-	boolean isOnCloud = false;
+	protected double[] data = new double[0];
+	protected boolean isOnCloud = false;
 	protected CloudConfig localConfig = null;
-	boolean isReady = true;//Indicate if the result of a function is under evaluating 
-	boolean isAsync = false;
 	
+	protected boolean isReady = true;//Indicate if the result of a function is under evaluating 
+	protected boolean isAsync = false;
+
+	private static AtomicInteger cdsVarNameGenerator = new AtomicInteger(0);
+	protected boolean isGenName = false; //A flag to indicate if the name is a generated name
+
 	/**
 	 * Construct a CloudSD object with random name
 	 */
 	public CloudSD() {
 		super(generateName());
+		this.isGenName = true;
 	}
 
 	public CloudSD(String name) {
@@ -71,6 +74,7 @@ public class CloudSD extends Symbol {
 	 */
 	public CloudSD(Expr expr) {
 		super(generateName());
+		this.isGenName = true;
 		this.compile(this.label, expr);
 	}
 	
@@ -81,6 +85,7 @@ public class CloudSD extends Symbol {
 
 	public CloudSD(CloudConfig config) {
 		super(generateName());
+		this.isGenName = true;
 		this.localConfig = config;
 	}
 
@@ -91,6 +96,7 @@ public class CloudSD extends Symbol {
 	
 	public CloudSD(CloudConfig config, Expr expr) {
 		super(generateName());
+		this.isGenName = true;
 		this.localConfig = config;
 		this.compile(this.label, expr);
 	}
@@ -433,6 +439,17 @@ public class CloudSD extends Symbol {
 		if(!isReady) isAsync = true;
 	}
 
-
+	/**
+	 * Return true if the name is a generated name other than
+	 * a user specified name.
+	 * <BR>
+	 * The generated name of the return value of a function will 
+	 * always be replaced by the generated name from a cloud server
+	 * 
+	 * @return
+	 */
+	public boolean isGenName() {
+		return this.isGenName;
+	}
 }
 
