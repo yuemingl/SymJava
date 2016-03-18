@@ -30,7 +30,13 @@ import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
 public class CloudFunc extends LCBase {
-	public static enum FUNC_TYPE { SCALAR, VECTOR, BATCH }
+	
+	public static enum FUNC_TYPE { 
+		SCALAR, // BytecodeFunc
+		VECTOR, // BytecodeVecFunc
+		BATCH   // BytecodeBatchFunc
+	}
+	
 	protected String name; //TODO use label?
 	protected BytecodeFunc      func;
 	protected BytecodeVecFunc   vecFunc;
@@ -55,21 +61,52 @@ public class CloudFunc extends LCBase {
 	protected IR funcIR = null;
 	
 	//Need improving
-	int device;
+	private int device;
 	
+	
+	/**
+	 * Construct a CloudFunc by providing an expression.
+	 * The arguments of the function is extracted automatically.
+	 * 
+	 * @param expr
+	 */
 	public CloudFunc(Expr expr) {
 		this.name = generateName();
 		this.compile(expr);
 	}
 	
+	/**
+	 * Construct a CloudFunc by providing an expression and the arguments.
+	 * 
+	 * @param expr
+	 * @param args
+	 */
 	public CloudFunc(Expr expr, Expr... args) {
 		this.name = generateName();
-		this.compile(args, expr);
+		this.compile(expr, args);
 	}
 
+	/**
+	 * Construct a CloudFunc by providing a list of expressions.
+	 * The arguments of the function is extracted automatically.
+	 * 
+	 * @param expr
+	 * @param args
+	 */
+	public CloudFunc(Expr[] expr) {
+		this.name = generateName();
+		this.compile(expr);
+	}
+	
+	/**
+	 * Construct a CloudFunc by providing a list of expressions and the arguments.
+	 * 
+	 * @param expr
+	 * @param args
+	 */
 	public CloudFunc(Expr[] expr, Expr... args) {
 		this.name = generateName();
-		this.compile(args, expr);
+		this.compile(expr, args);
 	}
 
 	/**
@@ -87,12 +124,17 @@ public class CloudFunc extends LCBase {
 	
 	public CloudFunc(String name, Expr expr, Expr... args) {
 		this.name = name;
-		this.compile(args, expr);
+		this.compile(expr, args);
 	}
 	
-	public CloudFunc(String name, Expr[] expr, Expr... args) {
+	public CloudFunc(String name, Expr[] exprs) {
 		this.name = name;
-		this.compile(args, expr);
+		this.compile(exprs);
+	}
+	
+	public CloudFunc(String name, Expr[] exprs, Expr... args) {
+		this.name = name;
+		this.compile(exprs, args);
 	}
 	
 	public CloudFunc(CloudConfig config, Expr expr) {
@@ -104,13 +146,19 @@ public class CloudFunc extends LCBase {
 	public CloudFunc(CloudConfig config, Expr expr, Expr... args) {
 		this.name = generateName();
 		this.localConfig = config;
-		this.compile(args, expr);
+		this.compile(expr, args);
 	}
 
+	public CloudFunc(CloudConfig config, Expr[] expr) {
+		this.name = generateName();
+		this.localConfig = config;
+		this.compile(expr);
+	}
+	
 	public CloudFunc(CloudConfig config, Expr[] expr, Expr... args) {
 		this.name = generateName();
 		this.localConfig = config;
-		this.compile(args, expr);
+		this.compile(expr, args);
 	}
 
 	public CloudFunc(CloudConfig config, String name) {
@@ -127,18 +175,19 @@ public class CloudFunc extends LCBase {
 	public CloudFunc(CloudConfig config, String name, Expr expr, Expr... args) {
 		this.name = name;
 		this.localConfig = config;
-		this.compile(args, expr);
+		this.compile(expr, args);
+	}
+	
+	public CloudFunc(CloudConfig config, String name, Expr[] expr) {
+		this.name = name;
+		this.localConfig = config;
+		this.compile(expr);
 	}
 	
 	public CloudFunc(CloudConfig config, String name, Expr[] expr, Expr... args) {
 		this.name = name;
 		this.localConfig = config;
-
-		this.compile(args, expr);
-	}
-	
-	private String generateName() {
-		return "cfunc"+cfuncNameGenerator.incrementAndGet();
+		this.compile(expr, args);
 	}
 	
 	/**
@@ -161,132 +210,6 @@ public class CloudFunc extends LCBase {
 			throw new RuntimeException("CloudConfig is not specified!");
 		}
 		return config;
-	}
-	
-	public CloudFunc(Class<?> clazz) {
-		this.name = clazz.getSimpleName();
-		this.clazz = clazz;
-
-		if(currentCloudConfig().isLocal()) {
-			try {
-				method = clazz.getMethod("apply", new Class[] {double[].class});
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			String filePath = System.getProperty("user.dir")+"/"+clazz.getName().replace(".", "/")+".class";
-			File f = new File(filePath);
-			if(!f.exists()) {
-				filePath = System.getProperty("user.dir")+"/bin/"+clazz.getName().replace(".", "/")+".class";
-				f = new File(filePath);
-				if(!f.exists()) {
-					filePath = clazz.getProtectionDomain().getCodeSource().getLocation().getPath()+
-							clazz.getName().replace(".", "/")+".class";
-				}
-			}
-			Path path = Paths.get(filePath);
-			try {
-				byte[] data = Files.readAllBytes(path);
-				IR ir =  new IR();
-				ir.type = FUNC_TYPE.SCALAR;
-				ir.name = clazz.getName();
-				ir.bytes = data;
-				this.funcIR = ir;
-				CloudFuncHandler handler =currentCloudConfig().currentClient().getCloudFuncHandler();
-				Channel ch = currentCloudConfig().currentClient().getChannel();
-				try {
-					ch.writeAndFlush(this).sync();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				CloudResp resp = handler.getCloudResp();
-				if(resp.status == 0)
-					this.isOnCloud = true;
-				else
-					this.isOnCloud = false;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * Add this to support constructor with only expr
-	 * 
-	 * @param expr
-	 * @return
-	 */
-	public CloudFunc compile(Expr expr) {
-		List<Expr> args = Utils.extractSymbols(expr);
-		return compile(args.toArray(new Expr[0]), expr);
-	}
-	
-	public CloudFunc compile(Expr[] args, Expr expr) {
-		Expr compileExpr = expr;
-		
-		this.device = 0;
-		if(null != expr.getDevice())
-			this.device = Integer.parseInt(expr.getDevice().name);
-		//System.out.println("CloudFunc: compile " + expr + ", send to device: " + expr.getDevice().name);
-		
-		CloudConfig config = currentCloudConfig();
-		config.useClient(config.getClientByIndex(this.device));
-
-		//TODO Do we need LCReturn? It depends on how the compile function treat the return value of an expr
-		if(!(expr instanceof LCBase)) {
-			compileExpr = new LCReturn(expr);
-		}
-		
-		if(config.isLocal()) {
-			//Reset flags to generate matrix, vector declaration in a new func
-			CompileUtils.bytecodeGenResetAll(expr);
-			
-			if(expr.getType() == TYPE.MATRIX || expr.getType() == TYPE.VECTOR) {
-				vecFunc = CompileUtils.compileVecFunc(name, compileExpr, args);
-				this.funcType = FUNC_TYPE.VECTOR; //BytecodeVecFunc
-				if(expr.getType() == TYPE.VECTOR)
-					this.outAryLen = expr.getTypeInfo().dim[0];
-				else if(expr.getType() == TYPE.MATRIX)
-					this.outAryLen = expr.getTypeInfo().dim[0]*expr.getTypeInfo().dim[1];
-				this.numArgs = args.length;
-			} else {
-				funcType = FUNC_TYPE.SCALAR;
-				func = CompileUtils.compile(name, compileExpr, args);
-				//func = JIT.compile(args, expr);
-				
-			}
-		} else {
-			//send the expression to the server
-			this.funcIR = CompileUtils.getIR(name, compileExpr, args);
-			this.funcType = funcIR.type;
-			this.outAryLen = funcIR.outAryLen;
-			this.numArgs = funcIR.numArgs;
-
-			//funcIR = JIT.getIR(name, args, expr);
-			CloudFuncHandler handler = config.currentClient().getCloudFuncHandler();
-			Channel ch = config.currentClient().getChannel();
-			try {
-				ch.writeAndFlush(this).sync();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			CloudResp resp = handler.getCloudResp();
-			if(resp.status == 0)
-				this.isOnCloud = true;
-			else
-				this.isOnCloud = false;
-		}
-		return this;
-	}
-	
-	public CloudFunc compile(Expr[] args, Expr[] exprs) {
-		if(currentCloudConfig().isLocal()) {
-			funcType = FUNC_TYPE.VECTOR;
-			batchFunc = JIT.compileBatchFunc(args, exprs);
-		} else {
-			//send the exprssion to the server
-		}
-		return this;
 	}
 
 	/**
@@ -523,4 +446,140 @@ public class CloudFunc extends LCBase {
 	public void setNumArgs(int num) {
 		this.numArgs = num;
 	}
+	
+	private String generateName() {
+		return "cfunc"+cfuncNameGenerator.incrementAndGet();
+	}
+	
+	/**
+	 * Construct a CloudFunc by providing a class which implements interface BytecodeFunc
+	 * This is an experimental constructor.
+	 * 
+	 * @param clazz
+	 */
+	public CloudFunc(Class<?> clazz) {
+		this.name = clazz.getSimpleName();
+		this.clazz = clazz;
+
+		if(currentCloudConfig().isLocal()) {
+			try {
+				method = clazz.getMethod("apply", new Class[] {double[].class});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			String filePath = System.getProperty("user.dir")+"/"+clazz.getName().replace(".", "/")+".class";
+			File f = new File(filePath);
+			if(!f.exists()) {
+				filePath = System.getProperty("user.dir")+"/bin/"+clazz.getName().replace(".", "/")+".class";
+				f = new File(filePath);
+				if(!f.exists()) {
+					filePath = clazz.getProtectionDomain().getCodeSource().getLocation().getPath()+
+							clazz.getName().replace(".", "/")+".class";
+				}
+			}
+			Path path = Paths.get(filePath);
+			try {
+				byte[] data = Files.readAllBytes(path);
+				IR ir =  new IR();
+				ir.type = FUNC_TYPE.SCALAR;
+				ir.name = clazz.getName();
+				ir.bytes = data;
+				this.funcIR = ir;
+				CloudFuncHandler handler =currentCloudConfig().currentClient().getCloudFuncHandler();
+				Channel ch = currentCloudConfig().currentClient().getChannel();
+				try {
+					ch.writeAndFlush(this).sync();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				CloudResp resp = handler.getCloudResp();
+				if(resp.status == 0)
+					this.isOnCloud = true;
+				else
+					this.isOnCloud = false;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private CloudFunc compile(Expr expr) {
+		List<Expr> args = Utils.extractSymbols(expr);
+		return compile(expr, args.toArray(new Expr[0]));
+	}
+	
+	private CloudFunc compile(Expr expr, Expr[] args) {
+		Expr compileExpr = expr;
+		
+		this.device = 0;
+		if(null != expr.getDevice())
+			this.device = Integer.parseInt(expr.getDevice().name);
+		//System.out.println("CloudFunc: compile " + expr + ", send to device: " + expr.getDevice().name);
+		
+		CloudConfig config = currentCloudConfig();
+		config.useClient(config.getClientByIndex(this.device));
+
+		//TODO Do we need LCReturn? It depends on how the compile function treat the return value of an expr
+		if(!(expr instanceof LCBase)) {
+			compileExpr = new LCReturn(expr);
+		}
+		
+		if(config.isLocal()) {
+			//Reset flags to generate matrix, vector declaration in a new func
+			CompileUtils.bytecodeGenResetAll(expr);
+			
+			if(expr.getType() == TYPE.MATRIX || expr.getType() == TYPE.VECTOR) {
+				vecFunc = CompileUtils.compileVecFunc(name, compileExpr, args);
+				this.funcType = FUNC_TYPE.VECTOR; //BytecodeVecFunc
+				if(expr.getType() == TYPE.VECTOR)
+					this.outAryLen = expr.getTypeInfo().dim[0];
+				else if(expr.getType() == TYPE.MATRIX)
+					this.outAryLen = expr.getTypeInfo().dim[0]*expr.getTypeInfo().dim[1];
+				this.numArgs = args.length;
+			} else {
+				funcType = FUNC_TYPE.SCALAR;
+				func = CompileUtils.compile(name, compileExpr, args);
+				//func = JIT.compile(args, expr);
+				
+			}
+		} else {
+			//send the expression to the server
+			this.funcIR = CompileUtils.getIR(name, compileExpr, args);
+			this.funcType = funcIR.type;
+			this.outAryLen = funcIR.outAryLen;
+			this.numArgs = funcIR.numArgs;
+
+			//funcIR = JIT.getIR(name, args, expr);
+			CloudFuncHandler handler = config.currentClient().getCloudFuncHandler();
+			Channel ch = config.currentClient().getChannel();
+			try {
+				ch.writeAndFlush(this).sync();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			CloudResp resp = handler.getCloudResp();
+			if(resp.status == 0)
+				this.isOnCloud = true;
+			else
+				this.isOnCloud = false;
+		}
+		return this;
+	}
+	
+	private CloudFunc compile(Expr[] exprs) {
+		List<Expr> args = Utils.extractSymbols(exprs);
+		compile(args.toArray(new Expr[0]), exprs);
+		return this;
+	}
+	
+	private CloudFunc compile(Expr[] exprs, Expr[] args) {
+		if(currentCloudConfig().isLocal()) {
+			funcType = FUNC_TYPE.VECTOR;
+			batchFunc = JIT.compileBatchFunc(args, exprs);
+		} else {
+			//send the exprssion to the server
+		}
+		return this;
+	}	
  }
