@@ -29,7 +29,7 @@ import static symjava.symbolic.Symbol.y;
 public class Example2 {
 
 	public static void main(String[] args) {
-		CloudConfig.setGlobalTarget("job_local.conf");
+		CloudConfig.setGlobalConfig("job_local.conf");
 		
 		Expr expr = sqrt(x*x + y*y);
 		CloudFunc f = new CloudFunc(expr, new Expr[]{x, y});

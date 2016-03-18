@@ -95,7 +95,7 @@ public class ExampleFEM {
 			}
 		}
 		
-		CloudConfig config = CloudConfig.setGlobalTarget(configFile);
+		CloudConfig config = CloudConfig.setGlobalConfig(configFile);
 		
 		double[] data = new double[nData];
 		for(int i=0; i<data.length; i++)
@@ -109,8 +109,8 @@ public class ExampleFEM {
 		long start2, end2, applyTime;
 		start = System.currentTimeMillis();
 		start2 = System.currentTimeMillis();
-		for(int i=0; i<CloudConfig.getGlobalConfig().getTotalNumClients(); i++) {
-			config.useClient(config.getClientByIndex(i));
+		for(int i=0; i<CloudConfig.getGlobalConfig().getNumClients(); i++) {
+			config.setCurrentClient(config.getClientByIndex(i));
 			CloudFunc f = new CloudFunc(BytecodeFuncImpFEM.class);
 			//f.useCloudConfig(config); //No need to set config. We use global configuration here
 			
@@ -120,7 +120,7 @@ public class ExampleFEM {
 		end2 = System.currentTimeMillis();
 		applyTime = end2 - start2;
 
-		for(int i=0; i<CloudConfig.getGlobalConfig().getTotalNumClients(); i++) {
+		for(int i=0; i<CloudConfig.getGlobalConfig().getNumClients(); i++) {
 			if(output.fetch()) {
 				for(double d : output.getData()) {
 					System.out.println("output="+d);

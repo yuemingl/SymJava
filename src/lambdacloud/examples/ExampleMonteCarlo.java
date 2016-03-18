@@ -46,7 +46,7 @@ public class ExampleMonteCarlo {
 	 * 
 	 */
 	public static void MonteCarloTwoAnnulusImp1(int N, String configFile, boolean isAsync) {
-		CloudConfig config = CloudConfig.instance(configFile);
+		CloudConfig config = new CloudConfig(configFile);
 		LCBuilder task = new LCBuilder(config);
 		
 		LCVar x = task.declareDouble("x"); 
@@ -83,14 +83,14 @@ public class ExampleMonteCarlo {
 		task.Return((sum/counter)*area); 
 		
 		CloudSD params = new CloudSD(config,"params").init(new double[]{0.13,0.25,0.38,0.5});
-		CloudSD[] result = new CloudSD[config.getTotalNumClients()];
+		CloudSD[] result = new CloudSD[config.getNumClients()];
 		
 		long start, end, totalTime;
 		long start2, end2, applyTime;
 		start = System.currentTimeMillis();
 		start2 = System.currentTimeMillis();
-		for(int j=0; j<config.getTotalNumClients(); j++) {
-			config.useClient(config.getClientByIndex(j));
+		for(int j=0; j<config.getNumClients(); j++) {
+			config.setCurrentClient(config.getClientByIndex(j));
 			
 			CloudFunc func = task.build(new LCVar[]{a,b,c,d});
 			func.isAsyncApply(isAsync);
@@ -102,8 +102,8 @@ public class ExampleMonteCarlo {
 		applyTime = end2 - start2;
 		
 		double rltSum = 0.0;
-		for(int j=0; j<config.getTotalNumClients(); j++) {
-			config.useClient(config.getClientByIndex(j));
+		for(int j=0; j<config.getNumClients(); j++) {
+			config.setCurrentClient(config.getClientByIndex(j));
 			result[j].fetch();
 			double rlt = result[j].getData(0);
 			rltSum += rlt;
@@ -113,7 +113,7 @@ public class ExampleMonteCarlo {
 		totalTime = end-start;
 		System.out.println("apply time="+applyTime+" getDataTime="+(totalTime-applyTime)+" totalTime="+totalTime);
 		
-		System.out.println("final result="+rltSum/config.getTotalNumClients());
+		System.out.println("final result="+rltSum/config.getNumClients());
 	}
 	
 	public static void MonteCarloTowAnnulusVerifiy() {

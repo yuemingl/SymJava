@@ -21,7 +21,7 @@ import symjava.symbolic.Symbol;
 public class ExampleBlackScholes {
 
 	public static void main(String[] args) {
-		CloudConfig.setGlobalTarget("job_local.conf");
+		CloudConfig.setGlobalConfig("job_local.conf");
 		CloudLib lib = new CloudLib();
 		
 		Symbol spot = new Symbol("spot"); //spot price

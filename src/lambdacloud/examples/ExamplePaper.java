@@ -12,7 +12,7 @@ import static symjava.symbolic.Symbol.y;
 public class ExamplePaper {
 
 	public static void main(String[] args) {
-		CloudConfig.setGlobalTarget("job_local.conf");
+		CloudConfig.setGlobalConfig("job_local.conf");
 		
 		Expr R = 0.127-(x*0.194/(y+0.194));
 		//Derivative of expression R with respect to y

@@ -24,15 +24,15 @@ public class TestNetwork {
 		if(args.length >= 1) {
 			N = Integer.parseInt(args[0]);
 		}
-		CloudConfig.setGlobalTarget("job1.conf");
-		for(int i=0; i<CloudConfig.getGlobalConfig().getTotalNumClients(); i++) {
+		CloudConfig.setGlobalConfig("job1.conf");
+		for(int i=0; i<CloudConfig.getGlobalConfig().getNumClients(); i++) {
 			test(i, N);
 		}
 	}
 	public static void test(int serverIndex, int N) {
 		CloudConfig config = CloudConfig.getGlobalConfig();
-		config.useClient(config.getClientByIndex(serverIndex));
-		System.out.println("------------------------------------Using sever:"+config.currentClient().host);
+		config.setCurrentClient(config.getClientByIndex(serverIndex));
+		System.out.println("------------------------------------Using sever:"+config.getCurrentClient().host);
 		
 		double[] data = new double[N];
 		for(int i=0; i<data.length; i++)

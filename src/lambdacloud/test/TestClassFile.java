@@ -8,7 +8,7 @@ import symjava.bytecode.BytecodeFuncImp1;
 public class TestClassFile {
 
 	public static void main(String[] args) {
-		CloudConfig.setGlobalTarget("job_aws.conf");
+		CloudConfig.setGlobalConfig("job_aws.conf");
 		
 		CloudFunc f = new CloudFunc(BytecodeFuncImp1.class);
 		

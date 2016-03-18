@@ -23,7 +23,7 @@ public class TestServers {
 	}
 	
 	public static void test_multiple_inputs_for_bytecodefunc() {
-		CloudConfig config = CloudConfig.setGlobalTarget("job_local.conf");
+		CloudConfig config = CloudConfig.setGlobalConfig("job_local.conf");
 		
 		Expr sum = x + y + z;
 		CloudFunc f = new CloudFunc(config, sum, new Expr[]{x,y,z});

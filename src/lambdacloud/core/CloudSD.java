@@ -46,6 +46,7 @@ import symjava.symbolic.utils.Utils;
 public class CloudSD extends Symbol {
 	protected double[] data = new double[0];
 	protected boolean isOnCloud = false;
+	
 	protected CloudConfig localConfig = null;
 	
 	protected boolean isReady = true;//Indicate if the result of a function is under evaluating 
@@ -108,7 +109,7 @@ public class CloudSD extends Symbol {
 	}
 
 	public CloudSD compile(String name, Expr expr) {
-		if(currentCloudConfig().isLocal()) {
+		if(currentCloudConfig().isLocalConfig()) {
 			CloudSD[] args = Utils.extractCloudSDs(expr).toArray(new CloudSD[0]);
 			BytecodeVecFunc fexpr = JIT.compileVecFunc(args, expr);
 			data = new double[args[0].size()];
@@ -151,11 +152,7 @@ public class CloudSD extends Symbol {
 	public CloudConfig currentCloudConfig() {
 		if(this.localConfig != null)
 			return this.localConfig;
-		CloudConfig config = CloudConfig.getGlobalConfig();
-		if(config == null) {
-			throw new RuntimeException("CloudConfig is not specified!");
-		}
-		return config;
+		return CloudConfig.getGlobalConfig();
 	}
 	
 	/**
@@ -270,8 +267,8 @@ public class CloudSD extends Symbol {
 			}
 			return push(c);
 		}
-		CloudClient client = currentCloudConfig().currentClient();
-		if(!currentCloudConfig().isLocal()) {
+		CloudClient client = currentCloudConfig().getCurrentClient();
+		if(!currentCloudConfig().isLocalConfig()) {
 			return push(client);
 		} else {
 			this.isOnCloud = false;
@@ -314,7 +311,7 @@ public class CloudSD extends Symbol {
 			System.err.println("Fetching data "+this.getFullName());
 			return fetch(c);
 		}
-		if(currentCloudConfig().isLocal()) {
+		if(currentCloudConfig().isLocalConfig()) {
 			synchronized(this) {
 				while(!isReady) { //Return immediately if it is ready
 					//Block until it is ready
@@ -332,7 +329,7 @@ public class CloudSD extends Symbol {
 				System.out.println("Fetched without waiting: "+"["+this.toString()+"]");
 			return true;
 		} else { 
-			CloudClient client = currentCloudConfig().currentClient();
+			CloudClient client = currentCloudConfig().getCurrentClient();
 			return fetch(client);
 		}
 	}

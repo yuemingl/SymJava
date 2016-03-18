@@ -20,7 +20,7 @@ public class ExampleSqrt {
 		example2();
 	}
 	public static void example1() {
-		CloudConfig.setGlobalTarget("job_local.conf");
+		CloudConfig.setGlobalConfig("job_local.conf");
 		CloudLib lib = new CloudLib();
 		Expr[] freeVars = {x};
 		double num = 612;
@@ -39,7 +39,7 @@ public class ExampleSqrt {
 	}
 	
 	public static void example2() {
-		CloudConfig.setGlobalTarget("job_local.conf");
+		CloudConfig.setGlobalConfig("job_local.conf");
 		CloudLib lib = new CloudLib();
 		
 		double[] guess = new double[]{ 10 };

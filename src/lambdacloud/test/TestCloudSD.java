@@ -11,7 +11,7 @@ public class TestCloudSD {
 	}
 	
 	public static void test1() {
-		CloudConfig.setGlobalTarget("job_aws.conf");
+		CloudConfig.setGlobalConfig("job_aws.conf");
 		
 		// Store var123 to the cloud
 		double[] data = {1,2,3,4,5,6};

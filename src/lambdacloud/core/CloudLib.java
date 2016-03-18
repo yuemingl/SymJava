@@ -9,6 +9,7 @@ import lambdacloud.net.CloudSDHandler;
 public class CloudLib {
 	protected CloudConfig localConfig = null;
 	protected boolean isAsync = false;
+
 	/**
 	 * Return current cloud configuration. Default is the global configuration.
 	 * @return
@@ -16,11 +17,7 @@ public class CloudLib {
 	public CloudConfig currentCloudConfig() {
 		if(this.localConfig != null)
 			return this.localConfig;
-		CloudConfig config = CloudConfig.getGlobalConfig();
-		if(config == null) {
-			throw new RuntimeException("CloudConfig is not specified!");
-		}
-		return config;
+		return CloudConfig.getGlobalConfig();
 	}
 	
 	public static String convertParam(double[] param) {
@@ -126,7 +123,7 @@ public class CloudLib {
 	}
 	
 	protected void invokeStatic(String className, String methodName, String[] args, CloudSD output) {
-		CloudClient client = currentCloudConfig().currentClient();
+		CloudClient client = currentCloudConfig().getCurrentClient();
 		CloudSDHandler handler = client.getCloudSDHandler();
 		try {
 			CloudQuery qry = new CloudQuery();

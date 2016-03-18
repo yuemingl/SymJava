@@ -12,7 +12,7 @@ public class Test {
 	}
 	
 	public static void test() {
-		CloudConfig.setGlobalTarget("job_local.conf");
+		CloudConfig.setGlobalConfig("job_local.conf");
 		
 		//declare local variables
 		LCVar x = LCVar.getDouble("x");

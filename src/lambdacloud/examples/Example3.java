@@ -19,9 +19,9 @@ import symjava.relational.Lt;
 public class Example3 {
 
 	public static void main(String[] args) {
-		CloudConfig config = CloudConfig.instance("job_rackspace.conf");
+		CloudConfig config = new CloudConfig("job_rackspace.conf");
 		//config.useClient(config.getClientByIndex(2));
-		System.out.println("Current host: "+config.currentClient().host);
+		System.out.println("Current host: "+config.getCurrentClient().host);
 		
 		LCBuilder task = new LCBuilder(config);
 

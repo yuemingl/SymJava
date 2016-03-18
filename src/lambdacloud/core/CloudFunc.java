@@ -29,8 +29,21 @@ import symjava.symbolic.TypeInfo;
 import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
+/**
+ * Cloud Function (CloudFunc)
+ * <br>
+ * This class represents a function on cloud.
+ * A function is defined by giving a symbolic expression.
+ *
+ */
 public class CloudFunc extends LCBase {
 	
+	/**
+	 * Supported types of functions
+	 * @see BytecodeFunc
+	 * @see BytecodeVecFunc
+	 * @see BytecodeBatchFunc
+	 */
 	public static enum FUNC_TYPE { 
 		SCALAR, // BytecodeFunc
 		VECTOR, // BytecodeVecFunc
@@ -205,11 +218,7 @@ public class CloudFunc extends LCBase {
 	public CloudConfig currentCloudConfig() {
 		if(this.localConfig != null)
 			return this.localConfig;
-		CloudConfig config = CloudConfig.getGlobalConfig();
-		if(config == null) {
-			throw new RuntimeException("CloudConfig is not specified!");
-		}
-		return config;
+		return CloudConfig.getGlobalConfig();
 	}
 
 	/**
@@ -225,7 +234,7 @@ public class CloudFunc extends LCBase {
 	public void apply(CloudSD output, CloudSD ...inputs) {
 		
 		CloudConfig config = currentCloudConfig();
-		config.useClient(config.getClientByIndex(this.device));
+		config.setCurrentClient(config.getClientByIndex(this.device));
 		
 		output.useCloudConfig(config);
 		
@@ -236,7 +245,7 @@ public class CloudFunc extends LCBase {
 		}
 		
 		if(this.clazz != null) {
-			if(config.isLocal()) {
+			if(config.isLocalConfig()) {
 				try {
 					Object ret = method.invoke(this.clazz.newInstance(), inputs[0].getData());
 					output.resize(1);
@@ -247,7 +256,7 @@ public class CloudFunc extends LCBase {
 				return;
 			}
 		}
-		if(config.isLocal()) {
+		if(config.isLocalConfig()) {
 			if(this.clazz != null) {
 				Double val1;
 				try {
@@ -313,7 +322,7 @@ public class CloudFunc extends LCBase {
 				}
 			}
 			
-			CloudClient client = config.currentClient();
+			CloudClient client = config.getCurrentClient();
 			CloudSDHandler handler = client.getCloudSDHandler();
 			try {
 				CloudQuery qry = new CloudQuery();
@@ -461,7 +470,7 @@ public class CloudFunc extends LCBase {
 		this.name = clazz.getSimpleName();
 		this.clazz = clazz;
 
-		if(currentCloudConfig().isLocal()) {
+		if(currentCloudConfig().isLocalConfig()) {
 			try {
 				method = clazz.getMethod("apply", new Class[] {double[].class});
 			} catch (Exception e) {
@@ -486,8 +495,8 @@ public class CloudFunc extends LCBase {
 				ir.name = clazz.getName();
 				ir.bytes = data;
 				this.funcIR = ir;
-				CloudFuncHandler handler =currentCloudConfig().currentClient().getCloudFuncHandler();
-				Channel ch = currentCloudConfig().currentClient().getChannel();
+				CloudFuncHandler handler =currentCloudConfig().getCurrentClient().getCloudFuncHandler();
+				Channel ch = currentCloudConfig().getCurrentClient().getChannel();
 				try {
 					ch.writeAndFlush(this).sync();
 				} catch (InterruptedException e) {
@@ -518,14 +527,14 @@ public class CloudFunc extends LCBase {
 		//System.out.println("CloudFunc: compile " + expr + ", send to device: " + expr.getDevice().name);
 		
 		CloudConfig config = currentCloudConfig();
-		config.useClient(config.getClientByIndex(this.device));
+		config.setCurrentClient(config.getClientByIndex(this.device));
 
 		//TODO Do we need LCReturn? It depends on how the compile function treat the return value of an expr
 		if(!(expr instanceof LCBase)) {
 			compileExpr = new LCReturn(expr);
 		}
 		
-		if(config.isLocal()) {
+		if(config.isLocalConfig()) {
 			//Reset flags to generate matrix, vector declaration in a new func
 			CompileUtils.bytecodeGenResetAll(expr);
 			
@@ -551,8 +560,8 @@ public class CloudFunc extends LCBase {
 			this.numArgs = funcIR.numArgs;
 
 			//funcIR = JIT.getIR(name, args, expr);
-			CloudFuncHandler handler = config.currentClient().getCloudFuncHandler();
-			Channel ch = config.currentClient().getChannel();
+			CloudFuncHandler handler = config.getCurrentClient().getCloudFuncHandler();
+			Channel ch = config.getCurrentClient().getChannel();
 			try {
 				ch.writeAndFlush(this).sync();
 			} catch (InterruptedException e) {
@@ -574,7 +583,7 @@ public class CloudFunc extends LCBase {
 	}
 	
 	private CloudFunc compile(Expr[] exprs, Expr[] args) {
-		if(currentCloudConfig().isLocal()) {
+		if(currentCloudConfig().isLocalConfig()) {
 			funcType = FUNC_TYPE.VECTOR;
 			batchFunc = JIT.compileBatchFunc(args, exprs);
 		} else {

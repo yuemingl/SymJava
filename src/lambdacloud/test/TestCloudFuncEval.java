@@ -10,7 +10,7 @@ import lambdacloud.core.CloudSD;
 public class TestCloudFuncEval {
 
 	public static void main(String[] args) {
-		CloudConfig.setGlobalTarget("job_local.conf");
+		CloudConfig.setGlobalConfig("job_local.conf");
 		
 		double[] data = { 3, 4 };
 		CloudSD input = new CloudSD("var123").init(data);

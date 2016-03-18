@@ -12,7 +12,7 @@ public class Session {
 	CloudConfig config;
 	
 	public Session() {
-		config = CloudConfig.setGlobalTarget("job_local.conf");
+		config = CloudConfig.setGlobalConfig("job_local.conf");
 	}
 	
 	public Session(CloudConfig config) {

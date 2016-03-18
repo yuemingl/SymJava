@@ -23,7 +23,7 @@ public class TestThread {
 		testMatrixSplit3();
 	}
 	public static void test1() {
-		CloudConfig config = new CloudConfig("local");
+		CloudConfig config = new CloudConfig();
 		//make sure the expression can be run on different thread
 		Expr expr = CPU(x*x);
 		System.out.println(expr);
@@ -41,7 +41,7 @@ public class TestThread {
 	 * Test multi-thread
 	 */
 	public static void test2() {
-		CloudConfig config = new CloudConfig("local");
+		CloudConfig config = new CloudConfig();
 		Expr sum = CPU(x*x) + CPU(y*y) + CPU(z*z) + CPU(x+y+z);
 		//Expr sum = CPU(x*x) + CPU(y+z);
 		//Expr sum = CPU(x) + CPU(y) + CPU(z) + CPU(x);
@@ -66,7 +66,7 @@ public class TestThread {
 	}
 	
 	public static void testMatrixSplit3() {
-		CloudConfig config = new CloudConfig("local");
+		CloudConfig config = new CloudConfig();
 		TestMatrix.testMatrixSplit3(config);
 		/**
 Using 'local' config.

@@ -10,7 +10,7 @@ import lambdacloud.core.lang.LCVar;
 
 public class TestCloudFunc {
 	public static void main(String[] args) {
-		CloudConfig.setGlobalTarget("job_local.conf");
+		CloudConfig.setGlobalConfig("job_local.conf");
 
 		testConstructors1();
 		testConstructors2();

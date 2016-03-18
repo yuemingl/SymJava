@@ -41,7 +41,7 @@ public class ExampleModelFit {
 		//Here we go ...
 		GaussNewton.solve(eq, initialGuess, data, 100, 1e-4);
 		
-		CloudConfig.setGlobalTarget("job_local.conf");
+		CloudConfig.setGlobalConfig("job_local.conf");
 		CloudLib lib = new CloudLib();
 		double[] rlt = lib.solverGaussNewton(eq, initialGuess, data, 100, 1e-4);
 		for(double d : rlt)
