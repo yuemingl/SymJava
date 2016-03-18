@@ -268,7 +268,6 @@ public class CloudSD extends Symbol {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			System.err.println("Pushing data ( Connected to " + Utils.joinLabels(host_ip,":")+" )");
 			return push(c);
 		}
 		CloudClient client = currentCloudConfig().currentClient();
@@ -283,6 +282,7 @@ public class CloudSD extends Symbol {
 	private boolean push(CloudClient client) {
 		CloudSDRespHandler handler = client.getCloudSDRespHandler();
 		try {
+			System.err.println("Pushing data: "+this.getFullName());
 			client.getChannel().writeAndFlush(this).sync();
 			CloudSDResp resp = handler.getCloudResp();
 			if(resp.status == 0)
@@ -311,7 +311,7 @@ public class CloudSD extends Symbol {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			System.err.println("Fetch data ( Connected to " + Utils.joinLabels(host_ip,":")+" )");
+			System.err.println("Fetching data "+this.getFullName());
 			return fetch(c);
 		}
 		if(currentCloudConfig().isLocal()) {

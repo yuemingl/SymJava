@@ -59,8 +59,9 @@ public class GraphBuilder {
 	private static int idx;
 	private Node buildHelper(Expr expr) {
 		Expr[] args = expr.args();
-		Node ret = new Node();
-		ret.expr = expr.clone();
+		
+		//We need a clone of the expr since the expr may be changed
+		Node ret = new Node( expr.clone() );
 		if(args == null || args.length == 0) 
 			return ret;
 

@@ -7,7 +7,6 @@ import lambdacloud.core.graph.Node;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Matrix;
 import symjava.symbolic.Vector;
-import symjava.symbolic.utils.Utils;
 
 public class Session {
 	CloudConfig config;

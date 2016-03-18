@@ -1,9 +1,10 @@
 package lambdacloud.test;
 
 import static lambdacloud.core.LambdaCloud.CPU;
-import static lambdacloud.test.TestUtils.assertEqual;
 import static symjava.math.SymMath.sqrt;
-import static symjava.symbolic.Symbol.*;
+import static symjava.symbolic.Symbol.x;
+import static symjava.symbolic.Symbol.y;
+import static symjava.symbolic.Symbol.z;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,12 +13,7 @@ import lambdacloud.core.CloudConfig;
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
 import lambdacloud.core.Session;
-import symjava.matrix.SymMatrix;
-import symjava.matrix.SymVector;
-import symjava.symbolic.Concat;
 import symjava.symbolic.Expr;
-import symjava.symbolic.Matrix;
-import symjava.symbolic.Vector;
 
 public class TestThread {
 

@@ -23,9 +23,10 @@ public class Node {
 		return expr.getDevice()!=null;
 	}
 	
-	public Node() {
-		
+	public Node(Expr expr) {
+		this.expr = expr;
 	}
+	
 	public String toString() {
 		return expr.toString();
 	}
