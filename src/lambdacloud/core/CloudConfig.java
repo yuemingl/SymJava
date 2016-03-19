@@ -10,8 +10,11 @@ import java.util.List;
 import lambdacloud.net.CloudClient;
 
 /**
- * An instance of CloudConfig is constructed from a configuration file.
- * All the available servers information are store in the CloudConfig object.
+ * An instance of CloudConfig contains the information of available servers.
+ * A global instance of CloudConfig (call getGlobalConfg()) is used in the 
+ * computation if no CloudConfig is provided. The default value of the global
+ * configure of servers is simulated by multi-thread locally.
+ * 
  */
 public class CloudConfig {
 	protected String configFile;
@@ -21,12 +24,14 @@ public class CloudConfig {
 	protected CloudClient currentClient;
 
 	/**
-	 * Construct a CloudConfig object which allows all the computations run on local machine
+	 * Construct a CloudConfig object which allows all the computations 
+	 * run on local machine and the servers are simulated by multi-thread
 	 */
 	public CloudConfig() {
 	}
 	
 	/**
+	 * Construct a instance from a configuration file
 	 * 
 	 * @param configFile
 	 */
@@ -62,7 +67,7 @@ public class CloudConfig {
 	}
 	
 	/**
-	 * Set a configuration file used as global configuration
+	 * Set the global configuration by providing a configuration file
 	 * 
 	 * @param configFile
 	 */
@@ -71,6 +76,11 @@ public class CloudConfig {
 		return globalConfig;
 	}
 	
+	/**
+	 * Set config as the global configuration
+	 * @param config
+	 * @return
+	 */
 	public static CloudConfig setGlobalConfig(CloudConfig config) {
 		globalConfig = config;
 		return globalConfig;
@@ -87,29 +97,6 @@ public class CloudConfig {
 		return null == configFile;
 	}
 
-//	/**
-//	 * Print the configuration of the target environment
-//	 * @return
-//	 */
-//	public String printTargetInfo() {
-//		return "16 CPU, 64GB RAM";
-//	}
-	
-	/*
-	public String getHost() {
-		//return "localhost";
-		//return "ec2-54-200-107-134.us-west-2.compute.amazonaws.com"; //
-		//return "ec2-52-27-4-226.us-west-2.compute.amazonaws.com"; //c4.large
-		//return "104.197.57.20";//gcloud
-		return "vm1-yliu.cloudapp.net";//MA
-	}
-	
-	public int getPort() {
-		return 8322;
-		
-	}
-	*/
-	
 	public CloudClient getClientByIndex(int index) {
 		if(this.isLocalConfig())
 			return null;
@@ -130,6 +117,12 @@ public class CloudConfig {
 		if(this.isLocalConfig()) 
 			return;
 		this.currentClient = client;
+	}
+
+	public void setCurrentClient(int index) {
+		if(this.currentClient == null)
+			return;
+		this.currentClient = clients.get(index);
 	}
 	
 	public void reconnectAll() {

@@ -22,7 +22,7 @@ public class Test2 {
 	}
 	
 	public static void test() {
-		CloudConfig.setGlobalConfig("job_aws.conf");
+		CloudConfig.setGlobalConfig("job_local.conf");
 		
 		LCVar x = LCVar.getDouble("x");
 		LCVar y = LCVar.getDouble("y");
@@ -34,14 +34,16 @@ public class Test2 {
 		CloudFunc f = new CloudFunc("a_vector_function", exprs, new LCVar[]{x, y});
 		
 		CloudSD input = new CloudSD("input").init(new double[]{2, 1});
-		CloudSD output = new CloudSD("output").resize(2);
+		CloudSD output = new CloudSD("output");
 		
 		long begin = System.currentTimeMillis();
 		//f.apply(output, input);
 		// Call apply in every iteration
 		for(int i=0; i<10; i++) {
 			f.apply(output, input);
+			output.fetch(); //This fetch can be removed as long as the clone is removed from class Multiply
 			Expr update = input + 1.0*output;
+			//The output here is a different object from the output due to clone in class Multiply
 			input = update; //Cast update to type CloudSD
 			if(input.fetch()) {
 				for(double d : input.getData())

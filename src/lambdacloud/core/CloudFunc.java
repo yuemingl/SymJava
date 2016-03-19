@@ -11,8 +11,11 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCBase;
+import lambdacloud.core.lang.LCDoubleArray;
 import lambdacloud.core.lang.LCReturn;
+import lambdacloud.core.lang.LCStatements;
 import lambdacloud.core.utils.FuncEvalThread;
 import lambdacloud.net.CloudClient;
 import lambdacloud.net.CloudFuncHandler;
@@ -33,7 +36,7 @@ import symjava.symbolic.utils.Utils;
  * Cloud Function (CloudFunc)
  * <br>
  * This class represents a function on cloud.
- * A function is defined by giving a symbolic expression.
+ * A function is defined by giving a symbolic expression and arguments (optional).
  *
  */
 public class CloudFunc extends LCBase {
@@ -207,7 +210,7 @@ public class CloudFunc extends LCBase {
 	 * Use the given cloud configuration other than the global one
 	 * @param conf
 	 */
-	public void useCloudConfig(CloudConfig conf) {
+	public void setCloudConfig(CloudConfig conf) {
 		this.localConfig = conf;
 	}
 	
@@ -215,7 +218,7 @@ public class CloudFunc extends LCBase {
 	 * Return current cloud configuration. Default is the global configuration.
 	 * @return
 	 */
-	public CloudConfig currentCloudConfig() {
+	public CloudConfig getCloudConfig() {
 		if(this.localConfig != null)
 			return this.localConfig;
 		return CloudConfig.getGlobalConfig();
@@ -232,16 +235,16 @@ public class CloudFunc extends LCBase {
 	}
 	
 	public void apply(CloudSD output, CloudSD ...inputs) {
+		CloudConfig config = getCloudConfig();
+		config.setCurrentClient(this.device);
 		
-		CloudConfig config = currentCloudConfig();
-		config.setCurrentClient(config.getClientByIndex(this.device));
-		
-		output.useCloudConfig(config);
+		//Make sure the output has the same CloudConfig as CloudFunc
+		output.setCloudConfig(config);
 		
 		//for input see the priority of cloud config
 		//TODO need better implementation for the priority in CloudSD
 		for(int i=0; i<inputs.length; i++) {
-			inputs[i].useCloudConfig(config);
+			inputs[i].setCloudConfig(config);
 		}
 		
 		if(this.clazz != null) {
@@ -365,7 +368,7 @@ public class CloudFunc extends LCBase {
 	}
 	
 	public String getFullName() {
-		CloudConfig config = this.currentCloudConfig();
+		CloudConfig config = this.getCloudConfig();
 		CloudClient client = config.getClientByIndex(this.device);
 		if(client != null) {
 			return "csf://"+client.host+":"+client.port+"/"+this.name;
@@ -470,7 +473,7 @@ public class CloudFunc extends LCBase {
 		this.name = clazz.getSimpleName();
 		this.clazz = clazz;
 
-		if(currentCloudConfig().isLocalConfig()) {
+		if(getCloudConfig().isLocalConfig()) {
 			try {
 				method = clazz.getMethod("apply", new Class[] {double[].class});
 			} catch (Exception e) {
@@ -495,8 +498,8 @@ public class CloudFunc extends LCBase {
 				ir.name = clazz.getName();
 				ir.bytes = data;
 				this.funcIR = ir;
-				CloudFuncHandler handler =currentCloudConfig().getCurrentClient().getCloudFuncHandler();
-				Channel ch = currentCloudConfig().getCurrentClient().getChannel();
+				CloudFuncHandler handler =getCloudConfig().getCurrentClient().getCloudFuncHandler();
+				Channel ch = getCloudConfig().getCurrentClient().getChannel();
 				try {
 					ch.writeAndFlush(this).sync();
 				} catch (InterruptedException e) {
@@ -526,7 +529,7 @@ public class CloudFunc extends LCBase {
 			this.device = Integer.parseInt(expr.getDevice().name);
 		//System.out.println("CloudFunc: compile " + expr + ", send to device: " + expr.getDevice().name);
 		
-		CloudConfig config = currentCloudConfig();
+		CloudConfig config = getCloudConfig();
 		config.setCurrentClient(config.getClientByIndex(this.device));
 
 		//TODO Do we need LCReturn? It depends on how the compile function treat the return value of an expr
@@ -539,7 +542,7 @@ public class CloudFunc extends LCBase {
 			CompileUtils.bytecodeGenResetAll(expr);
 			
 			if(expr.getType() == TYPE.MATRIX || expr.getType() == TYPE.VECTOR) {
-				vecFunc = CompileUtils.compileVecFunc(name, compileExpr, args);
+				this.vecFunc = CompileUtils.compileVecFunc(name, compileExpr, args);
 				this.funcType = FUNC_TYPE.VECTOR; //BytecodeVecFunc
 				if(expr.getType() == TYPE.VECTOR)
 					this.outAryLen = expr.getTypeInfo().dim[0];
@@ -583,12 +586,52 @@ public class CloudFunc extends LCBase {
 	}
 	
 	private CloudFunc compile(Expr[] exprs, Expr[] args) {
-		if(currentCloudConfig().isLocalConfig()) {
-			funcType = FUNC_TYPE.VECTOR;
-			batchFunc = JIT.compileBatchFunc(args, exprs);
+		if(getCloudConfig().isLocalConfig()) {
+			this.funcType = FUNC_TYPE.BATCH;
+			this.outAryLen = -1; //Determined by input CloudSD
+			this.numArgs = args.length;
+			this.batchFunc = JIT.compileBatchFunc(args, exprs);
 		} else {
-			//send the exprssion to the server
+			//method 1: See CompileUtils.compileBatchFunc which follows the implementation of JIT.compileBatchFunc()
+			//BytecodeBatchFunc func = CompileUtils.compileBatchFunc(name, exprs, args);
+			//this.funcType = FUNC_TYPE.BATCH;
+			//this.batchFunc = func;
+			
+			//method 2: use output for vecfunction
+//			int dim = exprs.length;
+//			LCStatements lcs = new LCStatements();
+//			LCArray outAry = new LCDoubleArray("outAry");
+//			for(int i=0; i<dim; i++) {
+//				lcs.append( outAry[i].assign(exprs[i]) );
+//			}
+//			BytecodeVecFunc func = CompileUtils.compileVecFunc(lcs, outAry, args);
+//			this.batchFunc = JIT.compileBatchFunc(args, exprs);
+//			
+			
+			//send the expression to the server
+			this.funcIR = CompileUtils.getIR(name, exprs, args);
+			this.funcType = funcIR.type;
+			this.outAryLen = -1;
+			this.numArgs = funcIR.numArgs;
+
+			CloudConfig config = this.getCloudConfig();
+			CloudFuncHandler handler = config.getCurrentClient().getCloudFuncHandler();
+			Channel ch = config.getCurrentClient().getChannel();
+			try {
+				ch.writeAndFlush(this).sync();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			CloudResp resp = handler.getCloudResp();
+			if(resp.status == 0)
+				this.isOnCloud = true;
+			else
+				this.isOnCloud = false;
 		}
 		return this;
 	}	
+	
+	public String toString() {
+		return name;
+	}
  }

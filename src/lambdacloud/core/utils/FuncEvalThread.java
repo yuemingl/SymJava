@@ -2,6 +2,7 @@ package lambdacloud.core.utils;
 
 import lambdacloud.core.CloudFunc;
 import lambdacloud.core.CloudSD;
+import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeVecFunc;
 
@@ -47,7 +48,15 @@ public class FuncEvalThread implements Runnable {
 			output.init(outAry);
 			break;
 		case BATCH:
-			throw new UnsupportedOperationException();
+			BytecodeBatchFunc bfunc3 = func.getBytecodeBatchFunc();
+			//The length of returned array can be obtained from CloundFunc 
+			double[] outAry2 = new double[args[0].length()];
+			if(args.length > 0) {
+				bfunc3.apply(outAry2, 0, Utils.flatten(doubleArgs));
+			} else
+				bfunc3.apply(outAry2, 0);
+			output.init(outAry2);
+			break;
 		default:
 			throw new UnsupportedOperationException();
 		}

@@ -88,6 +88,22 @@ public class CompileUtils {
 		return ir;
 	}
 	
+	public static IR getIR(String name, Expr[] exprs, Expr ...args) {
+		ClassGen cg = null;
+		IR ir =  new IR();
+		
+		//Reset flags to generate matrix, vector declaration in a new func
+		for(int i=0; i<exprs.length; i++)
+			bytecodeGenResetAll(exprs[i]);
+		
+		cg = _compileBatchFunc(name, exprs, args);
+		ir.type = FUNC_TYPE.BATCH;
+		ir.name = cg.getJavaClass().getClassName();
+		ir.bytes = cg.getJavaClass().getBytes();
+		
+		return ir;
+	}
+	
 	public static BytecodeFunc compile(Expr expr, LCVar ...args) {
 		ClassGen cg = _compile(null, expr, args);
 		FuncClassLoader<BytecodeFunc> fcl = new FuncClassLoader<BytecodeFunc>();

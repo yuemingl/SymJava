@@ -34,7 +34,7 @@ import symjava.symbolic.utils.Utils;
  * Example:
  * <p><blockquote><pre>
  *     CloudSD data = new CloudSD("myvar").init(new double[]{1, 2, 3, 4, 5});
- *     data.sotoreToCloud();
+ *     data.push(); // Push data onto cloud
  *     if(data.fetch()) {
  *       for(double d : data.getData()) {
  *         System.out.println(d);
@@ -50,27 +50,39 @@ public class CloudSD extends Symbol {
 	protected CloudConfig localConfig = null;
 	
 	protected boolean isReady = true;//Indicate if the result of a function is under evaluating 
-	protected boolean isAsync = false;
+	protected boolean isAsync = false; //Test purpose: isAsync==true when isReady==false
 
 	private static AtomicInteger cdsVarNameGenerator = new AtomicInteger(0);
 	protected boolean isGenName = false; //A flag to indicate if the name is a generated name
 
 	/**
-	 * Construct a CloudSD object with random name
+	 * Construct an instance with a generated name
 	 */
 	public CloudSD() {
 		super(generateName());
 		this.isGenName = true;
 	}
 
+	/**
+	 * Construct an instance with a given name
+	 * 
+	 * @param name
+	 */
 	public CloudSD(String name) {
 		super(name);
 	}
 	
 	/**
-	 * Construct a CloudSD object with random name
-	 * based on the given expression
-	 * 
+	 * Construct a CloudSD object with a generated name based on a given expression.
+	 * This constructor is used to create a new instance of CloudSD from other CloudSD.
+	 * <br>
+	 * An example application is in the iterating algorithms as below:
+	 *	for(int i=0; i<maxIter; i++) {
+	 *		func.apply(output, input);
+	 *		Expr update = input + 1.0*output;
+	 *		input = update; //Cast update to type CloudSD
+	 *	}
+	 *
 	 * @param expr
 	 */
 	public CloudSD(Expr expr) {
@@ -108,18 +120,6 @@ public class CloudSD extends Symbol {
 		this.compile(name, expr);
 	}
 
-	public CloudSD compile(String name, Expr expr) {
-		if(currentCloudConfig().isLocalConfig()) {
-			CloudSD[] args = Utils.extractCloudSDs(expr).toArray(new CloudSD[0]);
-			BytecodeVecFunc fexpr = JIT.compileVecFunc(args, expr);
-			data = new double[args[0].size()];
-			fexpr.apply(data, 0, Utils.getDataFromCloudSDs(args));
-		} else {
-			//expr contains server references
-		}
-		return this;
-	}
-
 	/**
 	 * Initialize the cloud variable with the given array.
 	 * The new cloud variable simply wrap the array; that is,
@@ -141,7 +141,7 @@ public class CloudSD extends Symbol {
 	 * Use the given cloud configuration other than the global one
 	 * @param conf
 	 */
-	public void useCloudConfig(CloudConfig conf) {
+	public void setCloudConfig(CloudConfig conf) {
 		this.localConfig = conf;
 	}
 	
@@ -149,7 +149,7 @@ public class CloudSD extends Symbol {
 	 * Return current cloud configuration. Default is the global configuration.
 	 * @return
 	 */
-	public CloudConfig currentCloudConfig() {
+	public CloudConfig getCloudConfig() {
 		if(this.localConfig != null)
 			return this.localConfig;
 		return CloudConfig.getGlobalConfig();
@@ -165,14 +165,26 @@ public class CloudSD extends Symbol {
 	}
 	
 	/**
-	 * Get the value of the backed array at index
+	 * Get the value of the backed array at index. If the data on cloud need to be returned
+	 * call fetch() first.
+	 * 
 	 * @param index
 	 * @return
 	 */
 	public double getData(int index) {
 		return data[index];
 	}
-	 
+	
+	/**
+	 * Return the backed array (local data). If the data on cloud need to be returned
+	 * call fetch() first.
+	 * 
+	 * @return
+	 */
+	public double[] getData() {
+		return data;
+	}
+	
 	/**
 	 * Resize the backed array. Old data will be copied to the new backed array
 	 * if the new size is larger than the old size otherwise the data that beyond
@@ -230,14 +242,6 @@ public class CloudSD extends Symbol {
 		return this.label;
 	}
 	
-	/**
-	 * Return the backed array
-	 * @return
-	 */
-	public double[] getData() {
-		return data;
-	}
-	
 	private String[] parseName(String name) {
 		if(name.startsWith("csd://")) {
 			String host_ip = this.label.substring(6);
@@ -267,8 +271,8 @@ public class CloudSD extends Symbol {
 			}
 			return push(c);
 		}
-		CloudClient client = currentCloudConfig().getCurrentClient();
-		if(!currentCloudConfig().isLocalConfig()) {
+		CloudClient client = getCloudConfig().getCurrentClient();
+		if(!getCloudConfig().isLocalConfig()) {
 			return push(client);
 		} else {
 			this.isOnCloud = false;
@@ -311,7 +315,7 @@ public class CloudSD extends Symbol {
 			System.err.println("Fetching data "+this.getFullName());
 			return fetch(c);
 		}
-		if(currentCloudConfig().isLocalConfig()) {
+		if(getCloudConfig().isLocalConfig()) {
 			synchronized(this) {
 				while(!isReady) { //Return immediately if it is ready
 					//Block until it is ready
@@ -329,7 +333,7 @@ public class CloudSD extends Symbol {
 				System.out.println("Fetched without waiting: "+"["+this.toString()+"]");
 			return true;
 		} else { 
-			CloudClient client = currentCloudConfig().getCurrentClient();
+			CloudClient client = getCloudConfig().getCurrentClient();
 			return fetch(client);
 		}
 	}
@@ -366,19 +370,16 @@ public class CloudSD extends Symbol {
 	
 	@Override
 	public Expr simplify() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public Expr diff(Expr expr) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -448,5 +449,24 @@ public class CloudSD extends Symbol {
 	public boolean isGenName() {
 		return this.isGenName;
 	}
+	
+	private CloudSD compile(String name, Expr expr) {
+		if(getCloudConfig().isLocalConfig()) {
+			CloudSD[] args = Utils.extractCloudSDs(expr).toArray(new CloudSD[0]);
+			BytecodeVecFunc fexpr = JIT.compileVecFunc(args, expr);
+			data = new double[args[0].size()];
+			fexpr.apply(data, 0, Utils.getDataFromCloudSDs(args));
+		} else {
+			//expr contains server references
+			//TODO Is it possible to lazy eval the expr at cloud side?
+			// that is to say this CloudSD is the return value of a CloudFunc
+			// which constructed from the given expr?
+			
+			
+			
+		}
+		return this;
+	}
+	
 }
 

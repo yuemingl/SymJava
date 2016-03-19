@@ -18,13 +18,18 @@ public class TestCompile {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		testCompileBarchFunc();
+		testCompileBatchFunc();
 		testCompileVecFunc1();
 		testCompileVecFunc2();
 	}
 
-	public static void testCompileBarchFunc() {
-		BytecodeBatchFunc func = CompileUtils.compileBatchFunc("test1", new Expr[]{z,y*y,x+y+z}, x,y,z);
+	public static void testCompileBatchFunc() {
+		BytecodeBatchFunc func = CompileUtils.compileBatchFunc("test1", new Expr[] 
+				{
+					z,
+					y*y,
+					x+y+z
+				}, x,y,z);
 		double[] outAry = new double[3];
 		func.apply(outAry, 0, new double[]{1,2,3});
 		for(double d : outAry) {
