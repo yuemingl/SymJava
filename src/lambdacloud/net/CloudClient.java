@@ -88,4 +88,8 @@ public final class CloudClient {
     public void shutDown() {
     	group.shutdownGracefully();
     }
+    
+    public String toString() {
+    	return this.host+":"+this.port;
+    }
 }

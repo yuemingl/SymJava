@@ -283,7 +283,7 @@ public class CloudSD extends Symbol {
 	private boolean push(CloudClient client) {
 		CloudSDRespHandler handler = client.getCloudSDRespHandler();
 		try {
-			System.err.println("Pushing data: "+this.getFullName());
+			System.err.println("Pushing data: "+this.toString()+" to "+client.toString());
 			client.getChannel().writeAndFlush(this).sync();
 			CloudSDResp resp = handler.getCloudResp();
 			if(resp.status == 0)
@@ -320,9 +320,9 @@ public class CloudSD extends Symbol {
 				while(!isReady) { //Return immediately if it is ready
 					//Block until it is ready
 					try {
-						System.out.println("Fetching: ["+this.toString()+"]");
+						System.out.println("Fetching: "+this.toString());
 						wait();
-						System.out.println("Fetched: "+"["+this.toString()+"]");
+						System.out.println("Fetched: "+this.toString());
 						return true;
 					} catch (InterruptedException e) {
 						e.printStackTrace();
@@ -330,7 +330,7 @@ public class CloudSD extends Symbol {
 				}
 			}
 			if(isAsync) //only for test purpose
-				System.out.println("Fetched without waiting: "+"["+this.toString()+"]");
+				System.out.println("Fetched without waiting: "+this.toString());
 			return true;
 		} else { 
 			CloudClient client = getCloudConfig().getCurrentClient();
@@ -400,19 +400,10 @@ public class CloudSD extends Symbol {
 	}
 	
 	public String toString() {
-		if(this.data.length == 0) {
-			if(isOnCloud)
-				return this.getFullName()+" = [] (on Cloud)";
-			else
-				return this.getFullName()+" = [] (Local)";
-		}
-		else {
-			if(isOnCloud)
-				return this.getFullName()+" = "+printData()+" (on Cloud & Local)";
-			else
-				return this.getFullName()+" = "+printData()+" (Local)";
-				
-		}
+		if(isOnCloud)
+			return this.getFullName()+" = "+printData() + " (On Cloud)";
+		else
+			return this.getFullName()+" = "+printData();
 	}
 	
 	private String printData() {
