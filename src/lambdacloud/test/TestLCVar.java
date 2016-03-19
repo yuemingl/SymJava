@@ -6,7 +6,7 @@ import lambdacloud.core.CloudSD;
 import lambdacloud.core.lang.LCVar;
 import symjava.symbolic.Expr;
 
-public class Test {
+public class TestLCVar {
 	public static void main(String[] args) {
 		test();
 	}
@@ -22,9 +22,10 @@ public class Test {
 		Expr expr = x + y + z;
 		//x,y are not local now since they are passed as arguments
 		CloudFunc f = new CloudFunc(expr, new LCVar[]{x, y});
+		//CloudFunc f = new CloudFunc(expr, new LCVar[]{x, y, z});
 		
-		CloudSD input = new CloudSD("input").init(new double[]{1, 2});
-		CloudSD output = new CloudSD("output").resize(1);
+		CloudSD input = new CloudSD("input").init(new double[]{1, 2, 3});
+		CloudSD output = new CloudSD();
 		
 		long begin = System.currentTimeMillis();
 		f.apply(output, input);

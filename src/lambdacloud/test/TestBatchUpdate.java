@@ -15,14 +15,14 @@ import symjava.symbolic.Expr;
 
  *
  */
-public class Test2 {
+public class TestBatchUpdate {
 
 	public static void main(String[] args) {
-		test();
+		test(null);
+		test(new CloudConfig("job_local.conf"));
 	}
 	
-	public static void test() {
-		CloudConfig.setGlobalConfig("job_local.conf");
+	public static void test(CloudConfig config) {
 		
 		LCVar x = LCVar.getDouble("x");
 		LCVar y = LCVar.getDouble("y");
@@ -31,7 +31,7 @@ public class Test2 {
 			x + y,
 			x - y
 		};
-		CloudFunc f = new CloudFunc("a_vector_function", exprs, new LCVar[]{x, y});
+		CloudFunc f = new CloudFunc(config, "a_vector_function", exprs, new LCVar[]{x, y});
 		
 		CloudSD input = new CloudSD("input").init(new double[]{2, 1});
 		CloudSD output = new CloudSD("output");
