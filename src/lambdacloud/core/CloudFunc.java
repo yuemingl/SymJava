@@ -590,14 +590,17 @@ public class CloudFunc extends LCBase {
 			this.funcType = FUNC_TYPE.BATCH;
 			this.outAryLen = -1; //Determined by input CloudSD
 			this.numArgs = args.length;
-			this.batchFunc = JIT.compileBatchFunc(args, exprs);
+			//both works:
+			//this.batchFunc = JIT.compileBatchFunc(args, exprs);
+			this.batchFunc = CompileUtils.compileBatchFunc(name, exprs, args);
 		} else {
+			//Need reconsider 
 			//method 1: See CompileUtils.compileBatchFunc which follows the implementation of JIT.compileBatchFunc()
 			//BytecodeBatchFunc func = CompileUtils.compileBatchFunc(name, exprs, args);
 			//this.funcType = FUNC_TYPE.BATCH;
 			//this.batchFunc = func;
 			
-			//method 2: use output for vecfunction
+			//method 2: use output for vecfunction (not work, return a BytecodeVecFunc)
 //			int dim = exprs.length;
 //			LCStatements lcs = new LCStatements();
 //			LCArray outAry = new LCDoubleArray("outAry");

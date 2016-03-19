@@ -325,10 +325,12 @@ public class BytecodeUtils {
 //		il.append(new PUSH(cp, exprs.length));
 //		il.append(new NEWARRAY(Type.DOUBLE));
 //		il.append(new ASTORE(retArray));
+		System.out.println("JIT compiling: class="+fullClsName);
 		for(int i=0; i<exprs.size(); i++) {
 			if(!Utils.symCompare(Symbol.C0, exprs[i])) {
 				il.append(new ALOAD(1));
 				il.append(new PUSH(cp,outPos.get(i)));
+				System.out.println("JIT compiling: expr="+exprs.get(i));
 				addToInstructionList(mg, cp, factory, il, 3, exprs.get(i), args, argsMap);
 				il.append(new DASTORE());
 			}
