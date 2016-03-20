@@ -48,6 +48,7 @@ public class CompileUtils {
 	 * @param expr
 	 */
 	public static void bytecodeGenResetAll(Expr expr) {
+		if(null == expr) return;
 		Expr[] tmp = expr.args();
 		for(int i=0; i<tmp.length; i++) 
 			bytecodeGenResetAll(tmp[i]);

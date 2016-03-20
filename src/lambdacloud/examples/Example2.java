@@ -36,7 +36,7 @@ public class Example2 {
 		
 		CloudSD input = new CloudSD("input").init(new double[]{3, 4});
 		
-		CloudSD output = new CloudSD("output").resize(1);
+		CloudSD output = new CloudSD("output");
 		f.apply(output, input);
 		//You have to fetch the result to local after evaluating, 
 		//since it's stored on cloud by default

@@ -11,7 +11,7 @@ import symjava.relational.Lt;
 
 /**
  * This example shows how to use LCBuilder to create a function
- * that sums up the numbers from the arguments. We also use local
+ * that sums up the numbers from the arguments. We also demo using local and cloud
  * configuration for cloud shared data (CloudSD) and cloud function
  * (CloudFunc)
  *
@@ -19,39 +19,42 @@ import symjava.relational.Lt;
 public class Example3 {
 
 	public static void main(String[] args) {
-		CloudConfig config = new CloudConfig("job_rackspace.conf");
-		//config.useClient(config.getClientByIndex(2));
-		System.out.println("Current host: "+config.getCurrentClient().host);
+		example(null); // Run locally
+		example(new CloudConfig("job_local.conf")); // Run on cloud
+	}
+	
+	public static void example(CloudConfig config) {
 		
 		LCBuilder task = new LCBuilder(config);
 
-		LCDoubleArray argData = new LCDoubleArray("argData"); //double[] argData;
-		LCInt i = new LCInt("i"); //int i=0;
-		LCDouble sum = new LCDouble("sum"); //double sum=0;
+		//Declare variables
+		LCDoubleArray args    = new LCDoubleArray("args"); //double[] args;
+		LCInt i               = new LCInt("i");            //int i=0;
+		LCDouble sum          = new LCDouble("sum");       //double sum=0;
 		
 		/**
-		 * double apply(double[] argData) {
+		 * double apply( double[] args ) {
 		 * 	for(i=0; i<argData.length; i++) {
 		 * 		sum = sum + argData[i];
 		 * 	}
 		 * 	return sum;
 		 * }
 		 */
-		task.For(i.assign(0), Lt.apply(i, argData.getLength()), i.inc())
-			.appendBody(sum.assign( sum + argData[i] ));
+		task.For(i.assign(0), Lt.apply(i, args.getLength()), i.inc())
+			.appendBody(sum.assign( sum + args[i] ));
 		task.Return(sum);
-		CloudFunc func = task.build(argData);
+		
+		CloudFunc func = task.build(args); //Pass args as arguments and build the function
 		System.out.println(task);
 
-		CloudSD myOutput = new CloudSD(config, "myOutput").resize(1);
-		CloudSD myData = new CloudSD(config, "myData").init(new double[] {2,2,3,3,4,4});
-		myData.push();
+		CloudSD output = new CloudSD();
+		CloudSD myData = new CloudSD("myData").init(new double[] {2,2,3,3,4,4});
 		
-		// Evaluating on the cloud server
-		func.apply(myOutput, myData);
+		//Call the compiled function
+		func.apply(output, myData);
 
-		if(myOutput.fetch()) {
-			for(double d : myOutput.getData()) {
+		if(output.fetch()) {
+			for(double d : output.getData()) {
 				System.out.println(d);
 			}
 		}

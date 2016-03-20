@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import symjava.symbolic.Expr;
+import symjava.symbolic.TypeInfo;
 
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
@@ -66,4 +67,13 @@ public class LCStatements extends LCBase {
 	public Expr[] args() {
 		return this.exprList.toArray(new Expr[0]);
 	}
+	
+	@Override
+	public TypeInfo getTypeInfo() {
+		if(this.exprList.size() > 0) {
+			Expr last = this.exprList.get(this.exprList.size()-1);
+			return last.getTypeInfo();
+		}
+		return null;
+	}	
 }
