@@ -25,7 +25,7 @@ public class Example3 {
 	
 	public static void example(CloudConfig config) {
 		
-		LCBuilder task = new LCBuilder(config);
+		LCBuilder lcb = new LCBuilder(config);
 
 		//Declare variables
 		LCDoubleArray args    = new LCDoubleArray("args"); //double[] args;
@@ -40,12 +40,12 @@ public class Example3 {
 		 * 	return sum;
 		 * }
 		 */
-		task.For(i.assign(0), Lt.apply(i, args.getLength()), i.inc())
+		lcb.For(i.assign(0), Lt.apply(i, args.getLength()), i.inc())
 			.appendBody(sum.assign( sum + args[i] ));
-		task.Return(sum);
+		lcb.Return(sum);
 		
-		CloudFunc func = task.build(args); //Pass args as arguments and build the function
-		System.out.println(task);
+		CloudFunc func = lcb.build(args); //Pass args as arguments and build the function
+		System.out.println(lcb);
 
 		CloudSD output = new CloudSD();
 		CloudSD myData = new CloudSD("myData").init(new double[] {2,2,3,3,4,4});

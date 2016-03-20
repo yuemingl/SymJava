@@ -38,22 +38,25 @@ public class ExampleModelFit {
 		
 		double[] initialGuess = {0.9, 0.2};
 		
-		//Here we go ...
+		//Local solver
 		GaussNewton.solve(eq, initialGuess, data, 100, 1e-4);
+		
 		
 		CloudConfig.setGlobalConfig("job_local.conf");
 		CloudLib lib = new CloudLib();
+		
+		//Symbolic representation of the equation
 		double[] rlt = lib.solverGaussNewton(eq, initialGuess, data, 100, 1e-4);
 		for(double d : rlt)
 			System.out.println(d);
 		
-		rlt = lib.solverGaussNewton("eq(y,a/(b + x)*x,array(x),array(a,b))", initialGuess, data, 100, 1e-4);
+		//Pass the string representation of the equation
+		rlt = lib.solverGaussNewton("eq( y,a/(b + x)*x, array(x), array(a,b) )", initialGuess, data, 100, 1e-4);
 		for(double d : rlt)
 			System.out.println(d);
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		example1();
 	}
 
