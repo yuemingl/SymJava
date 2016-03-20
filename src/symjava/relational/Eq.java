@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import symjava.symbolic.Expr;
+import symjava.symbolic.Symbol;
+import symjava.symbolic.TypeInfo;
+import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.utils.Utils;
+
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.DCMPL;
 import com.sun.org.apache.bcel.internal.generic.GOTO;
-import com.sun.org.apache.bcel.internal.generic.IFLE;
 import com.sun.org.apache.bcel.internal.generic.IFNE;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
@@ -16,15 +21,13 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.NOP;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 
-import symjava.symbolic.Expr;
-import symjava.symbolic.Expr.TYPE;
-import symjava.symbolic.Symbol;
-import symjava.symbolic.TypeInfo;
-import symjava.symbolic.arity.BinaryOp;
-import symjava.symbolic.utils.Utils;
-
 /**
- * An object of Eq represents an equation like
+ * This class has two meanings:
+ * <br>
+ * 1. Represents the relation: a == b
+ * <br>
+ * 2. An object of Eq also represents an equation. For example:
+ * <br>
  * y == a*x+b
  * 
  */

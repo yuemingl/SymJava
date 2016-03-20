@@ -2,6 +2,10 @@ package symjava.relational;
 
 import java.util.Map;
 
+import symjava.symbolic.Expr;
+import symjava.symbolic.TypeInfo;
+import symjava.symbolic.arity.BinaryOp;
+
 import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
 import com.sun.org.apache.bcel.internal.generic.DCMPL;
 import com.sun.org.apache.bcel.internal.generic.GOTO;
@@ -13,11 +17,10 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.NOP;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 
-import symjava.symbolic.Expr;
-import symjava.symbolic.Expr.TYPE;
-import symjava.symbolic.TypeInfo;
-import symjava.symbolic.arity.BinaryOp;
-
+/**
+ * a > b
+ *
+ */
 public class Gt extends BinaryOp implements Relation {
 
 	public Gt(Expr arg1, Expr arg2) {
