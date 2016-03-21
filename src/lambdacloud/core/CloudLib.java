@@ -129,8 +129,10 @@ public class CloudLib {
 			CloudQuery qry = new CloudQuery();
 			qry.qryType = CloudQuery.CLOUD_LIB_INVOKE;
 			qry.objName = className+"."+methodName;
-			for(int i=0; i<args.length; i++) 
+			for(int i=0; i<args.length; i++) {
+				System.out.println(args[i]);
 				qry.argNames.add(args[i]);
+			}
 			qry.outputName = output.getName();
 			if(this.isAsync)
 				client.getChannel().writeAndFlush(qry);
