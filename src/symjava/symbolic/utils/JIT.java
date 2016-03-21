@@ -128,7 +128,7 @@ public class JIT {
 //		for(double d : outAry)
 //			System.out.println(d);
 		
-		Expr expr = Symbol.x + Symbol.y;
+		Expr expr = Symbol.x.add(Symbol.y);
 		BytecodeVecFunc vecFunc = JIT.compileVecFunc(new Expr[]{Symbol.x, Symbol.y}, expr);
 		double[] outAry = new double[3];
 		double[][] params = {

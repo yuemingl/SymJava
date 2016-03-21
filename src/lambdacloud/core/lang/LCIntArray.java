@@ -11,7 +11,7 @@ public class LCIntArray extends LCArray {
 	public LCIntArray(LCIntArray array, int index) {
 		super(array + "["+index+"]");
 		this.arrayRef = array;
-		this.index = index;
+		this.index = Expr.valueOf(index);
 	}
 	
 	public LCIntArray(LCIntArray array, Expr index) {

@@ -11,7 +11,7 @@ public class LCFloatArray extends LCArray {
 	public LCFloatArray(LCFloatArray array, int index) {
 		super(array + "["+index+"]");
 		this.arrayRef = array;
-		this.index = index;
+		this.index = Expr.valueOf(index);
 	}
 	public LCFloatArray(LCFloatArray array, Expr index) {
 		super(array + "["+index+"]");

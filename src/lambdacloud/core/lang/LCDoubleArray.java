@@ -11,7 +11,7 @@ public class LCDoubleArray extends LCArray {
 	public LCDoubleArray(LCDoubleArray array, int index) {
 		super(array + "["+index+"]");
 		this.arrayRef = array;
-		this.index = index;
+		this.index = Expr.valueOf(index);
 	}
 	
 	public LCDoubleArray(LCDoubleArray array, Expr index) {

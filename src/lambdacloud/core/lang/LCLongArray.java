@@ -11,7 +11,7 @@ public class LCLongArray extends LCArray {
 	public LCLongArray(LCLongArray array, int index) {
 		super(array + "["+index+"]");
 		this.arrayRef = array;
-		this.index = index;
+		this.index = Expr.valueOf(index);
 	}
 	
 	public LCLongArray(LCLongArray array, Expr index) {

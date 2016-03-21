@@ -32,7 +32,7 @@ public class Reciprocal extends UnaryOp {
 		if(arg instanceof Pow) {
 			Pow p = (Pow)arg.simplify();
 			p.isSimplified = true;
-			Expr rlt = Pow.simplifiedIns(p.arg1, -p.arg2);
+			Expr rlt = Pow.simplifiedIns(p.arg1, p.arg2.negate());
 			rlt.isSimplified = true;
 			return rlt;
 		}

@@ -35,7 +35,7 @@ public abstract class LCArray extends LCVar {
 	public LCArray(LCArray array, int index) {
 		super(array + "["+index+"]");
 		this.arrayRef = array;
-		this.index = index;
+		this.index = Expr.valueOf(index);
 	}
 	
 	public LCArray getArrayRef() {

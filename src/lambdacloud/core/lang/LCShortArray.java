@@ -11,7 +11,7 @@ public class LCShortArray extends LCArray {
 	public LCShortArray(LCShortArray array, int index) {
 		super(array + "["+index+"]");
 		this.arrayRef = array;
-		this.index = index;
+		this.index = Expr.valueOf(index);
 	}
 	
 	public LCShortArray(LCShortArray array, Expr index) {

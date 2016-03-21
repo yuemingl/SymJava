@@ -27,7 +27,7 @@ public class Sqrt extends BinaryOp {
 
 	@Override
 	public Expr diff(Expr expr) {
-		return Pow.simplifiedIns(arg1, 1.0/arg2).diff(expr);
+		return Pow.simplifiedIns(arg1, arg2.divideRev(1.0)).diff(expr);
 	}
 
 	public static Expr simplifiedIns(Expr expr, Expr root) {

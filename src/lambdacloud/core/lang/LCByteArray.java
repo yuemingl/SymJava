@@ -11,7 +11,7 @@ public class LCByteArray extends LCArray {
 	public LCByteArray(LCByteArray array, int index) {
 		super(array + "["+index+"]");
 		this.arrayRef = array;
-		this.index = index;
+		this.index = Expr.valueOf(index);
 	}
 	public LCByteArray(LCByteArray array, Expr index) {
 		super(array + "["+index+"]");

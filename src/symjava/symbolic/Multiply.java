@@ -78,19 +78,19 @@ public class Multiply extends BinaryOp {
 			Pow lp = (Pow)l;
 			Pow rp = (Pow)r;
 			if(Utils.symCompare(lp.arg1, rp.arg1)) {
-				return Pow.simplifiedIns( lp.arg1, lp.arg2+rp.arg2).setSimplifyOps(simOps).setAsSimplified();
+				return Pow.simplifiedIns( lp.arg1, lp.arg2.add(rp.arg2)).setSimplifyOps(simOps).setAsSimplified();
 			} else if(lp.arg2 == rp.arg2) {
 				return Pow.simplifiedIns( simplifiedIns(lp.arg1, rp.arg1), lp.arg2).setSimplifyOps(simOps).setAsSimplified();
 			}
 		} else if(l instanceof Pow) {
 			Pow lp = (Pow)l;
 			if(Utils.symCompare(lp.arg1, r)) {
-				return new Pow(lp.arg1, lp.arg2 + 1).setSimplifyOps(simOps).setAsSimplified();
+				return new Pow(lp.arg1, lp.arg2.add(1)).setSimplifyOps(simOps).setAsSimplified();
 			}
 		} else if(r instanceof Pow) {
 			Pow rp = (Pow)r;
 			if(Utils.symCompare(rp.arg1, l)) {
-				return new Pow(rp.arg1, rp.arg2 + 1).setSimplifyOps(simOps).setAsSimplified();
+				return new Pow(rp.arg1, rp.arg2.add(1)).setSimplifyOps(simOps).setAsSimplified();
 			}
 		}
 		if(Utils.symCompare(l, r)) {

@@ -32,7 +32,7 @@ public class LCReturn extends LCBase {
 	}
 	
 	public LCReturn(double expr) {
-		this.arg = expr;
+		this.arg =  Expr.valueOf(expr);
 		updateLabel();
 	}
 	

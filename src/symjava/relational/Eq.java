@@ -360,7 +360,7 @@ public class Eq extends BinaryOp implements Relation {
 	}
 	
 	public void moveRHS2LHS() {
-		this.arg1 = this.arg1 - this.arg2;
+		this.arg1 = this.arg1.subtract(this.arg2);
 		this.arg2 = Symbol.C0;
 	}
 	
