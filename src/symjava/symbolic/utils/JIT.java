@@ -37,7 +37,7 @@ public class JIT {
 			return func.toBytecodeFunc();
 		} else {
 			Func func = new Func("JITFunc_"+java.util.UUID.randomUUID().toString().replaceAll("-", ""), expr);
-			return func.toBytecodeFunc(true, false);
+			return func.toBytecodeFunc(false, false);
 		}
 	}
 	
@@ -50,7 +50,7 @@ public class JIT {
 		boolean staticMethod = false;
 		try {
 			int NMaxExpr = 36;
-			FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>();
+			FuncClassLoader<BytecodeBatchFunc> fcl = new FuncClassLoader<BytecodeBatchFunc>(Thread.currentThread().getContextClassLoader());
 			List<Expr> nonZeroList = new ArrayList<Expr>();
 			List<Integer> nonZeroIdx = new ArrayList<Integer>();
 			for(int i=0; i<exprs.length; i++) {
@@ -101,7 +101,7 @@ public class JIT {
 	public static BytecodeVecFunc compileVecFunc(Expr[] args, Expr expr) {
 		String className = "JITVecFunc_YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"+java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		ClassGen genClass = BytecodeUtils.genClassBytecodeVecFunc(className,expr, args, true, false);
-		FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>();
+		FuncClassLoader<BytecodeVecFunc> fcl = new FuncClassLoader<BytecodeVecFunc>(Thread.currentThread().getContextClassLoader());
 		return fcl.newInstance(genClass);
 	}
 	

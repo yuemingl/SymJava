@@ -7,6 +7,8 @@
 	<classpathentry kind="lib" path="lib/libsvm.jar"/>
 	<classpathentry kind="lib" path="lib/jzlib.jar"/>
 	<classpathentry kind="lib" path="lib/netty-all-5.0.0.Alpha2.jar" sourcepath="/home/yueming/Downloads/netty-5.0.0.Alpha2/jar/all-in-one/netty-all-5.0.0.Alpha2-sources.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/Java8"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/Java SE 7 [1.7.0_80]"/>
+	<classpathentry kind="lib" path="/Users/yueming.liu/workspace/eclipse_mars/SymJava/lib/hadoop-common-2.0.0-cdh4.3.1.jar"/>
+	<classpathentry kind="lib" path="/Users/yueming.liu/workspace/eclipse_mars/SymJava/lib/hive-exec-0.10.0-cdh4.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
