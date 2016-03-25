@@ -51,6 +51,7 @@ public class ExampleModelFit {
 			System.out.println(d);
 		
 		//Pass the string representation of the equation
+		// eq ( LHS, RHS, FreeVars, Parameters )
 		rlt = lib.solverGaussNewton("eq( y,a/(b + x)*x, array(x), array(a,b) )", initialGuess, data, 100, 1e-4);
 		for(double d : rlt)
 			System.out.println(d);
