@@ -4,9 +4,13 @@ import com.sun.org.apache.bcel.internal.generic.ClassGen;
 
 public class FuncClassLoader<T> extends ClassLoader {
 	
-	public FuncClassLoader(ClassLoader parent) {
-		super(parent);
+	public FuncClassLoader() {
+		super(Thread.currentThread().getContextClassLoader());
 	}
+//	
+//	public FuncClassLoader(ClassLoader parent) {
+//		super(parent);
+//	}
 	
 	/**
 	 * Return an instance from a ClassGen object 
