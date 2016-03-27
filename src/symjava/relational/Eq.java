@@ -316,6 +316,15 @@ public class Eq extends BinaryOp implements Relation {
 		return dependentVars;
 	}
 	
+	public Expr[] getAllArgs() {
+		List<Expr> ret = new ArrayList<Expr>();
+		for(int i=0; i<this.params.length; i++)
+			ret.add(this.params[i]);
+		for(int i=0; i<this.unknowns.length; i++)
+			ret.add(this.unknowns[i]);
+		return ret.toArray(new Expr[0]);
+	}
+	
 	/**
 	 * TODO
 	 * @param var

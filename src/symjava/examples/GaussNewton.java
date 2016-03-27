@@ -1,6 +1,7 @@
 package symjava.examples;
 
 import Jama.Matrix;
+import symjava.bytecode.BytecodeVecFunc;
 import symjava.matrix.*;
 import symjava.numeric.NumMatrix;
 import symjava.numeric.NumVector;
@@ -28,7 +29,17 @@ public class GaussNewton {
 		return solve((Eq)eq, new double[params.length], data, 30, 1e-8);
 	}
 	
-	public static double[] solve(Eq eq, double[] init, double[][] data, int maxIter, double eps) {
+	/**
+	 * Compile all the expressions
+	 * 
+	 * @param eq
+	 * @param init
+	 * @param data
+	 * @param maxIter
+	 * @param eps
+	 * @return
+	 */
+	public static double[] solve2(Eq eq, double[] init, double[][] data, int maxIter, double eps) {
 		int n = data.length;
 		
 		//Construct Jacobian Matrix and Residuals
@@ -74,4 +85,89 @@ public class GaussNewton {
 		}
 		return init;
 	}
+
+	/**
+	 * Compile the minimal expressions
+	 * 
+	 * @param eq
+	 * @param init
+	 * @param data
+	 * @param maxIter
+	 * @param eps
+	 * @return
+	 */
+	public static double[] solve(Eq eq, double[] init, double[][] data, int maxIter, double eps) {
+		int n = data.length;
+		
+		//Construct template function for Jacobian Matrix and Residuals
+		// res = y - f(x);
+		Expr res = eq.lhs() - eq.rhs(); 
+		// The jth column of Jacobian matrix = res.diff(params[i])
+		Expr[] params = eq.getParams();
+		Expr[] colsOfJac = new Expr[params.length];
+		for(int j=0; j<params.length; j++) {
+			colsOfJac[j]  = res.diff(params[j]);
+		}
+		
+		System.out.println("Arguments: "+Utils.joinLabels(eq.getAllArgs(),", "));
+		System.out.println("Jacobian = ");
+		System.out.println(Utils.joinLabels(colsOfJac, ","));
+		System.out.println("Residuals = ");
+		System.out.println(res);
+		
+//		System.out.println(Utils.joinLabels(eq.getParams(),", "));
+//		System.out.println(Utils.joinLabels(eq.getFreeVars(),", "));
+//		System.out.println(Utils.joinLabels(eq.getDependentVars(),", "));
+//		System.out.println(Utils.joinLabels(eq.getUnknowns(),", "));
+		
+		BytecodeVecFunc[] fColsOfJac = new BytecodeVecFunc[colsOfJac.length];
+		for(int j=0; j<params.length; j++) {
+			fColsOfJac[j] = JIT.compileVecFunc(eq.getAllArgs(), colsOfJac[j]);
+		}
+		BytecodeVecFunc fRes = JIT.compileVecFunc(eq.getAllArgs(), res);
+		
+		
+		double[] outRes = new double[n];
+		double[] outJac = new double[init.length * n];
+		double[][] fArgs = new double[init.length + data[0].length][n];
+		for(int i=0; i<n; i++) {
+			for(int j=0; j<init.length; j++)
+				fArgs[j][i] = init[j];
+			for(int j=init.length; j<init.length + data[0].length; j++)
+				fArgs[j][i] = data[i][j-init.length];
+		}
+		fRes.apply(outRes, 0, fArgs);
+		for(int i=0; i<fColsOfJac.length; i++) {
+			fColsOfJac[i].apply(outJac,n*i,fArgs);
+		}
+		
+		
+		System.out.println("Iterativly sovle ... ");
+		for(int k=0; k<maxIter; k++) {
+			for(int i=0; i<n; i++) {
+				for(int j=0; j<init.length; j++)
+					fArgs[j][i] = init[j];
+			}
+			fRes.apply(outRes, 0, fArgs);
+			for(int i=0; i<fColsOfJac.length; i++) {
+				fColsOfJac[i].apply(outJac,n*i,fArgs);
+			}
+			
+			//Use JAMA to solve the system
+			Matrix A = new Matrix(outJac, n);
+			Matrix b = new Matrix(outRes, n);
+			Matrix x = A.solve(b); //Lease Square solution
+			if(x.norm2() < eps) 
+				break;
+			//Update initial guess
+			for(int j=0; j<init.length; j++) {
+				init[j] = init[j] - x.get(j, 0);
+				System.out.print(String.format("%s=%.5f",eq.getParams()[j], init[j])+" ");
+			}
+			System.out.println();
+		}
+
+		return init;
+		}
+
 }
