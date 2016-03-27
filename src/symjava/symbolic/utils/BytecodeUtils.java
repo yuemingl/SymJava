@@ -420,7 +420,10 @@ public class BytecodeUtils {
 		
 		//Loop body:
 		InstructionHandle loopStart = il.append(new ALOAD(1)); 
-		il.append(new ILOAD(idxI)); //outAry[i]
+		//outAry[i+outPos]
+		il.append(new ILOAD(idxI));
+		il.append(new ILOAD(2));
+		il.append(InstructionConstants.IADD);
 		
 		//Traverse the expression tree
 		List<Expr> insList = new ArrayList<Expr>();
