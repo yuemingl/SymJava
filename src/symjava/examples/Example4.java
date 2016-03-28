@@ -10,6 +10,8 @@ import symjava.symbolic.*;
  * Example for PDE Constrained Parameters Optimization
  * The math expression can be displayed using this online tool:
  * http://rogercortesi.com/eqn/index.php
+ * or 
+ * http://quicklatex.com/
  */
 public class Example4 {
 	public static void main(String[] args) {

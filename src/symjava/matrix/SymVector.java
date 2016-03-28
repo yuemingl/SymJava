@@ -119,7 +119,7 @@ public class SymVector extends Expr implements Iterable<Expr> {
 	public SymVector subs(Expr from, Expr to) {
 		SymVector rlt = new SymVector();
 		for(Expr e : data) {
-			rlt.add(e.subs(from, to));
+			rlt.data.add(e.subs(from, to));
 		}
 		return rlt;
 	}
@@ -127,7 +127,7 @@ public class SymVector extends Expr implements Iterable<Expr> {
 	public SymVector diff(Expr expr) {
 		SymVector rlt = new SymVector();
 		for(Expr e : data) {
-			rlt.add(e.diff(expr));
+			rlt.data.add(e.diff(expr));
 		}
 		return rlt;
 	}
