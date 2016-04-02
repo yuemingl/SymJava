@@ -162,13 +162,20 @@ public class SymVector extends Expr implements Iterable<Expr> {
 	
 	@Override
 	public Expr simplify() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean symEquals(Expr other) {
-		// TODO Auto-generated method stub
+		if(other instanceof SymVector) {
+			SymVector ov = (SymVector)other;
+			if(this.dim() != ov.dim()) return false;
+			for(int i=0; i<this.dim(); i++) {
+				if(!this.get(i).symEquals(ov.get(i)))
+					return false;
+			}
+			return true;
+		}
 		return false;
 	}
 
