@@ -121,13 +121,13 @@ public class Session {
 		}
 		System.out.print("]");
 		root.cfunc.apply(output, inputs);
-		if(output.fetch()) {
-			System.out.print("Return: [");
-			for(double d : output.getData()) {
-				System.out.print(d+" ");
-			}
-			System.out.println("]");
-		}
+//		if(output.fetch()) {
+//			System.out.print("Return: [");
+//			for(double d : output.getData()) {
+//				System.out.print(d+" ");
+//			}
+//			System.out.println("]");
+//		}
 		
 		return output;
 	}

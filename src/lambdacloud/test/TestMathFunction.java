@@ -27,14 +27,17 @@ public class TestMathFunction {
 		Session sess1 = new Session();
 		
 		CloudSD rlt1 = sess1.runVec(A, dict);
+		rlt1.fetch();
 		for(double d : rlt1.getData())
 			System.out.println(d);
 		
 		CloudSD rlt2 = sess1.runVec(sin(A), dict);
+		rlt2.fetch();
 		for(double d : rlt2.getData())
 			System.out.println(d);
 		
 		CloudSD rlt3 = sess1.runVec(abs(A), dict);
+		rlt3.fetch();
 		for(double d : rlt3.getData())
 			System.out.println(d);
 	}

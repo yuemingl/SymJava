@@ -11,11 +11,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCBase;
-import lambdacloud.core.lang.LCDoubleArray;
 import lambdacloud.core.lang.LCReturn;
-import lambdacloud.core.lang.LCStatements;
 import lambdacloud.core.utils.FuncEvalThread;
 import lambdacloud.net.CloudClient;
 import lambdacloud.net.CloudFuncHandler;
@@ -29,7 +26,6 @@ import symjava.bytecode.BytecodeVecFunc;
 import symjava.bytecode.IR;
 import symjava.symbolic.Expr;
 import symjava.symbolic.TypeInfo;
-import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
 /**
