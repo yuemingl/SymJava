@@ -4,10 +4,18 @@ import static lambdacloud.test.TestUtils.assertEqual;
 import static symjava.symbolic.Symbol.x;
 import static symjava.symbolic.Symbol.y;
 import static symjava.symbolic.Symbol.z;
+import lambdacloud.core.lang.LCArray;
+import lambdacloud.core.lang.LCInt;
+import lambdacloud.core.lang.LCLoop;
 import lambdacloud.core.lang.LCReturn;
+import lambdacloud.core.lang.LCStatements;
+import lambdacloud.core.lang.LCVar;
 import symjava.bytecode.BytecodeBatchVecFunc;
 import symjava.bytecode.BytecodeSelect;
 import symjava.bytecode.BytecodeVecFunc;
+import symjava.math.Dot;
+import symjava.math.SymMath;
+import symjava.relational.Lt;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Vector;
 import symjava.symbolic.utils.JIT;
@@ -15,18 +23,23 @@ import symjava.symbolic.utils.JIT;
 public class TestBatchVec {
 
 	public static void main(String[] args) {
-		testVector();
-		testBatchVecFunc();
-		testSimpleCartesian();
-		testCartesian();
-	}
-	public static void testVector() {
-		Vector x = new Vector("x",3);
-		BytecodeVecFunc fun =  CompileUtils.compileVecFunc(new LCReturn(x));
-		double[] data_x = new double[] {1,2,3};
-		double[] outAry = new double[3];
-		fun.apply(outAry, 0, data_x);
-		assertEqual(new double[]{1,2,3}, outAry);
+		//testBatchVecFunc();
+		//testSimpleCartesian();
+		//testCartesian();
+
+		//testVector();
+		//testBatchVector();
+
+		testBatchVectorDot1();
+		//TODO
+		//1. dot product of vector type
+		//2. Cartesian between vectors
+		// [[1,2,3]] * [[4,5,6],[7,8,9]] =
+		// [ [1,2,3] dot [4,5,6]; [1,2,3] dot [7,8,9] ]
+		// 1,2,3,1,2,3
+		// 4,5,6,7,8,9
+		
+		
 	}
 	
 	public static void testBatchVecFunc() {
@@ -86,4 +99,63 @@ public class TestBatchVec {
 		assertEqual(new double[]{5,6,7,8,7,8,9,10,9,10,11,12}, outAry2);
 	}
 
+	public static void testVector() {
+		Vector x = new Vector("x",3);
+		BytecodeVecFunc fun =  CompileUtils.compileVecFunc(new LCReturn(x));
+		double[] data_x = new double[] {1,2,3};
+		double[] outAry = new double[3];
+		fun.apply(outAry, 0, data_x);
+		assertEqual(new double[]{1,2,3}, outAry);
+	}
+	
+	
+	public static void testBatchVector() {
+		int dim = 3;
+		Vector x = new Vector("x", dim);
+		Vector y = new Vector("y", dim);
+		Vector z = new Vector("z", dim);
+		
+		BytecodeVecFunc func =  CompileUtils.compileVecFunc(new LCReturn(x+y+z));
+
+		double[][][] args = { { {1,2,3}, {4,5,6} }, {{0,1,2,3}}};
+		
+		BytecodeBatchVecFunc ff = new BytecodeBatchVecFunc(func, dim, dim);
+		double[][] args2 = BytecodeSelect.cartesion(args);
+		double[] outAry2 = new double[args2[0].length];
+		ff.apply(outAry2, 0, args2);
+		for(double d : outAry2) {
+			System.out.println(d);
+		}
+		assertEqual(new double[]{5,6,7,8,7,8,9,10,9,10,11,12}, outAry2);
+	}
+	
+	public static void testBatchVectorDot1() {
+		LCStatements lcs = new LCStatements();
+		
+		LCArray x = LCArray.getDoubleArray("x");
+		LCArray y = LCArray.getDoubleArray("y");
+		LCArray output = LCArray.getDoubleArray("output");
+		LCInt i = LCVar.getInt("i");
+		LCVar sum = LCVar.getDouble("sum");
+		
+		lcs.append(new LCLoop(i.assign(0), Lt.apply(i, x.getLength()), i.inc())
+			.appendBody(sum.assign( sum + x[i]*y[i] )));
+
+		lcs.append(output[0].assign(sum));
+		
+		BytecodeVecFunc func = CompileUtils.compileVecFunc(lcs, output, x, y);
+		
+		double[][][] args = { { {1,2,3}}, {{4,5,6}} };
+		int dim = 3;
+		// The length of the return value of dot product is 1.
+		BytecodeBatchVecFunc ff = new BytecodeBatchVecFunc(func, dim, 1);
+		double[][] args2 = BytecodeSelect.cartesion(args);
+		double[] outAry2 = new double[dim];
+		ff.apply(outAry2, 0, args2);
+		for(double d : outAry2) {
+			System.out.println(d);
+		}
+		assertEqual(new double[]{15,30,45}, outAry2);
+	}
+	
 }

@@ -22,7 +22,7 @@ public class BytecodeBatchVecFunc implements BytecodeVecFunc {
 				System.arraycopy(args[j], argPos, tmpArgs[j], 0, vecLen);
 			}
 			func.apply(tmpBuf, 0, tmpArgs);
-			System.arraycopy(tmpBuf, 0, outAry, destPos, vecLen);
+			System.arraycopy(tmpBuf, 0, outAry, destPos, retLen);
 			destPos += retLen;
 			argPos += vecLen;
 		}
