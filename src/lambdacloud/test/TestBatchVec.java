@@ -75,7 +75,7 @@ public class TestBatchVec {
 		}
 		
 		BytecodeBatchVecFunc ff = new BytecodeBatchVecFunc(func, dim, dim);
-		double[][] args2 = BytecodeSelect.cartesion(args);
+		double[][] args2 = BytecodeSelect.cartesian(args);
 		double[] outAry2 = new double[args2[0].length];
 		ff.apply(outAry2, 0, args2);
 		for(double d : outAry2) {
@@ -90,7 +90,7 @@ public class TestBatchVec {
 		double[][][] args = { { {1,2,3}, {4,5,6} }, {{0,1,2,3}}};
 		
 		BytecodeBatchVecFunc ff = new BytecodeBatchVecFunc(func, dim, dim);
-		double[][] args2 = BytecodeSelect.cartesion(args);
+		double[][] args2 = BytecodeSelect.cartesian(args);
 		double[] outAry2 = new double[args2[0].length];
 		ff.apply(outAry2, 0, args2);
 		for(double d : outAry2) {
@@ -120,7 +120,7 @@ public class TestBatchVec {
 		double[][][] args = { { {1,2,3}, {4,5,6} }, {{0,1,2,3}}};
 		
 		BytecodeBatchVecFunc ff = new BytecodeBatchVecFunc(func, dim, dim);
-		double[][] args2 = BytecodeSelect.cartesion(args);
+		double[][] args2 = BytecodeSelect.cartesian(args);
 		double[] outAry2 = new double[args2[0].length];
 		ff.apply(outAry2, 0, args2);
 		for(double d : outAry2) {
@@ -149,7 +149,7 @@ public class TestBatchVec {
 		int dim = 3;
 		// The length of the return value of dot product is 1.
 		BytecodeBatchVecFunc ff = new BytecodeBatchVecFunc(func, dim, 1);
-		double[][] args2 = BytecodeSelect.cartesion(args);
+		double[][] args2 = BytecodeSelect.cartesian(args);
 		double[] outAry2 = new double[dim];
 		ff.apply(outAry2, 0, args2);
 		for(double d : outAry2) {
