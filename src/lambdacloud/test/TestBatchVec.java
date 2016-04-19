@@ -33,11 +33,14 @@ public class TestBatchVec {
 		testBatchVectorDot1();
 		//TODO
 		//1. dot product of vector type
-		//2. Cartesian between vectors
+		//2. Cartesian between vectors (Done)
 		// [[1,2,3]] * [[4,5,6],[7,8,9]] =
 		// [ [1,2,3] dot [4,5,6]; [1,2,3] dot [7,8,9] ]
 		// 1,2,3,1,2,3
 		// 4,5,6,7,8,9
+		long begin = System.currentTimeMillis();
+		testBatchVectorDot2();
+		System.out.println("Time: "+(System.currentTimeMillis() - begin)+"ms");
 		
 		
 	}
@@ -145,17 +148,48 @@ public class TestBatchVec {
 		
 		BytecodeVecFunc func = CompileUtils.compileVecFunc(lcs, output, x, y);
 		
-		double[][][] args = { { {1,2,3}}, {{4,5,6}} };
+		double[][][] args = { {{1,2,3}}, {{4,5,6}} };
 		int dim = 3;
 		// The length of the return value of dot product is 1.
 		BytecodeBatchVecFunc ff = new BytecodeBatchVecFunc(func, dim, 1);
 		double[][] args2 = BytecodeSelect.cartesian(args);
-		double[] outAry2 = new double[dim];
+		int outLen = args2[0].length/dim;
+		double[] outAry2 = new double[outLen];
 		ff.apply(outAry2, 0, args2);
 		for(double d : outAry2) {
 			System.out.println(d);
 		}
 		assertEqual(new double[]{15,30,45}, outAry2);
+	}
+	
+	public static void testBatchVectorDot2() {
+		LCStatements lcs = new LCStatements();
+		
+		LCArray x = LCArray.getDoubleArray("x");
+		LCArray y = LCArray.getDoubleArray("y");
+		LCArray output = LCArray.getDoubleArray("output");
+		LCInt i = LCVar.getInt("i");
+		LCVar sum = LCVar.getDouble("sum");
+		
+		lcs.append(new LCLoop(i.assign(0), Lt.apply(i, x.getLength()), i.inc())
+			.appendBody(sum.assign( sum + x[i]*y[i] )));
+
+		lcs.append(output[0].assign(sum));
+		
+		BytecodeVecFunc func = CompileUtils.compileVecFunc(lcs, output, x, y);
+		
+		double[][][] args = { {{1,2,3,4,5,6}}, {{1,1,1,2,2,2}} };
+		int dim = 3;
+		// The length of the return value of dot product is 1.
+		BytecodeBatchVecFunc ff = new BytecodeBatchVecFunc(func, dim, 1);
+		double[][] args2 = BytecodeSelect.cartesian(dim, args);
+		int outLen = args2[0].length/dim;
+		double[] outAry2 = new double[outLen];
+		ff.apply(outAry2, 0, args2);
+		for(double d : outAry2) {
+			System.out.println(d);
+		}
+		assertEqual(new double[]{6,12,15,30}, outAry2);
 	}
 	
 }
