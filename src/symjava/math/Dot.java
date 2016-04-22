@@ -157,6 +157,7 @@ public class Dot extends BinaryOp {
 		if(Utils.symCompare(this, from))
 			return to;
 		if(expr == null)
+			//TODO How to deal with class Vector?
 			return new Dot((SymVector)arg1.subs(from, to), (SymVector)arg2.subs(from, to));
 		else
 			return expr.subs(from, to);
