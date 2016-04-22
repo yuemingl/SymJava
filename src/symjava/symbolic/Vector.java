@@ -114,6 +114,10 @@ public class Vector extends Tensor {
 		return this.parent;
 	}
 	
+	public int dim() {
+		return this.nDim;
+	}
+	
 	public static void main(String[] args) {
 		Vector v = new Vector("A",8);
 		SymVector sv = v.split(3);

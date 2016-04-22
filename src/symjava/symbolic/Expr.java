@@ -551,10 +551,35 @@ abstract public class Expr implements Cloneable {
 	abstract public void updateLabel();
 	
 	/**
-	 * Parent expression, for example sub-matrix
+	 * Parent expression, for example: a sub-matrix or sub-vector has a parent 
 	 */
 	public Expr getParent() {
-		return null;
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * Return the dimension of a vector
+	 * @return
+	 */
+	public int dim() {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * return the dimension of a matrix or tensor
+	 * @return
+	 */
+	public int[] dims() {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * return the element at index
+	 * @param index
+	 * @return
+	 */
+	public Expr get(int index) {
+		throw new UnsupportedOperationException();
 	}
 }
 

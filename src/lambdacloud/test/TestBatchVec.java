@@ -1,9 +1,8 @@
 package lambdacloud.test;
 
 import static lambdacloud.test.TestUtils.assertEqual;
-import static symjava.symbolic.Symbol.x;
-import static symjava.symbolic.Symbol.y;
-import static symjava.symbolic.Symbol.z;
+import static symjava.symbolic.Symbol.*;
+import static symjava.math.SymMath.*;
 import lambdacloud.core.lang.LCArray;
 import lambdacloud.core.lang.LCInt;
 import lambdacloud.core.lang.LCLoop;
@@ -13,8 +12,6 @@ import lambdacloud.core.lang.LCVar;
 import symjava.bytecode.BytecodeBatchVecFunc;
 import symjava.bytecode.BytecodeSelect;
 import symjava.bytecode.BytecodeVecFunc;
-import symjava.math.Dot;
-import symjava.math.SymMath;
 import symjava.relational.Lt;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Vector;
@@ -30,19 +27,15 @@ public class TestBatchVec {
 		//testVector();
 		//testBatchVector();
 
-		testBatchVectorDot1();
-		//TODO
-		//1. dot product of vector type
-		//2. Cartesian between vectors (Done)
-		// [[1,2,3]] * [[4,5,6],[7,8,9]] =
-		// [ [1,2,3] dot [4,5,6]; [1,2,3] dot [7,8,9] ]
-		// 1,2,3,1,2,3
-		// 4,5,6,7,8,9
+		testBatchVectorDotWithLCArray();
 		long begin = System.currentTimeMillis();
-		testBatchVectorDot2();
+		//Cartesian between vectors
+		testBatchVectorDotWithLCArray2();
 		System.out.println("Time: "+(System.currentTimeMillis() - begin)+"ms");
 		
-		
+		//Dot product of Vector type
+		testBatchVectorDot();
+		testBatchVectorDot2();
 	}
 	
 	public static void testBatchVecFunc() {
@@ -132,7 +125,7 @@ public class TestBatchVec {
 		assertEqual(new double[]{5,6,7,8,7,8,9,10,9,10,11,12}, outAry2);
 	}
 	
-	public static void testBatchVectorDot1() {
+	public static void testBatchVectorDotWithLCArray() {
 		LCStatements lcs = new LCStatements();
 		
 		LCArray x = LCArray.getDoubleArray("x");
@@ -162,7 +155,7 @@ public class TestBatchVec {
 		assertEqual(new double[]{15,30,45}, outAry2);
 	}
 	
-	public static void testBatchVectorDot2() {
+	public static void testBatchVectorDotWithLCArray2() {
 		LCStatements lcs = new LCStatements();
 		
 		LCArray x = LCArray.getDoubleArray("x");
@@ -182,6 +175,7 @@ public class TestBatchVec {
 		int dim = 3;
 		// The length of the return value of dot product is 1.
 		BytecodeBatchVecFunc ff = new BytecodeBatchVecFunc(func, dim, 1);
+		//Cartesian with vector length = dim
 		double[][] args2 = BytecodeSelect.cartesian(dim, args);
 		int outLen = args2[0].length/dim;
 		double[] outAry2 = new double[outLen];
@@ -192,4 +186,39 @@ public class TestBatchVec {
 		assertEqual(new double[]{6,12,15,30}, outAry2);
 	}
 	
+	public static void testBatchVectorDot() {
+		int dim = 3;
+		Vector x = new Vector("x", dim);
+		Vector y = new Vector("y", dim);
+		
+		BytecodeVecFunc func =  CompileUtils.compileVecFunc(new LCReturn(dot(x,y)));
+		double[] outAry = new double[1];
+		double[][] args = { {1,2,3}, {4,5,6} };
+		func.apply(outAry, 0, args);
+		for(double d : outAry) {
+			System.out.println(d);
+		}
+		assertEqual(new double[]{32}, outAry);
+	}
+	
+	public static void testBatchVectorDot2() {
+		int dim = 3;
+		Vector x = new Vector("x", dim);
+		Vector y = new Vector("y", dim);
+		
+		BytecodeVecFunc func =  CompileUtils.compileVecFunc(new LCReturn(dot(x,y)));
+		
+		double[][][] args = { {{1,2,3,4,5,6}}, {{1,1,1,2,2,2}} };
+		// The length of the return value of dot product is 1.
+		BytecodeBatchVecFunc ff = new BytecodeBatchVecFunc(func, dim, 1);
+		//Cartesian with vector length = dim
+		double[][] args2 = BytecodeSelect.cartesian(dim, args);
+		int outLen = args2[0].length/dim;
+		double[] outAry2 = new double[outLen];
+		ff.apply(outAry2, 0, args2);
+		for(double d : outAry2) {
+			System.out.println(d);
+		}
+		assertEqual(new double[]{6,12,15,30}, outAry2);
+	}
 }
