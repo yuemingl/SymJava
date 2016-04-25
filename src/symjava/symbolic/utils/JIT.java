@@ -12,7 +12,7 @@ import symjava.bytecode.BytecodeFunc;
 import symjava.bytecode.BytecodeBatchFunc;
 import symjava.bytecode.IR;
 import symjava.bytecode.VecFuncs;
-import symjava.matrix.SymMatrix;
+import symjava.matrix.ExprMatrix;
 import symjava.numeric.NumMatrix;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
@@ -41,7 +41,7 @@ public class JIT {
 		}
 	}
 	
-	public static NumMatrix compile(Expr[] args, SymMatrix m) {
+	public static NumMatrix compile(Expr[] args, ExprMatrix m) {
 		return new NumMatrix(m, args);
 	}
 	

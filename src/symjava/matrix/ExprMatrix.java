@@ -8,40 +8,40 @@ import symjava.symbolic.Expr;
 import symjava.symbolic.TypeInfo;
 
 /**
- * SymMatrix is a matrix of symbolic expressions
+ * Matrix of symbolic expressions
  *
  */
-public class SymMatrix extends Expr {
+public class ExprMatrix extends Expr {
 	/**
 	 * Row vectors
 	 */
-	Vector<SymVector> data = new Vector<SymVector>();;
+	Vector<ExprVector> data = new Vector<ExprVector>();;
 	
-	public SymMatrix() {
+	public ExprMatrix() {
 	}
 	
-	public SymMatrix(String name) {
+	public ExprMatrix(String name) {
 	}
 	
-	public SymMatrix(Expr[][] array) {
+	public ExprMatrix(Expr[][] array) {
 		for(Expr[] row : array)
-			data.add(new SymVector(row));
+			data.add(new ExprVector(row));
 	}
 	
-	public SymMatrix(int[][] array) {
+	public ExprMatrix(int[][] array) {
 		for(int[] row : array)
-			data.add(new SymVector(row));
+			data.add(new ExprVector(row));
 	}
 	
-	public SymMatrix(double[][] array) {
+	public ExprMatrix(double[][] array) {
 		for(double[] row : array)
-			data.add(new SymVector(row));
+			data.add(new ExprVector(row));
 	}
 	
-	public SymMatrix(int m, int n) {
+	public ExprMatrix(int m, int n) {
 		data.setSize(m);
 		for(int i=0; i<data.size(); i++) {
-			data.set(i, new SymVector(n));
+			data.set(i, new ExprVector(n));
 		}
 	}
 	
@@ -54,7 +54,7 @@ public class SymMatrix extends Expr {
 	 * @param i
 	 * @return
 	 */
-	public SymVector get(int i) {
+	public ExprVector get(int i) {
 		return data.get(i);
 	}
 	
@@ -63,11 +63,11 @@ public class SymMatrix extends Expr {
 	}
 	
 	public void set(int i, int j, Expr expr) {
-		SymVector row = data.get(i);
+		ExprVector row = data.get(i);
 		row.set(j, expr);
 	}
 	
-	public void append(SymVector v) {
+	public void append(ExprVector v) {
 		data.add(v);
 	}
 	
@@ -92,7 +92,7 @@ public class SymMatrix extends Expr {
 			sb.append("c");
 		sb.append("}\n");
 		for(int i=0; i<data.size(); i++) {
-			SymVector row = data.get(i);
+			ExprVector row = data.get(i);
 			sb.append(row.get(0));
 			for(int j=1; j<row.dim(); j++)
 				sb.append(" & "+row.get(j));
@@ -146,23 +146,23 @@ public class SymMatrix extends Expr {
 
 	@Override
 	public Expr add(Expr other) {
-		SymMatrix o = (SymMatrix)other;
-		SymMatrix ret = new SymMatrix();
+		ExprMatrix o = (ExprMatrix)other;
+		ExprMatrix ret = new ExprMatrix();
 		for(int i=0; i<data.size(); i++) {
-			ret.append((SymVector)(this.get(i).add(o.get(i))));
+			ret.append((ExprVector)(this.get(i).add(o.get(i))));
 		}
 		return ret;
 	}
 	
 	@Override
 	public Expr multiply(Expr other) {
-		if(other instanceof SymVector) {
-			SymVector ret = new SymVector();
+		if(other instanceof ExprVector) {
+			ExprVector ret = new ExprVector();
 			for(int i=0; i<this.rowDim(); i++) {
-				ret.append(this.get(i).dot((SymVector)other));
+				ret.append(this.get(i).dot((ExprVector)other));
 			}
 			return ret;
-		} else if(other instanceof SymMatrix) {
+		} else if(other instanceof ExprMatrix) {
 			//TODO
 		} 
 		return null;

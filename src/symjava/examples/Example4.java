@@ -35,7 +35,7 @@ public class Example4 {
 		Expr[] dxs = new Expr[]{phi, psi,  chi };
 		//We want print the exact expression instead of \nebla{L}
 		//SymVector Lx = Grad.apply(L, xs, dxs);
-		SymVector Lx = Grad.apply(Lexpr, xs, dxs); 
+		ExprVector Lx = Grad.apply(Lexpr, xs, dxs); 
 		System.out.println("\nGradient Lx = (Lu, Llamd, Lq) =");
 		System.out.println(Lx.toString());
 		
@@ -43,7 +43,7 @@ public class Example4 {
 		Func dl = new Func("\\delta{\\lambda}", x,y,z);
 		Func dq = new Func("\\delta{q}", x,y,z);
 		Expr[] dxs2 = new Expr[] { du, dl, dq };
-		SymMatrix Lxx = new SymMatrix();
+		ExprMatrix Lxx = new ExprMatrix();
 		for(Expr Lxi : Lx) {
 			Lxx.append(Grad.apply(Lxi, xs, dxs2));
 		}

@@ -43,8 +43,8 @@ public class GaussNewton {
 		int n = data.length;
 		
 		//Construct Jacobian Matrix and Residuals
-		SymVector res = new SymVector(n);
-		SymMatrix J = new SymMatrix(n, eq.getParams().length);
+		ExprVector res = new ExprVector(n);
+		ExprMatrix J = new ExprMatrix(n, eq.getParams().length);
 		
 		Expr[] params = eq.getParams();
 		for(int i=0; i<n; i++) {

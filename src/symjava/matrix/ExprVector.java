@@ -11,47 +11,47 @@ import symjava.symbolic.TypeInfo;
 import symjava.symbolic.utils.AddList;
 
 /**
- * SymVector is a vector of symbolic expressions 
+ * Vector of symbolic expressions 
  * 
  *
  */
-public class SymVector extends Expr implements Iterable<Expr> {
+public class ExprVector extends Expr implements Iterable<Expr> {
 	protected boolean isRow = true;
 	protected Vector<Expr> data = new Vector<Expr>();
 	
-	public SymVector() {
+	public ExprVector() {
 	}
 	
-	public SymVector(int size) {
+	public ExprVector(int size) {
 		data.setSize(size);
 	}
 	
-	public SymVector(Expr[] array) {
+	public ExprVector(Expr[] array) {
 		for(Expr e : array)
 			data.add(e);
 	}
 	
-	public SymVector(Expr[] array, int startPos, int length) {
+	public ExprVector(Expr[] array, int startPos, int length) {
 		for(int i=startPos; i<startPos+length; i++)
 			data.add(array[i]);
 	}
 
-	public SymVector(double[] array) {
+	public ExprVector(double[] array) {
 		for(double e : array)
 			data.add(Expr.valueOf(e));
 	}
 	
-	public SymVector(int[] array) {
+	public ExprVector(int[] array) {
 		for(int e : array)
 			data.add(Expr.valueOf(e));
 	}
 	
-	public SymVector(double[] array, int startPos, int length) {
+	public ExprVector(double[] array, int startPos, int length) {
 		for(int i=startPos; i<startPos+length; i++)
 			data.add(Expr.valueOf(array[i]));
 	}
 	
-	public SymVector(String prefix, int startIdx, int endIdx) {
+	public ExprVector(String prefix, int startIdx, int endIdx) {
 		Symbols v = new Symbols(prefix);
 		for(Expr e : v.get(startIdx, endIdx))
 			data.add(e);
@@ -116,16 +116,16 @@ public class SymVector extends Expr implements Iterable<Expr> {
 		return data.iterator();
 	}
 	
-	public SymVector subs(Expr from, Expr to) {
-		SymVector rlt = new SymVector();
+	public ExprVector subs(Expr from, Expr to) {
+		ExprVector rlt = new ExprVector();
 		for(Expr e : data) {
 			rlt.data.add(e.subs(from, to));
 		}
 		return rlt;
 	}
 	
-	public SymVector diff(Expr expr) {
-		SymVector rlt = new SymVector();
+	public ExprVector diff(Expr expr) {
+		ExprVector rlt = new ExprVector();
 		for(Expr e : data) {
 			rlt.data.add(e.diff(expr));
 		}
@@ -137,22 +137,22 @@ public class SymVector extends Expr implements Iterable<Expr> {
 		return ret;
 	}
 	
-	public SymVector trans() {
-		SymVector rlt = new SymVector(this.data.toArray(new Expr[0]));
+	public ExprVector trans() {
+		ExprVector rlt = new ExprVector(this.data.toArray(new Expr[0]));
 		rlt.isRow = !this.isRow;
 		return rlt;
 	}
 
 	public Expr add(Expr other) {
-		SymVector o = (SymVector)other;
-		SymVector ret = new SymVector();
+		ExprVector o = (ExprVector)other;
+		ExprVector ret = new ExprVector();
 		for(int i=0; i<this.dim(); i++) {
 			ret.append(this.get(i).add(o.get(i)));
 		}
 		return ret;
 	}
 	
-	public Expr dot(SymVector other) {
+	public Expr dot(ExprVector other) {
 		AddList adds = new AddList();
 		for(int i=0; i<this.dim(); i++) {
 			adds.add(this.get(i).multiply(other.get(i)));
@@ -167,8 +167,8 @@ public class SymVector extends Expr implements Iterable<Expr> {
 
 	@Override
 	public boolean symEquals(Expr other) {
-		if(other instanceof SymVector) {
-			SymVector ov = (SymVector)other;
+		if(other instanceof ExprVector) {
+			ExprVector ov = (ExprVector)other;
 			if(this.dim() != ov.dim()) return false;
 			for(int i=0; i<this.dim(); i++) {
 				if(!this.get(i).symEquals(ov.get(i)))

@@ -18,7 +18,7 @@ import com.sun.org.apache.bcel.internal.generic.MethodGen;
 import com.sun.org.apache.bcel.internal.generic.ObjectType;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprVector;
 import symjava.symbolic.Add;
 import symjava.symbolic.Expr;
 import symjava.symbolic.SymReal;
@@ -35,7 +35,7 @@ import symjava.symbolic.utils.Utils;
  */
 public class Dot extends BinaryOp {
 	protected Expr expr = null;
-	public Dot(SymVector l, SymVector r) {
+	public Dot(ExprVector l, ExprVector r) {
 		super(l,r);
 		if(l.dim() != r.dim())
 			throw new IllegalArgumentException("The size of the two vector must be the same!");
@@ -65,7 +65,7 @@ public class Dot extends BinaryOp {
 		sortKey = label;
 	}
 	
-	public static Expr apply(SymVector l, SymVector r) {
+	public static Expr apply(ExprVector l, ExprVector r) {
 		List<Expr> list = new ArrayList<Expr>();
 		for(int i=0; i<l.dim(); i++) {
 			list.add(l.get(i).multiply(r.get(i)));
@@ -158,7 +158,7 @@ public class Dot extends BinaryOp {
 			return to;
 		if(expr == null)
 			//TODO How to deal with class Vector?
-			return new Dot((SymVector)arg1.subs(from, to), (SymVector)arg2.subs(from, to));
+			return new Dot((ExprVector)arg1.subs(from, to), (ExprVector)arg2.subs(from, to));
 		else
 			return expr.subs(from, to);
 	}

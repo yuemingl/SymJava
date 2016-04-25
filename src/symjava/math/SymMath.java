@@ -1,7 +1,7 @@
 package symjava.math;
 
-import symjava.matrix.SymMatrix;
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprMatrix;
+import symjava.matrix.ExprVector;
 import symjava.symbolic.Abs;
 import symjava.symbolic.Cos;
 import symjava.symbolic.Exp;
@@ -123,17 +123,17 @@ public class SymMath {
 		return Dot.apply(l, r);
 	}
 	
-	public static Expr dot(SymVector l, SymVector r) {
+	public static Expr dot(ExprVector l, ExprVector r) {
 		return Dot.apply(l, r);
 	}
 	
-	public static Expr dot(double[] l, SymVector r) {
-		SymVector v = new SymVector(l, 0, r.dim());
+	public static Expr dot(double[] l, ExprVector r) {
+		ExprVector v = new ExprVector(l, 0, r.dim());
 		return Dot.apply(v, r);
 	}
 
-	public static Expr dot(SymVector l, double[] r) {
-		SymVector v = new SymVector(r, 0, l.dim());
+	public static Expr dot(ExprVector l, double[] r) {
+		ExprVector v = new ExprVector(r, 0, l.dim());
 		return Dot.apply(l, v);
 	}
 	
@@ -177,7 +177,7 @@ public class SymMath {
 	 * @param f
 	 * @return
 	 */
-	public static SymVector grad(Expr f) {
+	public static ExprVector grad(Expr f) {
 		return Grad.apply(f);
 	}
 	
@@ -186,10 +186,10 @@ public class SymMath {
 	 * @param f
 	 * @return
 	 */
-	public static SymMatrix hess(Expr f) {
+	public static ExprMatrix hess(Expr f) {
 		Expr[] args = Utils.extractSymbols(f).toArray(new Expr[0]);
-		SymVector grad = Grad.apply(f, args);
-		SymMatrix mat = new SymMatrix();
+		ExprVector grad = Grad.apply(f, args);
+		ExprMatrix mat = new ExprMatrix();
 		for(Expr e : grad) {
 			mat.append(Grad.apply(e, args));
 		}

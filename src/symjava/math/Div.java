@@ -3,7 +3,7 @@ package symjava.math;
 import java.util.ArrayList;
 import java.util.List;
 
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprVector;
 import symjava.symbolic.Expr;
 import symjava.symbolic.TypeInfo;
 import symjava.symbolic.arity.NaryOp;
@@ -16,7 +16,7 @@ import symjava.symbolic.utils.Utils;
 public class Div extends NaryOp {
 	protected Expr expr;
 
-	public Div(SymVector vec) {
+	public Div(ExprVector vec) {
 		super(null);
 		if(vec instanceof Grad) {
 			Grad g = (Grad)vec;
@@ -31,12 +31,12 @@ public class Div extends NaryOp {
 		create(vec, freeVars.toArray(new Expr[0]));
 	}
 	
-	public Div(SymVector vec, Expr... freeVars) {
+	public Div(ExprVector vec, Expr... freeVars) {
 		super(null);
 		create(vec, freeVars);
 	}
 	
-	private Div create(SymVector vec, Expr... freeVars) {
+	private Div create(ExprVector vec, Expr... freeVars) {
 		if(vec.dim() != freeVars.length) {
 			throw new RuntimeException("vec.dim() != freeVars.length");
 		}
@@ -52,11 +52,11 @@ public class Div extends NaryOp {
 		return this;
 	}
 	
-	public static Div apply(SymVector vec) {
+	public static Div apply(ExprVector vec) {
 		return new Div(vec);
 	}
 	
-	public static Div apply(SymVector vec, Expr ...expr) {
+	public static Div apply(ExprVector vec, Expr ...expr) {
 		return new Div(vec, expr);
 	}
 	

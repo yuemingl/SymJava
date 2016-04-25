@@ -2,7 +2,7 @@ package symjava.math;
 
 import java.util.List;
 
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprVector;
 import symjava.symbolic.Derivative;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
@@ -12,7 +12,7 @@ import symjava.symbolic.utils.Utils;
  * Gradient of a function or expression
  *
  */
-public class Grad extends SymVector {
+public class Grad extends ExprVector {
 	public Expr[] args = null;
 	protected Func func = null;
 	
@@ -22,7 +22,7 @@ public class Grad extends SymVector {
 	 * @param data
 	 * @param args
 	 */
-	public Grad(SymVector data, Expr... args) {
+	public Grad(ExprVector data, Expr... args) {
 		for(Expr e : data)
 			this.data.add(e);
 		this.args = args;
@@ -91,15 +91,15 @@ public class Grad extends SymVector {
 		}
 	}
 	
-	public static SymVector apply(Expr f) {
+	public static ExprVector apply(Expr f) {
 		return new Grad(f);
 	}
 
-	public static SymVector apply(Expr f, Expr[] args) {
+	public static ExprVector apply(Expr f, Expr[] args) {
 		return new Grad(f, args);
 	}
 	
-	public static SymVector apply(Expr F, Expr[] fs, Expr[] dfs) {
+	public static ExprVector apply(Expr F, Expr[] fs, Expr[] dfs) {
 		return new Grad(F, fs, dfs);
 	}
 	
@@ -113,7 +113,7 @@ public class Grad extends SymVector {
 		return false;
 	}
 	
-	public SymVector subs(Expr from, Expr to) {
+	public ExprVector subs(Expr from, Expr to) {
 		//if(Utils.symCompare(this, from)) {
 		//	return to;
 		//}
@@ -127,7 +127,7 @@ public class Grad extends SymVector {
 		return this;
 	}
 	
-	public SymVector diff(Expr expr) {
+	public ExprVector diff(Expr expr) {
 		return new Grad(super.diff(expr), this.args);
 	}
 	

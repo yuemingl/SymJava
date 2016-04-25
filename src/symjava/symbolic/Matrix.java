@@ -19,7 +19,7 @@ import com.sun.org.apache.bcel.internal.generic.ObjectType;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
-import symjava.matrix.SymMatrix;
+import symjava.matrix.ExprMatrix;
 import symjava.symbolic.Expr.TYPE;
 
 public class Matrix extends Tensor {
@@ -57,7 +57,7 @@ public class Matrix extends Tensor {
 	}
 	
 	
-	public SymMatrix split(int nRowBlock, int nColBlock) {
+	public ExprMatrix split(int nRowBlock, int nColBlock) {
 		int m = nRow/nRowBlock;
 		if(nRow%nRowBlock > 0) 
 			m = (nRow+(nRowBlock-nRow%nRowBlock))/nRowBlock;
@@ -82,7 +82,7 @@ public class Matrix extends Tensor {
 				items[i][j] = new Matrix(this, this.label+"_"+i+"_"+j, i*m, j*n, nr, nc);
 			}
 		}
-		return new SymMatrix(items);
+		return new ExprMatrix(items);
 	}
 
 	@Override
@@ -151,7 +151,7 @@ public class Matrix extends Tensor {
 	
 	public static void main(String[] args) {
 		Matrix m = new Matrix("A",6,8);
-		SymMatrix sm = m.split(3, 2);
+		ExprMatrix sm = m.split(3, 2);
 		System.out.println(sm);
 		
 	}

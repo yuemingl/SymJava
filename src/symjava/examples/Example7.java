@@ -13,7 +13,7 @@ import Jama.Matrix;
 import symjava.domains.Domain;
 import symjava.examples.fem.*;
 import symjava.math.Transformation;
-import symjava.matrix.SymMatrix;
+import symjava.matrix.ExprMatrix;
 import symjava.numeric.NumFunc;
 import symjava.numeric.NumInt;
 import symjava.relational.Eq;
@@ -102,7 +102,7 @@ public class Example7 {
 		//Jacobian matrix of the transformation
 		// jacMat = (xr xs)
 		//          (yr ys)
-		SymMatrix jacMat = trans.getJacobianMatrix();
+		ExprMatrix jacMat = trans.getJacobianMatrix();
 		System.out.println(jacMat+"\n");
 		
 		//Shape functions

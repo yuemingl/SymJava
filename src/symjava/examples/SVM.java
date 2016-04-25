@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprVector;
 import symjava.relational.Eq;
 import symjava.symbolic.*;
 import symjava.symbolic.utils.AddList;
@@ -158,13 +158,13 @@ public class SVM extends JFrame {
 
 public static double[] solve(double[][] data, double[] init) {
 	int nFeatures = data[0].length - 1;
-	SymVector w = new SymVector("w", 1, nFeatures);
+	ExprVector w = new ExprVector("w", 1, nFeatures);
 	
 	Expr sumf = 0.5*dot(w, w);
 	System.out.println(sumf);
 	
-	SymVector lmd = new SymVector("\\lambda", 1, data.length);
-	SymVector c = new SymVector("c", 1, data.length); //slack variable
+	ExprVector lmd = new ExprVector("\\lambda", 1, data.length);
+	ExprVector c = new ExprVector("c", 1, data.length); //slack variable
 	AddList addList = new AddList();
 	for (int i = 0; i < data.length; i++) {
 		double[] xi = data[i];

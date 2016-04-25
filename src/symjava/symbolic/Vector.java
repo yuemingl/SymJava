@@ -18,7 +18,7 @@ import com.sun.org.apache.bcel.internal.generic.ObjectType;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprVector;
 
 public class Vector extends Tensor {
 	public int nStart;
@@ -46,7 +46,7 @@ public class Vector extends Tensor {
 		this.parent = parent;
 	}
 	
-	public SymVector split(int nBlock) {
+	public ExprVector split(int nBlock) {
 		int n = nDim/nBlock;
 		if(nDim%nBlock > 0)
 			n = (nDim+(nBlock-nDim%nBlock))/nBlock;
@@ -58,7 +58,7 @@ public class Vector extends Tensor {
 			items[j] = new Vector(this, this.label+"_"+j, j*n, n);
 		}
 		items[nBlock-1] = new Vector(this, this.label+"_"+(nBlock-1), (nBlock-1)*n, last_n);
-		return new SymVector(items);
+		return new ExprVector(items);
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public class Vector extends Tensor {
 	
 	public static void main(String[] args) {
 		Vector v = new Vector("A",8);
-		SymVector sv = v.split(3);
+		ExprVector sv = v.split(3);
 		System.out.println(sv);
 	}
 }

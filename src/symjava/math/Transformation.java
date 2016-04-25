@@ -2,7 +2,7 @@ package symjava.math;
 
 import java.util.HashSet;
 
-import symjava.matrix.SymMatrix;
+import symjava.matrix.ExprMatrix;
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
@@ -54,10 +54,10 @@ public class Transformation {
 		return getJacobianMatrix().det();
 	}
 	
-	public SymMatrix getJacobianMatrix() {
+	public ExprMatrix getJacobianMatrix() {
 		Expr[] fromVars = this.getFromVars();
 		Expr[] toVars = this.getToVars();
-		SymMatrix m = new SymMatrix(fromVars.length, toVars.length);
+		ExprMatrix m = new ExprMatrix(fromVars.length, toVars.length);
 		for(int i=0; i<fromVars.length; i++) {
 			for(int j=0; j<toVars.length; j++) {
 				m.set(i, j, eqs[i].arg2.diff(toVars[j]));

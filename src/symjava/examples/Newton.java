@@ -1,7 +1,7 @@
 package symjava.examples;
 
-import symjava.matrix.SymMatrix;
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprMatrix;
+import symjava.matrix.ExprVector;
 import symjava.numeric.NumMatrix;
 import symjava.numeric.NumVector;
 import symjava.relational.Eq;
@@ -60,8 +60,8 @@ public class Newton {
 		int n = unknowns.length;
 		
 		//Construct Jacobian Matrix
-		SymVector lhss = new SymVector(m);
-		SymMatrix hess = new SymMatrix(m, n);
+		ExprVector lhss = new ExprVector(m);
+		ExprMatrix hess = new ExprMatrix(m, n);
 		for(int i=0; i<m; i++) {
 			for(int j=0; j<n; j++) {
 				lhss[i] = eqs[i].lhs();

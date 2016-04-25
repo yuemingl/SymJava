@@ -16,7 +16,7 @@ import symjava.examples.fem.Node;
 import symjava.examples.fem.RefTriangle;
 import symjava.examples.fem.WeakForm;
 import symjava.math.Transformation;
-import symjava.matrix.SymMatrix;
+import symjava.matrix.ExprMatrix;
 import symjava.numeric.NumInt;
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
@@ -95,7 +95,7 @@ solve(wf, mesh, diri, "triangle.dat");
 				);
 		// jac = (xr xs)
 		//       (yr ys)
-		SymMatrix jacMat = trans.getJacobianMatrix();
+		ExprMatrix jacMat = trans.getJacobianMatrix();
 		System.out.println(jacMat);
 		System.out.println();
 		
