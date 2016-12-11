@@ -25,7 +25,7 @@ import symjava.domains.Interval;
 import symjava.math.Div;
 import symjava.math.Dot;
 import symjava.math.Grad;
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprVector;
 import symjava.numeric.NumVector;
 import symjava.relational.Ge;
 import symjava.relational.Gt;
@@ -332,7 +332,7 @@ public class TestSymbolic {
 		checkResult("\\nabla{w(x,y,x)} \\cdot \\nabla{v(x,y,z)}", new Dot(gu, gv).fdiff(u,w));
 		
 		Func f = new Func("F");
-		SymVector grad = Grad.apply(f);
+		ExprVector grad = Grad.apply(f);
 		Div div = new Div(grad);
 		//checkResult("\\nabla \\cdot \\nabla{F}", div);
 		checkResult("div(\\nabla{F})", div);
@@ -466,7 +466,7 @@ public class TestSymbolic {
 	}
 	
 	public static void testJITVectorized() {
-		SymVector v = new SymVector();
+		ExprVector v = new ExprVector();
 		for(int i=0; i<101; i++)
 			v[i] = x*x + 1;
 		NumVector nv = v.toNumVector(new Expr[]{x});
