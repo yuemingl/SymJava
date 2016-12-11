@@ -66,6 +66,14 @@ public class Integrate extends Expr {
 				this.domain.transform(this.domain.getLabel()+"T", trans));
 	}
 	
+	/**
+	 * Change of Variables for the integration
+	 * 
+	 * @param subsList
+	 * @param jac
+	 * @param target
+	 * @return
+	 */
 	public Integrate changeOfVars(List<ExprPair> subsList, Expr jac, Domain target) {
 		Expr tmp = this.integrand;
 		for(ExprPair p : subsList) {
