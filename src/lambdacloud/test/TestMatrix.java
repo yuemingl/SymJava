@@ -12,8 +12,8 @@ import lambdacloud.core.Session;
 import lambdacloud.core.lang.LCDevice;
 import lambdacloud.core.lang.LCReturn;
 import symjava.bytecode.BytecodeVecFunc;
-import symjava.matrix.SymMatrix;
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprMatrix;
+import symjava.matrix.ExprVector;
 import symjava.symbolic.Concat;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Matrix;
@@ -117,9 +117,9 @@ public class TestMatrix {
 		Vector x = new Vector("x", dim);
 		Vector y0 = new Vector("y0", dim);
 
-		SymMatrix AA = A.split(2, 2);
-		SymVector xx = x.split(2);
-		SymVector yy = (SymVector)(AA*xx);
+		ExprMatrix AA = A.split(2, 2);
+		ExprVector xx = x.split(2);
+		ExprVector yy = (ExprVector)(AA*xx);
 		System.out.println(yy);
 		yy[0].runOn(new LCDevice(0));
 		yy[1].runOn(new LCDevice(1));
@@ -155,9 +155,9 @@ public class TestMatrix {
 		Vector x = new Vector("x", dim);
 		Vector y0 = new Vector("y0", dim);
 
-		SymMatrix AA = A.split(2, 2);
-		SymVector xx = x.split(2);
-		SymVector yy = (SymVector)(AA*xx);
+		ExprMatrix AA = A.split(2, 2);
+		ExprVector xx = x.split(2);
+		ExprVector yy = (ExprVector)(AA*xx);
 		System.out.println(yy);
 		yy[0].runOn(new LCDevice(0));
 		yy[1].runOn(new LCDevice(1));
@@ -205,10 +205,10 @@ public class TestMatrix {
 		Vector x = new Vector("x", dim);
 		Vector y0 = new Vector("y0", dim);
 
-		SymMatrix AA = A.split(2, 2);
-		SymVector xx = x.split(2);
+		ExprMatrix AA = A.split(2, 2);
+		ExprVector xx = x.split(2);
 		// yy = AA * xx
-		SymVector yy = (SymVector)(AA*xx);
+		ExprVector yy = (ExprVector)(AA*xx);
 		// res = yy + y0
 		Expr res = CPU( new Concat( CPU(yy[0]), CPU(yy[1]) )+y0 );
 		System.out.println("Test: res="+res);
