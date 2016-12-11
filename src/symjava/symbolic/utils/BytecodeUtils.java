@@ -1,6 +1,8 @@
 package symjava.symbolic.utils;
 
-import static com.sun.org.apache.bcel.internal.Constants.*;
+import static com.sun.org.apache.bcel.internal.Constants.ACC_PUBLIC;
+import static com.sun.org.apache.bcel.internal.Constants.ACC_STATIC;
+import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
 import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.D2F;
 import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.D2I;
 import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.D2L;
@@ -34,7 +36,6 @@ import lambdacloud.core.lang.LCInt;
 import lambdacloud.core.lang.LCLong;
 import lambdacloud.core.lang.LCShort;
 import lambdacloud.core.lang.LCVar;
-import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain2D;
 import symjava.domains.Interval;
 import symjava.logic.And;
@@ -54,6 +55,7 @@ import symjava.symbolic.Add;
 import symjava.symbolic.Cos;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.Func;
 import symjava.symbolic.Infinity;
 import symjava.symbolic.Integrate;
@@ -66,12 +68,11 @@ import symjava.symbolic.Sin;
 import symjava.symbolic.Sqrt;
 import symjava.symbolic.Subtract;
 import symjava.symbolic.Sum;
+import symjava.symbolic.SymConst;
 import symjava.symbolic.SymRandom;
 import symjava.symbolic.SymReal;
 import symjava.symbolic.Symbol;
-import symjava.symbolic.SymConst;
 import symjava.symbolic.Tan;
-import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.arity.NaryOp;
 import symjava.symbolic.arity.TernaryOp;
@@ -92,7 +93,6 @@ import com.sun.org.apache.bcel.internal.generic.DALOAD;
 import com.sun.org.apache.bcel.internal.generic.DASTORE;
 import com.sun.org.apache.bcel.internal.generic.DCMPL;
 import com.sun.org.apache.bcel.internal.generic.DDIV;
-import com.sun.org.apache.bcel.internal.generic.DLOAD;
 import com.sun.org.apache.bcel.internal.generic.DMUL;
 import com.sun.org.apache.bcel.internal.generic.DSTORE;
 import com.sun.org.apache.bcel.internal.generic.DSUB;
@@ -112,18 +112,15 @@ import com.sun.org.apache.bcel.internal.generic.ILOAD;
 import com.sun.org.apache.bcel.internal.generic.IOR;
 import com.sun.org.apache.bcel.internal.generic.ISTORE;
 import com.sun.org.apache.bcel.internal.generic.IXOR;
-import com.sun.org.apache.bcel.internal.generic.Instruction;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.LocalVariableGen;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
-import com.sun.org.apache.bcel.internal.generic.NEWARRAY;
 import com.sun.org.apache.bcel.internal.generic.NOP;
 import com.sun.org.apache.bcel.internal.generic.POP2;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
-import com.sun.org.apache.bcel.internal.generic.SASTORE;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class BytecodeUtils {
@@ -792,7 +789,7 @@ public class BytecodeUtils {
 		List<Expr> insList = new ArrayList<Expr>();
 		post_order(expr, insList);
 		if(insList.size() == 0) {
-			throw new RuntimeException("Expressionis empty. Nothing to generate!");
+			throw new RuntimeException("Expression is empty. Nothing to generate!");
 		}
 
 		for(int insIndex=0; insIndex<insList.size(); insIndex++) {
