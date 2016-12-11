@@ -3,12 +3,14 @@ package symjava.matrix;
 import java.util.Vector;
 
 import symjava.numeric.NumMatrix;
-import symjava.symbolic.Add;
 import symjava.symbolic.Expr;
 import symjava.symbolic.TypeInfo;
 
 /**
- * Matrix of symbolic expressions
+ * Matrix of symbolic expressions. 
+ * 
+ * See @Matrix for symbolic matrix which is a single
+ * symbol represents a matrix object
  *
  */
 public class ExprMatrix extends Expr {
