@@ -12,7 +12,9 @@ Click in menu: Help -> Install New Software. Enter in "Work with" field:
 http://amelentev.github.io/eclipse.jdt-oo-site/
 
 If you are using Eclipse-Kepler you need to install SR2 4.3.2 here https://www.eclipse.org/downloads/packages/release/kepler/sr2)
+
 If you are using Eclipse 4.4+, you need Scalar IDE plugin. see https://github.com/amelentev/java-oo
+
 Both Java 7 and 8 are supported.
 
 ### Citing Our Papers ###
