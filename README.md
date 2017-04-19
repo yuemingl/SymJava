@@ -5,13 +5,15 @@ There are two interesting features:
 
 1. Operator Overloading is implemented by using Java-OO (https://github.com/amelentev/java-oo)
 
-2. "Lambdify" in sympy is implemented in SymJava by using BCEL library. The java bytecode is generated at runtime for a symbolic expression. Fast numerical evaluation is achieved.
-
-SymJava is developed under Java 7 and Eclipse-Kepler (SR2 4.3.2, https://www.eclipse.org/downloads/packages/release/kepler/sr2)
+2. Java bytecode is generated at runtime for a symbolic expression. Fast numerical evaluation is achieved. 
 
 Install java-oo Eclipse plugin for Java Operator Overloading support (https://github.com/amelentev/java-oo):
 Click in menu: Help -> Install New Software. Enter in "Work with" field: 
 http://amelentev.github.io/eclipse.jdt-oo-site/
+
+If you are using Eclipse-Kepler you need to install SR2 4.3.2 here https://www.eclipse.org/downloads/packages/release/kepler/sr2)
+If you are using Eclipse 4.4+, you need Scalar IDE plugin. see https://github.com/amelentev/java-oo
+Both Java 7 and 8 are supported.
 
 ### Citing Our Papers ###
 
