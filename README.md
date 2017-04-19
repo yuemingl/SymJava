@@ -5,7 +5,7 @@ There are two unique features which make SymJava different:
 
 1. Operator Overloading is implemented by using Java-OO (https://github.com/amelentev/java-oo)
 
-2. Java bytecode is generated at runtime for a symbolic expression. Fast numerical evaluation is achieved. 
+2. Java bytecode is generated at runtime for symbolic expressions which make the numerical evaluation really fast. 
 
 Install java-oo Eclipse plugin for Java Operator Overloading support (https://github.com/amelentev/java-oo):
 Click in menu: Help -> Install New Software. Enter in "Work with" field: 
