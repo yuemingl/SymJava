@@ -212,7 +212,27 @@ abstract public class Expr implements Cloneable {
 	public Expr addRev(double other) {
 		return Add.simplifiedIns(new SymDouble(other), this);
 	}
-	
+	/**
+	 * Operator overload support for Groovy:
+	 * a+b
+	 * @param other
+	 * @return
+	 */
+	public Expr plus(Expr other) {
+		return Add.simplifiedIns(this, other);
+	}
+	public Expr plus(int other) {
+		return Add.simplifiedIns(this, new SymInteger(other));
+	}
+	public Expr plus(long other) {
+		return Add.simplifiedIns(this, new SymLong(other));
+	}
+	public Expr plus(float other) {
+		return Add.simplifiedIns(this, new SymFloat(other));
+	}
+	public Expr plus(double other) {
+		return Add.simplifiedIns(this, new SymDouble(other));
+	}
 	/**
 	 * Operator overload support:
 	 * a-b
@@ -246,7 +266,27 @@ abstract public class Expr implements Cloneable {
 	public Expr subtractRev(double other) {
 		return Subtract.simplifiedIns(new SymDouble(other), this);
 	}
-	
+	/**
+	 * Operator overload support for Groovy:
+	 * a-b
+	 * @param other
+	 * @return
+	 */
+	public Expr minus(Expr other) {
+		return Subtract.simplifiedIns(this, other);
+	}
+	public Expr minus(int other) {
+		return Subtract.simplifiedIns(this, new SymInteger(other));
+	}
+	public Expr minus(long other) {
+		return Subtract.simplifiedIns(this, new SymLong(other));
+	}
+	public Expr minus(float other) {
+		return Subtract.simplifiedIns(this, new SymFloat(other));
+	}
+	public Expr minus(double other) {
+		return Subtract.simplifiedIns(this, new SymDouble(other));
+	}
 	/**
 	 * Operator overload support:
 	 * a*b
@@ -314,7 +354,27 @@ abstract public class Expr implements Cloneable {
 	public Expr divideRev(double other) {
 		return Divide.simplifiedIns(new SymDouble(other), this);
 	}
-	
+	/**
+	 * Operator overload support for Groovy:
+	 * a/b
+	 * @param other
+	 * @return
+	 */
+	public Expr div(Expr other) {
+		return Divide.simplifiedIns(this, other);
+	}	
+	public Expr divi(int other) {
+		return Divide.simplifiedIns(this, new SymInteger(other));
+	}
+	public Expr div(long other) {
+		return Divide.simplifiedIns(this, new SymLong(other));
+	}
+	public Expr div(float other) {
+		return Divide.simplifiedIns(this, new SymFloat(other));
+	}
+	public Expr div(double other) {
+		return Divide.simplifiedIns(this, new SymDouble(other));
+	}
 	/**
 	 * Operator overload support:
 	 * -a
