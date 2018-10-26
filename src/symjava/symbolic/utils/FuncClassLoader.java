@@ -1,11 +1,15 @@
 package symjava.symbolic.utils;
 
+import symjava.bytecode.BytecodeFunc;
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
 
 public class FuncClassLoader<T> extends ClassLoader {
 	
 	public FuncClassLoader() {
-		super(Thread.currentThread().getContextClassLoader());
+		//super(Thread.currentThread().getContextClassLoader());
+		//https://blogs.oracle.com/sundararajan/understanding-java-class-loading
+		//super(java.lang.ClassLoader.getSystemClassLoader());
+		super(BytecodeFunc.class.getClassLoader());
 	}
 //	
 //	public FuncClassLoader(ClassLoader parent) {

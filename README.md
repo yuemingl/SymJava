@@ -1,25 +1,32 @@
+<<<<<<< HEAD
 # SymJava
 SymJava is a Java library for symbolic-numeric computation.
 
-There are two interesting features:
+There are two unique features which make SymJava different:
 
 1. Operator Overloading is implemented by using Java-OO (https://github.com/amelentev/java-oo)
 
-2. "Lambdify" in sympy is implemented in SymJava by using BCEL library. The java bytecode is generated at runtime for a symbolic expression. Fast numerical evaluation is achieved.
-
-SymJava is developed under Java 7 and Eclipse-Kepler (SR2 4.3.2, https://www.eclipse.org/downloads/packages/release/kepler/sr2)
+2. Java bytecode is generated at runtime for symbolic expressions which make the numerical evaluation really fast. 
 
 Install java-oo Eclipse plugin for Java Operator Overloading support (https://github.com/amelentev/java-oo):
 Click in menu: Help -> Install New Software. Enter in "Work with" field: 
 http://amelentev.github.io/eclipse.jdt-oo-site/
 
-#Citing SymJava
-If you use SymJava for academic research, you are encouraged to cite the following paper:
+If you are using Eclipse-Kepler you need to install SR2 4.3.2 here https://www.eclipse.org/downloads/packages/release/kepler/sr2)
 
-Yueming Liu, Peng Zhang, Meikang Qiu, "Fast Numerical Evaluation for Symbolic Expressions in Java", 17th IEEE International Conference on High Performance and Communications (HPCC 2015), New York, USA, August 24-26, 2015
-. (In Press)
+If you are using Eclipse 4.4+, you need Scalar IDE plugin. see https://github.com/amelentev/java-oo
 
-#Examples:
+Both Java 7 and 8 are supported.
+
+### Citing Our Papers ###
+
+If you were using Futureye_JIT for academic research, you are encouraged to cite the following papers:
+
+[Y. Liu, P. Zhang, M. Qiu, "Fast Numerical Evaluation for Symbolic Expressions in Java", 17th IEEE International Conference on High Performance and Communications (HPCC 2015), New York, USA, August 24-26, 2015.](http://ieeexplore.ieee.org/document/7336223/)
+
+[Y. Liu, P. Zhang, M. Qiu, "SNC: A Cloud Service Platform for Symbolic-Numeric Computation using Just-In-Time Compilation", IEEE Transactions on Cloud Computing, 2017](http://ieeexplore.ieee.org/abstract/document/7828007/)
+
+### Examples ###
 
 ```Java
 package symjava.examples;
@@ -329,3 +336,59 @@ y_0=0.01624 y_1=0.08735 y_2=0.15765 y_3=0.19518 y_4=0.25469 y_5=0.29667 y_6=0.31
 y_0=0.02256 y_1=0.09240 y_2=0.15593 y_3=0.19116 y_4=0.25076 y_5=0.29644 y_6=0.31550 \lambda_0=0.05487 \lambda_1=0.06919 \lambda_2=-0.12387 \lambda_3=0.04207 \lambda_4=0.04428 \lambda_5=-0.05989 \lambda_6=0.03240 a=0.36223 b=0.55462 
 y_0=0.02314 y_1=0.09356 y_2=0.15671 y_3=0.19159 y_4=0.25059 y_5=0.29598 y_6=0.31499 \lambda_0=0.05373 \lambda_1=0.06689 \lambda_2=-0.12542 \lambda_3=0.04123 \lambda_4=0.04463 \lambda_5=-0.05896 \lambda_6=0.03342 a=0.36185 b=0.55631 
 ```
+
+```Java	
+package symjava.examples;	
+ import static symjava.symbolic.Symbol.*;	
+import symjava.matrix.*;	
+import symjava.symbolic.*;	
+ /**	
+ * Example for PDE Constrained Parameters Optimization	
+ *	
+ */	
+public class Example4 {	
+	public static void main(String[] args) {	
+		Func u =  new Func("u",  x,y,z);	
+		Func u0 = new Func("u0", x,y,z);	
+		Func q =  new Func("q",  x,y,z);	
+		Func q0 = new Func("q0", x,y,z);	
+		Func f =  new Func("f",  x,y,z);	
+		Func lamd = new Func("\\lambda ", x,y,z);	
+			
+		Expr reg_term = (q-q0)*(q-q0)*0.5*0.1;	
+ 		Func L = new Func("L",(u-u0)*(u-u0)/2 + reg_term + q*Dot.apply(Grad.apply(u), Grad.apply(lamd)) - f*lamd);	
+		System.out.println("Lagrange L(u, \\lambda, q) = \n"+L);	
+			
+		Func phi = new Func("\\phi ", x,y,z);	
+		Func psi = new Func("\\psi ", x,y,z);	
+		Func chi = new Func("\\chi ", x,y,z);	
+		Expr[] xs =  new Expr[]{u,   lamd, q   };	
+		Expr[] dxs = new Expr[]{phi, psi,  chi };	
+		SymVector Lx = Grad.apply(L, xs, dxs);	
+		System.out.println("\nGradient Lx = (Lu, Llamd, Lq) =");	
+		System.out.println(Lx);	
+			
+		Func du = new Func("\\delta{u}", x,y,z);	
+		Func dl = new Func("\\delta{\\lambda}", x,y,z);	
+		Func dq = new Func("\\delta{q}", x,y,z);	
+		Expr[] dxs2 = new Expr[] { du, dl, dq };	
+		SymMatrix Lxx = new SymMatrix();	
+		for(Expr Lxi : Lx) {	
+			Lxx.add(Grad.apply(Lxi, xs, dxs2));	
+		}	
+		System.out.println("\nHessian Matrix =");	
+		System.out.println(Lxx);	
+	}	
+}	
+```	
+Output in Latex:	
+ Lagrange=	
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_L.png)	
+ Hessian=	
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_hessian.png)	
+ Grad(L)=	
+![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_grad.png)	
+
+
+ Example6: Finite Element Solver for Laplace Equation	
+ ![](https://raw.githubusercontent.com/yuemingl/SymJava/master/images/ex6.png)
