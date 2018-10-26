@@ -6,7 +6,8 @@ import symjava.symbolic.utils.Utils;
 public class Exp extends Pow {
 	public Exp(Expr arg) {
 		super(SymMath.E, arg);
-		String displayExp = String.format("{%s}", this.arg2);
+		//String displayExp = String.format("{%s}", this.arg2);
+		String displayExp = String.format("%s", this.arg2);
 		if(arg instanceof SymReal<?>) {
 			SymReal<?> realExp = (SymReal<?>)arg;
 			if(realExp.isInteger()) {
@@ -15,8 +16,13 @@ public class Exp extends Pow {
 			//if(realExp.isNegative())
 			//	displayExp = "{"+displayExp+"}";
 		}
-		label = "e^" + displayExp + "";
+		//label = "e^" + displayExp + "";
+		label = "pow(e," + displayExp + ")";
 		sortKey = "epower"+String.valueOf(displayExp);
+	}
+	
+	public String toString() {
+		return label;
 	}
 
 	public static Expr simplifiedIns(Expr expr) {

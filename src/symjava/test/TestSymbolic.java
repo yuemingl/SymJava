@@ -1,10 +1,23 @@
 package symjava.test;
 
-import static symjava.symbolic.Symbol.*;
-import static symjava.math.SymMath.*;
-
-import java.math.BigInteger;
-
+import static symjava.math.SymMath.PI2;
+import static symjava.math.SymMath.cos;
+import static symjava.math.SymMath.exp;
+import static symjava.math.SymMath.log;
+import static symjava.math.SymMath.log10;
+import static symjava.math.SymMath.log2;
+import static symjava.math.SymMath.pow;
+import static symjava.math.SymMath.sin;
+import static symjava.math.SymMath.sqrt;
+import static symjava.math.SymMath.tan;
+import static symjava.symbolic.Symbol.e;
+import static symjava.symbolic.Symbol.oo;
+import static symjava.symbolic.Symbol.r;
+import static symjava.symbolic.Symbol.s;
+import static symjava.symbolic.Symbol.t;
+import static symjava.symbolic.Symbol.x;
+import static symjava.symbolic.Symbol.y;
+import static symjava.symbolic.Symbol.z;
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
@@ -12,15 +25,26 @@ import symjava.domains.Interval;
 import symjava.math.Div;
 import symjava.math.Dot;
 import symjava.math.Grad;
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprVector;
 import symjava.numeric.NumVector;
-import symjava.relational.Eq;
 import symjava.relational.Ge;
 import symjava.relational.Gt;
 import symjava.relational.Le;
 import symjava.relational.Lt;
 import symjava.relational.Neq;
-import symjava.symbolic.*;
+import symjava.symbolic.Expr;
+import symjava.symbolic.Func;
+import symjava.symbolic.Integrate;
+import symjava.symbolic.Reciprocal;
+import symjava.symbolic.Sum;
+import symjava.symbolic.SymDouble;
+import symjava.symbolic.SymFloat;
+import symjava.symbolic.SymInteger;
+import symjava.symbolic.SymLong;
+import symjava.symbolic.SymRandom;
+import symjava.symbolic.SymReal;
+import symjava.symbolic.Symbol;
+import symjava.symbolic.Symbols;
 import symjava.symbolic.utils.JIT;
 
 
@@ -308,7 +332,7 @@ public class TestSymbolic {
 		checkResult("\\nabla{w(x,y,x)} \\cdot \\nabla{v(x,y,z)}", new Dot(gu, gv).fdiff(u,w));
 		
 		Func f = new Func("F");
-		SymVector grad = Grad.apply(f);
+		ExprVector grad = Grad.apply(f);
 		Div div = new Div(grad);
 		//checkResult("\\nabla \\cdot \\nabla{F}", div);
 		checkResult("div(\\nabla{F})", div);
@@ -442,7 +466,7 @@ public class TestSymbolic {
 	}
 	
 	public static void testJITVectorized() {
-		SymVector v = new SymVector();
+		ExprVector v = new ExprVector();
 		for(int i=0; i<101; i++)
 			v[i] = x*x + 1;
 		NumVector nv = v.toNumVector(new Expr[]{x});
@@ -453,6 +477,30 @@ public class TestSymbolic {
 			System.out.println(outAry[i]);
 		}
 	}
+	public static void testMatrixVector() {
+		
+	}
+	
+	public static void testSymRandom() {
+		BytecodeFunc f = JIT.compile(new SymRandom());
+		System.out.println(f.apply());
+	}
+	
+	
+	public static double eps = 1e-5;
+	public static void check(String info, double d1, double d2) {
+		if(Math.abs(d1-d2) < eps) {
+			System.out.println("pass");
+		} else {
+			System.out.println("!!!FAIL!!!   "+d1+"!="+d2+" "+info);
+		}
+	}
+
+	public static void testMathematicalFunction() {
+		//TODO compile use bytecoeGen()
+		check(sqrt(x).toString(), JIT.compile(sqrt(x)).apply(0.1), Math.sqrt(0.1));
+	}
+	
 	public static void main(String[] args) {
 		//eclipse不能编译的问题：cmd进到某个class目录后，该目录不允许删除，
 		//导致eclipse不能删除该目录，所以不能编译
@@ -470,6 +518,8 @@ public class TestSymbolic {
 //		testLogic();
 		
 		//set vm parameters: -XX:+PrintCompilation
-		testJITVectorized();
+		//testJITVectorized();
+		//testSymRandom();
+		testMathematicalFunction();
 	}
 }

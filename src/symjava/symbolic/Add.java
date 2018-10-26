@@ -1,15 +1,31 @@
 package symjava.symbolic;
 
-import java.util.List;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.DADD;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.FADD;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.IADD;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.LADD;
 
+import java.util.List;
+import java.util.Map;
+
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
+
+import com.sun.org.apache.bcel.internal.Constants;
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.ObjectType;
+import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class Add extends BinaryOp {
 	public Add(Expr l, Expr r) {
 		super(l, r);
-		label = l + " + " + r;
-		sortKey = arg1.getSortKey()+arg2.getSortKey();
+		updateLabel();
 	}
 	
 	public static Expr shallowSimplifiedIns(Expr l, Expr r) {
@@ -112,8 +128,12 @@ public class Add extends BinaryOp {
 	}
 
 	public void flattenAdd(List<Expr> outList) {
-		arg1.flattenAdd(outList);
-		arg2.flattenAdd(outList);
+		if(device != null) {
+			outList.add(this);
+		} else {
+			arg1.flattenAdd(outList);
+			arg2.flattenAdd(outList);
+		}
 	}
 
 	@Override
@@ -125,4 +145,52 @@ public class Add extends BinaryOp {
 		//return Utils.flattenSortAndCompare(this, other);
 		return Utils.flattenSortAndCompare(this.simplify(), other.simplify());
 	}
+	
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		if(arg1.getType() == TYPE.MATRIX && arg2.getType() == TYPE.MATRIX) {
+			arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			il.append(factory.createInvoke("Jama.Matrix", "plus",
+					new ObjectType("Jama.Matrix"), new Type[] { new ObjectType("Jama.Matrix") },
+					Constants.INVOKEVIRTUAL));
+			return startPos;
+		} else if(arg1.getType() == TYPE.VECTOR && arg2.getType() == TYPE.VECTOR) {
+			arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+			il.append(factory.createInvoke("Jama.Matrix", "plus",
+					new ObjectType("Jama.Matrix"), new Type[] { new ObjectType("Jama.Matrix") },
+					Constants.INVOKEVIRTUAL));
+			return startPos;
+		}
+		
+		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
+		BytecodeUtils.typeCast(il, arg1.getType(), ty);
+		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		BytecodeUtils.typeCast(il, arg2.getType(), ty);
+		if(ty == TYPE.DOUBLE)
+			il.append(DADD);
+		else if(ty == TYPE.INT)
+			il.append(IADD);
+		else if(ty == TYPE.LONG)
+			il.append(LADD);
+		else if(ty == TYPE.FLOAT)
+			il.append(FADD);
+		else
+			il.append(IADD);
+		return startPos;
+	}
+
+	@Override
+	public void updateLabel() {
+		label = arg1 + " + " + arg2;
+		sortKey = arg1.getSortKey()+arg2.getSortKey();
+	}
+	
+	@Override
+	public TypeInfo getTypeInfo() {
+		return arg1.getTypeInfo();
+	}	
 }

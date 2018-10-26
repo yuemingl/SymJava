@@ -7,6 +7,9 @@ import java.util.List;
 import symjava.symbolic.utils.AddList;
 import symjava.symbolic.utils.Utils;
 
+/**
+ * a+b+c+d+...
+ */
 public class Sum extends Expr {
 	public Expr summandTemplate;
 	public Expr indexExpr;
@@ -14,6 +17,14 @@ public class Sum extends Expr {
 	public int end;
 	HashMap<Integer, Expr> cache = new HashMap<Integer, Expr>();
 	
+	/**
+	 * \Sigma_{i=start}^{end}{x_i}
+	 * 
+	 * @param summandTemplate
+	 * @param indexExpr
+	 * @param start
+	 * @param end
+	 */
 	public Sum(Expr summandTemplate, Expr indexExpr, int start, int end) {
  		this.summandTemplate = summandTemplate;
  		this.indexExpr = indexExpr;
@@ -115,6 +126,24 @@ public class Sum extends Expr {
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
 		outList.add(this);
+	}
+
+	@Override
+	public Expr[] args() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public TypeInfo getTypeInfo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

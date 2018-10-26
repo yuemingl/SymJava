@@ -22,4 +22,11 @@ public abstract class TernaryOp extends Expr {
 	public Expr[] args() {
 		return new Expr[] { arg1, arg2, arg3 };
 	}
+	public Expr setArg(int index, Expr arg) {
+		if(index == 0) arg1 = arg;
+		else if(index == 1) arg2 = arg;
+		else if(index == 2) arg3 = arg;
+		updateLabel();
+		return this;
+	}	
 }

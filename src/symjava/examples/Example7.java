@@ -13,7 +13,7 @@ import Jama.Matrix;
 import symjava.domains.Domain;
 import symjava.examples.fem.*;
 import symjava.math.Transformation;
-import symjava.matrix.SymMatrix;
+import symjava.matrix.ExprMatrix;
 import symjava.numeric.NumFunc;
 import symjava.numeric.NumInt;
 import symjava.relational.Eq;
@@ -44,6 +44,21 @@ public class Example7 {
 				if(3.0-x < eps)
 					return 2; //
 				return 0;
+			}
+			@Override
+			public Expr[] args() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public TypeInfo getTypeInfo() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public void updateLabel() {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		
@@ -87,7 +102,7 @@ public class Example7 {
 		//Jacobian matrix of the transformation
 		// jacMat = (xr xs)
 		//          (yr ys)
-		SymMatrix jacMat = trans.getJacobianMatrix();
+		ExprMatrix jacMat = trans.getJacobianMatrix();
 		System.out.println(jacMat+"\n");
 		
 		//Shape functions

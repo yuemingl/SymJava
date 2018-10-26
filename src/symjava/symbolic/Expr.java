@@ -1,24 +1,30 @@
 package symjava.symbolic;
 
-import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
+import lambdacloud.core.lang.LCAssign;
+import lambdacloud.core.lang.LCDevice;
 import symjava.logic.And;
 import symjava.logic.Not;
 import symjava.logic.Or;
 import symjava.logic.Xor;
-import symjava.relational.Ge;
-import symjava.relational.Relation;
 import symjava.symbolic.utils.Utils;
+
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 abstract public class Expr implements Cloneable {
 	/**
-	 * Label(or name) of an expression(Symbol, Func,...)
+	 * Label(or name) of an expression
 	 */
 	protected String label = null;
 	
 	/**
-	 * A string used to sort terms in an expression
+	 * A string used to sort the terms in an expression
 	 */
 	protected String sortKey = null;
 	
@@ -26,25 +32,37 @@ abstract public class Expr implements Cloneable {
 	 * Number of operations for simplifying an expression
 	 */
 	public int simplifyOpNum = 0;
-	
+
+	/**
+	 * Return true if simplify() is called
+	 */
 	public boolean isSimplified = false;
 	
+	/**
+	 * Simplify the expression
+	 * @return
+	 */
 	public abstract Expr simplify();
 	
+	/**
+	 * Return true if two expressions are equal in the sense of mathematics
+	 * @param other
+	 * @return
+	 */
 	public abstract boolean symEquals(Expr other);
 	
 	/**
-	 * Return the arguments of the expr
+	 * Return the arguments of the expression
 	 * @return
 	 */
-	public Expr[] args() { return new Expr[0]; }
+	public abstract Expr[] args();// { return new Expr[0]; }
 
 	/**
-	 * Derivative of expr
-	 * @param expr
+	 * Derivative of the expression with respect to x
+	 * @param x
 	 * @return
 	 */
-	public abstract Expr diff(Expr expr);
+	public abstract Expr diff(Expr x);
 	
 	/**
 	 * Functional derivative of f with respect to df
@@ -93,9 +111,17 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Return the string expression
+	 * Return the string representation of the expression
 	 */
 	public String toString() {
+		return label;
+	}
+	
+	/**
+	 * Return the LaTex representation of the expression
+	 * @return
+	 */
+	public String toLaTex() {
 		return label;
 	}
 	
@@ -118,7 +144,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Set a string key for arranging terms in an expression
+	 * Set a string key for sorting the terms in the expression
 	 * @param sortKey
 	 * @return
 	 */
@@ -128,7 +154,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Get the string key used to arrange terms in an expression
+	 * Get the string key used to sort the terms in the expression
 	 * @param sortKey
 	 * @return
 	 */
@@ -161,7 +187,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * Expr a = 5;
 	 * 
 	 * @param v
@@ -180,7 +206,7 @@ abstract public class Expr implements Cloneable {
 		return new SymDouble(v);
 	}
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * a+b
 	 * @param other
 	 * @return
@@ -234,7 +260,7 @@ abstract public class Expr implements Cloneable {
 		return Add.simplifiedIns(this, new SymDouble(other));
 	}
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * a-b
 	 * @param other
 	 * @return
@@ -288,7 +314,7 @@ abstract public class Expr implements Cloneable {
 		return Subtract.simplifiedIns(this, new SymDouble(other));
 	}
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * a*b
 	 * @param other
 	 * @return
@@ -322,7 +348,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * a/b
 	 * @param other
 	 * @return
@@ -376,7 +402,7 @@ abstract public class Expr implements Cloneable {
 		return Divide.simplifiedIns(this, new SymDouble(other));
 	}
 	/**
-	 * Operator overload support:
+	 * Operator overloading support:
 	 * -a
 	 * 
 	 */
@@ -434,7 +460,7 @@ abstract public class Expr implements Cloneable {
 	}
 	
 //	/**
-//	 * TODO We cannot use the comparison operator overload in java-oo for our use case
+//	 * TODO We cannot use the comparison Operator overloading in java-oo for our use case
 //	 * @param other
 //	 * @return
 //	 */
@@ -474,7 +500,7 @@ abstract public class Expr implements Cloneable {
 		return subs(from, new SymDouble(to));
 	}
 	
-	protected Expr clone() {
+	public Expr clone() {
 		try {
 			return (Expr) super.clone();
 		} catch (CloneNotSupportedException e) {
@@ -496,4 +522,124 @@ abstract public class Expr implements Cloneable {
     public boolean equals(Object obj) {
        return this.label.equals(((Expr)obj).label);
     }
+    
+////////////////////////////////////////////////////////////////////////////
+//	/**
+//	 * Assign the result of evaluating an expression to a local variable
+//	 * when compiling. The local variable must be a symbol which is declared 
+//	 * as a local variable.
+//	 * <p>
+//	 * The call of this function can be understand as
+//	 * Symbol symLocal; //Declared somewhere
+//	 * symLocal = this;
+//	 * 
+//	 * <p>
+//	 * Note: The name of a symbol is a global name. Make sure you don't have 
+//	 * two symbols with the same name, otherwise they are treated as the same
+//	 * symbol or local variable in compiled code.
+//	 * 
+//	 * @param symLocal A symbol declared as a local variable
+//	 * @return An instance of operator OPAsign
+//	 */
+//	public Expr assignTo(Symbol symLocal) {
+//		return new OPAsign(symLocal, this);
+//	}
+	
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		throw new UnsupportedOperationException();//il.append(InstructionConstants.NOP);
+	}
+
+	
+	/**
+	 * Reset the compile flags for an expression. 
+	 * 
+	 * For example, a matrix is defined and stored to new a local variable when it is referenced
+	 * at the first time. The following references of the matrix just load the local variable.
+	 * By calling this function, the state is reset to define a new local variable.
+	 */
+	public void bytecodeGenReset() {
+		
+	}
+	
+	public enum TYPE {INT, LONG, FLOAT, DOUBLE, BOOLEAN, BYTE, CHAR, SHORT, VOID,
+		MATRIX, VECTOR, TENSOR};
+
+	public abstract TypeInfo getTypeInfo();
+	
+	public TYPE getType() {
+		return getTypeInfo().type;
+	}
+	
+	public Expr assign(Expr expr) {
+		return new LCAssign(this, expr);
+	}
+	
+	public Expr assign(double val) {
+		return new LCAssign(this, Expr.valueOf(val));
+	}
+
+	public Expr assign(int val) {
+		return new LCAssign(this, Expr.valueOf(val));
+	}	
+/////////////////////////////////////////////////////////////////////////
+	
+	protected LCDevice device = null;
+	public Expr runOn(LCDevice dev) {
+		device = dev;
+		return this;
+	}
+	
+	public LCDevice getDevice() {
+		return device;
+	}
+	
+	/**
+	 * Set the argument of the current expression
+	 * Depends on the specific implementation
+	 * 
+	 * @param index The position of the argument
+	 * @param arg The expression of the argument
+	 * @return
+	 */
+	public Expr setArg(int index, Expr arg) {
+		throw new UnsupportedOperationException();
+	}
+	
+	abstract public void updateLabel();
+	
+	/**
+	 * Parent expression, for example: a sub-matrix or sub-vector has a parent 
+	 */
+	public Expr getParent() {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * Return the dimension of a vector
+	 * @return
+	 */
+	public int dim() {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * return the dimension of a matrix or tensor
+	 * @return
+	 */
+	public int[] dims() {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * return the element at index
+	 * @param index
+	 * @return
+	 */
+	public Expr get(int index) {
+		throw new UnsupportedOperationException();
+	}
 }
+

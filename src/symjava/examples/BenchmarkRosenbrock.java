@@ -7,14 +7,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import symjava.math.SymMath;
-import symjava.matrix.SymMatrix;
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprMatrix;
+import symjava.matrix.ExprVector;
 import symjava.numeric.NumMatrix;
 import symjava.numeric.NumVector;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Sum;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.Symbols;
+import symjava.symbolic.utils.JIT;
 import symjava.symbolic.utils.Utils;
 
 public class BenchmarkRosenbrock {
@@ -28,7 +29,7 @@ public class BenchmarkRosenbrock {
 		rosen  =  Sum.apply(100*pow(xi-xim1*xim1,2) + pow(1-xim1,2), i, 2, N);
 		//System.out.println("Rosenbrock function with N="+N+": "+rosen);
 
-		boolean debug = false;
+		boolean debug = true;
 		PrintWriter pw = null;
 		String genFileName = "benchmark-rosenbrock"+N+"-manual.cpp";
 		try {
@@ -40,8 +41,8 @@ public class BenchmarkRosenbrock {
 		
 		Expr[] freeVars = xi.get(1, N);
 		begin = System.currentTimeMillis();
-		SymVector grad = SymMath.grad(rosen);
-		SymMatrix hess = SymMath.hess(rosen);
+		ExprVector grad = SymMath.grad(rosen);
+		ExprMatrix hess = SymMath.hess(rosen);
 		end = System.currentTimeMillis();
 		double timeSym = (end-begin)/1000.0;
 		
@@ -229,7 +230,7 @@ public class BenchmarkRosenbrock {
 		writer.println("//g++ -O3 benchmark-rosenbrock-manual.cpp -o run");
 	}
 
-	public static void print_c_code(PrintWriter pw, SymVector grad) {
+	public static void print_c_code(PrintWriter pw, ExprVector grad) {
 		Symbol i = new Symbol("i");
 		Symbols xi = new Symbols("x", i);
 		pw.println("void grad_"+grad.dim()+"(double* args, double* outAry) {");
@@ -247,7 +248,7 @@ public class BenchmarkRosenbrock {
 		pw.println("}");
 	}
 	
-	public static void print_c_code(PrintWriter pw, SymMatrix hess) {
+	public static void print_c_code(PrintWriter pw, ExprMatrix hess) {
 		Symbol i = new Symbol("i");
 		Symbols xi = new Symbols("x", i);
 		pw.println("void hess_"+hess.rowDim()+"(double* args, double* outAry) {");
@@ -274,7 +275,7 @@ public class BenchmarkRosenbrock {
 	public static void main(String[] args) {
 		System.out.println("============Benchmark for Rosenbrock==============");
 		System.out.println("N|Symbolic Manipulaton|Compile Gradient|Eval Gradient|Compile Hessian|Eval Hessian|Grad CheckSum|Hess CheckSum|C Code Compile");
-		for(int N=5; N<850; N+=50)
+		for(int N=5; N<10; N+=50)
 			test(N);
 		//test(5000);//Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceeded
 	}

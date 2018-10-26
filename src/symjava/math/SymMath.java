@@ -1,7 +1,8 @@
 package symjava.math;
 
-import symjava.matrix.SymMatrix;
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprMatrix;
+import symjava.matrix.ExprVector;
+import symjava.symbolic.Abs;
 import symjava.symbolic.Cos;
 import symjava.symbolic.Exp;
 import symjava.symbolic.Expr;
@@ -12,15 +13,17 @@ import symjava.symbolic.Pow;
 import symjava.symbolic.Sin;
 import symjava.symbolic.Sqrt;
 import symjava.symbolic.SymConst;
+import symjava.symbolic.SymRandom;
 import symjava.symbolic.Tan;
+import symjava.symbolic.Vector;
 import symjava.symbolic.utils.Utils;
 
 public class SymMath {
 	/**
 	 * Pre defined constant symbols
 	 */
-	public static SymConst PI = new SymConst("\\pi", Math.PI);
-	public static SymConst PI2 = new SymConst("2\\pi", 2*Math.PI);
+	public static SymConst PI = new SymConst("pi", Math.PI);
+	public static SymConst PI2 = new SymConst("2*pi", 2*Math.PI);
 	public static SymConst E = new SymConst("e", Math.E);
 	
 	/**
@@ -112,19 +115,34 @@ public class SymMath {
 	
 	//////////////////////////////////////////////////////////////
 	
-	public static Expr dot(SymVector l, SymVector r) {
+	public static Expr random() {
+		return new SymRandom();
+	}
+	
+	public static Expr dot(Vector l, Vector r) {
 		return Dot.apply(l, r);
 	}
 	
-	public static Expr dot(double[] l, SymVector r) {
-		SymVector v = new SymVector(l, 0, r.dim());
+	public static Expr dot(ExprVector l, ExprVector r) {
+		return Dot.apply(l, r);
+	}
+	
+	public static Expr dot(double[] l, ExprVector r) {
+		ExprVector v = new ExprVector(l, 0, r.dim());
 		return Dot.apply(v, r);
 	}
 
-	public static Expr dot(SymVector l, double[] r) {
-		SymVector v = new SymVector(r, 0, l.dim());
+	public static Expr dot(ExprVector l, double[] r) {
+		ExprVector v = new ExprVector(r, 0, l.dim());
 		return Dot.apply(l, v);
 	}
+	
+	////////////////////////////////////////////////////////////////
+	public static Expr abs(Expr x) {
+		return Abs.simplifiedIns(x);
+	}
+	
+	
 	
 //	public static Expr dot(double[] l, double[] r) {
 //		double sum = 0.0;
@@ -159,7 +177,7 @@ public class SymMath {
 	 * @param f
 	 * @return
 	 */
-	public static SymVector grad(Expr f) {
+	public static ExprVector grad(Expr f) {
 		return Grad.apply(f);
 	}
 	
@@ -168,12 +186,12 @@ public class SymMath {
 	 * @param f
 	 * @return
 	 */
-	public static SymMatrix hess(Expr f) {
+	public static ExprMatrix hess(Expr f) {
 		Expr[] args = Utils.extractSymbols(f).toArray(new Expr[0]);
-		SymVector grad = Grad.apply(f, args);
-		SymMatrix mat = new SymMatrix();
+		ExprVector grad = Grad.apply(f, args);
+		ExprMatrix mat = new ExprMatrix();
 		for(Expr e : grad) {
-			mat.add(Grad.apply(e, args));
+			mat.append(Grad.apply(e, args));
 		}
 		return mat;
 	}

@@ -1,4 +1,5 @@
-### SymJava ###
+<<<<<<< HEAD
+# SymJava
 SymJava is a Java library for symbolic-numeric computation.
 
 There are two unique features which make SymJava different:
@@ -24,7 +25,6 @@ If you were using Futureye_JIT for academic research, you are encouraged to cite
 [Y. Liu, P. Zhang, M. Qiu, "Fast Numerical Evaluation for Symbolic Expressions in Java", 17th IEEE International Conference on High Performance and Communications (HPCC 2015), New York, USA, August 24-26, 2015.](http://ieeexplore.ieee.org/document/7336223/)
 
 [Y. Liu, P. Zhang, M. Qiu, "SNC: A Cloud Service Platform for Symbolic-Numeric Computation using Just-In-Time Compilation", IEEE Transactions on Cloud Computing, 2017](http://ieeexplore.ieee.org/abstract/document/7828007/)
-
 
 ### Examples ###
 
@@ -388,5 +388,7 @@ Output in Latex:
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_hessian.png)	
  Grad(L)=	
 ![](https://github.com/yuemingl/SymJava/blob/master/images/ex4_grad.png)	
+
+
  Example6: Finite Element Solver for Laplace Equation	
  ![](https://raw.githubusercontent.com/yuemingl/SymJava/master/images/ex6.png)

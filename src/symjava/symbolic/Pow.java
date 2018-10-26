@@ -1,31 +1,28 @@
 package symjava.symbolic;
 
 import java.util.List;
+import java.util.Map;
 
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
+
+import com.sun.org.apache.bcel.internal.Constants;
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class Pow extends BinaryOp {
 	
 	public Pow(Expr base, Expr exponent) {
 		super(base, exponent);
-		String displayExp = String.format("%s", this.arg2);
-		if(exponent instanceof SymReal<?>) {
-			SymReal<?> realExp = (SymReal<?>)exponent;
-			if(realExp.isInteger()) {
-				displayExp = String.format("%d", realExp.getIntValue());
-			}
-			if(realExp.isNegative())
-				displayExp = "{"+displayExp+"}";
-		}
-		if(base instanceof Symbol) {
-			label = base + "^" + displayExp + "";
-			label = "pow(" + base + ","+displayExp+")";
-		} else {
-			label = "("+base + ")^" + displayExp;
-		}
-		//TODO? x^3 + x^2 + x + 1
-		sortKey = base.getSortKey()+"power"+String.valueOf(displayExp);
+		updateLabel();
+	}
+	
+	public String toString() {
+		return "pow("+arg1+","+arg2+")";
 	}
 
 	public static Expr simplifiedIns(Expr base, Expr exponent) {
@@ -63,7 +60,7 @@ public class Pow extends BinaryOp {
 	public Expr diff(Expr expr) {
 		if(arg2 instanceof SymReal<?>) {
 			SymReal<?> realExp = (SymReal<?>)arg2;
-			return realExp.multiply(Pow.simplifiedIns(arg1, arg2 - 1)).multiply(arg1.diff(expr));
+			return realExp.multiply(Pow.simplifiedIns(arg1, arg2.subtract(1))).multiply(arg1.diff(expr));
 		} else {
 			Expr x = expr;
 			Expr b = arg1;
@@ -100,19 +97,66 @@ public class Pow extends BinaryOp {
 
 	@Override
 	public void flattenMultiply(List<Expr> outList) {
+		if(device != null) {
+			outList.add(this);
+		} else {
+			if(arg2 instanceof SymReal<?>) {
+				SymReal<?> realExp = (SymReal<?>)arg2;
+				if(realExp.isPositive()) {
+					double exp = realExp.getDoubleValue();
+					for(int i=0; i<(int)exp; i++)
+						outList.add(arg1);
+					double remain = exp - Math.floor(exp);
+					if(remain > 0.0) {
+						outList.add(simplifiedIns(arg1, Expr.valueOf(remain)));
+					}
+					return;
+				}
+			}
+			outList.add(this);
+		}
+	}
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
 		if(arg2 instanceof SymReal<?>) {
 			SymReal<?> realExp = (SymReal<?>)arg2;
-			if(realExp.isPositive()) {
-				double exp = realExp.getDoubleValue();
-				for(int i=0; i<(int)exp; i++)
-					outList.add(arg1);
-				double remain = exp - Math.floor(exp);
-				if(remain > 0.0) {
-					outList.add(simplifiedIns(arg1, Expr.valueOf(remain)));
-				}
-				return;
+			if(realExp.isInteger()) {
+				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "powi",
+						Type.DOUBLE, new Type[] { Type.DOUBLE, Type.INT }, Constants.INVOKESTATIC));
+				return startPos;
 			}
 		}
-		outList.add(this);
+		il.append(factory.createInvoke("java.lang.Math", "pow",
+				Type.DOUBLE, new Type[] { Type.DOUBLE, Type.DOUBLE }, Constants.INVOKESTATIC));
+		return startPos;
 	}
+
+	@Override
+	public void updateLabel() {
+		Expr base = arg1;
+		Expr exponent = arg2;
+//		String displayExp = exponent.toString();
+//		if(exponent instanceof SymReal<?>) {
+//			SymReal<?> realExp = (SymReal<?>)exponent;
+//			if(realExp.isInteger()) {
+//				displayExp = String.format("%d", realExp.getIntValue());
+//			}
+//			if(realExp.isNegative())
+//				displayExp = "{"+displayExp+"}";
+//		}
+//		if(base instanceof Symbol) {
+//			label = base + "^" + displayExp + "";
+//		} else {
+//			label = "("+base + ")^" + displayExp;
+//		}
+		//TODO? x^3 + x^2 + x + 1
+		label = "pow(" + base + ","+exponent+")";
+		sortKey = base.getSortKey()+"power"+exponent.getSortKey();
+		
+	}		
 }

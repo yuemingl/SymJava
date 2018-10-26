@@ -3,18 +3,18 @@ package symjava.bytecode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VecFuncs implements BytecodeVecFunc {
+public class VecFuncs implements BytecodeBatchFunc {
 	public static class FuncInfo {
-		BytecodeVecFunc func;
+		BytecodeBatchFunc func;
 		int outPos;
-		public FuncInfo(BytecodeVecFunc func, int outPos) {
+		public FuncInfo(BytecodeBatchFunc func, int outPos) {
 			this.func = func;
 			this.outPos = outPos;
 		}
 	}
 	List<FuncInfo> funInfo = new ArrayList<FuncInfo>();
 	
-	public void addFunc(BytecodeVecFunc func, int outPos) {
+	public void addFunc(BytecodeBatchFunc func, int outPos) {
 		funInfo.add(new FuncInfo(func, outPos));
 	}
 	

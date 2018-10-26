@@ -2,14 +2,33 @@ package symjava.relational;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import symjava.symbolic.Expr;
+import symjava.symbolic.Symbol;
+import symjava.symbolic.TypeInfo;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.utils.Utils;
 
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.DCMPL;
+import com.sun.org.apache.bcel.internal.generic.GOTO;
+import com.sun.org.apache.bcel.internal.generic.IFNE;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.NOP;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
+
 /**
- * An object of Eq represents an equation like
- * y = a*x+b
+ * This class has two meanings:
+ * <br>
+ * 1. Represents the relation: a == b
+ * <br>
+ * 2. An object of Eq also represents an equation. For example:
+ * <br>
+ * y == a*x+b
  * 
  */
 public class Eq extends BinaryOp implements Relation {
@@ -19,28 +38,52 @@ public class Eq extends BinaryOp implements Relation {
 	Expr[] unknowns; //freeVars + dependentVars, for example: x, y in y=a*x+b
 	
 	/**
-	 * Create an equation without any symbolic parameters except free variables
-	 * For example:
-	 * Eq eq = new Eq(y, 2*x+1); //y = 2*x+1
+	 * Create an equation without any symbolic parameters. 
+	 * The free variables and dependent variables are extracted 
+	 * from the lhs and rhs expressions automatically
 	 * 
+	 * Examples:
+	 * Eq eq1 = new Eq(y, 2*x+1);    // y = 2*x+1
+	 *   free variables: [x]
+	 *   dependent variables: [y]
+	 *   unknowns: [x,y]
+	 * Eq eq2 = new Eq(x^2-2*x+1,0); // x^2-2*x+1 = 0
+	 *   free variables: [x]
+	 *   dependent variables:
+	 *   unknowns: [x]
+	 * Eq eq3 = new Eq(cos(x), x); // cos(x) = x
+	 *   free variables: [x]
+	 *   dependent variables: [x]
+	 *   unknowns: [x]
+	 * Note: In definition of eq3, one may need to pass more parameters to exactly 
+	 *    define free variables and dependent variables 
+	 *   
 	 * @param lhs
 	 * @param rhs
 	 */
 	public Eq(Expr lhs, Expr rhs) {
 		super(lhs, rhs);
-		this.label = arg1 + " = " + arg2;
+		this.label = arg1 + " == " + arg2;
 		this.sortKey = this.label;
-		this.freeVars = Utils.extractSymbols(rhs).toArray(new Expr[0]);
 		this.params = new Expr[0];
-		this.dependentVars = Utils.extractSymbols(lhs).toArray(new Expr[0]);
-		computeUnknowns();
+		Expr[] rhsVars = Utils.extractSymbols(rhs).toArray(new Expr[0]);
+		Expr[] lhsVars = Utils.extractSymbols(lhs).toArray(new Expr[0]);
+		if(rhsVars.length == 0) {
+			this.freeVars = lhsVars;
+			this.dependentVars = new Expr[0];
+		} else {
+			this.freeVars = rhsVars;
+			this.dependentVars = lhsVars;
+		}
+		this.unknowns = Utils.extractSymbols(lhs, rhs).toArray(new Expr[0]);
 	}
 	
 	/**
-	 * Create an equation that may contain symbolic parameters on the right hand side
+	 * Create an equation that may contain symbolic parameters on the right hand side.
 	 * The free variables are specified by the parameter freeVars
-	 * The paramters on the right hand side of the equation can be extracted automatically.
-	 * For example:
+	 * The parameters on the right hand side of the equation are extracted automatically.
+	 * 
+	 * Examples:
 	 * Eq eq = Eq(y, a*x+b, new Expr[]{x}); 
 	 * This will create equation y=a*x+b with
 	 *   freeVars = [x]
@@ -54,7 +97,7 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars) {
 		super(lhs, rhs);
-		this.label = arg1 + " = " + arg2;
+		this.label = arg1 + " == " + arg2;
 		this.sortKey = this.label;
 		this.freeVars = freeVars;
 		List<Expr> list = Utils.extractSymbols(lhs, rhs);
@@ -97,7 +140,7 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params) {
 		super(lhs, rhs);
-		this.label = arg1 + " = " + arg2;
+		this.label = arg1 + " == " + arg2;
 		this.sortKey = this.label;
 		this.freeVars = freeVars;
 		this.params = params;
@@ -132,12 +175,26 @@ public class Eq extends BinaryOp implements Relation {
 	 */
 	public Eq(Expr lhs, Expr rhs, Expr[] freeVars, Expr[] params, Expr[] dependentVars) {
 		super(lhs, rhs);
-		this.label = arg1 + " = " + arg2;
+		this.label = arg1 + " == " + arg2;
 		this.sortKey = this.label;
 		this.freeVars = freeVars;
 		this.params = params;
 		this.dependentVars = dependentVars;
 		computeUnknowns();
+	}
+	
+	public String toString() {
+		String sFreeVars = "";
+		if(this.freeVars.length > 0) {
+			sFreeVars = ", array("+Utils.joinLabels(this.freeVars, ",")+")";
+		}
+		
+		String sParams = "";
+		if(this.params.length > 0) {
+			sParams += ", array("+Utils.joinLabels(this.params, ",")+")";
+		}
+		
+		return "eq("+arg1+", "+arg2+sFreeVars+sParams+")";
 	}
 	
 	private void computeUnknowns() {
@@ -157,7 +214,13 @@ public class Eq extends BinaryOp implements Relation {
 	public static Eq apply(double lhs, Expr rhs) {
 		return new Eq(Expr.valueOf(lhs), rhs);
 	}
+	public static Eq apply(int lhs, Expr rhs) {
+		return new Eq(Expr.valueOf(lhs), rhs);
+	}
 	public static Eq apply(Expr lhs, double rhs) {
+		return new Eq(lhs, Expr.valueOf(rhs));
+	}
+	public static Eq apply(Expr lhs, int rhs) {
 		return new Eq(lhs, Expr.valueOf(rhs));
 	}
 	
@@ -253,6 +316,15 @@ public class Eq extends BinaryOp implements Relation {
 		return dependentVars;
 	}
 	
+	public Expr[] getAllArgs() {
+		List<Expr> ret = new ArrayList<Expr>();
+		for(int i=0; i<this.params.length; i++)
+			ret.add(this.params[i]);
+		for(int i=0; i<this.unknowns.length; i++)
+			ret.add(this.unknowns[i]);
+		return ret.toArray(new Expr[0]);
+	}
+	
 	/**
 	 * TODO
 	 * @param var
@@ -278,6 +350,38 @@ public class Eq extends BinaryOp implements Relation {
 	@Override
 	public Expr diff(Expr expr) {
 		return new Eq(arg1.diff(expr), arg2.diff(expr), this.freeVars, this.params, this.dependentVars);
+	}
+
+	
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		il.append(new DCMPL());
+		InstructionHandle iconst1 = il.append(new PUSH(cp, 1));
+		InstructionHandle iconst0 = il.append(new PUSH(cp, 0));
+		InstructionHandle nop = il.append(new NOP());
+		il.insert(iconst1, new IFNE(iconst0));
+		il.insert(iconst0, new GOTO(nop));
+		return startPos;
+	}
+	
+	public void moveRHS2LHS() {
+		this.arg1 = this.arg1.subtract(this.arg2);
+		this.arg2 = Symbol.C0;
+	}
+	
+	@Override
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiInt;
+	}
+	
+	@Override
+	public void updateLabel() {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

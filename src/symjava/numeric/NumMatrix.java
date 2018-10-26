@@ -1,12 +1,12 @@
 package symjava.numeric;
 
-import symjava.bytecode.BytecodeVecFunc;
-import symjava.matrix.SymMatrix;
+import symjava.bytecode.BytecodeBatchFunc;
+import symjava.matrix.ExprMatrix;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
 public class NumMatrix {
-	BytecodeVecFunc func;
+	public BytecodeBatchFunc func;
 	int nRow;
 	int nCol;
 	double[] lastEvalData;
@@ -24,7 +24,7 @@ public class NumMatrix {
 		this.nCol = n;
 	}
 	
-	public NumMatrix(SymMatrix sm, Expr[] args) {
+	public NumMatrix(ExprMatrix sm, Expr[] args) {
 		this.nRow = sm.rowDim();
 		this.nCol = sm.colDim();
 		Expr[] exprs = new Expr[nRow*nCol];
@@ -34,7 +34,7 @@ public class NumMatrix {
 				exprs[idx++] = sm.get(i, j);
 			}
 		}
-		this.func = JIT.compile(args, exprs);
+		this.func = JIT.compileBatchFunc(args, exprs);
 	}
 	
 	public int rowDim() {

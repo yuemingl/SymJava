@@ -1,6 +1,23 @@
 package symjava.symbolic.utils;
 
-import static com.sun.org.apache.bcel.internal.Constants.*;
+import static com.sun.org.apache.bcel.internal.Constants.ACC_PUBLIC;
+import static com.sun.org.apache.bcel.internal.Constants.ACC_STATIC;
+import static com.sun.org.apache.bcel.internal.Constants.ACC_SUPER;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.D2F;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.D2I;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.D2L;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.F2D;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.F2I;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.F2L;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2B;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2C;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2D;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2F;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2L;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.I2S;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.L2D;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.L2F;
+import static com.sun.org.apache.bcel.internal.generic.InstructionConstants.L2I;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +27,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import symjava.bytecode.BytecodeFunc;
+import lambdacloud.core.lang.LCBoolean;
+import lambdacloud.core.lang.LCByte;
+import lambdacloud.core.lang.LCChar;
+import lambdacloud.core.lang.LCDouble;
+import lambdacloud.core.lang.LCFloat;
+import lambdacloud.core.lang.LCInt;
+import lambdacloud.core.lang.LCLong;
+import lambdacloud.core.lang.LCShort;
+import lambdacloud.core.lang.LCVar;
 import symjava.domains.Domain2D;
 import symjava.domains.Interval;
 import symjava.logic.And;
@@ -30,6 +55,7 @@ import symjava.symbolic.Add;
 import symjava.symbolic.Cos;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.Func;
 import symjava.symbolic.Infinity;
 import symjava.symbolic.Integrate;
@@ -42,9 +68,10 @@ import symjava.symbolic.Sin;
 import symjava.symbolic.Sqrt;
 import symjava.symbolic.Subtract;
 import symjava.symbolic.Sum;
+import symjava.symbolic.SymConst;
+import symjava.symbolic.SymRandom;
 import symjava.symbolic.SymReal;
 import symjava.symbolic.Symbol;
-import symjava.symbolic.SymConst;
 import symjava.symbolic.Tan;
 import symjava.symbolic.arity.BinaryOp;
 import symjava.symbolic.arity.NaryOp;
@@ -66,7 +93,6 @@ import com.sun.org.apache.bcel.internal.generic.DALOAD;
 import com.sun.org.apache.bcel.internal.generic.DASTORE;
 import com.sun.org.apache.bcel.internal.generic.DCMPL;
 import com.sun.org.apache.bcel.internal.generic.DDIV;
-import com.sun.org.apache.bcel.internal.generic.DLOAD;
 import com.sun.org.apache.bcel.internal.generic.DMUL;
 import com.sun.org.apache.bcel.internal.generic.DSTORE;
 import com.sun.org.apache.bcel.internal.generic.DSUB;
@@ -86,18 +112,15 @@ import com.sun.org.apache.bcel.internal.generic.ILOAD;
 import com.sun.org.apache.bcel.internal.generic.IOR;
 import com.sun.org.apache.bcel.internal.generic.ISTORE;
 import com.sun.org.apache.bcel.internal.generic.IXOR;
-import com.sun.org.apache.bcel.internal.generic.Instruction;
 import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
 import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
 import com.sun.org.apache.bcel.internal.generic.InstructionList;
 import com.sun.org.apache.bcel.internal.generic.LocalVariableGen;
 import com.sun.org.apache.bcel.internal.generic.MethodGen;
-import com.sun.org.apache.bcel.internal.generic.NEWARRAY;
 import com.sun.org.apache.bcel.internal.generic.NOP;
 import com.sun.org.apache.bcel.internal.generic.POP2;
 import com.sun.org.apache.bcel.internal.generic.PUSH;
-import com.sun.org.apache.bcel.internal.generic.SASTORE;
 import com.sun.org.apache.bcel.internal.generic.Type;
 
 public class BytecodeUtils {
@@ -151,6 +174,10 @@ public class BytecodeUtils {
 				
 			}
 		} else if(e instanceof NaryOp || e instanceof TernaryOp) {
+			Expr[] args = e.args();
+			for(int i=0; i<args.length; i++)
+				post_order(args[i], outList);
+		} else {
 			Expr[] args = e.args();
 			for(int i=0; i<args.length; i++)
 				post_order(args[i], outList);
@@ -229,7 +256,7 @@ public class BytecodeUtils {
 		} else {
 			fExprArgs = fun.args;
 		}
-		System.out.println(fun.getLabel()+": "+fun.getExpr());
+		System.out.println("JIT Compiled: "+fun.getLabel()+": "+fun.getExpr());
 		//System.out.println(Utils.joinLabels(fExprArgs, ","));
 		
 		HashMap<Expr, Integer> argsMap = new HashMap<Expr, Integer>();
@@ -258,12 +285,12 @@ public class BytecodeUtils {
 		return cg;
 	}
 	
-	public static ClassGen genClassBytecodeVecFunc(String className, List<Expr> exprs, List<Integer> outPos, Expr[] args, 
+	public static ClassGen genClassBytecodeBatchFunc(String className, List<Expr> exprs, List<Integer> outPos, Expr[] args, 
 			boolean writeClassFile, boolean staticMethod) {
 		String packageName = "symjava.bytecode";
 		String fullClsName = packageName+"."+className;
 		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",
-				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeVecFunc"});
+				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeBatchFunc"});
 		ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
 		InstructionList il = new InstructionList();
 		InstructionFactory factory = new InstructionFactory(cg);
@@ -295,10 +322,12 @@ public class BytecodeUtils {
 //		il.append(new PUSH(cp, exprs.length));
 //		il.append(new NEWARRAY(Type.DOUBLE));
 //		il.append(new ASTORE(retArray));
+		System.out.println("JIT compiling: class="+fullClsName);
 		for(int i=0; i<exprs.size(); i++) {
-			if(!Utils.symCompare(Symbol.C0, exprs[i])) {
+			if(!Utils.symCompare(Symbol.C0, exprs.get(i))) {
 				il.append(new ALOAD(1));
 				il.append(new PUSH(cp,outPos.get(i)));
+				System.out.println("JIT compiling: expr="+exprs.get(i));
 				addToInstructionList(mg, cp, factory, il, 3, exprs.get(i), args, argsMap);
 				il.append(new DASTORE());
 			}
@@ -334,12 +363,15 @@ public class BytecodeUtils {
 	 * @param staticMethod NOT supported
 	 * @return
 	 */
-	public static ClassGen genClassBytecodeBatchFunc(String className, Expr expr, Expr[] args,
+	public static ClassGen genClassBytecodeVecFunc(String className, Expr expr, Expr[] args,
 			boolean writeClassFile, boolean staticMethod) {
+		
+		System.out.println("JIT Batch: "+expr);
+
 		String packageName = "symjava.bytecode";
 		String fullClsName = packageName+"."+className;
 		ClassGen cg = new ClassGen(fullClsName, "java.lang.Object",
-				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeBatchFunc"});
+				"<generated>", ACC_PUBLIC | ACC_SUPER, new String[]{"symjava.bytecode.BytecodeVecFunc"});
 		ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
 		InstructionList il = new InstructionList();
 		InstructionFactory factory = new InstructionFactory(cg);
@@ -385,7 +417,10 @@ public class BytecodeUtils {
 		
 		//Loop body:
 		InstructionHandle loopStart = il.append(new ALOAD(1)); 
-		il.append(new ILOAD(idxI)); //outAry[i]
+		//outAry[i+outPos]
+		il.append(new ILOAD(idxI));
+		il.append(new ILOAD(2));
+		il.append(InstructionConstants.IADD);
 		
 		//Traverse the expression tree
 		List<Expr> insList = new ArrayList<Expr>();
@@ -538,6 +573,9 @@ public class BytecodeUtils {
 				il.append(factory.createInvoke("symjava.symbolic.utils.BytecodeSupport", "log",
 						Type.DOUBLE, new Type[] { Type.DOUBLE,  Type.DOUBLE }, Constants.INVOKESTATIC));
 //			}
+		} else if(ins instanceof SymRandom) {
+			il.append(factory.createInvoke("java.lang.Math", "random",
+					Type.DOUBLE, new Type[] { }, Constants.INVOKESTATIC));
 		} else if(ins instanceof Reciprocal) {
 			il.append(new DDIV());
 		} else if(ins instanceof Negate) {
@@ -751,7 +789,7 @@ public class BytecodeUtils {
 		List<Expr> insList = new ArrayList<Expr>();
 		post_order(expr, insList);
 		if(insList.size() == 0) {
-			throw new RuntimeException("Expressionis empty. Nothing to generate!");
+			throw new RuntimeException("Expression is empty. Nothing to generate!");
 		}
 
 		for(int insIndex=0; insIndex<insList.size(); insIndex++) {
@@ -775,4 +813,142 @@ public class BytecodeUtils {
 			il.append(new I2D());
 		}
 	}
+	
+	public static int declareLocal(LCVar var, MethodGen mg, InstructionList il) {
+		//variable name
+		//initial value
+		//index in local variable table (LVT)
+		if(var instanceof LCInt) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.INT, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new ISTORE(idx)));
+			return idx;
+		} else if(var instanceof LCLong) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.LONG, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.LCONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+			
+		} else if(var instanceof LCFloat) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.FLOAT, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.FCONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof LCDouble) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.DOUBLE, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.DCONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof LCBoolean) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.BOOLEAN, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof LCChar) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.CHAR, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof LCByte) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.BYTE, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		} else if(var instanceof LCShort) {
+			LocalVariableGen lg = mg.addLocalVariable(var.getLabel(),
+					Type.SHORT, null, null);
+			int idx = lg.getIndex();
+			il.append(InstructionConstants.ICONST_0);
+			lg.setStart(il.append(new DSTORE(idx)));
+			return idx;
+		}
+		throw new RuntimeException();
+	}
+
+	public static InstructionHandle typeCast(InstructionList il, TYPE fromType, TYPE toType) {
+		if(fromType != toType) {
+			switch(fromType) {
+			case INT: 
+				switch(toType) {
+					case LONG:
+						return il.append(I2L);
+					case FLOAT:
+						return il.append(I2F);
+					case DOUBLE:
+						return il.append(I2D);
+					case BYTE:
+						return il.append(I2B);
+					case CHAR:
+						return il.append(I2C);
+					case SHORT:
+						return il.append(I2S);
+					default:
+						return null;
+				}
+			case LONG:
+				switch(toType) {
+					case INT:
+						return il.append(L2I);
+					case FLOAT:
+						return il.append(L2F);
+					case DOUBLE:
+						return il.append(L2D);
+					default:
+						return null;
+				}
+			case FLOAT:
+				switch(toType) {
+					case INT:
+						return il.append(F2I);
+					case LONG:
+						return il.append(F2L);
+					case DOUBLE:
+						return il.append(F2D);
+					default:
+						return null;
+				}
+			case DOUBLE:
+				switch(toType) {
+					case INT:
+						return il.append(D2I);
+					case LONG:
+						return il.append(D2L);
+					case FLOAT:
+						return il.append(D2F);
+					default:
+						return null;
+				}
+			default:
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	public static InstructionHandle appendCMPL(InstructionList il, TYPE ty) {
+//		InstructionHandle startPos = null;
+//		switch(ty) {
+//			case INT: 
+//				startPos = il.append(new IF_ICMPLT());
+//				return startPos;
+//			default:
+				return null;
+//		}
+		
+	}
+	
 }

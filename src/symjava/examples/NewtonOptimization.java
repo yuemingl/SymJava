@@ -1,12 +1,13 @@
 package symjava.examples;
 
-import symjava.matrix.SymMatrix;
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprMatrix;
+import symjava.matrix.ExprVector;
 import symjava.numeric.NumMatrix;
 import symjava.numeric.NumVector;
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Symbol;
+import symjava.symbolic.utils.JIT;
 import Jama.Matrix;
 
 /**
@@ -23,8 +24,8 @@ public class NewtonOptimization {
 		int n = unknowns.length;
 		
 		//Construct Hessian Matrix
-		SymVector grad = new SymVector(n);
-		SymMatrix hess = new SymMatrix(n, n);
+		ExprVector grad = new ExprVector(n);
+		ExprMatrix hess = new ExprMatrix(n, n);
 		Expr L = eq.lhs();
 		for(int i=0; i<n; i++) {
 			grad[i] = L.diff(unknowns[i]);

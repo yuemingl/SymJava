@@ -1,11 +1,25 @@
 package symjava.symbolic;
 
+import java.util.Map;
+
 import symjava.symbolic.utils.Utils;
 
+import com.sun.org.apache.bcel.internal.generic.ALOAD;
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
+
 /**
- * An object of Symbol has a string name which is its unique id.
- * Two objects of Symbol with the same name are the same thing in SymJava. 
- * see method symEquals()
+ * An object of Symbol has a string name which is its unique id,
+ * just like the name of a variable in Java.
+ * 
+ * Two Symbol objects with the same name are treated as the same thing. 
+ * 
+ * @see symEquals()
  * 
  */
 public class Symbol extends Expr {
@@ -46,7 +60,6 @@ public class Symbol extends Expr {
 	
 	public static Infinity oo = new Infinity();
 	
-	
 	public Symbol(String name) {
 		this.label = name;
 		sortKey = label;
@@ -84,6 +97,9 @@ public class Symbol extends Expr {
 	}
 	
 	public String getPrefix() {
+		//TODO Fixit suport reduce
+		if(this.toString().equals("_")||this.toString().equals("__"))
+			return this.toString();
 		String[] ss = this.toString().split("_");
 		return ss[0];
 	}
@@ -103,4 +119,53 @@ public class Symbol extends Expr {
 		}
 		throw new IllegalArgumentException(this.getLabel()+" contains no sub index.");
 	}
+	
+//	/**
+//	 * Declare the symbol as a local variable when compiling an expression which
+//	 * contains this symbol. By default, a symbol is one of the arguments of 
+//	 * an instance of SymFunc. The declaration changes this default behavior of 
+//	 * the symbol. 
+//	 * 
+//	 * If a symbol is declared as a local variable it will be defined as 
+//	 * a local variable in the compiled function. The result of evaluation of the 
+//	 * associated expression is stored in this local variable.
+//	 * 
+//	 * @return
+//	 */
+//	public Expr declareAsLocal(Class<?> clazz) {
+//		this.isDeclaredAsLocal = true;
+//		return this;
+//	}
+	
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+//Note: local variable implementation has been moved to LCVar		
+//		if(this.isDeclaredAsLocal) {
+//			// Load from a local variable
+//			return il.append(new DLOAD(indexLVT));
+//		} else {
+			// Load from an array (argument or local array)
+			il.append(new ALOAD(argsStartPos));
+			il.append(new PUSH(cp, argsMap.get(this.label)));
+			return il.append(InstructionConstants.DALOAD);
+//		}
+	}
+	
+	@Override
+	public TypeInfo getTypeInfo() {
+		return TypeInfo.tiDouble;
+	}
+
+	@Override
+	public Expr[] args() {
+		return new Expr[0];
+	}
+
+	@Override
+	public void updateLabel() {
+	}
+
 }

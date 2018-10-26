@@ -17,17 +17,20 @@ public class Integrate extends Expr {
 	public Expr integrand = null;
 	public Domain domain = null;
 	
+	/**
+	 * \int_{domain}{integrand}
+	 * 
+	 * @param integrand
+	 * @param domain
+	 */
 	public Integrate(Expr integrand, Domain domain) {
 		this.integrand = integrand;
 		this.domain = domain;
-		String postfix = "d" + Utils.joinLabels(domain.getCoordVars(),"d");
-		if(domain instanceof Interval) {
-			Interval o = (Interval)domain;
-			this.label = "\\int_{"+o.getStart()+"}^{"+o.getEnd()+"}{"+integrand+"}" + postfix;
-		}
-		else
-			this.label = "\\int_{"+domain+"}{"+integrand+"}" + postfix;
-		this.sortKey = integrand.toString()+domain.toString();
+		updateLabel();
+	}
+	
+	public String toString() {
+		return "integrate("+integrand+","+domain+")";
 	}
 	
 	public static Expr apply(Expr integrand, Domain domain) {
@@ -63,6 +66,14 @@ public class Integrate extends Expr {
 				this.domain.transform(this.domain.getLabel()+"T", trans));
 	}
 	
+	/**
+	 * Change of Variables for the integration
+	 * 
+	 * @param subsList
+	 * @param jac
+	 * @param target
+	 * @return
+	 */
 	public Integrate changeOfVars(List<ExprPair> subsList, Expr jac, Domain target) {
 		Expr tmp = this.integrand;
 		for(ExprPair p : subsList) {
@@ -97,6 +108,29 @@ public class Integrate extends Expr {
 	
 	public boolean isMultipleIntegral() {
 		return this.domain.getConstraint() == null;
+	}
+
+	@Override
+	public Expr[] args() {
+		//DOTO
+		return integrand.args();
+	}
+
+	@Override
+	public TypeInfo getTypeInfo() {
+		return null;
+	}
+
+	@Override
+	public void updateLabel() {
+		String postfix = "d" + Utils.joinLabels(domain.getCoordVars(),"d");
+		if(domain instanceof Interval) {
+			Interval o = (Interval)domain;
+			this.label = "\\int_{"+o.getStart()+"}^{"+o.getEnd()+"}{"+integrand+"}" + postfix;
+		}
+		else
+			this.label = "\\int_{"+domain+"}{"+integrand+"}" + postfix;
+		this.sortKey = integrand.toString()+domain.toString();
 	}
 
 }

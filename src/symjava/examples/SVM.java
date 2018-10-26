@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import symjava.matrix.SymVector;
+import symjava.matrix.ExprVector;
 import symjava.relational.Eq;
 import symjava.symbolic.*;
 import symjava.symbolic.utils.AddList;
@@ -41,7 +41,7 @@ import static symjava.symbolic.Symbol.*;
 public class SVM extends JFrame {
 	private static final long serialVersionUID = 1L;
 	public SVM(double[][] data, double[] line) {
-		setTitle("Points");
+		setTitle("SymJava SVM Demo");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		add(new MyPanel(data, line));
 		setSize(350, 350);
@@ -58,27 +58,23 @@ public class SVM extends JFrame {
 		}
 		private void doDrawing(Graphics g) {
 			Graphics2D g2d = (Graphics2D) g;
-			g2d.setStroke(new BasicStroke(3));
+			g2d.setStroke(new BasicStroke(5));
 			Dimension size = getSize();
 			Insets insets = getInsets();
 			int w = size.width - insets.left - insets.right;
 			int h = size.height - insets.top - insets.bottom;
 			g2d.setColor(Color.blue);
 			for (int i = 0; i < data.length/2; i++) {
-				int x = (int)(data[i][0]*w/2);
-				int y = (int)(data[i][1]*h/2);
-				x += w/2;
-				y += h/2;
+				int x = (int)(data[i][0]*w);
+				int y = (int)(data[i][1]*h);
 				y = h - y;
 				//System.out.println(x+", "+y);
 				g2d.drawLine(x, y, x, y);
 			}
 			g2d.setColor(Color.red);
 			for (int i = data.length/2; i < data.length; i++) {
-				int x = (int)(data[i][0]*w/2);
-				int y = (int)(data[i][1]*h/2);
-				x += w/2;
-				y += h/2;
+				int x = (int)(data[i][0]*w);
+				int y = (int)(data[i][1]*h);
 				y = h - y;
 				//System.out.println(x+", "+y);
 				g2d.drawLine(x, y, x, y);
@@ -93,8 +89,8 @@ public class SVM extends JFrame {
 			double step = 1.0/N;
 			for(double xx=0.0; xx<1.0; xx+=step) {
 				double yy = (-c-a*xx)/b;
-				int x = (int)(xx*w/2 + w/2);
-				int y = (int)(yy*h/2 + h/2);
+				int x = (int)(xx*w);
+				int y = (int)(yy*h);
 				y = h - y;
 				//System.out.println(x+", "+y);
 				g2d.drawLine(x, y, x, y);
@@ -132,15 +128,15 @@ public class SVM extends JFrame {
 //		 // w=(1,0) b=-2
 //		double[] sol = solve(data, new double[]{0.1,0.0,-1});
 
-		double[][] data = new double[10][3];
+		double[][] data = new double[16][3];
 		for (int i = 0; i < data.length/2; i++) {
-			data[i][0] = 0.5*Math.random();
-			data[i][1] = 0.5*Math.random();
+			data[i][0] = Math.random();
+			data[i][1] = (0.9 - data[i][0])*Math.random();
 			data[i][2] = 1.0;
 		}
 		for (int i = data.length/2; i < data.length; i++) {
-			data[i][0] = 0.5+0.5*Math.random();
-			data[i][1] = 0.5+0.5*Math.random();
+			data[i][0] = Math.random();
+			data[i][1] = (1.1-data[i][0])+(data[i][0]-0.1)*Math.random();
 			data[i][2] = -1.0;
 		}
 		double[] init = new double[] { -1.0, -1.0, 0.1 };
@@ -160,40 +156,33 @@ public class SVM extends JFrame {
 
 	}
 
-	public static double[] solve(double[][] data, double[] init) {
-		int nFeatures = data[0].length - 1;
-		SymVector w = new SymVector("w", 1, nFeatures);
-		
-		Expr sumf = 0.5*dot(w, w);
-		System.out.println(sumf);
-
-		SymVector lmd = new SymVector("\\lambda", 1, data.length);
-		SymVector relax = new SymVector("c", 1, data.length);
-		AddList addList = new AddList();
-		for (int i = 0; i < data.length; i++) {
-			double yi = data[i][2];
-			double[] xi = data[i];
-			addList.add(lmd.get(i) * (yi * (dot(xi, w) + b) - 1 - relax.get(i)*relax.get(i)));
-		}
-		Expr sumg = addList.toExpr();
-		System.out.println(sumg);
-
-		Expr L = sumf - sumg;
-		Expr[] freeVars = Utils.joinArrays(
-				w.getData(), 
-				new Expr[]{b}, 
-				lmd.getData(), 
-				relax.getData()
-				);
-
-		Eq eq = new Eq(L, C0, freeVars);
-		System.out.println(eq);
-
-		double[] guess = new double[freeVars.length];
-		System.arraycopy(init, 0, guess, 0, init.length);
-
-		NewtonOptimization.solve(eq, guess, 10000, 1e-6, false);
-		return guess;
+public static double[] solve(double[][] data, double[] init) {
+	int nFeatures = data[0].length - 1;
+	ExprVector w = new ExprVector("w", 1, nFeatures);
+	
+	Expr sumf = 0.5*dot(w, w);
+	System.out.println(sumf);
+	
+	ExprVector lmd = new ExprVector("\\lambda", 1, data.length);
+	ExprVector c = new ExprVector("c", 1, data.length); //slack variable
+	AddList addList = new AddList();
+	for (int i = 0; i < data.length; i++) {
+		double[] xi = data[i];
+		double yi = data[i][2];
+		addList.add(lmd.get(i) * (yi * (dot(xi, w) + b) - 1 - c.get(i)*c.get(i)));
 	}
+	Expr sumg = addList.toExpr();
+	System.out.println(sumg);
+	
+	Expr L = sumf - sumg;
+	Expr[] freeVars = Utils.joinArrays(w.getData(), new Expr[]{b}, 	lmd.getData(), c.getData());
+	
+	Eq eq = new Eq(L, C0, freeVars);
+	double[] guess = new double[freeVars.length];
+	System.arraycopy(init, 0, guess, 0, init.length);
+	
+	NewtonOptimization.solve(eq, guess, 10000, 1e-6, false);
+	return guess;
+}
 
 }

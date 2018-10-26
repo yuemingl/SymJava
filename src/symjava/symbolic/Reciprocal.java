@@ -1,14 +1,23 @@
 package symjava.symbolic;
 
+import java.util.Map;
+
 import symjava.symbolic.arity.UnaryOp;
+import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
+
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 public class Reciprocal extends UnaryOp {
 
 	public Reciprocal(Expr base) {
 		super(base);
-		label =  "1/" +  SymPrinting.addParenthsesIfNeeded(base, this);		
-		sortKey = base.getSortKey();
+		updateLabel();
 	}
 	
 	@Override
@@ -23,7 +32,7 @@ public class Reciprocal extends UnaryOp {
 		if(arg instanceof Pow) {
 			Pow p = (Pow)arg.simplify();
 			p.isSimplified = true;
-			Expr rlt = Pow.simplifiedIns(p.arg1, -p.arg2);
+			Expr rlt = Pow.simplifiedIns(p.arg1, p.arg2.negate());
 			rlt.isSimplified = true;
 			return rlt;
 		}
@@ -59,5 +68,23 @@ public class Reciprocal extends UnaryOp {
 			return this;
 		return Reciprocal.simplifiedIns(arg.subs(from, to));
 	}
+	
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		InstructionHandle startPos = il.append(InstructionConstants.DCONST_1);
+		arg.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		BytecodeUtils.typeCast(il, arg.getType(), TYPE.DOUBLE);
+		il.append(InstructionConstants.DDIV);
+		return startPos;
+	}
 
+	@Override
+	public void updateLabel() {
+		label =  "1/" +  SymPrinting.addParenthsesIfNeeded(arg, this);		
+		sortKey = arg.getSortKey();
+	}
+	
 }

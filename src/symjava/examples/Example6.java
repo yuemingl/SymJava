@@ -16,7 +16,7 @@ import symjava.examples.fem.Node;
 import symjava.examples.fem.RefTriangle;
 import symjava.examples.fem.WeakForm;
 import symjava.math.Transformation;
-import symjava.matrix.SymMatrix;
+import symjava.matrix.ExprMatrix;
 import symjava.numeric.NumInt;
 import symjava.relational.Eq;
 import symjava.symbolic.Expr;
@@ -71,7 +71,8 @@ mesh.readGridGenMesh("triangle.grd");
 //Mark boundary nodes
 double eps = 0.01;
 for(Node n : mesh.nodes) {
-	if(Math.abs(3-Math.abs(n.coords[0]))<eps || Math.abs(3-Math.abs(n.coords[1]))<eps)
+	if(Math.abs(3-Math.abs(n.coords[0]))<eps || 
+			Math.abs(3-Math.abs(n.coords[1]))<eps)
 		n.setType(1);
 }
 Map<Integer, Double> diri = new HashMap<Integer, Double>();
@@ -94,7 +95,7 @@ solve(wf, mesh, diri, "triangle.dat");
 				);
 		// jac = (xr xs)
 		//       (yr ys)
-		SymMatrix jacMat = trans.getJacobianMatrix();
+		ExprMatrix jacMat = trans.getJacobianMatrix();
 		System.out.println(jacMat);
 		System.out.println();
 		
@@ -248,7 +249,7 @@ solve(wf, mesh, diri, "triangle.dat");
 	/**
 	 * Hard code the solver for
 	 * 
-	 * dot(grad(u), grad(v)) == (-2*(x*x+y*y)+36)*v)
+	 * dot(grad(u), grad(v)) == (-2*(x*x+y*y)+36)*v
 	 * 
 	 * @param mesh
 	 * @param dirichlet

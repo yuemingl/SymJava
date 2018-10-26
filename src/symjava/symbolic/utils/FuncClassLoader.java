@@ -1,7 +1,6 @@
 package symjava.symbolic.utils;
 
 import symjava.bytecode.BytecodeFunc;
-
 import com.sun.org.apache.bcel.internal.generic.ClassGen;
 
 public class FuncClassLoader<T> extends ClassLoader {

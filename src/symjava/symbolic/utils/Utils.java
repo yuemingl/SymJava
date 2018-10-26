@@ -8,9 +8,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lambdacloud.core.CloudSD;
 import symjava.symbolic.Add;
 import symjava.symbolic.Divide;
 import symjava.symbolic.Expr;
+import symjava.symbolic.Expr.TYPE;
 import symjava.symbolic.Func;
 import symjava.symbolic.Multiply;
 import symjava.symbolic.Negate;
@@ -18,6 +20,7 @@ import symjava.symbolic.Reciprocal;
 import symjava.symbolic.Subtract;
 import symjava.symbolic.Symbol;
 import symjava.symbolic.Symbols;
+import symjava.symbolic.Tensor;
 
 public class Utils {
 
@@ -55,7 +58,7 @@ public class Utils {
 		});
 		return exprs;
 	}
-	
+
 	public static List<Expr> sortExprs(List<Expr> list) {
 		Collections.sort(list, new Comparator<Expr>() {
 			@Override
@@ -150,10 +153,18 @@ public class Utils {
 	}
 	
 	public static Expr flattenSortAndSimplify(Expr expr) {
+//		//Don't simplify the expr if it is on a device
+//		if(expr.getDevice() != null)
+//			return expr;
 		List<Expr> addList = flattenAddAndSort(expr);
 		List<Expr> rlt = new ArrayList<Expr>();
 		for(int i=0; i<addList.size(); i++) {
 			Expr e = addList.get(i);
+//			//Don't simplify the expr if it is on a device
+//			if(e.getDevice() != null) {
+//				rlt.add(e);
+//				continue;
+//			}
 			List<Expr> mulList = flattenMultiplyAndSort(e);
 			if(mulList.size() == 1)
 				rlt.addAll(mulList);
@@ -294,13 +305,19 @@ public class Utils {
 		}		
 	}
 	
+//	public static void extractSymbols(Expr expr, Set<Expr> set) {
+//		for(Expr e : expr.args())
+//			extractSymbols(e, set);
+//		set.add(expr);
+//	}
+	
 	public static List<Expr> extractSymbols(Expr ...exprs) {
 		Set<Expr> set = new HashSet<Expr>();
 		List<Expr> list = new ArrayList<Expr>();
 		for(int i=0; i<exprs.length; i++) {
 			BytecodeUtils.post_order(exprs[i], list);
 			for(Expr e : list) {
-				if(e instanceof Symbol) {
+				if(e instanceof Symbol || e instanceof Tensor) {
 					set.add((Symbol)e);
 				} else if(e instanceof Symbols) {
 					set.add((Symbols)e);
@@ -317,6 +334,36 @@ public class Utils {
 		List<Expr> rlt = new ArrayList<Expr>();
 		rlt.addAll(set);
 		sortExprs(rlt);
+		return rlt;
+	}
+	
+	public static List<CloudSD> extractCloudSDs(Expr ...exprs) {
+		Set<Expr> set = new HashSet<Expr>();
+		List<Expr> list = new ArrayList<Expr>();
+		for(int i=0; i<exprs.length; i++) {
+			BytecodeUtils.post_order(exprs[i], list);
+			for(Expr e : list) {
+				if(e instanceof CloudSD) {
+					set.add((CloudSD)e);
+				}
+			}
+		}
+		List<Expr> rlt = new ArrayList<Expr>();
+		rlt.addAll(set);
+		sortExprs(rlt);
+		List<CloudSD> rlt2 = new ArrayList<CloudSD>();
+		for(Expr e : rlt) {
+			rlt2.add((CloudSD)e);
+		}
+		return rlt2;
+	}
+	
+	public static double[][] getDataFromCloudSDs(CloudSD[] cloudSDs) {
+		double[][] rlt = new double[cloudSDs.length][];
+		for(int i=0; i<cloudSDs.length; i++) {
+			if(cloudSDs[i].fetch())
+				rlt[i] = cloudSDs[i].getData();
+		}
 		return rlt;
 	}
 	
@@ -351,6 +398,22 @@ public class Utils {
 			sb.delete(sb.length()-deliminator.length(), sb.length());
 		return sb.toString();
 	}
+	
+	public static String joinLabels(String[] list, int startIdx, int endIdx, String deliminator) {
+		StringBuilder sb = new StringBuilder();
+		if(list == null) return null;
+		for(int i=startIdx; i<endIdx; i++) {
+			sb.append(list[i]);
+			sb.append(deliminator);
+		}
+		if(sb.length() > deliminator.length())
+			sb.delete(sb.length()-deliminator.length(), sb.length());
+		return sb.toString();
+	}
+
+	public static String joinLabels(String[] list, String deliminator) {
+		return joinLabels(list, 0, list.length, deliminator);
+	}
 
 	public static String joinLabels(List<Expr> list, String deliminator) {
 		return joinLabels(list.toArray(new Expr[0]), deliminator);
@@ -371,4 +434,24 @@ public class Utils {
 		return rlt;
 	}
 	
+	public static TYPE getConvertedType(TYPE t1, TYPE t2) {
+		if(t1 == t2) return t1;
+		if(t1 == TYPE.BOOLEAN || t2 == TYPE.BOOLEAN) {
+			if(t1 != TYPE.BOOLEAN || t2 != TYPE.BOOLEAN)
+				throw new RuntimeException();
+		}
+		if(t1 == TYPE.VOID || t2 == TYPE.VOID) {
+			if(t1 != TYPE.VOID || t2 != TYPE.VOID)
+				throw new RuntimeException();
+		}
+		if(t1 == TYPE.DOUBLE || t2 == TYPE.DOUBLE) return TYPE.DOUBLE;
+		if(t1 == TYPE.FLOAT || t2 == TYPE.FLOAT) return TYPE.FLOAT;
+		if(t1 == TYPE.LONG || t2 == TYPE.LONG) return TYPE.LONG;
+		if(t1 == TYPE.INT || t2 == TYPE.INT) return TYPE.INT;
+		if(t1 == TYPE.SHORT || t2 == TYPE.SHORT) return TYPE.SHORT;
+		if(t1 == TYPE.CHAR || t2 == TYPE.CHAR) return TYPE.CHAR;
+		if(t1 != TYPE.BOOLEAN && t2 != TYPE.BYTE)
+			throw new RuntimeException();
+		return t1; //TYPE.BYTE
+	}
 }

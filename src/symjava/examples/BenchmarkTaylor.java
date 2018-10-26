@@ -5,7 +5,7 @@ import static symjava.math.SymMath.*;
 
 import java.util.ArrayList;
 
-import symjava.bytecode.BytecodeBatchFunc;
+import symjava.bytecode.BytecodeVecFunc;
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
@@ -19,7 +19,7 @@ public class BenchmarkTaylor {
 		return rlt;
 	}
 	public static void main(String[] args) {
-		test();
+		//test();
 		testBatchEval();
 	}
 	
@@ -72,14 +72,14 @@ public class BenchmarkTaylor {
 			exprs.add(expr);
 		}
 		
-		ArrayList<BytecodeBatchFunc> funcs = new ArrayList<BytecodeBatchFunc>();
+		ArrayList<BytecodeVecFunc> funcs = new ArrayList<BytecodeVecFunc>();
 		int batchLen = 100000;
 		double[] outAry = new double[batchLen];
 		double[] args = new double[batchLen];
 		
 		for(int i=0; i<n; i++) {
 			Func func = new Func("func"+i, exprs.get(i));
-			BytecodeBatchFunc bfunc = JIT.compileBatchFunc(func.args(), func);
+			BytecodeVecFunc bfunc = JIT.compileVecFunc(func.args(), func);
 			funcs.add(bfunc);
 		}
 		
@@ -100,7 +100,7 @@ public class BenchmarkTaylor {
 			long end = System.currentTimeMillis();
 			System.out.println("Time: "+((end-begin)/1000.0)+" expr="+exprs.get(i));
 		}
-		System.out.println("Test Value="+out);		
+		System.out.println("Test Value="+out);
 	}
 
 }

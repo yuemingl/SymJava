@@ -1,16 +1,30 @@
 package symjava.examples;
 
-import symjava.relational.Ge;
-import symjava.relational.Le;
-import symjava.symbolic.*;
-import static symjava.math.SymMath.*;
-import static symjava.symbolic.Symbol.*;
+import static symjava.math.SymMath.PI;
+import static symjava.math.SymMath.exp;
+import static symjava.math.SymMath.log;
+import static symjava.math.SymMath.pow;
+import static symjava.math.SymMath.sin;
+import static symjava.math.SymMath.sqrt;
+import static symjava.symbolic.Symbol.a;
+import static symjava.symbolic.Symbol.b;
+import static symjava.symbolic.Symbol.c;
+import static symjava.symbolic.Symbol.d;
+import static symjava.symbolic.Symbol.t;
+import static symjava.symbolic.Symbol.x;
+import static symjava.symbolic.Symbol.y;
+import static symjava.symbolic.Symbol.z;
 import symjava.bytecode.BytecodeFunc;
 import symjava.domains.Domain;
 import symjava.domains.Domain2D;
 import symjava.domains.Domain3D;
 import symjava.domains.DomainND;
 import symjava.domains.Interval;
+import symjava.relational.Ge;
+import symjava.relational.Le;
+import symjava.symbolic.Expr;
+import symjava.symbolic.Integrate;
+import symjava.symbolic.Symbol;
 import symjava.symbolic.utils.JIT;
 
 
@@ -80,7 +94,6 @@ public class NumericalIntegration {
 		ans =
 		0.5679196
 		*/
-
 		Domain omega = new Domain2D("\\Omega", x, y)
 			.setConstraint( Le.apply((x-0.5)*(x-0.5) + (y-0.5)*(y-0.5), 0.25) )
 			.setBound(x, 0, 1) 
@@ -141,19 +154,20 @@ public class NumericalIntegration {
 	 * \Omega={ (x,y), where (x-1/2)^2 + (y-1/2)^2 <= 0.25 }
 	 */
 	public static void test_paper_example1() {
-Domain omega = new Domain2D("\\Omega", x, y)
-	.setBound(x, 0.5-sqrt(0.25-(y-0.5)*(y-0.5)), 0.5+sqrt(0.25-(y-0.5)*(y-0.5)))
-	.setBound(y, 0, 1)
-	.setStepSize(0.001);
-
-Expr I = Integrate.apply( sin(sqrt(log(x+y+1)) ), omega);
-System.out.println(I);
-
-BytecodeFunc fI = JIT.compile(I);
-System.out.println(fI.apply());
+		Domain omega = new Domain2D("\\Omega", x, y)
+			.setBound(x, 0.5-sqrt(0.25-(y-0.5)*(y-0.5)), 0.5+sqrt(0.25-(y-0.5)*(y-0.5)))
+			.setBound(y, 0, 1)
+			.setStepSize(0.001);
+		
+		Expr I = Integrate.apply( sin(sqrt(log(x+y+1)) ), omega);
+		System.out.println(I);
+		
+		BytecodeFunc fI = JIT.compile(I);
+		System.out.println(fI.apply());
 	}
 	
 	/**
+	 * Monte Carlo integration on an annulus.
 	 * I = \int_{\Omega} sin(sqrt(log(x+y+1))) dxdy
 	 * where 
 	 * \Omega= { (x,y), where
@@ -164,19 +178,19 @@ System.out.println(fI.apply());
 	 * a=0.25, b=0.5, c=0.75, d=1.0
 	 */
 	public static void test_paper_example2() {
+		Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
+		Domain omega = new Domain2D("\\Omega", x, y)
+			.setConstraint(
+					( Ge.apply(eq, a*a) & Le.apply(eq, b*b)) |
+					( Ge.apply(eq, c*c) & Le.apply(eq, d*d) ))
+			.setBound(x, 0, 1)
+			.setBound(y, 0, 1);
 		
-Expr eq = (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5);
-Domain omega = new Domain2D("\\Omega", x, y)
-	.setConstraint(
-			( Ge.apply(eq, a*a) & Le.apply(eq, b*b)) |
-			( Ge.apply(eq, c*c) & Le.apply(eq, d*d) )
-	).setBound(x, 0, 1).setBound(y, 0, 1);
-
-Expr I = Integrate.apply( sin(sqrt(log(x+y+1)) ), omega);
-System.out.println(I);
-
-BytecodeFunc fI = JIT.compile(new Expr[]{a, b, c, d}, I);
-System.out.println(fI.apply(0.25, 0.5, 0.75, 1.0));
+		Expr I = Integrate.apply(sin(sqrt(log(x+y+1)) ), omega);
+		System.out.println(I);
+		
+		BytecodeFunc fI = JIT.compile(new Expr[]{a, b, c, d}, I);
+		System.out.println(fI.apply(0.25, 0.5, 0.75, 1.0));
 		
 		test_paper_example_verifiy();
 	}

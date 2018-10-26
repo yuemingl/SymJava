@@ -14,14 +14,14 @@ import static symjava.symbolic.Symbol.*;
  *
  */
 public class Example4Old {
-	public static SymVector grad(Func f) {
-		SymVector g = new SymVector();
+	public static ExprVector grad(Func f) {
+		ExprVector g = new ExprVector();
 		for(Expr arg : f.args) {
 			g.add(f.diff(arg));
 		}
 		return g;
 	}
-	public static Expr dot(SymVector a, SymVector b) {
+	public static Expr dot(ExprVector a, ExprVector b) {
 		if(a.dim() != b.dim()) 
 			return null;
 		List<Expr> list = new ArrayList<Expr>();
@@ -40,8 +40,8 @@ public class Example4Old {
 	}
 	
 	//Functional grad
-	public static SymVector fgrad(Expr F, Expr[] fs, Expr[] dfs) {
-		SymVector g = new SymVector();
+	public static ExprVector fgrad(Expr F, Expr[] fs, Expr[] dfs) {
+		ExprVector g = new ExprVector();
 		for(int i=0; i<fs.length; i++) {
 			g.add(fdiff(F, fs[i], dfs[i]));
 		}
@@ -66,7 +66,7 @@ public class Example4Old {
 		Func chi = new Func("\\chi ", x,y,z);
 		Expr[] xs =  new Expr[]{u,   lamd, q   };
 		Expr[] dxs = new Expr[]{phi, psi,  chi };
-		SymVector Lx = fgrad(L, xs, dxs);
+		ExprVector Lx = fgrad(L, xs, dxs);
 		System.out.println("\nGradient Lx = (Lu, Llamd, Lq) =");
 		System.out.println(Lx);
 		
@@ -74,9 +74,9 @@ public class Example4Old {
 		Func dl = new Func("\\delta{\\lambda}", x,y,z);
 		Func dq = new Func("\\delta{q}", x,y,z);
 		Expr[] dxs2 = new Expr[] { du, dl, dq };
-		SymMatrix Lxx = new SymMatrix();
+		ExprMatrix Lxx = new ExprMatrix();
 		for(Expr Lxi : Lx) {
-			Lxx.add(fgrad(Lxi, xs, dxs2));
+			Lxx.append(fgrad(Lxi, xs, dxs2));
 		}
 		System.out.println("\nHessian Matrix =");
 		System.out.println(Lxx);

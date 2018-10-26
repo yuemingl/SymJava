@@ -2,9 +2,18 @@ package symjava.symbolic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import symjava.symbolic.arity.BinaryOp;
+import symjava.symbolic.utils.BytecodeUtils;
 import symjava.symbolic.utils.Utils;
+
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
 
 /**
  * 
@@ -14,10 +23,7 @@ import symjava.symbolic.utils.Utils;
 public class Divide extends BinaryOp {
 	public Divide(Expr numerator, Expr denominator) {
 		super(numerator, denominator);
-		label =  SymPrinting.addParenthsesIfNeeded(arg1, this) 
-				+ "/" + 
-				SymPrinting.addParenthsesIfNeeded2(arg2, this);
-		sortKey = arg1.getSortKey()+arg2.getSortKey();
+		updateLabel();
 	}
 	
 	public static Expr shallowSimplifiedIns(Expr numerator, Expr denominator) {
@@ -101,5 +107,34 @@ public class Divide extends BinaryOp {
 		//return Utils.flattenSortAndCompare(this, other);
 		return Utils.flattenSortAndCompare(this.simplify(), other.simplify());
 	}
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		InstructionHandle startPos = arg1.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
+		BytecodeUtils.typeCast(il, arg1.getType(), ty);
+		arg2.bytecodeGen(clsName, mg, cp, factory, il, argsMap, argsStartPos, funcRefsMap);
+		BytecodeUtils.typeCast(il, arg2.getType(), ty);
+		if(ty == TYPE.DOUBLE)
+			il.append(InstructionConstants.DDIV);
+		else if(ty == TYPE.INT)
+			il.append(InstructionConstants.IDIV);
+		else if(ty == TYPE.LONG)
+			il.append(InstructionConstants.LDIV);
+		else if(ty == TYPE.FLOAT)
+			il.append(InstructionConstants.FDIV);
+		else
+			il.append(InstructionConstants.IDIV);
+		return startPos;
+	}
 
+	@Override
+	public void updateLabel() {
+		label =  SymPrinting.addParenthsesIfNeeded(arg1, this) 
+				+ "/" + 
+				SymPrinting.addParenthsesIfNeeded2(arg2, this);
+		sortKey = arg1.getSortKey()+arg2.getSortKey();		
+	}
 }

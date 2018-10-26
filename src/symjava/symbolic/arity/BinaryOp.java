@@ -1,6 +1,8 @@
 package symjava.symbolic.arity;
 
 import symjava.symbolic.Expr;
+import symjava.symbolic.TypeInfo;
+import symjava.symbolic.utils.Utils;
 
 public abstract class BinaryOp extends Expr {
 	public Expr arg1;
@@ -26,5 +28,19 @@ public abstract class BinaryOp extends Expr {
 	
 	public Expr rhs() {
 		return arg2;
-	}	
+	}
+
+	@Override
+	public TypeInfo getTypeInfo() {
+		//TODO make it support matrix, vector and tensor?
+		TYPE ty = Utils.getConvertedType(arg1.getType(), arg2.getType());
+		return new TypeInfo(ty);
+	}
+	
+	public Expr setArg(int index, Expr arg) {
+		if(index == 0) arg1 = arg;
+		else if(index == 1) arg2 = arg;
+		updateLabel();
+		return this;
+	}
 }

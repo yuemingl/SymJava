@@ -1,14 +1,17 @@
 package symjava.symbolic;
 
+/**
+ * A symbol represents infinity
+ *
+ */
 public class Infinity extends Expr {
 	public Infinity() {
-		this.label = "oo";
-		this.sortKey = label;
+		updateLabel();
 	}
 
 	@Override
 	public Expr diff(Expr expr) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -19,5 +22,22 @@ public class Infinity extends Expr {
 	@Override
 	public boolean symEquals(Expr other) {
 		return false;
+	}
+
+	@Override
+	public Expr[] args() {
+		return null;
+	}
+
+	@Override
+	public TypeInfo getTypeInfo() {
+		//TODO
+		return null;
+	}
+
+	@Override
+	public void updateLabel() {
+		this.label = "oo";
+		this.sortKey = label;
 	}
 }

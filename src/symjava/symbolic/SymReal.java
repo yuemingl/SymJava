@@ -1,15 +1,28 @@
 package symjava.symbolic;
 
+import java.util.Map;
+
+import com.sun.org.apache.bcel.internal.generic.ConstantPoolGen;
+import com.sun.org.apache.bcel.internal.generic.InstructionFactory;
+import com.sun.org.apache.bcel.internal.generic.InstructionHandle;
+import com.sun.org.apache.bcel.internal.generic.InstructionList;
+import com.sun.org.apache.bcel.internal.generic.MethodGen;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
+
 import symjava.symbolic.utils.Utils;
 
+/**
+ * A SymReal object is a symbolic representation of a real number
+ *
+ * @param <T>
+ */
 public class SymReal<T extends Number> extends Expr {
 	protected T value;
 	
 	public SymReal(T val) {
 		this.value = val;
-		label = String.valueOf(val);
-		sortKey = label;
 		isSimplified = true;
+		updateLabel();
 	}
 
 	public T getValue() {
@@ -105,5 +118,38 @@ public class SymReal<T extends Number> extends Expr {
 		}
 		return false;
 	}
+	
+	@Override
+	public InstructionHandle bytecodeGen(String clsName, MethodGen mg,
+			ConstantPoolGen cp, InstructionFactory factory,
+			InstructionList il, Map<String, Integer> argsMap, int argsStartPos, 
+			Map<Expr, Integer> funcRefsMap) {
+		return il.append(new PUSH(cp, value));
+	}
+
+	@Override
+	public TypeInfo getTypeInfo() {
+		if(value instanceof Double)
+			return TypeInfo.tiDouble;
+		else if(value instanceof Integer)
+			return TypeInfo.tiInt;
+		else if(value instanceof Long)
+			return TypeInfo.tiLong;
+		else if(value instanceof Float)
+			return TypeInfo.tiFloat;
+		else 
+			throw new RuntimeException();
+	}
+
+	@Override
+	public Expr[] args() {
+		return new Expr[0];
+	}
+
+	@Override
+	public void updateLabel() {
+		label = String.valueOf(value);
+		sortKey = label;
+	}	
 
 }

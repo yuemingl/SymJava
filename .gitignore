@@ -1,3 +1,3 @@
 /bin
-benchmark-rosenbrock*-manual.cpp
+benchmark-rosenbrock[0-9]*-manual.cpp
 run[0-9]*
