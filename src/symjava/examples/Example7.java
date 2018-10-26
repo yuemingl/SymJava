@@ -144,6 +144,8 @@ public class Example7 {
 		
 		List<Expr> addList = normalizeTerms(pde.lhs());
 		//Change of variables
+		System.out.println("Start change of variable...");
+		long begin = System.currentTimeMillis();
 		for(Expr term : addList) {
 			Integrate intTerm = (Integrate)term; // Integration term
 			//Integrate on the domain
@@ -206,9 +208,12 @@ public class Example7 {
 				}
 			}
 		}
+		System.out.println("Change of variable done! Time: "+(System.currentTimeMillis()-begin)+"ms");
 
 		//Generate bytecode for the integration
 		//You can save the class to some place for later use
+		System.out.println("Start generating bytecode...");
+		begin = System.currentTimeMillis();
 		NumInt lhsNInt[][] = new NumInt[shapeFuns.length][shapeFuns.length];
 		NumInt lhsNIntB[][] = new NumInt[shapeFunsB.length][shapeFunsB.length];
 		NumInt rhsNInt[] = new NumInt[shapeFuns.length];
@@ -223,10 +228,11 @@ public class Example7 {
 //				lhsNIntB[i][j] = new NumInt(lhsIntB[i][j]);
 //			}
 //		}
+		System.out.println("Bytecode gen done! Time: "+(System.currentTimeMillis()-begin)+"ms");
 
 		//Assemble the system
 		System.out.println("Start assemble the system...");
-		long begin = System.currentTimeMillis();
+		begin = System.currentTimeMillis();
 		double[][] matA = new double[mesh.nodes.size()][mesh.nodes.size()];
 		double[] vecb = new double[mesh.nodes.size()];
 		for(Domain d : mesh.getSubDomains()) {

@@ -245,4 +245,31 @@ public class Session {
 		}
 		return root.func.apply(args);
 	}
+	
+	public CloudSD[] runSelect(Expr expr, Map<String, double[]> dict) {
+		GraphBuilder gb = new GraphBuilder(config);
+		Node n = gb.build(expr);
+		return runSelelct(n, dict);
+	}
+	
+	public CloudSD[] runSelect(Node root, Map<String, double[]> dict) {
+		double[] args = new double[root.args.size()];
+		
+		for(int i=0; i<root.args.size(); i++) {
+			Double d = dict.get(root.args.get(i).toString());
+			if(d == null) {
+				Node child = root.children.get(root.args.get(i).toString());
+				args[i] = runSimple(child, dict);
+			} else {
+				args[i] = d;
+			}
+		}
+		
+		CloudSD input = new CloudSD().init(args);
+		CloudSD output = new CloudSD();
+		root.cfunc.apply(output, input);
+		//Will block
+		output.fetch();
+		return output.getData(0);
+	}
 }
