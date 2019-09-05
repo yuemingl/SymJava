@@ -28,11 +28,11 @@ If you were using Futureye_JIT for academic research, you are encouraged to cite
 ### Examples ###
 
 ```Java
-package symjava.examples;
+package io.lambdacloud.symjava.examples;
 
-import static symjava.symbolic.Symbol.*;
-import symjava.bytecode.BytecodeFunc;
-import symjava.symbolic.*;
+import static io.lambdacloud.symjava.symbolic.Symbol.*;
+import io.lambdacloud.symjava.bytecode.BytecodeFunc;
+import io.lambdacloud.symjava.symbolic.*;
 
 /**
  * This example uses Java Operator Overloading for symbolic computation. 
@@ -59,11 +59,11 @@ public class Example1 {
 ```
 
 ```Java
-package symjava.examples;
+package io.lambdacloud.symjava.examples;
 
-import symjava.relational.Eq;
-import symjava.symbolic.Symbol;
-import static symjava.symbolic.Symbol.*;
+import io.lambdacloud.symjava.relational.Eq;
+import io.lambdacloud.symjava.symbolic.Symbol;
+import static io.lambdacloud.symjava.symbolic.Symbol.*;
 
 
 public class Example2 {
@@ -172,12 +172,12 @@ a=7.99883 b=10.00184 c=16.32401
 ```
 
 ```Java
-package symjava.examples;
+package io.lambdacloud.symjava.examples;
 
 import Jama.Matrix;
-import symjava.matrix.*;
-import symjava.relational.Eq;
-import symjava.symbolic.Expr;
+import io.lambdacloud.symjava.matrix.*;
+import io.lambdacloud.symjava.relational.Eq;
+import io.lambdacloud.symjava.symbolic.Expr;
 
 /**
  * A general Gauss Newton solver using SymJava for simbolic computations
@@ -231,11 +231,11 @@ public class GaussNewton {
 ```
 
 ```Java
-package symjava.examples;
+package io.lambdacloud.symjava.examples;
 
-import static symjava.symbolic.Symbol.*;
-import symjava.relational.Eq;
-import symjava.symbolic.*;
+import static io.lambdacloud.symjava.symbolic.Symbol.*;
+import io.lambdacloud.symjava.relational.Eq;
+import io.lambdacloud.symjava.symbolic.*;
 
 public class Example3 {
 	
@@ -337,10 +337,10 @@ y_0=0.02314 y_1=0.09356 y_2=0.15671 y_3=0.19159 y_4=0.25059 y_5=0.29598 y_6=0.31
 ```
 
 ```Java	
-package symjava.examples;	
- import static symjava.symbolic.Symbol.*;	
-import symjava.matrix.*;	
-import symjava.symbolic.*;	
+package io.lambdacloud.symjava.examples;	
+ import static io.lambdacloud.symjava.symbolic.Symbol.*;	
+import io.lambdacloud.symjava.matrix.*;	
+import io.lambdacloud.symjava.symbolic.*;	
  /**	
  * Example for PDE Constrained Parameters Optimization	
  *	
